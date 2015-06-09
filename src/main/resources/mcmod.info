@@ -1,0 +1,16 @@
+[
+{
+  "modid": "enderRift",
+  "name": "Ender-Rift",
+  "description": "The Powered Bottomless Storage System",
+  "version": "${version}",
+  "mcversion": "${mcversion}",
+  "url": "",
+  "updateUrl": "",
+  "authorList": ["gigaherz"],
+  "credits": "",
+  "logoFile": "",
+  "screenshots": [],
+  "dependencies": []
+}
+]
