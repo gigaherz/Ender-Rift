@@ -1,17 +1,21 @@
 package gigaherz.enderRift;
 
+import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLInterModComms;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
+import cpw.mods.fml.common.network.NetworkRegistry;
+import cpw.mods.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import gigaherz.enderRift.blocks.BlockEnderRift;
 import gigaherz.enderRift.blocks.TileEnderRift;
 import gigaherz.enderRift.items.ItemEnderRift;
+import gigaherz.enderRift.network.ValueUpdate;
 import net.minecraft.block.Block;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.init.Blocks;
@@ -26,6 +30,8 @@ public class EnderRiftMod {
     public static final String MODID = "enderRift";
     public static final String VERSION = "1.0";
 
+    public static final String CHANNEL = "EnderRift";
+
     public static Block blockEnderRift;
     public static Item itemEnderRift;
     public static CreativeTabs tabEnderRift;
@@ -36,7 +42,14 @@ public class EnderRiftMod {
     @SidedProxy(clientSide = "gigaherz.enderRift.client.ClientProxy", serverSide = "gigaherz.enderRift.CommonProxy")
     public static CommonProxy proxy;
 
+    public static SimpleNetworkWrapper channel;
+
     public static final Logger logger = LogManager.getLogger(MODID);
+
+    private void registerNetworkStuff() {
+        channel = NetworkRegistry.INSTANCE.newSimpleChannel(CHANNEL);
+        channel.registerMessage(ValueUpdate.Handler.class, ValueUpdate.class, 0, Side.CLIENT);
+    }
 
     @EventHandler
     public void preInit(FMLPreInitializationEvent event) {
@@ -57,6 +70,10 @@ public class EnderRiftMod {
         GameRegistry.registerBlock(blockEnderRift, "blockEnderRift");
 
         GameRegistry.registerTileEntity(TileEnderRift.class, "tileEnderRift");
+
+        registerNetworkStuff();
+
+
     }
 
     @EventHandler

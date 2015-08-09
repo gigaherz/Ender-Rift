@@ -3,8 +3,6 @@ item.itemEnderRift.name=Ender-Rift Orb
 
 itemGroup.tabEnderRift=Ender-Rift
 
-text.blockEnderRift.waila.numPages=%s active pages.
 text.blockEnderRift.waila.usedSlots=%s / %s slots used.
-text.blockEnderRift.waila.energyStorage=%s / %s RF
 text.blockEnderRift.waila.energyUsageInsert=%s RF used by next insertion.
 text.blockEnderRift.waila.energyUsageExtract=%s RF used by next extraction.

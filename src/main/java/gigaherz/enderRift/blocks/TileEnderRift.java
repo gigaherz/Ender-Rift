@@ -1,14 +1,14 @@
 package gigaherz.enderRift.blocks;
 
 import cofh.api.energy.IEnergyReceiver;
+import cpw.mods.fml.common.network.NetworkRegistry;
+import gigaherz.enderRift.EnderRiftMod;
+import gigaherz.enderRift.network.ValueUpdate;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
-import net.minecraft.network.NetworkManager;
-import net.minecraft.network.Packet;
-import net.minecraft.network.play.server.S35PacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.common.util.ForgeDirection;
@@ -27,99 +27,61 @@ public class TileEnderRift
     public static final float PowerPerExtractionConstant = 1;
     public static final float PowerPerExtractionLinear = 0;
 
-    public static final int SlotsPerPage = 27;
+    public static int BroadcastRange = 256;
 
-    private List<ItemStack[]> inventoryPages;
+    private final List<ItemStack> inventorySlots = new ArrayList<ItemStack>();
 
     public final int energyLimit = 100000;
     public int energyBuffer = 0;
 
-    public TileEnderRift() {
-        inventoryPages = new ArrayList<ItemStack[]>();
-    }
-
     public int getEnergyInsert() {
-        return (int) Math.ceil(PowerPerInsertionConstant + (inventoryPages.size() * PowerPerInsertionLinear));
+        return (int) Math.ceil(PowerPerInsertionConstant + (inventorySlots.size() * PowerPerInsertionLinear));
     }
 
     public int getEnergyExtract() {
-        return (int) Math.ceil(PowerPerExtractionConstant + (inventoryPages.size() * PowerPerExtractionLinear));
-    }
-
-    public int getPageCount() {
-        return inventoryPages.size();
+        return (int) Math.ceil(PowerPerExtractionConstant + (inventorySlots.size() * PowerPerExtractionLinear));
     }
 
     public int countInventoryStacks() {
         int count = 0;
-        for (ItemStack[] page : inventoryPages) {
-            for (ItemStack stack : page) {
-                if (stack != null)
-                    count++;
-            }
+        for (ItemStack stack : inventorySlots) {
+            if (stack != null)
+                count++;
         }
         return count;
     }
 
     @Override
     public int getSizeInventory() {
-        return (inventoryPages.size() + 1) * SlotsPerPage;
+        return inventorySlots.size() + 1;
     }
 
     @Override
     public ItemStack getStackInSlot(int slotIndex) {
 
-        int page = slotIndex / SlotsPerPage;
-        int slot = slotIndex % SlotsPerPage;
-
-        if (page >= inventoryPages.size())
+        if (slotIndex >= inventorySlots.size())
             return null;
 
-        ItemStack[] inventory = inventoryPages.get(page);
-
-        return inventory[slot];
+        return inventorySlots.get(slotIndex);
     }
 
     private void setStackInSlotInternal(int slotIndex, ItemStack stack) {
 
-        int page = slotIndex / SlotsPerPage;
-        int slot = slotIndex % SlotsPerPage;
-
-        while (page >= inventoryPages.size()) {
-            inventoryPages.add(new ItemStack[SlotsPerPage]);
+        if(slotIndex >= inventorySlots.size())
+        {
+            inventorySlots.add(stack);
+            return;
         }
 
-        ItemStack[] inventory = inventoryPages.get(page);
-
-        inventory[slot] = stack;
-
-        this.markDirty();
+        inventorySlots.set(slotIndex, stack);
     }
 
     private void removeStackFromSlotInternal(int slotIndex) {
 
-        int page = slotIndex / SlotsPerPage;
-        int slot = slotIndex % SlotsPerPage;
-
-        if (page >= inventoryPages.size())
+        if (slotIndex >= inventorySlots.size())
             return;
 
-        ItemStack[] inventory = inventoryPages.get(page);
-
-        inventory[slot] = null;
-
-        if (isPageEmpty(inventory))
-            inventoryPages.remove(page);
-
-        this.markDirty();
-    }
-
-    private boolean isPageEmpty(ItemStack[] inventory) {
-        for (ItemStack stack : inventory) {
-            if (stack != null)
-                return false;
-        }
-        return true;
+        inventorySlots.remove(slotIndex);
     }
 
     @Override
@@ -220,14 +182,13 @@ public class TileEnderRift
         super.readFromNBT(nbtTagCompound);
         NBTTagList nbtTagList = nbtTagCompound.getTagList("Items", Constants.NBT.TAG_COMPOUND);
 
-        inventoryPages.clear();
+        inventorySlots.clear();
 
         for (int i = 0; i < nbtTagList.tagCount(); ++i) {
             NBTTagCompound nbtTagCompound1 = nbtTagList.getCompoundTagAt(i);
-            int p = nbtTagCompound1.getInteger("Page") & 255;
-            int j = nbtTagCompound1.getByte("Slot") & 255;
+            int j = nbtTagCompound1.getByte("Slot");
 
-            setStackInSlotInternal(p * SlotsPerPage + j, ItemStack.loadItemStackFromNBT(nbtTagCompound1));
+            setStackInSlotInternal(j, ItemStack.loadItemStackFromNBT(nbtTagCompound1));
         }
 
         energyBuffer = nbtTagCompound.getInteger("Energy");
@@ -237,17 +198,13 @@ public class TileEnderRift
         super.writeToNBT(nbtTagCompound);
         NBTTagList nbtTagList = new NBTTagList();
 
-        for (int j = 0; j < inventoryPages.size(); j++) {
-            ItemStack[] page = inventoryPages.get(j);
-            for (int i = 0; i < page.length; ++i) {
-                ItemStack stack = page[i];
-                if (stack != null) {
-                    NBTTagCompound nbtTagCompound1 = new NBTTagCompound();
-                    nbtTagCompound1.setInteger("Page", j);
-                    nbtTagCompound1.setByte("Slot", (byte) i);
-                    stack.writeToNBT(nbtTagCompound1);
-                    nbtTagList.appendTag(nbtTagCompound1);
-                }
+        for (int i = 0; i < getSizeInventory(); ++i) {
+            ItemStack stack = getStackInSlot(i);
+            if (stack != null) {
+                NBTTagCompound nbtTagCompound1 = new NBTTagCompound();
+                nbtTagCompound1.setInteger("Slot", i);
+                stack.writeToNBT(nbtTagCompound1);
+                nbtTagList.appendTag(nbtTagCompound1);
             }
         }
 
@@ -256,24 +213,14 @@ public class TileEnderRift
     }
 
     @Override
-    public Packet getDescriptionPacket() {
-        NBTTagCompound tag = new NBTTagCompound();
-        writeToNBT(tag);
-        return new S35PacketUpdateTileEntity(xCoord, yCoord, zCoord, 0, tag);
-    }
-
-    @Override
-    public void onDataPacket(NetworkManager net, S35PacketUpdateTileEntity packet) {
-        super.onDataPacket(net, packet);
-        readFromNBT(packet.func_148857_g());
-        worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
-    }
-
-    @Override
     public int receiveEnergy(ForgeDirection from, int maxReceive, boolean simulate) {
         int receive = Math.min(maxReceive, energyLimit - energyBuffer);
         if (!simulate)
             energyBuffer += receive;
+
+        int dim = worldObj.provider.dimensionId;
+        EnderRiftMod.channel.sendToAllAround(new ValueUpdate(this, 0, energyBuffer), new NetworkRegistry.TargetPoint(dim, xCoord, yCoord, zCoord, BroadcastRange));
+        this.markDirty();
         return receive;
     }
 
@@ -292,4 +239,10 @@ public class TileEnderRift
         return true;
     }
 
+    public void updateValue(int barIndex, int barValue) {
+        if(barIndex == 0)
+        {
+            energyBuffer = barValue;
+        }
+    }
 }

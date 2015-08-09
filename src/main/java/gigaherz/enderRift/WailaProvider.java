@@ -30,17 +30,11 @@ public class WailaProvider implements IWailaDataProvider {
     public List<String> getWailaBody(ItemStack itemStack, List<String> currenttip, IWailaDataAccessor accessor, IWailaConfigHandler config) {
 
         if (config.getConfig("enderRift.block")) {
-            TileEnderRift rift = (TileEnderRift) accessor.getTileEntity();
+            NBTTagCompound tag = accessor.getNBTData();
 
-            int usedSlots = rift.countInventoryStacks();
-            int exposedSlots = rift.getSizeInventory();
-            int numPages = rift.getPageCount() / TileEnderRift.SlotsPerPage;
-
-            currenttip.add(StatCollector.translateToLocalFormatted("text.blockEnderRift.waila.numPages", numPages));
-            currenttip.add(StatCollector.translateToLocalFormatted("text.blockEnderRift.waila.usedSlots", usedSlots, exposedSlots));
-            currenttip.add(StatCollector.translateToLocalFormatted("text.blockEnderRift.waila.energyStorage", rift.energyBuffer, rift.energyLimit));
-            currenttip.add(StatCollector.translateToLocalFormatted("text.blockEnderRift.waila.energyUsageInsert", rift.getEnergyInsert()));
-            currenttip.add(StatCollector.translateToLocalFormatted("text.blockEnderRift.waila.energyUsageExtract", rift.getEnergyExtract()));
+            currenttip.add(StatCollector.translateToLocalFormatted("text.blockEnderRift.waila.usedSlots", tag.getInteger("usedSlots"), tag.getInteger("exposedSlots")));
+            currenttip.add(StatCollector.translateToLocalFormatted("text.blockEnderRift.waila.energyUsageInsert", tag.getInteger("energyInsert")));
+            currenttip.add(StatCollector.translateToLocalFormatted("text.blockEnderRift.waila.energyUsageExtract", tag.getInteger("energyExtract")));
         }
 
         return currenttip;
@@ -62,7 +56,10 @@ public class WailaProvider implements IWailaDataProvider {
 
         TileEnderRift rift = (TileEnderRift) te;
 
-        rift.writeToNBT(tag);
+        tag.setInteger("usedSlots", rift.countInventoryStacks());
+        tag.setInteger("exposedSlots", rift.getSizeInventory());
+        tag.setInteger("energyInsert", rift.getEnergyInsert());
+        tag.setInteger("energyExtract", rift.getEnergyExtract());
 
         return tag;
     }

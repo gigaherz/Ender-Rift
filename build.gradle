@@ -22,7 +22,7 @@ group= "gigaherz.enderRift" // http://maven.apache.org/guides/mini/guide-naming-
 archivesBaseName = "EnderRift"
 
 minecraft {
-    version = "1.7.10-10.13.3.1428-1.7.10"
+    version = "1.7.10-10.13.4.1492-1.7.10"
     runDir = "eclipse"
 }
 
@@ -59,3 +59,5 @@ processResources
         exclude 'mcmod.info'
     }
 }
+
+idea { module.inheritOutputDirs = true }
