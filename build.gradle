@@ -17,13 +17,16 @@ buildscript {
 
 apply plugin: 'forge'
 
-version = "1.0"
+version = "0.1"
 group= "gigaherz.enderRift" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "EnderRift"
 
 minecraft {
     version = "1.7.10-10.13.4.1492-1.7.10"
     runDir = "eclipse"
+
+    replace "@VERSION@", project.version
+    replaceIn "EnderRiftMod.java"
 }
 
 dependencies {
