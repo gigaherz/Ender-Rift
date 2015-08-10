@@ -9,9 +9,11 @@ import net.minecraft.world.World;
 
 public class BlockEnderRift
         extends Block
-        implements ITileEntityProvider {
+        implements ITileEntityProvider
+{
 
-    public BlockEnderRift() {
+    public BlockEnderRift()
+    {
         super(Material.rock);
         this.setTickRandomly(true);
         this.setCreativeTab(EnderRiftMod.tabEnderRift);
@@ -19,7 +21,8 @@ public class BlockEnderRift
     }
 
     @Override
-    public TileEntity createNewTileEntity(World p_149915_1_, int p_149915_2_) {
+    public TileEntity createNewTileEntity(World p_149915_1_, int p_149915_2_)
+    {
         return new TileEnderRift();
     }
 }

@@ -10,7 +10,8 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.DimensionManager;
 
 public class ValueUpdate
-        implements IMessage {
+        implements IMessage
+{
 
     int dim;
     int posX;
@@ -20,10 +21,12 @@ public class ValueUpdate
     public int barIndex;
     public int barValue;
 
-    public ValueUpdate() {
+    public ValueUpdate()
+    {
     }
 
-    public ValueUpdate(TileEntity tile, int bar, int value) {
+    public ValueUpdate(TileEntity tile, int bar, int value)
+    {
         dim = tile.getWorldObj().provider.dimensionId;
         posX = tile.xCoord;
         posY = tile.yCoord;
@@ -33,7 +36,8 @@ public class ValueUpdate
     }
 
     @Override
-    public void fromBytes(ByteBuf buf) {
+    public void fromBytes(ByteBuf buf)
+    {
 
         dim = buf.readInt();
         posX = buf.readInt();
@@ -44,7 +48,8 @@ public class ValueUpdate
     }
 
     @Override
-    public void toBytes(ByteBuf buf) {
+    public void toBytes(ByteBuf buf)
+    {
 
         buf.writeInt(dim);
         buf.writeInt(posX);
@@ -54,19 +59,23 @@ public class ValueUpdate
         buf.writeInt(barValue);
     }
 
-    public TileEntity getTileEntityTarget() {
+    public TileEntity getTileEntityTarget()
+    {
         World world = DimensionManager.getWorld(dim);
         return world.getTileEntity(posX, posY, posZ);
     }
 
-    public static class Handler implements IMessageHandler<ValueUpdate, IMessage> {
+    public static class Handler implements IMessageHandler<ValueUpdate, IMessage>
+    {
 
         @Override
-        public IMessage onMessage(ValueUpdate message, MessageContext ctx) {
+        public IMessage onMessage(ValueUpdate message, MessageContext ctx)
+        {
 
             TileEntity tile = message.getTileEntityTarget();
 
-            if (!(tile instanceof TileEnderRift)) {
+            if (!(tile instanceof TileEnderRift))
+            {
                 return null;
             }
 

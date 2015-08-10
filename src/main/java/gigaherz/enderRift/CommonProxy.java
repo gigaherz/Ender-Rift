@@ -1,9 +1,11 @@
 package gigaherz.enderRift;
 
-public class CommonProxy {
+public class CommonProxy
+{
 
     // Client stuff
-    public void registerRenderers() {
+    public void registerRenderers()
+    {
         // Nothing here as this is the server side proxy
     }
 }

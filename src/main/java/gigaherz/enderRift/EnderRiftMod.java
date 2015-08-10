@@ -1,6 +1,5 @@
 package gigaherz.enderRift;
 
-import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.SidedProxy;
@@ -22,11 +21,13 @@ import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraftforge.common.config.Configuration;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 @Mod(modid = EnderRiftMod.MODID, version = EnderRiftMod.VERSION, dependencies = "after:Waila;after:NotEnoughItems")
-public class EnderRiftMod {
+public class EnderRiftMod
+{
     public static final String MODID = "enderRift";
     public static final String VERSION = "@VERSION";
 
@@ -46,19 +47,27 @@ public class EnderRiftMod {
 
     public static final Logger logger = LogManager.getLogger(MODID);
 
-    private void registerNetworkStuff() {
+    private void registerNetworkStuff()
+    {
         channel = NetworkRegistry.INSTANCE.newSimpleChannel(CHANNEL);
         channel.registerMessage(ValueUpdate.Handler.class, ValueUpdate.class, 0, Side.CLIENT);
     }
 
     @EventHandler
-    public void preInit(FMLPreInitializationEvent event) {
+    public void preInit(FMLPreInitializationEvent event)
+    {
 
-        tabEnderRift = new CreativeTabs("tabEnderRift") {
+        Configuration config = new Configuration(event.getSuggestedConfigurationFile());
+
+        ConfigValues.readConfig(config);
+
+        tabEnderRift = new CreativeTabs("tabEnderRift")
+        {
 
             @Override
             @SideOnly(Side.CLIENT)
-            public Item getTabIconItem() {
+            public Item getTabIconItem()
+            {
                 return itemEnderRift;
             }
         };
@@ -77,7 +86,8 @@ public class EnderRiftMod {
     }
 
     @EventHandler
-    public void init(FMLInitializationEvent event) {
+    public void init(FMLInitializationEvent event)
+    {
 
         proxy.registerRenderers();
 

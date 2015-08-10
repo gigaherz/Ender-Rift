@@ -14,22 +14,27 @@ import net.minecraft.world.World;
 
 import java.util.List;
 
-public class WailaProvider implements IWailaDataProvider {
+public class WailaProvider implements IWailaDataProvider
+{
 
     @Override
-    public ItemStack getWailaStack(IWailaDataAccessor accessor, IWailaConfigHandler config) {
+    public ItemStack getWailaStack(IWailaDataAccessor accessor, IWailaConfigHandler config)
+    {
         return null;
     }
 
     @Override
-    public List<String> getWailaHead(ItemStack itemStack, List<String> currenttip, IWailaDataAccessor accessor, IWailaConfigHandler config) {
+    public List<String> getWailaHead(ItemStack itemStack, List<String> currenttip, IWailaDataAccessor accessor, IWailaConfigHandler config)
+    {
         return currenttip;
     }
 
     @Override
-    public List<String> getWailaBody(ItemStack itemStack, List<String> currenttip, IWailaDataAccessor accessor, IWailaConfigHandler config) {
+    public List<String> getWailaBody(ItemStack itemStack, List<String> currenttip, IWailaDataAccessor accessor, IWailaConfigHandler config)
+    {
 
-        if (config.getConfig("enderRift.block")) {
+        if (config.getConfig("enderRift.block"))
+        {
             NBTTagCompound tag = accessor.getNBTData();
 
             currenttip.add(StatCollector.translateToLocalFormatted("text.blockEnderRift.waila.usedSlots", tag.getInteger("usedSlots"), tag.getInteger("exposedSlots")));
@@ -41,18 +46,21 @@ public class WailaProvider implements IWailaDataProvider {
     }
 
     @Override
-    public List<String> getWailaTail(ItemStack itemStack, List<String> currenttip, IWailaDataAccessor accessor, IWailaConfigHandler config) {
+    public List<String> getWailaTail(ItemStack itemStack, List<String> currenttip, IWailaDataAccessor accessor, IWailaConfigHandler config)
+    {
         return currenttip;
     }
 
-    public static void callbackRegister(IWailaRegistrar registrar) {
+    public static void callbackRegister(IWailaRegistrar registrar)
+    {
         registrar.addConfig("Ender-Rift", "enderRift.block");
         registrar.registerBodyProvider(new WailaProvider(), TileEnderRift.class);
         registrar.registerNBTProvider(new WailaProvider(), TileEnderRift.class);
     }
 
     @Override
-    public NBTTagCompound getNBTData(EntityPlayerMP player, TileEntity te, NBTTagCompound tag, World world, int x, int y, int z) {
+    public NBTTagCompound getNBTData(EntityPlayerMP player, TileEntity te, NBTTagCompound tag, World world, int x, int y, int z)
+    {
 
         TileEnderRift rift = (TileEnderRift) te;
 

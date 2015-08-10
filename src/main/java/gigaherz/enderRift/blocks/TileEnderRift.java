@@ -2,6 +2,7 @@ package gigaherz.enderRift.blocks;
 
 import cofh.api.energy.IEnergyReceiver;
 import cpw.mods.fml.common.network.NetworkRegistry;
+import gigaherz.enderRift.ConfigValues;
 import gigaherz.enderRift.EnderRiftMod;
 import gigaherz.enderRift.network.ValueUpdate;
 import net.minecraft.entity.player.EntityPlayer;
@@ -18,33 +19,41 @@ import java.util.List;
 
 public class TileEnderRift
         extends TileEntity
-        implements IEnergyReceiver, IInventory {
-
-    public static final float PowerPerInsertionConstant = 1;
-    public static final float PowerPerInsertionLinear = 1;
-
-
-    public static final float PowerPerExtractionConstant = 1;
-    public static final float PowerPerExtractionLinear = 0;
+        implements IEnergyReceiver, IInventory
+{
 
     public static int BroadcastRange = 256;
 
     private final List<ItemStack> inventorySlots = new ArrayList<ItemStack>();
 
-    public final int energyLimit = 100000;
+    public final int energyLimit = 10000000;
     public int energyBuffer = 0;
 
-    public int getEnergyInsert() {
-        return (int) Math.ceil(PowerPerInsertionConstant + (inventorySlots.size() * PowerPerInsertionLinear));
+    public int getEnergyInsert()
+    {
+        int sizeInventory = inventorySlots.size();
+        int sizeInventory2 = sizeInventory * sizeInventory;
+        return (int) Math.ceil(
+                ConfigValues.PowerPerInsertionConstant
+                        + (sizeInventory * ConfigValues.PowerPerInsertionLinear)
+                        + (sizeInventory2 * ConfigValues.PowerPerInsertionGeometric));
     }
 
-    public int getEnergyExtract() {
-        return (int) Math.ceil(PowerPerExtractionConstant + (inventorySlots.size() * PowerPerExtractionLinear));
+    public int getEnergyExtract()
+    {
+        int sizeInventory = inventorySlots.size();
+        int sizeInventory2 = sizeInventory * sizeInventory;
+        return (int) Math.ceil(
+                ConfigValues.PowerPerExtractionConstant
+                        + (sizeInventory * ConfigValues.PowerPerExtractionLinear)
+                        + (sizeInventory2 * ConfigValues.PowerPerExtractionGeometric));
     }
 
-    public int countInventoryStacks() {
+    public int countInventoryStacks()
+    {
         int count = 0;
-        for (ItemStack stack : inventorySlots) {
+        for (ItemStack stack : inventorySlots)
+        {
             if (stack != null)
                 count++;
         }
@@ -52,12 +61,14 @@ public class TileEnderRift
     }
 
     @Override
-    public int getSizeInventory() {
+    public int getSizeInventory()
+    {
         return inventorySlots.size() + 1;
     }
 
     @Override
-    public ItemStack getStackInSlot(int slotIndex) {
+    public ItemStack getStackInSlot(int slotIndex)
+    {
 
         if (slotIndex >= inventorySlots.size())
             return null;
@@ -65,9 +76,10 @@ public class TileEnderRift
         return inventorySlots.get(slotIndex);
     }
 
-    private void setStackInSlotInternal(int slotIndex, ItemStack stack) {
+    private void setStackInSlotInternal(int slotIndex, ItemStack stack)
+    {
 
-        if(slotIndex >= inventorySlots.size())
+        if (slotIndex >= inventorySlots.size())
         {
             inventorySlots.add(stack);
             return;
@@ -76,7 +88,8 @@ public class TileEnderRift
         inventorySlots.set(slotIndex, stack);
     }
 
-    private void removeStackFromSlotInternal(int slotIndex) {
+    private void removeStackFromSlotInternal(int slotIndex)
+    {
 
         if (slotIndex >= inventorySlots.size())
             return;
@@ -85,9 +98,11 @@ public class TileEnderRift
     }
 
     @Override
-    public void setInventorySlotContents(int slot, ItemStack stack) {
+    public void setInventorySlotContents(int slot, ItemStack stack)
+    {
 
-        if (stack == null) {
+        if (stack == null)
+        {
             ItemStack oldStack = getStackInSlot(slot);
 
             if (oldStack == null)
@@ -95,7 +110,8 @@ public class TileEnderRift
 
             int powerCost = getEnergyExtract();
 
-            if (energyBuffer >= powerCost) {
+            if (energyBuffer >= powerCost)
+            {
                 removeStackFromSlotInternal(slot);
                 energyBuffer -= powerCost;
             }
@@ -105,41 +121,52 @@ public class TileEnderRift
 
         int powerCost = getEnergyInsert();
 
-        if (energyBuffer >= powerCost) {
+        if (energyBuffer >= powerCost)
+        {
             setStackInSlotInternal(slot, stack);
             energyBuffer -= powerCost;
-        } else {
+        }
+        else
+        {
             stack.stackSize = 0;
         }
 
-        if (stack.stackSize > getInventoryStackLimit()) {
+        if (stack.stackSize > getInventoryStackLimit())
+        {
             stack.stackSize = getInventoryStackLimit();
         }
     }
 
     @Override
-    public String getInventoryName() {
+    public String getInventoryName()
+    {
         return null;
     }
 
     @Override
-    public boolean hasCustomInventoryName() {
+    public boolean hasCustomInventoryName()
+    {
         return false;
     }
 
     @Override
-    public ItemStack decrStackSize(int slotIndex, int amount) {
+    public ItemStack decrStackSize(int slotIndex, int amount)
+    {
         ItemStack stack = getStackInSlot(slotIndex);
 
         if (stack == null)
             return null;
 
-        if (stack.stackSize <= amount) {
+        if (stack.stackSize <= amount)
+        {
             setInventorySlotContents(slotIndex, null);
-        } else {
+        }
+        else
+        {
             stack = stack.splitStack(amount);
 
-            if (stack.stackSize == 0) {
+            if (stack.stackSize == 0)
+            {
                 setInventorySlotContents(slotIndex, null);
             }
         }
@@ -148,43 +175,51 @@ public class TileEnderRift
     }
 
     @Override
-    public ItemStack getStackInSlotOnClosing(int slotIndex) {
+    public ItemStack getStackInSlotOnClosing(int slotIndex)
+    {
         return null;
     }
 
     @Override
-    public int getInventoryStackLimit() {
+    public int getInventoryStackLimit()
+    {
         return 64;
     }
 
     @Override
-    public boolean isUseableByPlayer(EntityPlayer player) {
+    public boolean isUseableByPlayer(EntityPlayer player)
+    {
         return worldObj.getTileEntity(xCoord, yCoord, zCoord) == this
                 && player.getDistanceSq((double) xCoord + 0.5D, (double) yCoord + 0.5D, (double) zCoord + 0.5D) <= 64.0D;
     }
 
     @Override
-    public void openInventory() {
+    public void openInventory()
+    {
 
     }
 
     @Override
-    public void closeInventory() {
+    public void closeInventory()
+    {
 
     }
 
     @Override
-    public boolean isItemValidForSlot(int slot, ItemStack stack) {
+    public boolean isItemValidForSlot(int slot, ItemStack stack)
+    {
         return true;
     }
 
-    public void readFromNBT(NBTTagCompound nbtTagCompound) {
+    public void readFromNBT(NBTTagCompound nbtTagCompound)
+    {
         super.readFromNBT(nbtTagCompound);
         NBTTagList nbtTagList = nbtTagCompound.getTagList("Items", Constants.NBT.TAG_COMPOUND);
 
         inventorySlots.clear();
 
-        for (int i = 0; i < nbtTagList.tagCount(); ++i) {
+        for (int i = 0; i < nbtTagList.tagCount(); ++i)
+        {
             NBTTagCompound nbtTagCompound1 = nbtTagList.getCompoundTagAt(i);
             int j = nbtTagCompound1.getByte("Slot");
 
@@ -194,13 +229,16 @@ public class TileEnderRift
         energyBuffer = nbtTagCompound.getInteger("Energy");
     }
 
-    public void writeToNBT(NBTTagCompound nbtTagCompound) {
+    public void writeToNBT(NBTTagCompound nbtTagCompound)
+    {
         super.writeToNBT(nbtTagCompound);
         NBTTagList nbtTagList = new NBTTagList();
 
-        for (int i = 0; i < getSizeInventory(); ++i) {
+        for (int i = 0; i < getSizeInventory(); ++i)
+        {
             ItemStack stack = getStackInSlot(i);
-            if (stack != null) {
+            if (stack != null)
+            {
                 NBTTagCompound nbtTagCompound1 = new NBTTagCompound();
                 nbtTagCompound1.setInteger("Slot", i);
                 stack.writeToNBT(nbtTagCompound1);
@@ -213,7 +251,8 @@ public class TileEnderRift
     }
 
     @Override
-    public int receiveEnergy(ForgeDirection from, int maxReceive, boolean simulate) {
+    public int receiveEnergy(ForgeDirection from, int maxReceive, boolean simulate)
+    {
         int receive = Math.min(maxReceive, energyLimit - energyBuffer);
         if (!simulate)
             energyBuffer += receive;
@@ -225,22 +264,26 @@ public class TileEnderRift
     }
 
     @Override
-    public int getEnergyStored(ForgeDirection from) {
+    public int getEnergyStored(ForgeDirection from)
+    {
         return energyBuffer;
     }
 
     @Override
-    public int getMaxEnergyStored(ForgeDirection from) {
+    public int getMaxEnergyStored(ForgeDirection from)
+    {
         return energyLimit;
     }
 
     @Override
-    public boolean canConnectEnergy(ForgeDirection from) {
+    public boolean canConnectEnergy(ForgeDirection from)
+    {
         return true;
     }
 
-    public void updateValue(int barIndex, int barValue) {
-        if(barIndex == 0)
+    public void updateValue(int barIndex, int barValue)
+    {
+        if (barIndex == 0)
         {
             energyBuffer = barValue;
         }
