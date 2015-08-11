@@ -1,6 +1,7 @@
 package gigaherz.enderRift;
 
 import gigaherz.enderRift.blocks.TileEnderRift;
+import gigaherz.enderRift.blocks.TileEnderRiftCorner;
 import mcp.mobius.waila.api.IWailaConfigHandler;
 import mcp.mobius.waila.api.IWailaDataAccessor;
 import mcp.mobius.waila.api.IWailaDataProvider;
@@ -37,9 +38,9 @@ public class WailaProvider implements IWailaDataProvider
         {
             NBTTagCompound tag = accessor.getNBTData();
 
-            currenttip.add(StatCollector.translateToLocalFormatted("text.blockEnderRift.waila.usedSlots", tag.getInteger("usedSlots"), tag.getInteger("exposedSlots")));
-            currenttip.add(StatCollector.translateToLocalFormatted("text.blockEnderRift.waila.energyUsageInsert", tag.getInteger("energyInsert")));
-            currenttip.add(StatCollector.translateToLocalFormatted("text.blockEnderRift.waila.energyUsageExtract", tag.getInteger("energyExtract")));
+            currenttip.add(StatCollector.translateToLocalFormatted("text." + EnderRiftMod.MODID + ".blockEnderRift.waila.usedSlots", tag.getInteger("usedSlots"), tag.getInteger("exposedSlots")));
+            currenttip.add(StatCollector.translateToLocalFormatted("text." + EnderRiftMod.MODID + ".blockEnderRift.waila.energyUsageInsert", tag.getInteger("energyInsert")));
+            currenttip.add(StatCollector.translateToLocalFormatted("text." + EnderRiftMod.MODID + ".blockEnderRift.waila.energyUsageExtract", tag.getInteger("energyExtract")));
         }
 
         return currenttip;
@@ -54,15 +55,23 @@ public class WailaProvider implements IWailaDataProvider
     public static void callbackRegister(IWailaRegistrar registrar)
     {
         registrar.addConfig("Ender-Rift", "enderRift.block");
-        registrar.registerBodyProvider(new WailaProvider(), TileEnderRift.class);
-        registrar.registerNBTProvider(new WailaProvider(), TileEnderRift.class);
+
+        WailaProvider instance = new WailaProvider();
+        registrar.registerBodyProvider(instance, TileEnderRift.class);
+        registrar.registerNBTProvider(instance, TileEnderRift.class);
+        registrar.registerBodyProvider(instance, TileEnderRiftCorner.class);
+        registrar.registerNBTProvider(instance, TileEnderRiftCorner.class);
     }
 
     @Override
     public NBTTagCompound getNBTData(EntityPlayerMP player, TileEntity te, NBTTagCompound tag, World world, int x, int y, int z)
     {
+        TileEnderRift rift;
 
-        TileEnderRift rift = (TileEnderRift) te;
+        if(te instanceof TileEnderRiftCorner)
+            rift = (TileEnderRift)((TileEnderRiftCorner)te).getParent();
+        else
+            rift = (TileEnderRift) te;
 
         tag.setInteger("usedSlots", rift.countInventoryStacks());
         tag.setInteger("exposedSlots", rift.getSizeInventory());

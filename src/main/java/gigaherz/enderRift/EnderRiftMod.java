@@ -11,8 +11,7 @@ import cpw.mods.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
-import gigaherz.enderRift.blocks.BlockEnderRift;
-import gigaherz.enderRift.blocks.TileEnderRift;
+import gigaherz.enderRift.blocks.*;
 import gigaherz.enderRift.items.ItemEnderRift;
 import gigaherz.enderRift.network.ValueUpdate;
 import net.minecraft.block.Block;
@@ -33,37 +32,32 @@ public class EnderRiftMod
 
     public static final String CHANNEL = "EnderRift";
 
-    public static Block blockEnderRift;
+    public static BlockEnderCasing blockEnderCasing;
+    public static BlockEnderRift blockEnderRift;
+    public static Block blockStructureInvisible;
+    public static Block blockStructureCorner;
     public static Item itemEnderRift;
     public static CreativeTabs tabEnderRift;
 
     @Mod.Instance(value = EnderRiftMod.MODID)
     public static EnderRiftMod instance;
 
-    @SidedProxy(clientSide = "gigaherz.enderRift.client.ClientProxy", serverSide = "gigaherz.enderRift.CommonProxy")
-    public static CommonProxy proxy;
+    @SidedProxy(clientSide = "gigaherz.enderRift.client.ClientProxy", serverSide = "gigaherz.enderRift.server.ServerProxy")
+    public static IModProxy proxy;
 
     public static SimpleNetworkWrapper channel;
 
     public static final Logger logger = LogManager.getLogger(MODID);
 
-    private void registerNetworkStuff()
-    {
-        channel = NetworkRegistry.INSTANCE.newSimpleChannel(CHANNEL);
-        channel.registerMessage(ValueUpdate.Handler.class, ValueUpdate.class, 0, Side.CLIENT);
-    }
-
     @EventHandler
     public void preInit(FMLPreInitializationEvent event)
     {
-
         Configuration config = new Configuration(event.getSuggestedConfigurationFile());
 
         ConfigValues.readConfig(config);
 
         tabEnderRift = new CreativeTabs("tabEnderRift")
         {
-
             @Override
             @SideOnly(Side.CLIENT)
             public Item getTabIconItem()
@@ -72,24 +66,34 @@ public class EnderRiftMod
             }
         };
 
-        itemEnderRift = new ItemEnderRift().setUnlocalizedName("itemEnderRift");
+        itemEnderRift = new ItemEnderRift().setUnlocalizedName(MODID + ".itemEnderRift");
         GameRegistry.registerItem(itemEnderRift, "itemEnderRift");
 
-        blockEnderRift = new BlockEnderRift().setHardness(0.5F).setStepSound(Block.soundTypeWood).setBlockName("blockEnderRift");
+        blockEnderRift = (BlockEnderRift)new BlockEnderRift().setHardness(0.5F).setStepSound(Block.soundTypeMetal).setBlockName(MODID + ".blockEnderRift");
         GameRegistry.registerBlock(blockEnderRift, "blockEnderRift");
 
         GameRegistry.registerTileEntity(TileEnderRift.class, "tileEnderRift");
 
-        registerNetworkStuff();
+        blockEnderCasing = (BlockEnderCasing)new BlockEnderCasing().setHardness(0.5F).setStepSound(Block.soundTypeMetal).setBlockName(MODID + ".blockEnderCasing");
+        GameRegistry.registerBlock(blockEnderCasing, "blockEnderCasing");
 
+        blockStructureInvisible = new BlockStructureInvisible().setHardness(0.5F).setStepSound(Block.soundTypeMetal).setBlockName(MODID + ".blockStructureInvisible");
+        GameRegistry.registerBlock(blockStructureInvisible, "blockStructureInvisible");
 
+        blockStructureCorner = new BlockStructureInvisibleCorner().setHardness(0.5F).setStepSound(Block.soundTypeMetal).setBlockName(MODID + ".blockStructureCorner");
+        GameRegistry.registerBlock(blockStructureCorner, "blockStructureCorner");
+
+        channel = NetworkRegistry.INSTANCE.newSimpleChannel(CHANNEL);
+        channel.registerMessage(ValueUpdate.Handler.class, ValueUpdate.class, 0, Side.CLIENT);
+
+        proxy.preInit();
     }
 
     @EventHandler
     public void init(FMLInitializationEvent event)
     {
 
-        proxy.registerRenderers();
+        proxy.init();
 
         // Recipes
         GameRegistry.addRecipe(new ItemStack(itemEnderRift, 1),

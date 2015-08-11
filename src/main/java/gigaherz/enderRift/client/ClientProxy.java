@@ -1,15 +1,18 @@
 package gigaherz.enderRift.client;
 
-import gigaherz.enderRift.CommonProxy;
+import cpw.mods.fml.client.registry.RenderingRegistry;
+import gigaherz.enderRift.IModProxy;
 
-public class ClientProxy extends CommonProxy
+public class ClientProxy implements IModProxy
 {
-
-    // Client stuff
+    @Override
+    public void preInit()
+    {
+        RenderingRegistry.registerBlockHandler(new SBRHEnderRift());
+    }
 
     @Override
-    public void registerRenderers()
+    public void init()
     {
-
     }
 }
