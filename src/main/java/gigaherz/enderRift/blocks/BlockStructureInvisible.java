@@ -8,6 +8,7 @@ import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
 import java.util.ArrayList;
@@ -15,11 +16,10 @@ import java.util.ArrayList;
 public class BlockStructureInvisible
         extends Block
 {
-
     public BlockStructureInvisible()
     {
         super(Material.rock);
-        this.setBlockTextureName("enderrift:block_invisible");
+        setBlockTextureName(EnderRiftMod.MODID.toLowerCase() + ":block_casing");
     }
 
     @Override
@@ -32,6 +32,21 @@ public class BlockStructureInvisible
     public int getRenderType()
     {
         return -1;
+    }
+
+    @Override
+    public void setBlockBoundsBasedOnState(IBlockAccess world, int x, int y, int z)
+    {
+        int meta = world.getBlockMetadata(x, y, z);
+
+        int d = meta>>2;
+        switch(d)
+        {
+            case 0: setBlockBounds(0/16.0f,0/16.0f,0/16.0f,16/16.0f,4/16.0f,16/16.0f); break;
+            case 1: setBlockBounds(0/16.0f,4/16.0f,4/16.0f,16/16.0f,12/16.0f,12/16.0f); break;
+            case 2: setBlockBounds(4/16.0f,0/16.0f,4/16.0f,12/16.0f,16/16.0f,12/16.0f); break;
+            case 3: setBlockBounds(4/16.0f,4/16.0f,0/16.0f,12/16.0f,12/16.0f,16/16.0f); break;
+        }
     }
 
     @Override

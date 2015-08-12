@@ -6,12 +6,11 @@ import gigaherz.enderRift.EnderRiftMod;
 import gigaherz.enderRift.blocks.BlockEnderRift;
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.RenderBlocks;
+import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.crash.CrashReport;
-import net.minecraft.init.Blocks;
 import net.minecraft.util.IIcon;
-import net.minecraft.util.ReportedException;
 import net.minecraft.world.IBlockAccess;
+import org.lwjgl.opengl.GL11;
 
 public class SBRHEnderRift implements ISimpleBlockRenderingHandler
 {
@@ -25,6 +24,11 @@ public class SBRHEnderRift implements ISimpleBlockRenderingHandler
     @Override
     public void renderInventoryBlock(Block block, int metadata, int modelId, RenderBlocks renderer)
     {
+        RenderHelper.enableGUIStandardItemLighting();
+        renderer.setOverrideBlockTexture(block.getIcon(0, 0));
+        renderer.renderBlockAsItem(EnderRiftMod.blockEnderRift.asInventory, 0, 1.0f);
+        renderer.clearOverrideBlockTexture();
+        RenderHelper.disableStandardItemLighting();
     }
 
     @Override
@@ -54,6 +58,15 @@ public class SBRHEnderRift implements ISimpleBlockRenderingHandler
     {
         if(block == null || !(block instanceof BlockEnderRift))
             return false;
+
+        if(world.getBlockMetadata(x,y,z) == 0)
+        {
+            renderer.setOverrideBlockTexture(block.getIcon(0, 0));
+            renderer.setRenderBoundsFromBlock(block);
+            renderer.renderStandardBlock(block, x, y, z);
+            renderer.clearOverrideBlockTexture();
+            return true;
+        }
 
         Tessellator tessellator = Tessellator.instance;
 
@@ -1334,6 +1347,8 @@ public class SBRHEnderRift implements ISimpleBlockRenderingHandler
         tessellator.addVertexWithUV(-0.9847, 0.2462, 0.9847, icon.getInterpolatedU(16.0), icon.getInterpolatedV(14.66672));
 
         tessellator.addTranslation(-x, -y, -z);
+
+        tessellator.disableColor();
 
         return true;
     }

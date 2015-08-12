@@ -12,22 +12,26 @@ import java.util.Map;
 
 public class RiftStorageWorldData extends WorldSavedData
 {
-    private static final String IDENTIFIER = "enderRiftStorageManager";
+    private static final String StorageKey = "enderRiftStorageManager";
 
     private Map<Integer, RiftInventory> rifts = new HashMap<Integer, RiftInventory>();
     private int lastRiftId;
 
     public RiftStorageWorldData() {
-        super(IDENTIFIER);
+        super(StorageKey);
+    }
+
+    public RiftStorageWorldData(String s) {
+        super(s);
     }
 
     public static RiftStorageWorldData get(World world)
     {
         MapStorage storage = world.mapStorage;
-        RiftStorageWorldData instance = (RiftStorageWorldData)storage.loadData(RiftStorageWorldData.class, IDENTIFIER);
+        RiftStorageWorldData instance = (RiftStorageWorldData)storage.loadData(RiftStorageWorldData.class, StorageKey);
         if (instance == null) {
             instance = new RiftStorageWorldData();
-            storage.setData(IDENTIFIER, instance);
+            storage.setData(StorageKey, instance);
         }
 
         return instance;

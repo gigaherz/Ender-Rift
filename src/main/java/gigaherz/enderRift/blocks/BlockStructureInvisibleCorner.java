@@ -8,6 +8,7 @@ import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
 import java.util.ArrayList;
@@ -18,9 +19,9 @@ public class BlockStructureInvisibleCorner
 {
 
     @Override
-    public boolean isOpaqueCube()
+    public void setBlockBoundsBasedOnState(IBlockAccess world, int x, int y, int z)
     {
-        return false;
+        setBlockBounds(0,0,0,1,1,1);
     }
 
     @Override

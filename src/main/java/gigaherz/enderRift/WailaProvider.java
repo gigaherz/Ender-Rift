@@ -38,6 +38,7 @@ public class WailaProvider implements IWailaDataProvider
         {
             NBTTagCompound tag = accessor.getNBTData();
 
+            currenttip.add(StatCollector.translateToLocalFormatted("text." + EnderRiftMod.MODID + ".blockEnderRift.waila.isFormed", tag.getBoolean("isFormed")));
             currenttip.add(StatCollector.translateToLocalFormatted("text." + EnderRiftMod.MODID + ".blockEnderRift.waila.usedSlots", tag.getInteger("usedSlots"), tag.getInteger("exposedSlots")));
             currenttip.add(StatCollector.translateToLocalFormatted("text." + EnderRiftMod.MODID + ".blockEnderRift.waila.energyUsageInsert", tag.getInteger("energyInsert")));
             currenttip.add(StatCollector.translateToLocalFormatted("text." + EnderRiftMod.MODID + ".blockEnderRift.waila.energyUsageExtract", tag.getInteger("energyExtract")));
@@ -77,6 +78,7 @@ public class WailaProvider implements IWailaDataProvider
         tag.setInteger("exposedSlots", rift.getSizeInventory());
         tag.setInteger("energyInsert", rift.getEnergyInsert());
         tag.setInteger("energyExtract", rift.getEnergyExtract());
+        tag.setBoolean("isFormed", rift.getBlockMetadata() != 0);
 
         return tag;
     }

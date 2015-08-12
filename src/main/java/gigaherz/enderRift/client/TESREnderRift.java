@@ -11,8 +11,8 @@ import org.lwjgl.opengl.GL12;
 
 public class TESREnderRift extends TileEntitySpecialRenderer
 {
-    IModelCustom model = AdvancedModelLoader.loadModel(new ResourceLocation(EnderRiftMod.MODID.toLowerCase(), "obj/casing.obj"));
-    ResourceLocation texture = new ResourceLocation(EnderRiftMod.MODID.toLowerCase(), "textures/blocks/block_rift.png");
+    IModelCustom model = AdvancedModelLoader.loadModel(new ResourceLocation(EnderRiftMod.MODID.toLowerCase(), "obj/rift.obj"));
+    ResourceLocation texture = new ResourceLocation(EnderRiftMod.MODID.toLowerCase(), "textures/blocks/rift_aura.png");
 
     @Override
     public void renderTileEntityAt(TileEntity entity, double x, double y, double z, float p_147500_8_) {

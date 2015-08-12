@@ -14,12 +14,14 @@ import cpw.mods.fml.relauncher.SideOnly;
 import gigaherz.enderRift.blocks.*;
 import gigaherz.enderRift.items.ItemEnderRift;
 import gigaherz.enderRift.network.ValueUpdate;
+import gigaherz.enderRift.recipe.RecipesRiftDuplication;
 import net.minecraft.block.Block;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.crafting.RecipesMapCloning;
 import net.minecraftforge.common.config.Configuration;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -32,7 +34,6 @@ public class EnderRiftMod
 
     public static final String CHANNEL = "EnderRift";
 
-    public static BlockEnderCasing blockEnderCasing;
     public static BlockEnderRift blockEnderRift;
     public static Block blockStructureInvisible;
     public static Block blockStructureCorner;
@@ -72,16 +73,14 @@ public class EnderRiftMod
         blockEnderRift = (BlockEnderRift)new BlockEnderRift().setHardness(0.5F).setStepSound(Block.soundTypeMetal).setBlockName(MODID + ".blockEnderRift");
         GameRegistry.registerBlock(blockEnderRift, "blockEnderRift");
 
-        GameRegistry.registerTileEntity(TileEnderRift.class, "tileEnderRift");
-
-        blockEnderCasing = (BlockEnderCasing)new BlockEnderCasing().setHardness(0.5F).setStepSound(Block.soundTypeMetal).setBlockName(MODID + ".blockEnderCasing");
-        GameRegistry.registerBlock(blockEnderCasing, "blockEnderCasing");
-
         blockStructureInvisible = new BlockStructureInvisible().setHardness(0.5F).setStepSound(Block.soundTypeMetal).setBlockName(MODID + ".blockStructureInvisible");
         GameRegistry.registerBlock(blockStructureInvisible, "blockStructureInvisible");
 
         blockStructureCorner = new BlockStructureInvisibleCorner().setHardness(0.5F).setStepSound(Block.soundTypeMetal).setBlockName(MODID + ".blockStructureCorner");
         GameRegistry.registerBlock(blockStructureCorner, "blockStructureCorner");
+
+        GameRegistry.registerTileEntity(TileEnderRift.class, "tileEnderRift");
+        GameRegistry.registerTileEntity(TileEnderRiftCorner.class, "tileStructureCorner");
 
         channel = NetworkRegistry.INSTANCE.newSimpleChannel(CHANNEL);
         channel.registerMessage(ValueUpdate.Handler.class, ValueUpdate.class, 0, Side.CLIENT);
@@ -106,13 +105,14 @@ public class EnderRiftMod
 
         GameRegistry.addRecipe(new ItemStack(blockEnderRift, 1),
                 "oho",
-                "rer",
+                "r r",
                 "oco",
                 'o', Blocks.obsidian,
                 'h', Blocks.hopper,
                 'r', Blocks.redstone_block,
-                'c', Blocks.ender_chest,
-                'e', itemEnderRift);
+                'c', Blocks.ender_chest);
+
+        GameRegistry.addRecipe(new RecipesRiftDuplication());
 
         FMLInterModComms.sendMessage("Waila", "register", "gigaherz.enderRift.WailaProvider.callbackRegister");
     }

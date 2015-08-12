@@ -6,6 +6,7 @@ item.enderRift.itemEnderRift.name=Ender-Rift Orb
 
 itemGroup.tabEnderRift=Ender-Rift
 
+text.enderRift.blockEnderRift.waila.isFormed=Is Formed? %s
 text.enderRift.blockEnderRift.waila.usedSlots=%s / %s slots used.
 text.enderRift.blockEnderRift.waila.energyUsageInsert=%s RF used by next insertion.
 text.enderRift.blockEnderRift.waila.energyUsageExtract=%s RF used by next extraction.

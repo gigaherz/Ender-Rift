@@ -20,6 +20,20 @@ public class ItemEnderRift extends Item
                              int x, int y, int z, int side,
                              float hitX, float hitY, float hitZ)
     {
-        return EnderRiftMod.blockEnderCasing.tryCompleteStructure(world, x, y, z, itemStack);
+        if (world.isRemote)
+            return true;
+
+        if (!player.canPlayerEdit(x, y, z, side, itemStack))
+            return false;
+
+        if(!EnderRiftMod.blockEnderRift.tryCompleteStructure(world, x, y, z, itemStack))
+            return false;
+
+        if (!player.capabilities.isCreativeMode)
+        {
+            --itemStack.stackSize;
+        }
+
+        return true;
     }
 }

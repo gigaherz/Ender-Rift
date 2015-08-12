@@ -7,12 +7,14 @@ import gigaherz.enderRift.EnderRiftMod;
 import gigaherz.enderRift.network.ValueUpdate;
 import gigaherz.enderRift.storage.RiftInventory;
 import gigaherz.enderRift.storage.RiftStorageWorldData;
+import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 
 public class TileEnderRift
@@ -59,7 +61,7 @@ public class TileEnderRift
 
     public int countInventoryStacks()
     {
-        return inventory.countInventoryStacks();
+        return getInventory().countInventoryStacks();
     }
 
     @Override
@@ -128,7 +130,7 @@ public class TileEnderRift
     @Override
     public ItemStack decrStackSize(int slotIndex, int amount)
     {
-        return inventory.decrStackSize(slotIndex, amount);
+        return getInventory().decrStackSize(slotIndex, amount);
     }
 
     @Override
@@ -224,4 +226,22 @@ public class TileEnderRift
         }
     }
 
+    @Override
+    public boolean shouldRefresh(Block oldBlock, Block newBlock, int oldMeta, int newMeta, World world, int x, int y, int z)
+    {
+        return oldBlock != newBlock;
+    }
+
+    public ItemStack getRiftItem()
+    {
+        ItemStack stack = new ItemStack(EnderRiftMod.itemEnderRift);
+
+        NBTTagCompound tag = new NBTTagCompound();
+
+        tag.setInteger("RiftId", riftId);
+
+        stack.setTagCompound(tag);
+
+        return stack;
+    }
 }
