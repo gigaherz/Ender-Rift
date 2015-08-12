@@ -27,8 +27,6 @@ public class SBRHEnderRift implements ISimpleBlockRenderingHandler
         renderer.setOverrideBlockTexture(block.getIcon(0, 0));
         renderer.renderBlockAsItem(EnderRiftMod.blockEnderRift.asInventory, 0, 1.0f);
         renderer.clearOverrideBlockTexture();
-        GL11.glDisable(GL11.GL_BLEND);
-        GL11.glBlendFunc(GL11.GL_ONE,GL11.GL_ZERO);
     }
 
     @Override
