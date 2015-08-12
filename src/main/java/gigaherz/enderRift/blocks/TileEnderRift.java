@@ -27,7 +27,7 @@ public class TileEnderRift
     public final int energyLimit = 10000000;
     public int energyBuffer = 0;
 
-    int riftId;
+    public int riftId;
     RiftInventory inventory;
 
     RiftInventory getInventory()
@@ -179,12 +179,14 @@ public class TileEnderRift
     {
         super.readFromNBT(nbtTagCompound);
         energyBuffer = nbtTagCompound.getInteger("Energy");
+        riftId = nbtTagCompound.getInteger("RiftId");
     }
 
     public void writeToNBT(NBTTagCompound nbtTagCompound)
     {
         super.writeToNBT(nbtTagCompound);
         nbtTagCompound.setInteger("Energy", energyBuffer);
+        nbtTagCompound.setInteger("RiftId", riftId);
     }
 
     @Override

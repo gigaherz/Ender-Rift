@@ -6,6 +6,8 @@ import gigaherz.enderRift.storage.RiftStorageWorldData;
 import net.minecraft.block.*;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IIconRegister;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
@@ -180,11 +182,13 @@ public class BlockEnderRift
         if(tagCompound != null && tagCompound.hasKey("RiftId"))
         {
             rift.inventory = null;
+            rift.blockMetadata = -1;
             rift.riftId = tagCompound.getInteger("RiftId");
         }
         else
         {
             rift.inventory = null;
+            rift.blockMetadata = -1;
             rift.riftId = RiftStorageWorldData.get(world).getNextRiftId();
         }
 
@@ -229,6 +233,12 @@ public class BlockEnderRift
             TileEnderRift rift = (TileEnderRift)world.getTileEntity(x, y, z);
 
             rift.inventory = null;
+            rift.blockMetadata = -1;
+
+            ItemStack stack = rift.getRiftItem();
+
+            Entity entity = new EntityItem(world, x, y, z, stack);
+            world.spawnEntityInWorld(entity);
         }
     }
 
@@ -275,4 +285,18 @@ public class BlockEnderRift
         return ret;
     }
 
+    public boolean tryDuplicateRift(World world, int x, int y, int z, EntityPlayer player)
+    {
+        TileEntity te = world.getTileEntity(x, y, z);
+
+        if(!(te instanceof TileEnderRift))
+            return false;
+
+        ItemStack stack = ((TileEnderRift) te).getRiftItem();
+
+        Entity entity = new EntityItem(world, player.posX, player.posY+0.5f, player.posZ, stack);
+        world.spawnEntityInWorld(entity);
+
+        return true;
+    }
 }
