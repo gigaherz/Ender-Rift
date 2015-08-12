@@ -43,9 +43,18 @@ public class BlockStructureInvisible
         switch(d)
         {
             case 0: setBlockBounds(0/16.0f,0/16.0f,0/16.0f,16/16.0f,4/16.0f,16/16.0f); break;
-            case 1: setBlockBounds(0/16.0f,4/16.0f,4/16.0f,16/16.0f,12/16.0f,12/16.0f); break;
+            case 1:
+                if((meta&1) == 1)
+                    setBlockBounds(0/16.0f,4/16.0f,4/16.0f,16/16.0f,12/16.0f,12/16.0f);
+                else
+                    setBlockBounds(0/16.0f,0/16.0f,0/16.0f,16/16.0f,12/16.0f,16/16.0f);
+                break;
             case 2: setBlockBounds(4/16.0f,0/16.0f,4/16.0f,12/16.0f,16/16.0f,12/16.0f); break;
-            case 3: setBlockBounds(4/16.0f,4/16.0f,0/16.0f,12/16.0f,12/16.0f,16/16.0f); break;
+            case 3:
+                if((meta&2) == 2)
+                    setBlockBounds(4/16.0f,4/16.0f,0/16.0f,12/16.0f,12/16.0f,16/16.0f);
+                else
+                    setBlockBounds(0/16.0f,0/16.0f,0/16.0f,16/16.0f,12/16.0f,16/16.0f); break;
         }
     }
 

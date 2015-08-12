@@ -3,9 +3,7 @@ package gigaherz.enderRift.blocks;
 import gigaherz.enderRift.EnderRiftMod;
 import gigaherz.enderRift.client.SBRHEnderRift;
 import gigaherz.enderRift.storage.RiftStorageWorldData;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockFlowerPot;
-import net.minecraft.block.ITileEntityProvider;
+import net.minecraft.block.*;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.player.EntityPlayer;
@@ -15,6 +13,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.IIcon;
+import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
 import java.util.ArrayList;
@@ -57,9 +56,27 @@ public class BlockEnderRift
     }
 
     @Override
+    public boolean isOpaqueCube()
+    {
+        return false;
+    }
+
+    @Override
     public int getRenderType()
     {
         return isInventory ? super.getRenderType() : SBRHEnderRift.renderId;
+    }
+
+    @Override
+    public int getLightValue(IBlockAccess world, int x, int y, int z)
+    {
+        return (world.getBlockMetadata(x,y,z) != 0) ? 15 : 0;
+    }
+
+    @Override
+    public int getLightOpacity(IBlockAccess world, int x, int y, int z)
+    {
+        return (world.getBlockMetadata(x,y,z) != 0) ? 1 : 15;
     }
 
     @Override
@@ -162,10 +179,12 @@ public class BlockEnderRift
         NBTTagCompound tagCompound = itemStack.getTagCompound();
         if(tagCompound != null && tagCompound.hasKey("RiftId"))
         {
+            rift.inventory = null;
             rift.riftId = tagCompound.getInteger("RiftId");
         }
         else
         {
+            rift.inventory = null;
             rift.riftId = RiftStorageWorldData.get(world).getNextRiftId();
         }
 
@@ -203,8 +222,14 @@ public class BlockEnderRift
         restoreStructureBlockTo(world, x, y + 1, z + 1, Blocks.redstone_block);
         restoreStructureBlockTo(world, x + 1, y + 1, z + 1, Blocks.iron_block);
 
-        if(world.getBlockMetadata(x,y,z) != 0)
+        if(world.getBlock(x,y,z) == EnderRiftMod.blockEnderRift && world.getBlockMetadata(x,y,z) != 0)
+        {
             world.setBlockMetadataWithNotify(x, y, z, 0, 3);
+
+            TileEnderRift rift = (TileEnderRift)world.getTileEntity(x, y, z);
+
+            rift.inventory = null;
+        }
     }
 
     private void restoreStructureBlockTo(World world, int xx, int yy, int zz, Block bb)
