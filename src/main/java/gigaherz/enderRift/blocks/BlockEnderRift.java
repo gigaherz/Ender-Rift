@@ -82,6 +82,12 @@ public class BlockEnderRift
     }
 
     @Override
+    public boolean hasTileEntity(int metadata)
+    {
+        return true;
+    }
+
+    @Override
     public TileEntity createNewTileEntity(World p_149915_1_, int p_149915_2_)
     {
         return new TileEnderRift();

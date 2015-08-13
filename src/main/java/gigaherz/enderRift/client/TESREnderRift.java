@@ -34,10 +34,10 @@ public class TESREnderRift extends TileEntitySpecialRenderer
         GL11.glTranslated(x + 0.5, y + 0.5, z + 0.5);
 
         drawSphere(f, time % 20);
-        drawSphere(f, time%20 + 20);
-        drawSphere(f, time%20 + 40);
-        drawSphere(f, time%20 + 60);
-        drawSphere(f, time%20 + 80);
+        drawSphere(f, time % 20 + 20);
+        drawSphere(f, time % 20 + 40);
+        drawSphere(f, time % 20 + 60);
+        drawSphere(f, time % 20 + 80);
 
         GL11.glPopMatrix();
         GL11.glDisable(GL11.GL_BLEND);

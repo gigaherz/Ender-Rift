@@ -1,5 +1,6 @@
 package gigaherz.enderRift;
 
+import gigaherz.enderRift.blocks.BlockEnderRift;
 import gigaherz.enderRift.blocks.TileEnderRift;
 import gigaherz.enderRift.blocks.TileEnderRiftCorner;
 import mcp.mobius.waila.api.IWailaConfigHandler;
@@ -33,19 +34,25 @@ public class WailaProvider implements IWailaDataProvider
     @Override
     public List<String> getWailaBody(ItemStack itemStack, List<String> currenttip, IWailaDataAccessor accessor, IWailaConfigHandler config)
     {
-
         if (config.getConfig("enderRift.block"))
         {
             NBTTagCompound tag = accessor.getNBTData();
 
-            currenttip.add(StatCollector.translateToLocalFormatted("text." + EnderRiftMod.MODID + ".blockEnderRift.waila.isFormed", tag.getBoolean("isFormed")));
-            if(tag.getBoolean("isFormed"))
+            if(tag != null && tag.hasKey("isFormed"))
             {
-                currenttip.add(StatCollector.translateToLocalFormatted("text." + EnderRiftMod.MODID + ".blockEnderRift.waila.riftId", tag.getInteger("riftId")));
+                currenttip.add(StatCollector.translateToLocalFormatted("text." + EnderRiftMod.MODID + ".blockEnderRift.waila.isFormed", tag.getBoolean("isFormed")));
+                if (tag.getBoolean("isFormed"))
+                {
+                    currenttip.add(StatCollector.translateToLocalFormatted("text." + EnderRiftMod.MODID + ".blockEnderRift.waila.riftId", tag.getInteger("riftId")));
+                }
+                currenttip.add(StatCollector.translateToLocalFormatted("text." + EnderRiftMod.MODID + ".blockEnderRift.waila.usedSlots", tag.getInteger("usedSlots"), tag.getInteger("exposedSlots")));
+                currenttip.add(StatCollector.translateToLocalFormatted("text." + EnderRiftMod.MODID + ".blockEnderRift.waila.energyUsageInsert", tag.getInteger("energyInsert")));
+                currenttip.add(StatCollector.translateToLocalFormatted("text." + EnderRiftMod.MODID + ".blockEnderRift.waila.energyUsageExtract", tag.getInteger("energyExtract")));
             }
-            currenttip.add(StatCollector.translateToLocalFormatted("text." + EnderRiftMod.MODID + ".blockEnderRift.waila.usedSlots", tag.getInteger("usedSlots"), tag.getInteger("exposedSlots")));
-            currenttip.add(StatCollector.translateToLocalFormatted("text." + EnderRiftMod.MODID + ".blockEnderRift.waila.energyUsageInsert", tag.getInteger("energyInsert")));
-            currenttip.add(StatCollector.translateToLocalFormatted("text." + EnderRiftMod.MODID + ".blockEnderRift.waila.energyUsageExtract", tag.getInteger("energyExtract")));
+            else
+            {
+                currenttip.add(StatCollector.translateToLocalFormatted("text." + EnderRiftMod.MODID + ".blockEnderRift.waila.isFormed", false));
+            }
         }
 
         return currenttip;

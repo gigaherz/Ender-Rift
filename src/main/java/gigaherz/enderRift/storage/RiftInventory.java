@@ -1,13 +1,19 @@
 package gigaherz.enderRift.storage;
 
+import gigaherz.enderRift.blocks.TileEnderRift;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.Constants;
 
+import java.lang.ref.Reference;
+import java.lang.ref.ReferenceQueue;
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 public class RiftInventory implements IInventory
@@ -15,9 +21,44 @@ public class RiftInventory implements IInventory
     private final List<ItemStack> inventorySlots = new ArrayList<ItemStack>();
     private final RiftStorageWorldData manager;
 
+    final List<Reference<? extends TileEnderRift>> listeners = new ArrayList<Reference<? extends TileEnderRift>>();
+    final ReferenceQueue<TileEnderRift> deadListeners = new ReferenceQueue<TileEnderRift>();
+
     RiftInventory(RiftStorageWorldData manager)
     {
         this.manager = manager;
+    }
+
+    public void addWeakListener(TileEnderRift e)
+    {
+        listeners.add(new WeakReference<TileEnderRift>(e, deadListeners));
+    }
+
+    @Override
+    public void markDirty()
+    {
+        for(Reference<? extends TileEnderRift>
+            ref = deadListeners.poll();
+            ref != null;
+            ref = deadListeners.poll())
+        {
+            listeners.remove(ref);
+        }
+
+        for (Iterator<Reference<? extends TileEnderRift>> it = listeners.iterator(); it.hasNext();)
+        {
+            TileEnderRift rift = it.next().get();
+            if(rift == null ||rift.isInvalid())
+            {
+                it.remove();
+            }
+            else
+            {
+                rift.setDirty();
+            }
+        }
+
+        manager.markDirty();
     }
 
     public int countInventoryStacks()
@@ -56,7 +97,7 @@ public class RiftInventory implements IInventory
                 return;
 
             inventorySlots.remove(slotIndex);
-            manager.markDirty();
+            markDirty();
 
             return;
         }
@@ -64,13 +105,13 @@ public class RiftInventory implements IInventory
         if (slotIndex >= inventorySlots.size())
         {
             inventorySlots.add(stack);
-            manager.markDirty();
+            markDirty();
 
             return;
         }
 
         inventorySlots.set(slotIndex, stack);
-        manager.markDirty();
+        markDirty();
     }
 
     @Override
@@ -107,6 +148,7 @@ public class RiftInventory implements IInventory
             }
         }
 
+        markDirty();
         return stack;
     }
 
@@ -120,12 +162,6 @@ public class RiftInventory implements IInventory
     public int getInventoryStackLimit()
     {
         return 64;
-    }
-
-    @Override
-    public void markDirty()
-    {
-        manager.markDirty();
     }
 
     @Override

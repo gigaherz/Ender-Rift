@@ -35,8 +35,15 @@ public class TileEnderRift
         if(inventory == null)
         {
             inventory = RiftStorageWorldData.get(worldObj).getRift(riftId);
+            inventory.addWeakListener(this);
         }
         return inventory;
+    }
+
+    @Override
+    public boolean shouldRenderInPass(int pass)
+    {
+        return pass==1;
     }
 
     public int getEnergyInsert()
@@ -152,6 +159,11 @@ public class TileEnderRift
         getInventory().markDirty();
     }
 
+    public void setDirty()
+    {
+        super.markDirty();
+    }
+
     @Override
     public boolean isUseableByPlayer(EntityPlayer player)
     {
@@ -231,7 +243,7 @@ public class TileEnderRift
     @Override
     public boolean shouldRefresh(Block oldBlock, Block newBlock, int oldMeta, int newMeta, World world, int x, int y, int z)
     {
-        return oldBlock != newBlock;
+        return oldBlock != newBlock || ((oldMeta != 0) != (newMeta != 0));
     }
 
     public ItemStack getRiftItem()
