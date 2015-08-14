@@ -1,0 +1,10 @@
+language: java
+install: chmod +x gradlew
+script: gradle setupCIWorkspace build uploadArchives
+sudo: false
+cache:
+  directories:
+    - $HOME/.gradle
+    - .gradle
+jdk:
+  - oraclejdk8
