@@ -30,6 +30,8 @@ public class TileEnderRift
     public int riftId;
     RiftInventory inventory;
 
+    boolean alreadyMarkedDirty;
+
     RiftInventory getInventory()
     {
         if(inventory == null)
@@ -161,6 +163,10 @@ public class TileEnderRift
 
     public void setDirty()
     {
+        if (alreadyMarkedDirty)
+            return;
+
+        alreadyMarkedDirty = true;
         super.markDirty();
     }
 
@@ -210,7 +216,9 @@ public class TileEnderRift
 
         int dim = worldObj.provider.dimensionId;
         EnderRiftMod.channel.sendToAllAround(new ValueUpdate(this, 0, energyBuffer), new NetworkRegistry.TargetPoint(dim, xCoord, yCoord, zCoord, BroadcastRange));
-        this.markDirty();
+
+        this.setDirty();
+
         return receive;
     }
 
@@ -244,6 +252,19 @@ public class TileEnderRift
     public boolean shouldRefresh(Block oldBlock, Block newBlock, int oldMeta, int newMeta, World world, int x, int y, int z)
     {
         return oldBlock != newBlock || ((oldMeta != 0) != (newMeta != 0));
+    }
+
+    @Override
+    public void updateEntity()
+    {
+        super.updateEntity();
+        alreadyMarkedDirty = false;
+    }
+
+    @Override
+    public boolean canUpdate()
+    {
+        return true;
     }
 
     public ItemStack getRiftItem()
