@@ -1,16 +1,13 @@
 package gigaherz.enderRift.blocks;
 
 import cofh.api.energy.IEnergyReceiver;
-import cpw.mods.fml.common.network.NetworkRegistry;
 import gigaherz.enderRift.ConfigValues;
 import gigaherz.enderRift.EnderRiftMod;
-import gigaherz.enderRift.network.ValueUpdate;
 import gigaherz.enderRift.storage.RiftInventory;
 import gigaherz.enderRift.storage.RiftStorageWorldData;
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
@@ -34,7 +31,7 @@ public class TileEnderRift
 
     RiftInventory getInventory()
     {
-        if(inventory == null)
+        if (inventory == null)
         {
             inventory = RiftStorageWorldData.get(worldObj).getRift(riftId);
             inventory.addWeakListener(this);
@@ -45,7 +42,7 @@ public class TileEnderRift
     @Override
     public boolean shouldRenderInPass(int pass)
     {
-        return pass==1;
+        return pass == 1;
     }
 
     public int getEnergyInsert()
@@ -211,13 +208,12 @@ public class TileEnderRift
     public int receiveEnergy(ForgeDirection from, int maxReceive, boolean simulate)
     {
         int receive = Math.min(maxReceive, energyLimit - energyBuffer);
-        if (!simulate)
+        if (!simulate && receive > 0)
+        {
             energyBuffer += receive;
 
-        int dim = worldObj.provider.dimensionId;
-        EnderRiftMod.channel.sendToAllAround(new ValueUpdate(this, 0, energyBuffer), new NetworkRegistry.TargetPoint(dim, xCoord, yCoord, zCoord, BroadcastRange));
-
-        this.setDirty();
+            this.setDirty();
+        }
 
         return receive;
     }

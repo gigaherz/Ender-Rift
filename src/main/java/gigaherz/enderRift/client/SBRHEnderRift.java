@@ -6,14 +6,9 @@ import gigaherz.enderRift.EnderRiftMod;
 import gigaherz.enderRift.blocks.BlockEnderRift;
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.RenderBlocks;
-import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.util.IIcon;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.IBlockAccess;
-import net.minecraftforge.client.model.AdvancedModelLoader;
-import net.minecraftforge.client.model.IModelCustom;
-import org.lwjgl.opengl.GL11;
 
 public class SBRHEnderRift implements ISimpleBlockRenderingHandler
 {
@@ -59,10 +54,10 @@ public class SBRHEnderRift implements ISimpleBlockRenderingHandler
     @Override
     public boolean renderWorldBlock(IBlockAccess world, int x, int y, int z, Block block, int modelId, RenderBlocks renderer)
     {
-        if(block == null || !(block instanceof BlockEnderRift))
+        if (block == null || !(block instanceof BlockEnderRift))
             return false;
 
-        if(world.getBlockMetadata(x,y,z) == 0)
+        if (world.getBlockMetadata(x, y, z) == 0)
         {
             renderer.setOverrideBlockTexture(block.getIcon(0, 0));
             renderer.setRenderBoundsFromBlock(block);
@@ -73,7 +68,7 @@ public class SBRHEnderRift implements ISimpleBlockRenderingHandler
 
         Tessellator tessellator = Tessellator.instance;
 
-        z+=2;
+        z += 2;
         y--;
         x--;
 

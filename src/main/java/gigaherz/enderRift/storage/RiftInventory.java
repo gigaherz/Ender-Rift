@@ -6,7 +6,6 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.Constants;
 
 import java.lang.ref.Reference;
@@ -37,18 +36,18 @@ public class RiftInventory implements IInventory
     @Override
     public void markDirty()
     {
-        for(Reference<? extends TileEnderRift>
-            ref = deadListeners.poll();
-            ref != null;
-            ref = deadListeners.poll())
+        for (Reference<? extends TileEnderRift>
+             ref = deadListeners.poll();
+             ref != null;
+             ref = deadListeners.poll())
         {
             listeners.remove(ref);
         }
 
-        for (Iterator<Reference<? extends TileEnderRift>> it = listeners.iterator(); it.hasNext();)
+        for (Iterator<Reference<? extends TileEnderRift>> it = listeners.iterator(); it.hasNext(); )
         {
             TileEnderRift rift = it.next().get();
-            if(rift == null ||rift.isInvalid())
+            if (rift == null || rift.isInvalid())
             {
                 it.remove();
             }

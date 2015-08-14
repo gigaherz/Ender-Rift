@@ -16,42 +16,42 @@ public class RecipesRiftDuplication implements IRecipe
      */
     public boolean matches(InventoryCrafting crafting, World p_77569_2_)
     {
-        if(crafting.getSizeInventory() < 9)
+        if (crafting.getSizeInventory() < 9)
             return false;
 
         ItemStack stack = crafting.getStackInSlot(4);
-        if(stack == null)
+        if (stack == null)
             return false;
 
-        if(stack.getItem() != EnderRiftMod.itemEnderRift)
+        if (stack.getItem() != EnderRiftMod.itemEnderRift)
             return false;
 
         NBTTagCompound tag = stack.getTagCompound();
-        if(tag == null || !tag.hasKey("RiftId"))
+        if (tag == null || !tag.hasKey("RiftId"))
             return false;
 
-        if(!slotHasItem(crafting, 0, Items.magma_cream))
+        if (!slotHasItem(crafting, 0, Items.magma_cream))
             return false;
 
-        if(!slotHasItem(crafting, 1, Items.ender_pearl))
+        if (!slotHasItem(crafting, 1, Items.ender_pearl))
             return false;
 
-        if(!slotHasItem(crafting, 2, Items.magma_cream))
+        if (!slotHasItem(crafting, 2, Items.magma_cream))
             return false;
 
-        if(!slotHasItem(crafting, 3,  Items.ender_pearl))
+        if (!slotHasItem(crafting, 3, Items.ender_pearl))
             return false;
 
-        if(!slotHasItem(crafting, 5,  Items.ender_pearl))
+        if (!slotHasItem(crafting, 5, Items.ender_pearl))
             return false;
 
-        if(!slotHasItem(crafting, 6,  Items.magma_cream))
+        if (!slotHasItem(crafting, 6, Items.magma_cream))
             return false;
 
-        if(!slotHasItem(crafting, 7,  Items.ender_pearl))
+        if (!slotHasItem(crafting, 7, Items.ender_pearl))
             return false;
 
-        if(!slotHasItem(crafting, 8,  Items.magma_cream))
+        if (!slotHasItem(crafting, 8, Items.magma_cream))
             return false;
 
         return true;

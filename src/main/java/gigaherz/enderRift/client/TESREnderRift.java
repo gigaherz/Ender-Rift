@@ -3,7 +3,6 @@ package gigaherz.enderRift.client;
 import gigaherz.enderRift.EnderRiftMod;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.MathHelper;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.model.AdvancedModelLoader;
 import net.minecraftforge.client.model.IModelCustom;
@@ -18,7 +17,7 @@ public class TESREnderRift extends TileEntitySpecialRenderer
     @Override
     public void renderTileEntityAt(TileEntity entity, double x, double y, double z, float f)
     {
-        if(entity.getBlockMetadata() == 0)
+        if (entity.getBlockMetadata() == 0)
             return;
 
         bindTexture(texture);

@@ -1,6 +1,5 @@
 package gigaherz.enderRift;
 
-import gigaherz.enderRift.blocks.BlockEnderRift;
 import gigaherz.enderRift.blocks.TileEnderRift;
 import gigaherz.enderRift.blocks.TileEnderRiftCorner;
 import mcp.mobius.waila.api.IWailaConfigHandler;
@@ -38,7 +37,7 @@ public class WailaProvider implements IWailaDataProvider
         {
             NBTTagCompound tag = accessor.getNBTData();
 
-            if(tag != null && tag.hasKey("isFormed"))
+            if (tag != null && tag.hasKey("isFormed"))
             {
                 currenttip.add(StatCollector.translateToLocalFormatted("text." + EnderRiftMod.MODID + ".blockEnderRift.waila.isFormed", tag.getBoolean("isFormed")));
                 if (tag.getBoolean("isFormed"))
@@ -80,8 +79,8 @@ public class WailaProvider implements IWailaDataProvider
     {
         TileEnderRift rift;
 
-        if(te instanceof TileEnderRiftCorner)
-            rift = (TileEnderRift)((TileEnderRiftCorner)te).getParent();
+        if (te instanceof TileEnderRiftCorner)
+            rift = (TileEnderRift) ((TileEnderRiftCorner) te).getParent();
         else
             rift = (TileEnderRift) te;
 

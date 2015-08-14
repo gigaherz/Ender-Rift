@@ -6,14 +6,11 @@ import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLInterModComms;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
-import cpw.mods.fml.common.network.NetworkRegistry;
-import cpw.mods.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import gigaherz.enderRift.blocks.*;
 import gigaherz.enderRift.items.ItemEnderRift;
-import gigaherz.enderRift.network.ValueUpdate;
 import gigaherz.enderRift.recipe.RecipesRiftDuplication;
 import net.minecraft.block.Block;
 import net.minecraft.creativetab.CreativeTabs;
@@ -21,7 +18,6 @@ import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.RecipesMapCloning;
 import net.minecraftforge.common.config.Configuration;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -46,8 +42,6 @@ public class EnderRiftMod
     @SidedProxy(clientSide = "gigaherz.enderRift.client.ClientProxy", serverSide = "gigaherz.enderRift.server.ServerProxy")
     public static IModProxy proxy;
 
-    public static SimpleNetworkWrapper channel;
-
     public static final Logger logger = LogManager.getLogger(MODID);
 
     @EventHandler
@@ -70,7 +64,7 @@ public class EnderRiftMod
         itemEnderRift = new ItemEnderRift().setUnlocalizedName(MODID + ".itemEnderRift");
         GameRegistry.registerItem(itemEnderRift, "itemEnderRift");
 
-        blockEnderRift = (BlockEnderRift)new BlockEnderRift().setHardness(0.5F).setStepSound(Block.soundTypeMetal).setBlockName(MODID + ".blockEnderRift");
+        blockEnderRift = (BlockEnderRift) new BlockEnderRift().setHardness(0.5F).setStepSound(Block.soundTypeMetal).setBlockName(MODID + ".blockEnderRift");
         GameRegistry.registerBlock(blockEnderRift, "blockEnderRift");
 
         blockStructureInvisible = new BlockStructureInvisible().setHardness(0.5F).setStepSound(Block.soundTypeMetal).setBlockName(MODID + ".blockStructureInvisible");
@@ -81,9 +75,6 @@ public class EnderRiftMod
 
         GameRegistry.registerTileEntity(TileEnderRift.class, "tileEnderRift");
         GameRegistry.registerTileEntity(TileEnderRiftCorner.class, "tileStructureCorner");
-
-        channel = NetworkRegistry.INSTANCE.newSimpleChannel(CHANNEL);
-        channel.registerMessage(ValueUpdate.Handler.class, ValueUpdate.class, 0, Side.CLIENT);
 
         proxy.preInit();
     }

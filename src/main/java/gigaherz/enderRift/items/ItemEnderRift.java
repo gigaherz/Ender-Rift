@@ -22,7 +22,7 @@ public class ItemEnderRift extends Item
     public String getUnlocalizedName(ItemStack stack)
     {
         NBTTagCompound tag = stack.getTagCompound();
-        if(tag == null ||!tag.hasKey("RiftId"))
+        if (tag == null || !tag.hasKey("RiftId"))
             return this.getUnlocalizedName() + ".empty";
         else
             return this.getUnlocalizedName() + ".bound";
@@ -32,7 +32,7 @@ public class ItemEnderRift extends Item
     public void addInformation(ItemStack stack, EntityPlayer player, List information, boolean p_77624_4_)
     {
         NBTTagCompound tag = stack.getTagCompound();
-        if(tag != null && tag.hasKey("RiftId"))
+        if (tag != null && tag.hasKey("RiftId"))
         {
             information.add("Rift ID: " + tag.getInteger("RiftId"));
         }
@@ -49,10 +49,10 @@ public class ItemEnderRift extends Item
         if (!player.canPlayerEdit(x, y, z, side, itemStack))
             return false;
 
-        if(world.getBlock(x, y, z) != EnderRiftMod.blockEnderRift)
+        if (world.getBlock(x, y, z) != EnderRiftMod.blockEnderRift)
             return false;
 
-        if(world.getBlockMetadata(x, y, z) != 0)
+        if (world.getBlockMetadata(x, y, z) != 0)
         {
             NBTTagCompound tag = itemStack.getTagCompound();
             if (tag == null || !tag.hasKey("RiftId"))
