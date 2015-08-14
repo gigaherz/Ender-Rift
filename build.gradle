@@ -21,6 +21,24 @@ version = "0.5"
 group= "gigaherz.enderRift" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "EnderRift"
 
+task deobfJar(type: Jar) {
+    from sourceSets.main.output
+    classifier = 'deobf'
+}
+
+task sourceJar(type: Jar) {
+    from sourceSets.main.allSource
+    classifier = 'sources'
+}
+
+artifacts {
+    archives sourceJar
+    archives deobfJar
+    archives jar
+}
+
+tasks.build.dependsOn('sourceJar', 'deobfJar')
+
 minecraft {
     version = "1.7.10-10.13.4.1492-1.7.10"
     runDir = "eclipse"
