@@ -14,33 +14,15 @@ buildscript {
 
 apply plugin: 'net.minecraftforge.gradle.forge'
 
-version = "0.53"
-group= "gigaherz.enderRift" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
+version = "0.64"
+group= "gigaherz.enderRift"
 archivesBaseName = "EnderRift"
 
-task deobfJar(type: Jar) {
-    from sourceSets.main.output
-    classifier = 'deobf'
-}
-
-task srcJar(type: Jar) {
-    from sourceSets.main.allSource
-    classifier = 'sources'
-}
-
-artifacts {
-    archives srcJar
-    archives deobfJar
-    archives jar
-}
-
-tasks.build.dependsOn('srcJar', 'deobfJar')
-
 minecraft {
-    version = "1.8.8-11.15.0.1654-1.8.8"
+    version = "1.8.9-11.15.0.1663"
     runDir = "run"
 
-    mappings = "snapshot_20151229"
+    mappings = "snapshot_20151231"
 
     replace "@VERSION@", project.version
     replaceIn "EnderRiftMod.java"
