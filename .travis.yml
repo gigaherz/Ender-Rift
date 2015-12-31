@@ -1,6 +1,6 @@
 language: java
 install: chmod +x gradlew
-script: gradle setupCIWorkspace build
+script: ./gradlew setupCIWorkspace build
 sudo: false
 cache:
   directories:
