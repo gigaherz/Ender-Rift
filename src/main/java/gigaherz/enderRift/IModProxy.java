@@ -1,7 +1,6 @@
 package gigaherz.enderRift;
 
-public interface IModProxy
-{
+public interface IModProxy {
     void preInit();
 
     void init();

@@ -1,22 +1,18 @@
 package cofh.api.tileentity;
 
-import com.mojang.authlib.GameProfile;
-
-import net.minecraft.entity.player.EntityPlayer;
-
 /**
  * Implement this interface on Tile Entities which can have access restrictions.
- *
+ * 
  * @author King Lemming
- *
+ * 
  */
 public interface ISecurable {
 
 	/**
 	 * Enum for Access Modes - Restricted is Friends Only, Private is Owner only.
-	 *
+	 * 
 	 * @author King Lemming
-	 *
+	 * 
 	 */
 	public static enum AccessMode {
 		PUBLIC, RESTRICTED, PRIVATE;
@@ -51,14 +47,10 @@ public interface ISecurable {
 
 	boolean setOwnerName(String name);
 
-	boolean setOwner(GameProfile name);
-
 	AccessMode getAccess();
 
 	String getOwnerName();
 
-	GameProfile getOwner();
-
-	boolean canPlayerAccess(EntityPlayer player);
+	boolean canPlayerAccess(String name);
 
 }

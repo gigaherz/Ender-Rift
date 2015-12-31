@@ -1,14 +1,5 @@
 package gigaherz.enderRift;
 
-import cpw.mods.fml.common.Mod;
-import cpw.mods.fml.common.Mod.EventHandler;
-import cpw.mods.fml.common.SidedProxy;
-import cpw.mods.fml.common.event.FMLInitializationEvent;
-import cpw.mods.fml.common.event.FMLInterModComms;
-import cpw.mods.fml.common.event.FMLPreInitializationEvent;
-import cpw.mods.fml.common.registry.GameRegistry;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 import gigaherz.enderRift.blocks.*;
 import gigaherz.enderRift.items.ItemEnderRift;
 import gigaherz.enderRift.recipe.RecipesRiftDuplication;
@@ -19,20 +10,24 @@ import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.config.Configuration;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.common.SidedProxy;
+import net.minecraftforge.fml.common.event.FMLInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLInterModComms;
+import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.registry.GameRegistry;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 @Mod(modid = EnderRiftMod.MODID, version = EnderRiftMod.VERSION, dependencies = "after:Waila;after:NotEnoughItems")
-public class EnderRiftMod
-{
+public class EnderRiftMod {
     public static final String MODID = "enderRift";
     public static final String VERSION = "@VERSION";
 
-    public static final String CHANNEL = "EnderRift";
-
     public static BlockEnderRift blockEnderRift;
-    public static Block blockStructureInvisible;
-    public static Block blockStructureCorner;
+    public static Block blockStructure;
     public static Item itemEnderRift;
     public static CreativeTabs tabEnderRift;
 
@@ -44,19 +39,16 @@ public class EnderRiftMod
 
     public static final Logger logger = LogManager.getLogger(MODID);
 
-    @EventHandler
-    public void preInit(FMLPreInitializationEvent event)
-    {
+    @Mod.EventHandler
+    public void preInit(FMLPreInitializationEvent event) {
         Configuration config = new Configuration(event.getSuggestedConfigurationFile());
 
         ConfigValues.readConfig(config);
 
-        tabEnderRift = new CreativeTabs("tabEnderRift")
-        {
+        tabEnderRift = new CreativeTabs("tabEnderRift") {
             @Override
             @SideOnly(Side.CLIENT)
-            public Item getTabIconItem()
-            {
+            public Item getTabIconItem() {
                 return itemEnderRift;
             }
         };
@@ -64,14 +56,11 @@ public class EnderRiftMod
         itemEnderRift = new ItemEnderRift().setUnlocalizedName(MODID + ".itemEnderRift");
         GameRegistry.registerItem(itemEnderRift, "itemEnderRift");
 
-        blockEnderRift = (BlockEnderRift) new BlockEnderRift().setHardness(0.5F).setStepSound(Block.soundTypeMetal).setBlockName(MODID + ".blockEnderRift");
+        blockEnderRift = new BlockEnderRift();
         GameRegistry.registerBlock(blockEnderRift, "blockEnderRift");
 
-        blockStructureInvisible = new BlockStructureInvisible().setHardness(0.5F).setStepSound(Block.soundTypeMetal).setBlockName(MODID + ".blockStructureInvisible");
-        GameRegistry.registerBlock(blockStructureInvisible, "blockStructureInvisible");
-
-        blockStructureCorner = new BlockStructureInvisibleCorner().setHardness(0.5F).setStepSound(Block.soundTypeMetal).setBlockName(MODID + ".blockStructureCorner");
-        GameRegistry.registerBlock(blockStructureCorner, "blockStructureCorner");
+        blockStructure = new BlockStructure();
+        GameRegistry.registerBlock(blockStructure, "blockStructure");
 
         GameRegistry.registerTileEntity(TileEnderRift.class, "tileEnderRift");
         GameRegistry.registerTileEntity(TileEnderRiftCorner.class, "tileStructureCorner");
@@ -79,10 +68,8 @@ public class EnderRiftMod
         proxy.preInit();
     }
 
-    @EventHandler
-    public void init(FMLInitializationEvent event)
-    {
-
+    @Mod.EventHandler
+    public void init(FMLInitializationEvent event) {
         proxy.init();
 
         // Recipes

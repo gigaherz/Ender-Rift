@@ -1,26 +1,26 @@
 package gigaherz.enderRift.items;
 
 import gigaherz.enderRift.EnderRiftMod;
+import gigaherz.enderRift.blocks.BlockEnderRift;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.world.World;
 
 import java.util.List;
 
-public class ItemEnderRift extends Item
-{
-    public ItemEnderRift()
-    {
+public class ItemEnderRift extends Item {
+    public ItemEnderRift() {
         this.maxStackSize = 16;
         this.setCreativeTab(EnderRiftMod.tabEnderRift);
-        this.setTextureName("enderrift:item_rift");
     }
 
     @Override
-    public String getUnlocalizedName(ItemStack stack)
-    {
+    public String getUnlocalizedName(ItemStack stack) {
         NBTTagCompound tag = stack.getTagCompound();
         if (tag == null || !tag.hasKey("RiftId"))
             return this.getUnlocalizedName() + ".empty";
@@ -29,47 +29,41 @@ public class ItemEnderRift extends Item
     }
 
     @Override
-    public void addInformation(ItemStack stack, EntityPlayer player, List information, boolean p_77624_4_)
-    {
+    public void addInformation(ItemStack stack, EntityPlayer player, List<String> information, boolean p_77624_4_) {
         NBTTagCompound tag = stack.getTagCompound();
-        if (tag != null && tag.hasKey("RiftId"))
-        {
+        if (tag != null && tag.hasKey("RiftId")) {
             information.add("Rift ID: " + tag.getInteger("RiftId"));
         }
     }
 
     @Override
-    public boolean onItemUse(ItemStack itemStack, EntityPlayer player, World world,
-                             int x, int y, int z, int side,
-                             float hitX, float hitY, float hitZ)
+    public boolean onItemUse(ItemStack stack, EntityPlayer playerIn, World worldIn, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ)
     {
-        if (world.isRemote)
+        if (worldIn.isRemote)
             return true;
 
-        if (!player.canPlayerEdit(x, y, z, side, itemStack))
+        if (!playerIn.canPlayerEdit(pos, side, stack))
             return false;
 
-        if (world.getBlock(x, y, z) != EnderRiftMod.blockEnderRift)
+        IBlockState state = worldIn.getBlockState(pos);
+
+        if (state.getBlock() != EnderRiftMod.blockEnderRift)
             return false;
 
-        if (world.getBlockMetadata(x, y, z) != 0)
+        if (state.getValue(BlockEnderRift.ASSEMBLED))
         {
-            NBTTagCompound tag = itemStack.getTagCompound();
-            if (tag == null || !tag.hasKey("RiftId"))
-            {
-                if (!EnderRiftMod.blockEnderRift.tryDuplicateRift(world, x, y, z, player))
+            NBTTagCompound tag = stack.getTagCompound();
+            if (tag == null || !tag.hasKey("RiftId")) {
+                if (!EnderRiftMod.blockEnderRift.tryDuplicateRift(worldIn, pos, playerIn))
                     return false;
             }
-        }
-        else
-        {
-            if (!EnderRiftMod.blockEnderRift.tryCompleteStructure(world, x, y, z, itemStack))
+        } else {
+            if (!EnderRiftMod.blockEnderRift.tryCompleteStructure(worldIn, pos, stack))
                 return false;
         }
 
-        if (!player.capabilities.isCreativeMode)
-        {
-            --itemStack.stackSize;
+        if (!playerIn.capabilities.isCreativeMode) {
+            --stack.stackSize;
         }
 
         return true;

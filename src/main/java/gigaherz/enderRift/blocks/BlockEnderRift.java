@@ -1,12 +1,12 @@
 package gigaherz.enderRift.blocks;
 
 import gigaherz.enderRift.EnderRiftMod;
-import gigaherz.enderRift.client.SBRHEnderRift;
 import gigaherz.enderRift.storage.RiftStorageWorldData;
 import net.minecraft.block.Block;
-import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.material.Material;
-import net.minecraft.client.renderer.texture.IIconRegister;
+import net.minecraft.block.properties.PropertyBool;
+import net.minecraft.block.state.BlockState;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
@@ -15,195 +15,235 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.IIcon;
+import net.minecraft.util.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class BlockEnderRift
         extends Block
-        implements ITileEntityProvider
 {
-    public IIcon iconMain;
-    public IIcon iconBase;
+    public static final PropertyBool ASSEMBLED = PropertyBool.create("assembled");
 
-    public boolean isInventory;
-    public final BlockEnderRift asInventory;
-
-    public BlockEnderRift(boolean isInventory)
-    {
+    public BlockEnderRift() {
         super(Material.rock);
-        this.isInventory = isInventory;
-        setBlockTextureName(EnderRiftMod.MODID.toLowerCase() + ":block_casing");
-        asInventory = null;
-    }
-
-    public BlockEnderRift()
-    {
-        super(Material.rock);
+        setHardness(0.5F);
+        setStepSound(Block.soundTypeMetal);
+        setUnlocalizedName(EnderRiftMod.MODID + ".blockEnderRift");
         setCreativeTab(EnderRiftMod.tabEnderRift);
-        setBlockTextureName(EnderRiftMod.MODID.toLowerCase() + ":block_casing");
-        asInventory = new BlockEnderRift(true);
+        setDefaultState(this.blockState.getBaseState()
+                .withProperty(ASSEMBLED, false));
     }
 
     @Override
-    public void registerBlockIcons(IIconRegister register)
+    protected BlockState createBlockState()
     {
-        super.registerBlockIcons(register);
-        if (!isInventory)
-        {
-            this.iconMain = register.registerIcon(EnderRiftMod.MODID.toLowerCase() + ":block_rift");
-            this.iconBase = register.registerIcon(EnderRiftMod.MODID.toLowerCase() + ":block_rift_base");
-        }
+        return new BlockState(this, ASSEMBLED);
     }
 
     @Override
-    public boolean isOpaqueCube()
+    public IBlockState getStateFromMeta(int meta)
     {
+        return getDefaultState().withProperty(ASSEMBLED, meta != 0);
+    }
+
+    @Override
+    public int getMetaFromState(IBlockState state)
+    {
+        return state.getValue(ASSEMBLED) ? 1 : 0;
+    }
+
+    @Override
+    public boolean isOpaqueCube() {
         return false;
     }
 
     @Override
-    public int getRenderType()
+    public int getLightValue(IBlockAccess world, BlockPos pos)
     {
-        return isInventory ? super.getRenderType() : SBRHEnderRift.renderId;
+        IBlockState state = world.getBlockState(pos);
+        if(state.getBlock() != this)
+            return super.getLightValue(world, pos);
+        return world.getBlockState(pos).getValue(ASSEMBLED) ? 15 : 0;
     }
 
     @Override
-    public int getLightValue(IBlockAccess world, int x, int y, int z)
+    public int getLightOpacity(IBlockAccess world, BlockPos pos)
     {
-        return (world.getBlockMetadata(x, y, z) != 0) ? 15 : 0;
+        IBlockState state = world.getBlockState(pos);
+        if(state.getBlock() != this)
+            return super.getLightOpacity(world, pos);
+        return state.getValue(ASSEMBLED) ? 1 : 15;
     }
 
     @Override
-    public int getLightOpacity(IBlockAccess world, int x, int y, int z)
-    {
-        return (world.getBlockMetadata(x, y, z) != 0) ? 1 : 15;
-    }
-
-    @Override
-    public boolean hasTileEntity(int metadata)
+    public boolean hasTileEntity(IBlockState state)
     {
         return true;
     }
 
     @Override
-    public TileEntity createNewTileEntity(World p_149915_1_, int p_149915_2_)
+    public TileEntity createTileEntity(World world, IBlockState state)
     {
         return new TileEnderRift();
     }
 
-    public boolean tryCompleteStructure(World world, int x, int y, int z, ItemStack itemStack)
+    @Override
+    public int getRenderType()
     {
-        if (world.getBlock(x, y, z) != EnderRiftMod.blockEnderRift)
+        return super.getRenderType();
+    }
+
+    Block getBlockXYZ(IBlockAccess world, int x, int y, int z)
+    {
+        return world.getBlockState(new BlockPos(x,y,z)).getBlock();
+    }
+
+    void setBlockXYZ(World world, int x, int y, int z, IBlockState state)
+    {
+        world.setBlockState(new BlockPos(x,y,z), state);
+    }
+
+    void setBlockCorner(World world, int x, int y, int z, int corner, boolean base)
+    {
+        setBlockXYZ(world, x, y, z, EnderRiftMod.blockStructure.getDefaultState()
+                .withProperty(BlockStructure.TYPE1, BlockStructure.Type1.CORNER)
+                .withProperty(BlockStructure.TYPE2, BlockStructure.Type2.NONE)
+                .withProperty(BlockStructure.CORNER, corner)
+                .withProperty(BlockStructure.BASE, base));
+    }
+
+    private void setBlockOther(World world, int x, int y, int z, BlockStructure.Type2 type2, boolean base)
+    {
+        setBlockXYZ(world, x, y, z, EnderRiftMod.blockStructure.getDefaultState()
+                .withProperty(BlockStructure.TYPE1, BlockStructure.Type1.NORMAL)
+                .withProperty(BlockStructure.TYPE2, type2)
+                .withProperty(BlockStructure.CORNER, 0)
+                .withProperty(BlockStructure.BASE, base));
+    }
+
+    public boolean tryCompleteStructure(World world, BlockPos pos, ItemStack itemStack)
+    {
+        int x = pos.getX();
+        int y = pos.getY();
+        int z = pos.getZ();
+
+        IBlockState state = world.getBlockState(pos);
+
+        if (state.getBlock() != EnderRiftMod.blockEnderRift)
             return false;
 
-        if (world.getBlockMetadata(x, y, z) != 0)
+        if (state.getValue(ASSEMBLED))
             return false;
 
-        if (world.getBlock(x - 1, y, z).isNormalCube(world, x, y, z))
+        if (getBlockXYZ(world, x - 1, y, z).isNormalCube(world, pos))
             return false;
-        if (world.getBlock(x + 1, y, z).isNormalCube(world, x, y, z))
+        if (getBlockXYZ(world, x + 1, y, z).isNormalCube(world, pos))
             return false;
-        if (world.getBlock(x, y + 1, z).isNormalCube(world, x, y, z))
+        if (getBlockXYZ(world, x, y + 1, z).isNormalCube(world, pos))
             return false;
-        if (world.getBlock(x, y, z - 1).isNormalCube(world, x, y, z))
+        if (getBlockXYZ(world, x, y, z - 1).isNormalCube(world, pos))
             return false;
-        if (world.getBlock(x, y, z + 1).isNormalCube(world, x, y, z))
-            return false;
-
-        if (world.getBlock(x - 1, y, z - 1) != Blocks.redstone_block)
-            return false;
-        if (world.getBlock(x + 1, y, z - 1) != Blocks.redstone_block)
-            return false;
-        if (world.getBlock(x - 1, y, z + 1) != Blocks.redstone_block)
-            return false;
-        if (world.getBlock(x + 1, y, z + 1) != Blocks.redstone_block)
+        if (getBlockXYZ(world, x, y, z + 1).isNormalCube(world, pos))
             return false;
 
-        if (world.getBlock(x - 1, y - 1, z - 1) != Blocks.iron_block)
+        if (getBlockXYZ(world, x - 1, y, z - 1) != Blocks.redstone_block)
             return false;
-        if (world.getBlock(x, y - 1, z - 1) != Blocks.redstone_block)
+        if (getBlockXYZ(world, x + 1, y, z - 1) != Blocks.redstone_block)
             return false;
-        if (world.getBlock(x + 1, y - 1, z - 1) != Blocks.iron_block)
+        if (getBlockXYZ(world, x - 1, y, z + 1) != Blocks.redstone_block)
             return false;
-        if (world.getBlock(x - 1, y - 1, z) != Blocks.redstone_block)
-            return false;
-        if (world.getBlock(x, y - 1, z) != Blocks.redstone_block)
-            return false;
-        if (world.getBlock(x + 1, y - 1, z) != Blocks.redstone_block)
-            return false;
-        if (world.getBlock(x - 1, y - 1, z + 1) != Blocks.iron_block)
-            return false;
-        if (world.getBlock(x, y - 1, z + 1) != Blocks.redstone_block)
-            return false;
-        if (world.getBlock(x + 1, y - 1, z + 1) != Blocks.iron_block)
+        if (getBlockXYZ(world, x + 1, y, z + 1) != Blocks.redstone_block)
             return false;
 
-        if (world.getBlock(x - 1, y + 1, z - 1) != Blocks.iron_block)
+        if (getBlockXYZ(world, x - 1, y - 1, z - 1) != Blocks.iron_block)
             return false;
-        if (world.getBlock(x, y + 1, z - 1) != Blocks.redstone_block)
+        if (getBlockXYZ(world, x, y - 1, z - 1) != Blocks.redstone_block)
             return false;
-        if (world.getBlock(x + 1, y + 1, z - 1) != Blocks.iron_block)
+        if (getBlockXYZ(world, x + 1, y - 1, z - 1) != Blocks.iron_block)
             return false;
-        if (world.getBlock(x - 1, y + 1, z) != Blocks.redstone_block)
+        if (getBlockXYZ(world, x - 1, y - 1, z) != Blocks.redstone_block)
             return false;
-        if (world.getBlock(x + 1, y + 1, z) != Blocks.redstone_block)
+        if (getBlockXYZ(world, x, y - 1, z) != Blocks.redstone_block)
             return false;
-        if (world.getBlock(x - 1, y + 1, z + 1) != Blocks.iron_block)
+        if (getBlockXYZ(world, x + 1, y - 1, z) != Blocks.redstone_block)
             return false;
-        if (world.getBlock(x, y + 1, z + 1) != Blocks.redstone_block)
+        if (getBlockXYZ(world, x - 1, y - 1, z + 1) != Blocks.iron_block)
             return false;
-        if (world.getBlock(x + 1, y + 1, z + 1) != Blocks.iron_block)
+        if (getBlockXYZ(world, x, y - 1, z + 1) != Blocks.redstone_block)
+            return false;
+        if (getBlockXYZ(world, x + 1, y - 1, z + 1) != Blocks.iron_block)
             return false;
 
-        world.setBlock(x - 1, y - 1, z - 1, EnderRiftMod.blockStructureCorner, 0, 3);
-        world.setBlock(x + 1, y - 1, z - 1, EnderRiftMod.blockStructureCorner, 1, 3);
-        world.setBlock(x - 1, y + 1, z - 1, EnderRiftMod.blockStructureCorner, 2, 3);
-        world.setBlock(x + 1, y + 1, z - 1, EnderRiftMod.blockStructureCorner, 3, 3);
-        world.setBlock(x - 1, y - 1, z + 1, EnderRiftMod.blockStructureCorner, 4, 3);
-        world.setBlock(x + 1, y - 1, z + 1, EnderRiftMod.blockStructureCorner, 5, 3);
-        world.setBlock(x - 1, y + 1, z + 1, EnderRiftMod.blockStructureCorner, 6, 3);
-        world.setBlock(x + 1, y + 1, z + 1, EnderRiftMod.blockStructureCorner, 7, 3);
+        if (getBlockXYZ(world, x - 1, y + 1, z - 1) != Blocks.iron_block)
+            return false;
+        if (getBlockXYZ(world, x, y + 1, z - 1) != Blocks.redstone_block)
+            return false;
+        if (getBlockXYZ(world, x + 1, y + 1, z - 1) != Blocks.iron_block)
+            return false;
+        if (getBlockXYZ(world, x - 1, y + 1, z) != Blocks.redstone_block)
+            return false;
+        if (getBlockXYZ(world, x + 1, y + 1, z) != Blocks.redstone_block)
+            return false;
+        if (getBlockXYZ(world, x - 1, y + 1, z + 1) != Blocks.iron_block)
+            return false;
+        if (getBlockXYZ(world, x, y + 1, z + 1) != Blocks.redstone_block)
+            return false;
+        if (getBlockXYZ(world, x + 1, y + 1, z + 1) != Blocks.iron_block)
+            return false;
 
-        world.setBlock(x, y - 1, z, EnderRiftMod.blockStructureInvisible, 0, 3);
-        world.setBlock(x, y - 1, z - 1, EnderRiftMod.blockStructureInvisible, 4, 3);
-        world.setBlock(x, y + 1, z - 1, EnderRiftMod.blockStructureInvisible, 5, 3);
-        world.setBlock(x, y - 1, z + 1, EnderRiftMod.blockStructureInvisible, 6, 3);
-        world.setBlock(x, y + 1, z + 1, EnderRiftMod.blockStructureInvisible, 7, 3);
-        world.setBlock(x - 1, y, z - 1, EnderRiftMod.blockStructureInvisible, 8, 3);
-        world.setBlock(x + 1, y, z - 1, EnderRiftMod.blockStructureInvisible, 9, 3);
-        world.setBlock(x - 1, y, z + 1, EnderRiftMod.blockStructureInvisible, 10, 3);
-        world.setBlock(x + 1, y, z + 1, EnderRiftMod.blockStructureInvisible, 11, 3);
-        world.setBlock(x - 1, y - 1, z, EnderRiftMod.blockStructureInvisible, 12, 3);
-        world.setBlock(x + 1, y - 1, z, EnderRiftMod.blockStructureInvisible, 13, 3);
-        world.setBlock(x - 1, y + 1, z, EnderRiftMod.blockStructureInvisible, 14, 3);
-        world.setBlock(x + 1, y + 1, z, EnderRiftMod.blockStructureInvisible, 15, 3);
+        setBlockCorner(world, x - 1, y - 1, z - 1, 0, true);
+        setBlockCorner(world, x + 1, y - 1, z - 1, 1, true);
+        setBlockCorner(world, x - 1, y - 1, z + 1, 2, true);
+        setBlockCorner(world, x + 1, y - 1, z + 1, 3, true);
+        setBlockCorner(world, x - 1, y + 1, z - 1, 0, false);
+        setBlockCorner(world, x + 1, y + 1, z - 1, 1, false);
+        setBlockCorner(world, x - 1, y + 1, z + 1, 2, false);
+        setBlockCorner(world, x + 1, y + 1, z + 1, 3, false);
 
-        world.setBlockMetadataWithNotify(x, y, z, 1, 3);
+        setBlockOther(world, x, y - 1, z,      BlockStructure.Type2.NONE, true);
+        setBlockOther(world, x, y - 1, z - 1,  BlockStructure.Type2.SIDE_EW, true);
+        setBlockOther(world, x, y + 1, z - 1,  BlockStructure.Type2.SIDE_EW, false);
+        setBlockOther(world, x, y - 1, z + 1,  BlockStructure.Type2.SIDE_EW, true);
+        setBlockOther(world, x, y + 1, z + 1,  BlockStructure.Type2.SIDE_EW, false);
+        setBlockOther(world, x - 1, y, z - 1,  BlockStructure.Type2.VERTICAL, false);
+        setBlockOther(world, x + 1, y, z - 1,  BlockStructure.Type2.VERTICAL, false);
+        setBlockOther(world, x - 1, y, z + 1,  BlockStructure.Type2.VERTICAL, false);
+        setBlockOther(world, x + 1, y, z + 1,  BlockStructure.Type2.VERTICAL, false);
+        setBlockOther(world, x - 1, y - 1, z,  BlockStructure.Type2.SIDE_NS, true);
+        setBlockOther(world, x + 1, y - 1, z,  BlockStructure.Type2.SIDE_NS, true);
+        setBlockOther(world, x - 1, y + 1, z,  BlockStructure.Type2.SIDE_NS, false);
+        setBlockOther(world, x + 1, y + 1, z,  BlockStructure.Type2.SIDE_NS, false);
 
-        TileEnderRift rift = (TileEnderRift) world.getTileEntity(x, y, z);
+        world.setBlockState(pos, state.withProperty(ASSEMBLED, true));
+
+        TileEnderRift rift = (TileEnderRift) world.getTileEntity(pos);
 
         NBTTagCompound tagCompound = itemStack.getTagCompound();
         if (tagCompound != null && tagCompound.hasKey("RiftId"))
         {
             rift.inventory = null;
-            rift.blockMetadata = -1;
+            rift.markDirty();
             rift.riftId = tagCompound.getInteger("RiftId");
         }
         else
         {
             rift.inventory = null;
-            rift.blockMetadata = -1;
+            rift.markDirty();
             rift.riftId = RiftStorageWorldData.get(world).getNextRiftId();
         }
 
         return true;
     }
 
-    public void breakStructure(World world, int x, int y, int z)
+    public void breakStructure(World world, BlockPos pos)
     {
+        int x = pos.getX();
+        int y = pos.getY();
+        int z = pos.getZ();
+
         restoreStructureBlockTo(world, x, y - 1, z, Blocks.redstone_block);
 
         restoreStructureBlockTo(world, x - 1, y, z - 1, Blocks.redstone_block);
@@ -233,14 +273,15 @@ public class BlockEnderRift
         restoreStructureBlockTo(world, x, y + 1, z + 1, Blocks.redstone_block);
         restoreStructureBlockTo(world, x + 1, y + 1, z + 1, Blocks.iron_block);
 
-        if (world.getBlock(x, y, z) == EnderRiftMod.blockEnderRift && world.getBlockMetadata(x, y, z) != 0)
-        {
-            world.setBlockMetadataWithNotify(x, y, z, 0, 3);
+        IBlockState state = world.getBlockState(pos);
 
-            TileEnderRift rift = (TileEnderRift) world.getTileEntity(x, y, z);
+        if (state.getBlock() == EnderRiftMod.blockEnderRift && state.getValue(ASSEMBLED)) {
+            world.setBlockState(pos, state.withProperty(ASSEMBLED, false));
+
+            TileEnderRift rift = (TileEnderRift) world.getTileEntity(pos);
 
             rift.inventory = null;
-            rift.blockMetadata = -1;
+            rift.markDirty();
 
             ItemStack stack = rift.getRiftItem();
 
@@ -251,40 +292,39 @@ public class BlockEnderRift
 
     private void restoreStructureBlockTo(World world, int xx, int yy, int zz, Block bb)
     {
-        if (world.getBlock(xx, yy, zz) == EnderRiftMod.blockStructureInvisible
-                || world.getBlock(xx, yy, zz) == EnderRiftMod.blockStructureCorner)
-            world.setBlock(xx, yy, zz, bb);
+        if (getBlockXYZ(world, xx, yy, zz) == EnderRiftMod.blockStructure)
+            setBlockXYZ(world, xx, yy, zz, bb.getDefaultState());
     }
 
     @Override
-    public boolean removedByPlayer(World world, EntityPlayer player, int x, int y, int z, boolean willHarvest)
+    public boolean removedByPlayer(World world, BlockPos pos, EntityPlayer player, boolean willHarvest)
     {
         //If it will harvest, delay deletion of the block until after getDrops
-        return willHarvest || super.removedByPlayer(world, player, x, y, z, false);
+        return willHarvest || super.removedByPlayer(world, pos, player, false);
     }
 
     @Override
-    public void harvestBlock(World world, EntityPlayer player, int x, int y, int z, int meta)
+    public void breakBlock(World worldIn, BlockPos pos, IBlockState state)
     {
-        super.harvestBlock(world, player, x, y, z, meta);
-        world.setBlockToAir(x, y, z);
+        super.breakBlock(worldIn, pos, state);
+        breakStructure(worldIn, pos);
     }
 
     @Override
-    public void breakBlock(World world, int x, int y, int z, Block block, int p_149749_6_)
+    public void harvestBlock(World worldIn, EntityPlayer player, BlockPos pos, IBlockState state, TileEntity te)
     {
-        super.breakBlock(world, x, y, z, block, p_149749_6_);
-        breakStructure(world, x, y, z);
+        super.harvestBlock(worldIn, player, pos, state, te);
+        worldIn.setBlockToAir(pos);
     }
 
     @Override
-    public ArrayList<ItemStack> getDrops(World world, int x, int y, int z, int metadata, int fortune)
+    public List<ItemStack> getDrops(IBlockAccess world, BlockPos pos, IBlockState state, int fortune)
     {
-        ArrayList<ItemStack> ret = new ArrayList<ItemStack>();
+        ArrayList<ItemStack> ret = new ArrayList<>();
 
         ret.add(new ItemStack(Item.getItemFromBlock(this), 1, 0));
 
-        TileEntity te = world.getTileEntity(x, y, z);
+        TileEntity te = world.getTileEntity(pos);
 
         if (te instanceof TileEnderRift)
             ret.add(((TileEnderRift) te).getRiftItem());
@@ -292,9 +332,9 @@ public class BlockEnderRift
         return ret;
     }
 
-    public boolean tryDuplicateRift(World world, int x, int y, int z, EntityPlayer player)
+    public boolean tryDuplicateRift(World world, BlockPos pos, EntityPlayer player)
     {
-        TileEntity te = world.getTileEntity(x, y, z);
+        TileEntity te = world.getTileEntity(pos);
 
         if (!(te instanceof TileEnderRift))
             return false;

@@ -2,15 +2,12 @@ package gigaherz.enderRift.server;
 
 import gigaherz.enderRift.IModProxy;
 
-public class ServerProxy implements IModProxy
-{
+public class ServerProxy implements IModProxy {
     @Override
-    public void preInit()
-    {
+    public void preInit() {
     }
 
     @Override
-    public void init()
-    {
+    public void init() {
     }
 }

@@ -3,47 +3,41 @@ package gigaherz.enderRift.blocks;
 import cofh.api.energy.IEnergyReceiver;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumFacing;
 
 public class TileEnderRiftCorner
         extends TileEntity
-        implements IEnergyReceiver
-{
+        implements IEnergyReceiver {
     int xParent = 0;
     int yParent;
     int zParent;
     TileEnderRift energyParent;
 
-    public IEnergyReceiver getParent()
-    {
-        if (energyParent == null)
-        {
+    public IEnergyReceiver getParent() {
+        if (energyParent == null) {
             int meta = getBlockMetadata();
-            xParent = xCoord + ((meta & 1) != 0 ? -1 : 1);
-            yParent = yCoord + ((meta & 2) != 0 ? -1 : 1);
-            zParent = zCoord + ((meta & 4) != 0 ? -1 : 1);
-            TileEntity te = worldObj.getTileEntity(xParent, yParent, zParent);
-            if (te instanceof TileEnderRift)
-            {
+            xParent = pos.getX() + ((meta & 2) != 0 ? -1 : 1);
+            yParent = pos.getY() + ((meta & 1) != 0 ? -1 : 1);
+            zParent = pos.getZ() + ((meta & 4) != 0 ? -1 : 1);
+            TileEntity te = worldObj.getTileEntity(new BlockPos(xParent, yParent, zParent));
+            if (te instanceof TileEnderRift) {
                 energyParent = (TileEnderRift) te;
             }
         }
         return energyParent;
     }
 
-    public void readFromNBT(NBTTagCompound nbtTagCompound)
-    {
+    public void readFromNBT(NBTTagCompound nbtTagCompound) {
         super.readFromNBT(nbtTagCompound);
     }
 
-    public void writeToNBT(NBTTagCompound nbtTagCompound)
-    {
+    public void writeToNBT(NBTTagCompound nbtTagCompound) {
         super.writeToNBT(nbtTagCompound);
     }
 
     @Override
-    public int receiveEnergy(ForgeDirection from, int maxReceive, boolean simulate)
-    {
+    public int receiveEnergy(EnumFacing from, int maxReceive, boolean simulate) {
         IEnergyReceiver parent = getParent();
         if (parent == null)
             return 0;
@@ -51,8 +45,7 @@ public class TileEnderRiftCorner
     }
 
     @Override
-    public int getEnergyStored(ForgeDirection from)
-    {
+    public int getEnergyStored(EnumFacing from) {
         IEnergyReceiver parent = getParent();
         if (parent == null)
             return 0;
@@ -60,8 +53,7 @@ public class TileEnderRiftCorner
     }
 
     @Override
-    public int getMaxEnergyStored(ForgeDirection from)
-    {
+    public int getMaxEnergyStored(EnumFacing from) {
         IEnergyReceiver parent = getParent();
         if (parent == null)
             return 0;
@@ -69,8 +61,7 @@ public class TileEnderRiftCorner
     }
 
     @Override
-    public boolean canConnectEnergy(ForgeDirection from)
-    {
+    public boolean canConnectEnergy(EnumFacing from) {
         return true;
     }
 
