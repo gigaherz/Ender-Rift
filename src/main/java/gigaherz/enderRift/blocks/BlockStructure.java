@@ -5,17 +5,14 @@ import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.PropertyBool;
 import net.minecraft.block.properties.PropertyEnum;
-import net.minecraft.block.properties.PropertyInteger;
 import net.minecraft.block.state.BlockState;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.crash.CrashReport;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.IStringSerializable;
-import net.minecraft.util.ReportedException;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
@@ -27,7 +24,7 @@ public class BlockStructure
 {
     public static final PropertyEnum<Type1> TYPE1 = PropertyEnum.create("type1", Type1.class);
     public static final PropertyEnum<Type2> TYPE2 = PropertyEnum.create("type2", Type2.class);
-    public static final PropertyInteger CORNER = PropertyInteger.create("corner", 0, 3);
+    public static final PropertyEnum<Corner> CORNER = PropertyEnum.create("corner", Corner.class);
     public static final PropertyBool BASE = PropertyBool.create("base");
 
     public BlockStructure()
@@ -37,7 +34,7 @@ public class BlockStructure
         setUnlocalizedName(EnderRiftMod.MODID + ".blockStructure");
         setDefaultState(this.blockState.getBaseState()
             .withProperty(TYPE1, Type1.NORMAL).withProperty(TYPE2, Type2.NONE)
-            .withProperty(CORNER, 0).withProperty(BASE, false));
+            .withProperty(CORNER, Corner.values[0]).withProperty(BASE, false));
     }
 
     @Override
@@ -72,7 +69,7 @@ public class BlockStructure
 
         int type2 = (meta>>1)&3;
         if(type1 == Type1.CORNER)
-            state = state.withProperty(CORNER, type2);
+            state = state.withProperty(CORNER, Corner.values[type2]);
         else
             state = state.withProperty(TYPE2, Type2.values[type2]);
 
@@ -88,7 +85,7 @@ public class BlockStructure
 
         int type2;
         if(type1 == Type1.CORNER)
-            type2 = state.getValue(CORNER);
+            type2 = state.getValue(CORNER).ordinal();
         else
             type2 = state.getValue(TYPE2).ordinal();
 
@@ -265,5 +262,34 @@ public class BlockStructure
         }
 
         public static Type2[] values = values();
+    }
+
+    enum Corner implements IStringSerializable
+    {
+        NE("ne"),
+        NW("nw"),
+        SE("se"),
+        SW("sw");
+
+        private final String name;
+
+        Corner(String name)
+        {
+            this.name = name;
+        }
+
+        @Override
+        public String toString()
+        {
+            return name;
+        }
+
+        @Override
+        public String getName()
+        {
+            return name;
+        }
+
+        public static Corner[] values = values();
     }
 }

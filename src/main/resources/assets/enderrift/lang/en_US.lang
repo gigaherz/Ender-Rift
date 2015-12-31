@@ -1,6 +1,5 @@
 tile.enderRift.blockEnderRift.name=Ender-Rift Core
-tile.enderRift.blockEnderCasing.name=Ender-Rift Casing
-tile.enderRift.blockStructureInvisible.name=Ender-Rift Structure
+tile.enderRift.blockStructure.name=Ender-Rift Structure
 tile.enderRift.blockStructureCorner.name=Ender-Rift Structure (Corner)
 item.enderRift.itemEnderRift.empty.name=Ender-Rift Orb (Unbound)
 item.enderRift.itemEnderRift.bound.name=Ender-Rift Orb (Bound)
@@ -12,3 +11,4 @@ text.enderRift.blockEnderRift.waila.riftId=Rift Id: %s
 text.enderRift.blockEnderRift.waila.usedSlots=%s / %s slots used.
 text.enderRift.blockEnderRift.waila.energyUsageInsert=%s RF used by next insertion.
 text.enderRift.blockEnderRift.waila.energyUsageExtract=%s RF used by next extraction.
+text.enderRift.blockEnderRift.waila.rf=%s / %s RF.

@@ -1,6 +1,7 @@
 package gigaherz.enderRift.blocks;
 
 import cofh.api.energy.IEnergyReceiver;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockPos;
@@ -16,10 +17,19 @@ public class TileEnderRiftCorner
 
     public IEnergyReceiver getParent() {
         if (energyParent == null) {
-            int meta = getBlockMetadata();
-            xParent = pos.getX() + ((meta & 2) != 0 ? -1 : 1);
-            yParent = pos.getY() + ((meta & 1) != 0 ? -1 : 1);
-            zParent = pos.getZ() + ((meta & 4) != 0 ? -1 : 1);
+            IBlockState state = worldObj.getBlockState(pos);
+            boolean base = state.getValue(BlockStructure.BASE);
+            BlockStructure.Corner corner = state.getValue(BlockStructure.CORNER) ;
+            xParent = pos.getX();
+            yParent = pos.getY() + (base?1:-1);
+            zParent = pos.getZ();
+            switch(corner)
+            {
+                case NE: xParent-=1; zParent+=1; break;
+                case NW: xParent+=1; zParent+=1; break;
+                case SE: xParent-=1; zParent-=1; break;
+                case SW: xParent+=1; zParent-=1; break;
+            }
             TileEntity te = worldObj.getTileEntity(new BlockPos(xParent, yParent, zParent));
             if (te instanceof TileEnderRift) {
                 energyParent = (TileEnderRift) te;

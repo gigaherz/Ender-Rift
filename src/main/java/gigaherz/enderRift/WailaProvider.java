@@ -11,6 +11,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.StatCollector;
 import net.minecraft.world.World;
 
@@ -37,6 +38,7 @@ public class WailaProvider implements IWailaDataProvider {
                 currenttip.add(StatCollector.translateToLocalFormatted("text." + EnderRiftMod.MODID + ".blockEnderRift.waila.isFormed", tag.getBoolean("isFormed")));
                 if (tag.getBoolean("isFormed")) {
                     currenttip.add(StatCollector.translateToLocalFormatted("text." + EnderRiftMod.MODID + ".blockEnderRift.waila.riftId", tag.getInteger("riftId")));
+                    currenttip.add(StatCollector.translateToLocalFormatted("text." + EnderRiftMod.MODID + ".blockEnderRift.waila.rf", tag.getInteger("energy"), tag.getInteger("energyTotal")));
                 }
                 currenttip.add(StatCollector.translateToLocalFormatted("text." + EnderRiftMod.MODID + ".blockEnderRift.waila.usedSlots", tag.getInteger("usedSlots"), tag.getInteger("exposedSlots")));
                 currenttip.add(StatCollector.translateToLocalFormatted("text." + EnderRiftMod.MODID + ".blockEnderRift.waila.energyUsageInsert", tag.getInteger("energyInsert")));
@@ -79,6 +81,8 @@ public class WailaProvider implements IWailaDataProvider {
         tag.setInteger("energyExtract", (int) Math.ceil(rift.getEnergyExtract()));
         tag.setBoolean("isFormed", rift.getBlockMetadata() != 0);
         tag.setInteger("riftId", rift.riftId);
+        tag.setInteger("energy", rift.getEnergyStored(EnumFacing.NORTH));
+        tag.setInteger("energyTotal", rift.getMaxEnergyStored(EnumFacing.NORTH));
 
         return tag;
     }

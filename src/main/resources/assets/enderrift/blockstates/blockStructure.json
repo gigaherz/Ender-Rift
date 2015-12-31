@@ -1,7 +1,7 @@
 {
   "forge_marker": 1,
   "defaults": {
-    "model": "enderrift:straight.obj"
+    "model": "builtin/generated"
   },
   "variants": {
     "inventory": [{ "model": "enderrift:hedron.obj" }],
@@ -11,11 +11,10 @@
     },
     "type2":{
       "none": {
-        "model": null
       },
-      "vertical": { "x": 90 },
-      "side_ns": { },
-      "side_ew": { "y": 90 }
+      "vertical": { "model": "enderrift:straight.obj", "x": 90 },
+      "side_ns": { "model": "enderrift:straight.obj"},
+      "side_ew": { "model": "enderrift:straight.obj", "y": 90 }
     },
     "base": {
       "false": {
@@ -28,10 +27,10 @@
       }
     },
     "corner": {
-      "0":{},
-      "1":{},
-      "2":{},
-      "3":{}
+      "ne":{},
+      "nw":{},
+      "se":{},
+      "sw":{}
     }
   }
 }

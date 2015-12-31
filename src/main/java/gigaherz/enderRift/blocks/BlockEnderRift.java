@@ -106,11 +106,10 @@ public class BlockEnderRift
         world.setBlockState(new BlockPos(x,y,z), state);
     }
 
-    void setBlockCorner(World world, int x, int y, int z, int corner, boolean base)
+    void setBlockCorner(World world, int x, int y, int z, BlockStructure.Corner corner, boolean base)
     {
         setBlockXYZ(world, x, y, z, EnderRiftMod.blockStructure.getDefaultState()
                 .withProperty(BlockStructure.TYPE1, BlockStructure.Type1.CORNER)
-                .withProperty(BlockStructure.TYPE2, BlockStructure.Type2.NONE)
                 .withProperty(BlockStructure.CORNER, corner)
                 .withProperty(BlockStructure.BASE, base));
     }
@@ -120,7 +119,6 @@ public class BlockEnderRift
         setBlockXYZ(world, x, y, z, EnderRiftMod.blockStructure.getDefaultState()
                 .withProperty(BlockStructure.TYPE1, BlockStructure.Type1.NORMAL)
                 .withProperty(BlockStructure.TYPE2, type2)
-                .withProperty(BlockStructure.CORNER, 0)
                 .withProperty(BlockStructure.BASE, base));
     }
 
@@ -194,14 +192,14 @@ public class BlockEnderRift
         if (getBlockXYZ(world, x + 1, y + 1, z + 1) != Blocks.iron_block)
             return false;
 
-        setBlockCorner(world, x - 1, y - 1, z - 1, 0, true);
-        setBlockCorner(world, x + 1, y - 1, z - 1, 1, true);
-        setBlockCorner(world, x - 1, y - 1, z + 1, 2, true);
-        setBlockCorner(world, x + 1, y - 1, z + 1, 3, true);
-        setBlockCorner(world, x - 1, y + 1, z - 1, 0, false);
-        setBlockCorner(world, x + 1, y + 1, z - 1, 1, false);
-        setBlockCorner(world, x - 1, y + 1, z + 1, 2, false);
-        setBlockCorner(world, x + 1, y + 1, z + 1, 3, false);
+        setBlockCorner(world, x - 1, y - 1, z - 1, BlockStructure.Corner.NW, true);
+        setBlockCorner(world, x + 1, y - 1, z - 1, BlockStructure.Corner.NE, true);
+        setBlockCorner(world, x - 1, y - 1, z + 1, BlockStructure.Corner.SW, true);
+        setBlockCorner(world, x + 1, y - 1, z + 1, BlockStructure.Corner.SE, true);
+        setBlockCorner(world, x - 1, y + 1, z - 1, BlockStructure.Corner.NW, false);
+        setBlockCorner(world, x + 1, y + 1, z - 1, BlockStructure.Corner.NE, false);
+        setBlockCorner(world, x - 1, y + 1, z + 1, BlockStructure.Corner.SW, false);
+        setBlockCorner(world, x + 1, y + 1, z + 1, BlockStructure.Corner.SE, false);
 
         setBlockOther(world, x, y - 1, z,      BlockStructure.Type2.NONE, true);
         setBlockOther(world, x, y - 1, z - 1,  BlockStructure.Type2.SIDE_EW, true);
