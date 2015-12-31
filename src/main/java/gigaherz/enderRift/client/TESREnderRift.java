@@ -21,6 +21,7 @@ public class TESREnderRift extends TileEntitySpecialRenderer<TileEnderRift>
 
         long time = te.getWorld().getWorldTime();
 
+        GlStateManager.disableLighting();
         GlStateManager.disableAlpha();
         GlStateManager.disableRescaleNormal();
         GlStateManager.enableBlend();

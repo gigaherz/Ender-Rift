@@ -14,9 +14,11 @@ import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.StatCollector;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.common.Optional;
 
 import java.util.List;
 
+@Optional.Interface(modid="Waila", iface="mcp.mobius.waila.api.IWailaDataProvider")
 public class WailaProvider implements IWailaDataProvider {
 
     @Override

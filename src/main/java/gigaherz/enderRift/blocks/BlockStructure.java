@@ -11,6 +11,7 @@ import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.IStringSerializable;
 import net.minecraft.world.IBlockAccess;
@@ -32,9 +33,10 @@ public class BlockStructure
         super(Material.rock);
         setHardness(0.5F).setStepSound(Block.soundTypeMetal);
         setUnlocalizedName(EnderRiftMod.MODID + ".blockStructure");
+        setBlockBounds(0 / 16.0f, 0 / 16.0f, 0 / 16.0f, 16 / 16.0f, 16 / 16.0f, 16 / 16.0f);
         setDefaultState(this.blockState.getBaseState()
-            .withProperty(TYPE1, Type1.NORMAL).withProperty(TYPE2, Type2.NONE)
-            .withProperty(CORNER, Corner.values[0]).withProperty(BASE, false));
+                .withProperty(TYPE1, Type1.NORMAL).withProperty(TYPE2, Type2.NONE)
+                .withProperty(CORNER, Corner.values[0]).withProperty(BASE, false));
     }
 
     @Override
@@ -50,7 +52,8 @@ public class BlockStructure
     }
 
     @Override
-    public boolean isOpaqueCube() {
+    public boolean isOpaqueCube()
+    {
         return false;
     }
 
@@ -67,8 +70,8 @@ public class BlockStructure
 
         IBlockState state = getDefaultState().withProperty(TYPE1, type1);
 
-        int type2 = (meta>>1)&3;
-        if(type1 == Type1.CORNER)
+        int type2 = (meta >> 1) & 3;
+        if (type1 == Type1.CORNER)
             state = state.withProperty(CORNER, Corner.values[type2]);
         else
             state = state.withProperty(TYPE2, Type2.values[type2]);
@@ -84,14 +87,14 @@ public class BlockStructure
         int type1i = type1.ordinal();
 
         int type2;
-        if(type1 == Type1.CORNER)
+        if (type1 == Type1.CORNER)
             type2 = state.getValue(CORNER).ordinal();
         else
             type2 = state.getValue(TYPE2).ordinal();
 
         int base = state.getValue(BASE) ? 1 : 0;
 
-        return (type1i << 3) | (type2<<1) | base;
+        return (type1i << 3) | (type2 << 1) | base;
     }
 
     @Override
@@ -101,37 +104,50 @@ public class BlockStructure
     }
 
     @Override
-    public void setBlockBoundsBasedOnState(IBlockAccess world, BlockPos pos)
+    public AxisAlignedBB getSelectedBoundingBox(World worldIn, BlockPos pos)
     {
-        IBlockState state = world.getBlockState(pos);
-        if(state.getValue(TYPE1) == Type1.CORNER)
+        int x = pos.getX();
+        int y = pos.getY();
+        int z = pos.getZ();
+
+        IBlockState state = worldIn.getBlockState(pos);
+        if (state.getValue(TYPE1) == Type1.NORMAL)
         {
-            setBlockBounds(0 / 16.0f, 0 / 16.0f, 0 / 16.0f, 16 / 16.0f, 16 / 16.0f, 16 / 16.0f);
-            return;
+            Type2 d = state.getValue(TYPE2);
+            switch (d)
+            {
+                case NONE: // base center
+                    return new AxisAlignedBB(
+                            x + 0 / 16.0f, y + 0 / 16.0f, z + 0 / 16.0f,
+                            x + 16 / 16.0f, y + 4 / 16.0f, z + 16 / 16.0f);
+                case SIDE_EW:
+                    if (!state.getValue(BASE))
+                        return new AxisAlignedBB(
+                                x + 0 / 16.0f, y + 4 / 16.0f, z + 4 / 16.0f,
+                                x + 16 / 16.0f, y + 12 / 16.0f, z + 12 / 16.0f);
+                    else
+                        return new AxisAlignedBB(
+                                x + 0 / 16.0f, y + 0 / 16.0f, z + 0 / 16.0f,
+                                x + 16 / 16.0f, y + 12 / 16.0f, z + 16 / 16.0f);
+                case VERTICAL:
+                    return new AxisAlignedBB(
+                            x + 4 / 16.0f, y + 0 / 16.0f, z + 4 / 16.0f,
+                            x + 12 / 16.0f, y + 16 / 16.0f, z + 12 / 16.0f);
+                case SIDE_NS:
+                    if (!state.getValue(BASE))
+                        return new AxisAlignedBB(
+                                x + 4 / 16.0f, y + 4 / 16.0f, z + 0 / 16.0f,
+                                x + 12 / 16.0f, y + 12 / 16.0f, z + 16 / 16.0f);
+                    else
+                        return new AxisAlignedBB(
+                                x + 0 / 16.0f, y + 0 / 16.0f, z + 0 / 16.0f,
+                                x + 16 / 16.0f, y + 12 / 16.0f, z + 16 / 16.0f);
+            }
         }
 
-        Type2 d = state.getValue(TYPE2);
-        switch (d)
-        {
-            case NONE: // base center
-                setBlockBounds(0 / 16.0f, 0 / 16.0f, 0 / 16.0f, 16 / 16.0f, 4 / 16.0f, 16 / 16.0f);
-                break;
-            case SIDE_EW:
-                if (!state.getValue(BASE))
-                    setBlockBounds(0 / 16.0f, 4 / 16.0f, 4 / 16.0f, 16 / 16.0f, 12 / 16.0f, 12 / 16.0f);
-                else
-                    setBlockBounds(0 / 16.0f, 0 / 16.0f, 0 / 16.0f, 16 / 16.0f, 12 / 16.0f, 16 / 16.0f);
-                break;
-            case VERTICAL:
-                setBlockBounds(4 / 16.0f, 0 / 16.0f, 4 / 16.0f, 12 / 16.0f, 16 / 16.0f, 12 / 16.0f);
-                break;
-            case SIDE_NS:
-                if (!state.getValue(BASE))
-                    setBlockBounds(4 / 16.0f, 4 / 16.0f, 0 / 16.0f, 12 / 16.0f, 12 / 16.0f, 16 / 16.0f);
-                else
-                    setBlockBounds(0 / 16.0f, 0 / 16.0f, 0 / 16.0f, 16 / 16.0f, 12 / 16.0f, 16 / 16.0f);
-                break;
-        }
+        return new AxisAlignedBB(
+                x + 0 / 16.0f, y + 0 / 16.0f, z + 0 / 16.0f,
+                x + 16 / 16.0f, y + 16 / 16.0f, z + 16 / 16.0f);
     }
 
     @Override
@@ -145,7 +161,7 @@ public class BlockStructure
             {
                 for (int zz = -1; zz <= 1; zz++)
                 {
-                    BlockPos pos2 = new BlockPos(pos.getX()+xx,pos.getY()+yy,pos.getZ()+zz);
+                    BlockPos pos2 = new BlockPos(pos.getX() + xx, pos.getY() + yy, pos.getZ() + zz);
                     if (worldIn.getBlockState(pos2).getBlock() == EnderRiftMod.blockEnderRift)
                     {
                         EnderRiftMod.blockEnderRift.breakStructure(worldIn, pos2);
@@ -158,7 +174,7 @@ public class BlockStructure
 
     Block getBlockXYZ(IBlockAccess world, int x, int y, int z)
     {
-        return world.getBlockState(new BlockPos(x,y,z)).getBlock();
+        return world.getBlockState(new BlockPos(x, y, z)).getBlock();
     }
 
     @Override
