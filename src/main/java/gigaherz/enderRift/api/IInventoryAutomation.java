@@ -1,5 +1,6 @@
 package gigaherz.enderRift.api;
 
+import com.google.common.base.Predicate;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 
@@ -26,10 +27,11 @@ public interface IInventoryAutomation
      * @param limit The maximum number of items to pull.
      * @return Returns the items that were extracted. Can be null.
      */
-    ItemStack pullItems(int limit);
+    ItemStack pullItems(int limit, Predicate<ItemStack> filter);
 
     /**
      * Tries to extract a specific amount of a certain item, as defined by the provided ItemStack.
+     * Will attempt to gather from more than one stack.
      * @param stack The item to extract, and the quantity being requested.
      * @return Returns the items that were extracted. Can be null.
      */

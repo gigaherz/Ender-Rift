@@ -5,20 +5,20 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.IChatComponent;
 
-public class InventoryFromSlots implements IInventory
+public class InventorySlotsWrapper implements IInventory
 {
     IInventory parent;
     int[] slots;
 
-    private InventoryFromSlots(IInventory parent, int[] slots)
+    private InventorySlotsWrapper(IInventory parent, int[] slots)
     {
         this.parent = parent;
         this.slots = slots;
     }
 
-    public static InventoryFromSlots create(IInventory parent, int... slots)
+    public static InventorySlotsWrapper create(IInventory parent, int... slots)
     {
-        return new InventoryFromSlots(parent, slots);
+        return new InventorySlotsWrapper(parent, slots);
     }
 
     @Override

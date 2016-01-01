@@ -9,7 +9,7 @@ public interface IBetterSidedInventory
     default IInventory getInventoryForSide(EnumFacing face)
     {
         if (this instanceof ISidedInventory)
-            return InventoryFromSlots.create((IInventory)this, ((ISidedInventory)this).getSlotsForFace(face));
+            return InventorySlotsWrapper.create((IInventory)this, ((ISidedInventory)this).getSlotsForFace(face));
         return null;
     }
 
