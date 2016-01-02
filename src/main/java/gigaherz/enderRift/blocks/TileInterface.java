@@ -53,6 +53,8 @@ public class TileInterface extends TileEntity
         if (getParent() == null)
             return;
 
+        boolean anyChanged = false;
+
         for (int i = 0; i < FilterCount; i++)
         {
             if (filters[i] != null)
@@ -61,6 +63,8 @@ public class TileInterface extends TileEntity
                 {
                     int free = 64;
                     outputs[i] = getParent().extractItems(filters[i], free);
+                    if(outputs[i] != null)
+                        anyChanged = true;
                 }
                 else if (outputs[i].isItemEqual(filters[i]))
                 {
@@ -69,19 +73,31 @@ public class TileInterface extends TileEntity
                     {
                         ItemStack extracted = getParent().extractItems(filters[i], free);
                         if (extracted != null)
+                        {
                             outputs[i].stackSize += extracted.stackSize;
+                            anyChanged = true;
+                        }
                     }
                 }
-                else
+                else if (outputs[i] != null)
                 {
+                    int stackSize = outputs[i].stackSize;
                     outputs[i] = getParent().pushItems(outputs[i]);
+                    if(outputs[i] == null || stackSize != outputs[i].stackSize)
+                        anyChanged = true;
                 }
             }
             else if (outputs[i] != null)
             {
+                int stackSize = outputs[i].stackSize;
                 outputs[i] = getParent().pushItems(outputs[i]);
+                if(outputs[i] == null || stackSize != outputs[i].stackSize)
+                    anyChanged = true;
             }
         }
+
+        if(anyChanged)
+            markDirty();
     }
 
     @Override
