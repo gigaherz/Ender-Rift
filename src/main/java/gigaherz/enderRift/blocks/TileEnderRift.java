@@ -2,6 +2,7 @@ package gigaherz.enderRift.blocks;
 
 import cofh.api.energy.IEnergyReceiver;
 import com.google.common.base.Predicate;
+import gigaherz.api.automation.IBrowsableInventory;
 import gigaherz.enderRift.ConfigValues;
 import gigaherz.enderRift.EnderRiftMod;
 import gigaherz.api.automation.IInventoryAutomation;
@@ -17,7 +18,7 @@ import javax.annotation.Nonnull;
 
 public class TileEnderRift
         extends TileEntity
-        implements IEnergyReceiver, IInventoryAutomation, ITickable
+        implements IEnergyReceiver, IInventoryAutomation, IBrowsableInventory, ITickable
 {
     public final int energyLimit = 10000000;
     public int energyBuffer = 0;
@@ -42,7 +43,7 @@ public class TileEnderRift
     }
 
     public double getEnergyInsert() {
-        int sizeInventory = getInventory().getSlotCount();
+        int sizeInventory = getInventory().getSizeInventory();
         int sizeInventory2 = sizeInventory * sizeInventory;
         return ConfigValues.PowerPerInsertionConstant
                 + (sizeInventory * ConfigValues.PowerPerInsertionLinear)
@@ -50,7 +51,7 @@ public class TileEnderRift
     }
 
     public double getEnergyExtract() {
-        int sizeInventory = getInventory().getSlotCount();
+        int sizeInventory = getInventory().getSizeInventory();
         int sizeInventory2 = sizeInventory * sizeInventory;
         return ConfigValues.PowerPerExtractionConstant
                 + (sizeInventory * ConfigValues.PowerPerExtractionLinear)
@@ -58,7 +59,7 @@ public class TileEnderRift
     }
 
     public int countInventoryStacks() {
-        return getInventory().getSlotCount();
+        return getInventory().getSizeInventory();
     }
 
     private int getEffectivePowerUsageToInsert(int stackSize)
@@ -226,5 +227,17 @@ public class TileEnderRift
         this.energyBuffer -= actualCost;
 
         return extracted;
+    }
+
+    @Override
+    public int getSizeInventory()
+    {
+        return inventory.getSizeInventory();
+    }
+
+    @Override
+    public ItemStack getStackInSlot(int index)
+    {
+        return inventory.getStackInSlot(index);
     }
 }

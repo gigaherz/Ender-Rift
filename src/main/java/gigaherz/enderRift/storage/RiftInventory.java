@@ -1,15 +1,13 @@
 package gigaherz.enderRift.storage;
 
 import com.google.common.base.Predicate;
+import gigaherz.api.automation.IBrowsableInventory;
 import gigaherz.api.automation.IInventoryAutomation;
 import gigaherz.enderRift.blocks.TileEnderRift;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.IChatComponent;
 import net.minecraftforge.common.util.Constants;
 
 import javax.annotation.Nonnull;
@@ -20,7 +18,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public class RiftInventory implements IInventoryAutomation
+public class RiftInventory implements IInventoryAutomation, IBrowsableInventory
 {
     private final List<ItemStack> inventorySlots = new ArrayList<>();
     private final RiftStorageWorldData manager;
@@ -36,9 +34,16 @@ public class RiftInventory implements IInventoryAutomation
         listeners.add(new WeakReference<>(e, deadListeners));
     }
 
-    public int getSlotCount()
+    @Override
+    public int getSizeInventory()
     {
         return inventorySlots.size();
+    }
+
+    @Override
+    public ItemStack getStackInSlot(int index)
+    {
+        return inventorySlots.get(index);
     }
 
     public void markDirty()
