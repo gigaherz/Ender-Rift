@@ -22,7 +22,7 @@ public class BlockInterface
     {
         super(Material.iron, MapColor.stoneColor);
         setStepSound(soundTypeMetal);
-        setUnlocalizedName(EnderRiftMod.MODID+".blockInterface");
+        setUnlocalizedName(EnderRiftMod.MODID + ".blockInterface");
         setCreativeTab(EnderRiftMod.tabEnderRift);
         setDefaultState(blockState.getBaseState().withProperty(FACING, EnumFacing.NORTH));
         setBlockBounds(0.0F, 0.0F, 0.0F, 1.0F, 1.0F, 1.0F);
@@ -31,7 +31,8 @@ public class BlockInterface
     }
 
     @Override
-    public boolean isOpaqueCube() {
+    public boolean isOpaqueCube()
+    {
         return false;
     }
 
@@ -64,7 +65,7 @@ public class BlockInterface
     @Override
     public IBlockState getStateFromMeta(int meta)
     {
-        return getDefaultState().withProperty(FACING, EnumFacing.VALUES[meta&7]);
+        return getDefaultState().withProperty(FACING, EnumFacing.VALUES[meta & 7]);
     }
 
     @Override
@@ -85,5 +86,4 @@ public class BlockInterface
 
         return true;
     }
-
 }

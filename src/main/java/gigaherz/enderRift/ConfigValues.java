@@ -2,7 +2,8 @@ package gigaherz.enderRift;
 
 import net.minecraftforge.common.config.Configuration;
 
-public class ConfigValues {
+public class ConfigValues
+{
 
     public static float PowerPerInsertionConstant;
     public static float PowerPerInsertionLinear;
@@ -12,7 +13,8 @@ public class ConfigValues {
     public static float PowerPerExtractionLinear;
     public static float PowerPerExtractionGeometric;
 
-    public static void readConfig(Configuration config) {
+    public static void readConfig(Configuration config)
+    {
         config.load();
 
         PowerPerInsertionConstant = (float) config.get("PowerUsage", "PowerPerInsertionConstant", 1.23).getDouble();

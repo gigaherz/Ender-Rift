@@ -1,6 +1,7 @@
 package gigaherz.enderRift.storage;
 
 import com.google.common.base.Predicate;
+import com.google.common.collect.Lists;
 import gigaherz.api.automation.IBrowsableInventory;
 import gigaherz.api.automation.IInventoryAutomation;
 import gigaherz.enderRift.blocks.TileEnderRift;
@@ -14,24 +15,25 @@ import javax.annotation.Nonnull;
 import java.lang.ref.Reference;
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
 public class RiftInventory implements IInventoryAutomation, IBrowsableInventory
 {
-    private final List<ItemStack> inventorySlots = new ArrayList<>();
+    private final List<ItemStack> inventorySlots = Lists.newArrayList();
     private final RiftStorageWorldData manager;
 
-    final List<Reference<? extends TileEnderRift>> listeners = new ArrayList<>();
-    final ReferenceQueue<TileEnderRift> deadListeners = new ReferenceQueue<>();
+    final List<Reference<? extends TileEnderRift>> listeners = Lists.newArrayList();
+    final ReferenceQueue<TileEnderRift> deadListeners = new ReferenceQueue<TileEnderRift>();
 
-    RiftInventory(RiftStorageWorldData manager) {
+    RiftInventory(RiftStorageWorldData manager)
+    {
         this.manager = manager;
     }
 
-    public void addWeakListener(TileEnderRift e) {
-        listeners.add(new WeakReference<>(e, deadListeners));
+    public void addWeakListener(TileEnderRift e)
+    {
+        listeners.add(new WeakReference<TileEnderRift>(e, deadListeners));
     }
 
     @Override
@@ -51,15 +53,20 @@ public class RiftInventory implements IInventoryAutomation, IBrowsableInventory
         for (Reference<? extends TileEnderRift>
              ref = deadListeners.poll();
              ref != null;
-             ref = deadListeners.poll()) {
+             ref = deadListeners.poll())
+        {
             listeners.remove(ref);
         }
 
-        for (Iterator<Reference<? extends TileEnderRift>> it = listeners.iterator(); it.hasNext(); ) {
+        for (Iterator<Reference<? extends TileEnderRift>> it = listeners.iterator(); it.hasNext(); )
+        {
             TileEnderRift rift = it.next().get();
-            if (rift == null || rift.isInvalid()) {
+            if (rift == null || rift.isInvalid())
+            {
                 it.remove();
-            } else {
+            }
+            else
+            {
                 rift.setDirty();
             }
         }
@@ -80,7 +87,8 @@ public class RiftInventory implements IInventoryAutomation, IBrowsableInventory
         }
     }
 
-    public void writeToNBT(NBTTagCompound nbtTagCompound) {
+    public void writeToNBT(NBTTagCompound nbtTagCompound)
+    {
         NBTTagList itemList = new NBTTagList();
 
         for (ItemStack stack : inventorySlots)
@@ -125,8 +133,8 @@ public class RiftInventory implements IInventoryAutomation, IBrowsableInventory
         }
 
         // Then place any remaining items in the first available empty slot
-        if(remaining.stackSize > 0)
-          inventorySlots.add(remaining);
+        if (remaining.stackSize > 0)
+            inventorySlots.add(remaining);
 
         markDirty();
 
@@ -136,16 +144,16 @@ public class RiftInventory implements IInventoryAutomation, IBrowsableInventory
     @Override
     public ItemStack pullItems(int limit, Predicate<ItemStack> filter)
     {
-        for(int i=0;i<inventorySlots.size();i++)
+        for (int i = 0; i < inventorySlots.size(); i++)
         {
             ItemStack slot = inventorySlots.get(i);
-            if(slot != null)
+            if (slot != null)
             {
                 int available = Math.min(limit, slot.stackSize);
-                if(filter.apply(slot) && available > 0)
+                if (filter.apply(slot) && available > 0)
                 {
                     ItemStack pulled = slot.splitStack(available);
-                    if(slot.stackSize <= 0)
+                    if (slot.stackSize <= 0)
                         inventorySlots.remove(i);
                     markDirty();
                     return pulled;
@@ -161,30 +169,30 @@ public class RiftInventory implements IInventoryAutomation, IBrowsableInventory
         ItemStack extracted = stack.copy();
         extracted.stackSize = 0;
 
-        if(stack.stackSize <= 0)
+        if (stack.stackSize <= 0)
             return null;
 
-        for(int i=0;i<inventorySlots.size();i++)
+        for (int i = 0; i < inventorySlots.size(); i++)
         {
             ItemStack slot = inventorySlots.get(i);
-            if(slot != null)
+            if (slot != null)
             {
                 int available = Math.min(wanted, slot.stackSize);
                 if (ItemStack.areItemsEqual(slot, stack) && ItemStack.areItemStackTagsEqual(slot, stack) && available > 0)
                 {
                     slot.stackSize -= available;
                     extracted.stackSize += available;
-                    if(slot.stackSize <= 0)
+                    if (slot.stackSize <= 0)
                         inventorySlots.remove(i);
 
                     wanted = extracted.stackSize - stack.stackSize;
-                    if(wanted <= 0)
+                    if (wanted <= 0)
                         break;
                 }
             }
         }
 
-        if(extracted.stackSize <= 0)
+        if (extracted.stackSize <= 0)
             return null;
 
         markDirty();

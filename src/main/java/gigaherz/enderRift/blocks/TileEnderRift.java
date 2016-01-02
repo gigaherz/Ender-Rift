@@ -3,9 +3,9 @@ package gigaherz.enderRift.blocks;
 import cofh.api.energy.IEnergyReceiver;
 import com.google.common.base.Predicate;
 import gigaherz.api.automation.IBrowsableInventory;
+import gigaherz.api.automation.IInventoryAutomation;
 import gigaherz.enderRift.ConfigValues;
 import gigaherz.enderRift.EnderRiftMod;
-import gigaherz.api.automation.IInventoryAutomation;
 import gigaherz.enderRift.storage.RiftInventory;
 import gigaherz.enderRift.storage.RiftStorageWorldData;
 import net.minecraft.item.ItemStack;
@@ -29,8 +29,10 @@ public class TileEnderRift
 
     boolean alreadyMarkedDirty;
 
-    RiftInventory getInventory() {
-        if (inventory == null) {
+    RiftInventory getInventory()
+    {
+        if (inventory == null)
+        {
             inventory = RiftStorageWorldData.get(worldObj).getRift(riftId);
             inventory.addWeakListener(this);
         }
@@ -38,11 +40,13 @@ public class TileEnderRift
     }
 
     @Override
-    public boolean shouldRenderInPass(int pass) {
+    public boolean shouldRenderInPass(int pass)
+    {
         return pass == 1;
     }
 
-    public double getEnergyInsert() {
+    public double getEnergyInsert()
+    {
         int sizeInventory = getInventory().getSizeInventory();
         int sizeInventory2 = sizeInventory * sizeInventory;
         return ConfigValues.PowerPerInsertionConstant
@@ -50,7 +54,8 @@ public class TileEnderRift
                 + (sizeInventory2 * ConfigValues.PowerPerInsertionGeometric);
     }
 
-    public double getEnergyExtract() {
+    public double getEnergyExtract()
+    {
         int sizeInventory = getInventory().getSizeInventory();
         int sizeInventory2 = sizeInventory * sizeInventory;
         return ConfigValues.PowerPerExtractionConstant
@@ -58,7 +63,8 @@ public class TileEnderRift
                 + (sizeInventory2 * ConfigValues.PowerPerExtractionGeometric);
     }
 
-    public int countInventoryStacks() {
+    public int countInventoryStacks()
+    {
         return getInventory().getSizeInventory();
     }
 
@@ -116,9 +122,11 @@ public class TileEnderRift
     }
 
     @Override
-    public int receiveEnergy(EnumFacing from, int maxReceive, boolean simulate) {
+    public int receiveEnergy(EnumFacing from, int maxReceive, boolean simulate)
+    {
         int receive = Math.min(maxReceive, energyLimit - energyBuffer);
-        if (!simulate && receive > 0) {
+        if (!simulate && receive > 0)
+        {
             energyBuffer += receive;
 
             this.setDirty();
@@ -128,22 +136,26 @@ public class TileEnderRift
     }
 
     @Override
-    public int getEnergyStored(EnumFacing from) {
+    public int getEnergyStored(EnumFacing from)
+    {
         return energyBuffer;
     }
 
     @Override
-    public int getMaxEnergyStored(EnumFacing from) {
+    public int getMaxEnergyStored(EnumFacing from)
+    {
         return energyLimit;
     }
 
     @Override
-    public boolean canConnectEnergy(EnumFacing from) {
+    public boolean canConnectEnergy(EnumFacing from)
+    {
         return false;
     }
 
     @Override
-    public void update() {
+    public void update()
+    {
         alreadyMarkedDirty = false;
     }
 
@@ -160,23 +172,23 @@ public class TileEnderRift
     {
         int stackSize = stack.stackSize;
         int cost = getEffectivePowerUsageToInsert(stackSize);
-        while(cost > this.energyBuffer && stackSize > 0)
+        while (cost > this.energyBuffer && stackSize > 0)
         {
             stackSize--;
         }
 
-        if(stackSize <= 0)
+        if (stackSize <= 0)
             return stack;
 
         ItemStack temp = stack;
-        if(stackSize != stack.stackSize)
+        if (stackSize != stack.stackSize)
         {
             temp = stack.copy();
             temp.stackSize = stackSize;
         }
 
         ItemStack remaining = (automation = getInventory()).pushItems(temp);
-        if(remaining != null)
+        if (remaining != null)
             stackSize -= remaining.stackSize;
 
         int actualCost = getEffectivePowerUsageToInsert(stackSize);
@@ -189,7 +201,7 @@ public class TileEnderRift
     public ItemStack pullItems(int limit, Predicate<ItemStack> filter)
     {
         int cost = getEffectivePowerUsageToExtract(limit);
-        while(cost > this.energyBuffer && limit > 0)
+        while (cost > this.energyBuffer && limit > 0)
         {
             limit--;
         }
@@ -198,7 +210,7 @@ public class TileEnderRift
             return null;
 
         ItemStack extracted = (automation = getInventory()).pullItems(limit, filter);
-        if(extracted == null)
+        if (extracted == null)
             return null;
 
         int actualCost = getEffectivePowerUsageToExtract(extracted.stackSize);
@@ -211,7 +223,7 @@ public class TileEnderRift
     public ItemStack extractItems(@Nonnull ItemStack stack, int wanted)
     {
         int cost = getEffectivePowerUsageToExtract(wanted);
-        while(cost > this.energyBuffer && wanted > 0)
+        while (cost > this.energyBuffer && wanted > 0)
         {
             wanted--;
         }
@@ -220,7 +232,7 @@ public class TileEnderRift
             return null;
 
         ItemStack extracted = (automation = getInventory()).extractItems(stack, wanted);
-        if(extracted == null)
+        if (extracted == null)
             return null;
 
         int actualCost = getEffectivePowerUsageToExtract(extracted.stackSize);

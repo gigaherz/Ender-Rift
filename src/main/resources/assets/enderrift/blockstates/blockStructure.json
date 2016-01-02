@@ -5,11 +5,11 @@
   },
   "variants": {
     "inventory": [{ "model": "enderrift:hedron.obj" }],
-    "type1":{
+    "type1": {
       "normal": {},
       "corner": { "model": "enderrift:hedron.obj" }
     },
-    "type2":{
+    "type2": {
       "none": {
       },
       "vertical": { "model": "enderrift:straight.obj", "x": 90 },
@@ -20,17 +20,17 @@
       "false": {
       },
       "true": {
-        "custom": { },
+        "custom": {},
         "submodel": {
           "base": { "model": "enderrift:base.obj" }
         }
       }
     },
     "corner": {
-      "ne":{},
-      "nw":{},
-      "se":{},
-      "sw":{}
+      "ne": {},
+      "nw": {},
+      "se": {},
+      "sw": {}
     }
   }
 }

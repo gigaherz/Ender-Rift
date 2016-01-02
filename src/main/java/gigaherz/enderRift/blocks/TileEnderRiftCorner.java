@@ -9,45 +9,64 @@ import net.minecraft.util.EnumFacing;
 
 public class TileEnderRiftCorner
         extends TileEntity
-        implements IEnergyReceiver {
+        implements IEnergyReceiver
+{
     int xParent = 0;
     int yParent;
     int zParent;
     TileEnderRift energyParent;
 
-    public IEnergyReceiver getParent() {
-        if (energyParent == null) {
+    public IEnergyReceiver getParent()
+    {
+        if (energyParent == null)
+        {
             IBlockState state = worldObj.getBlockState(pos);
             boolean base = state.getValue(BlockStructure.BASE);
-            BlockStructure.Corner corner = state.getValue(BlockStructure.CORNER) ;
+            BlockStructure.Corner corner = state.getValue(BlockStructure.CORNER);
             xParent = pos.getX();
-            yParent = pos.getY() + (base?1:-1);
+            yParent = pos.getY() + (base ? 1 : -1);
             zParent = pos.getZ();
-            switch(corner)
+            switch (corner)
             {
-                case NE: xParent-=1; zParent+=1; break;
-                case NW: xParent+=1; zParent+=1; break;
-                case SE: xParent-=1; zParent-=1; break;
-                case SW: xParent+=1; zParent-=1; break;
+                case NE:
+                    xParent -= 1;
+                    zParent += 1;
+                    break;
+                case NW:
+                    xParent += 1;
+                    zParent += 1;
+                    break;
+                case SE:
+                    xParent -= 1;
+                    zParent -= 1;
+                    break;
+                case SW:
+                    xParent += 1;
+                    zParent -= 1;
+                    break;
             }
             TileEntity te = worldObj.getTileEntity(new BlockPos(xParent, yParent, zParent));
-            if (te instanceof TileEnderRift) {
+            if (te instanceof TileEnderRift)
+            {
                 energyParent = (TileEnderRift) te;
             }
         }
         return energyParent;
     }
 
-    public void readFromNBT(NBTTagCompound nbtTagCompound) {
+    public void readFromNBT(NBTTagCompound nbtTagCompound)
+    {
         super.readFromNBT(nbtTagCompound);
     }
 
-    public void writeToNBT(NBTTagCompound nbtTagCompound) {
+    public void writeToNBT(NBTTagCompound nbtTagCompound)
+    {
         super.writeToNBT(nbtTagCompound);
     }
 
     @Override
-    public int receiveEnergy(EnumFacing from, int maxReceive, boolean simulate) {
+    public int receiveEnergy(EnumFacing from, int maxReceive, boolean simulate)
+    {
         IEnergyReceiver parent = getParent();
         if (parent == null)
             return 0;
@@ -55,7 +74,8 @@ public class TileEnderRiftCorner
     }
 
     @Override
-    public int getEnergyStored(EnumFacing from) {
+    public int getEnergyStored(EnumFacing from)
+    {
         IEnergyReceiver parent = getParent();
         if (parent == null)
             return 0;
@@ -63,7 +83,8 @@ public class TileEnderRiftCorner
     }
 
     @Override
-    public int getMaxEnergyStored(EnumFacing from) {
+    public int getMaxEnergyStored(EnumFacing from)
+    {
         IEnergyReceiver parent = getParent();
         if (parent == null)
             return 0;
@@ -71,8 +92,8 @@ public class TileEnderRiftCorner
     }
 
     @Override
-    public boolean canConnectEnergy(EnumFacing from) {
+    public boolean canConnectEnergy(EnumFacing from)
+    {
         return true;
     }
-
 }

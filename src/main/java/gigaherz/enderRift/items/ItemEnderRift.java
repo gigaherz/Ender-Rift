@@ -13,14 +13,17 @@ import net.minecraft.world.World;
 
 import java.util.List;
 
-public class ItemEnderRift extends Item {
-    public ItemEnderRift() {
+public class ItemEnderRift extends Item
+{
+    public ItemEnderRift()
+    {
         this.maxStackSize = 16;
         this.setCreativeTab(EnderRiftMod.tabEnderRift);
     }
 
     @Override
-    public String getUnlocalizedName(ItemStack stack) {
+    public String getUnlocalizedName(ItemStack stack)
+    {
         NBTTagCompound tag = stack.getTagCompound();
         if (tag == null || !tag.hasKey("RiftId"))
             return this.getUnlocalizedName() + ".empty";
@@ -29,9 +32,11 @@ public class ItemEnderRift extends Item {
     }
 
     @Override
-    public void addInformation(ItemStack stack, EntityPlayer player, List<String> information, boolean p_77624_4_) {
+    public void addInformation(ItemStack stack, EntityPlayer player, List<String> information, boolean p_77624_4_)
+    {
         NBTTagCompound tag = stack.getTagCompound();
-        if (tag != null && tag.hasKey("RiftId")) {
+        if (tag != null && tag.hasKey("RiftId"))
+        {
             information.add("Rift ID: " + tag.getInteger("RiftId"));
         }
     }
@@ -53,16 +58,20 @@ public class ItemEnderRift extends Item {
         if (state.getValue(BlockEnderRift.ASSEMBLED))
         {
             NBTTagCompound tag = stack.getTagCompound();
-            if (tag == null || !tag.hasKey("RiftId")) {
+            if (tag == null || !tag.hasKey("RiftId"))
+            {
                 if (!EnderRiftMod.blockEnderRift.tryDuplicateRift(worldIn, pos, playerIn))
                     return false;
             }
-        } else {
+        }
+        else
+        {
             if (!EnderRiftMod.blockEnderRift.tryCompleteStructure(worldIn, pos, stack))
                 return false;
         }
 
-        if (!playerIn.capabilities.isCreativeMode) {
+        if (!playerIn.capabilities.isCreativeMode)
+        {
             --stack.stackSize;
         }
 

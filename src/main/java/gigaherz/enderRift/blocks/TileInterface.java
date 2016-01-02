@@ -9,11 +9,12 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.*;
+import net.minecraft.util.IChatComponent;
+import net.minecraft.util.ITickable;
 import net.minecraftforge.common.util.Constants;
 
 public class TileInterface extends TileEntity
-    implements IInventory, ITickable
+        implements IInventory, ITickable
 {
     static final int FilterCount = 9;
 
@@ -25,13 +26,13 @@ public class TileInterface extends TileEntity
 
     public IInventoryAutomation getParent()
     {
-        if(!parentSearched)
+        if (!parentSearched)
         {
             IBlockState state = worldObj.getBlockState(getPos());
             TileEntity te = worldObj.getTileEntity(pos.offset(state.getValue(BlockInterface.FACING)));
-            if(te instanceof IInventoryAutomation)
+            if (te instanceof IInventoryAutomation)
             {
-                parent = (IInventoryAutomation)te;
+                parent = (IInventoryAutomation) te;
             }
             parentSearched = true;
         }
@@ -49,12 +50,12 @@ public class TileInterface extends TileEntity
     @Override
     public void update()
     {
-        if(getParent() == null)
+        if (getParent() == null)
             return;
 
-        for(int i=0;i<FilterCount;i++)
+        for (int i = 0; i < FilterCount; i++)
         {
-            if(filters[i] != null)
+            if (filters[i] != null)
             {
                 if (outputs[i] == null)
                 {
@@ -67,7 +68,7 @@ public class TileInterface extends TileEntity
                     if (free > 0)
                     {
                         ItemStack extracted = getParent().extractItems(filters[i], free);
-                        if(extracted != null)
+                        if (extracted != null)
                             outputs[i].stackSize += extracted.stackSize;
                     }
                 }
@@ -78,7 +79,7 @@ public class TileInterface extends TileEntity
             }
             else if (outputs[i] != null)
             {
-               outputs[i] = getParent().pushItems(outputs[i]);
+                outputs[i] = getParent().pushItems(outputs[i]);
             }
         }
     }
@@ -92,7 +93,7 @@ public class TileInterface extends TileEntity
     @Override
     public ItemStack getStackInSlot(int index)
     {
-        if(index < 0 || index >= outputs.length)
+        if (index < 0 || index >= outputs.length)
             return null;
         return outputs[index];
     }
@@ -100,13 +101,13 @@ public class TileInterface extends TileEntity
     @Override
     public ItemStack decrStackSize(int index, int count)
     {
-        if(index < 0 || index >= outputs.length)
+        if (index < 0 || index >= outputs.length)
             return null;
 
         if (outputs[index] == null)
             return null;
 
-        if(count > outputs[index].stackSize)
+        if (count > outputs[index].stackSize)
             count = outputs[index].stackSize;
 
         ItemStack result = outputs[index].splitStack(count);
@@ -124,7 +125,7 @@ public class TileInterface extends TileEntity
     @Override
     public ItemStack removeStackFromSlot(int index)
     {
-        if(index < 0 || index >= outputs.length)
+        if (index < 0 || index >= outputs.length)
             return null;
 
         if (outputs[index] == null)
@@ -138,7 +139,7 @@ public class TileInterface extends TileEntity
     @Override
     public void setInventorySlotContents(int index, ItemStack stack)
     {
-        if(index < 0 || index >= outputs.length)
+        if (index < 0 || index >= outputs.length)
             return;
 
         outputs[index] = stack;
@@ -185,7 +186,7 @@ public class TileInterface extends TileEntity
                 filters[j] = ItemStack.loadItemStackFromNBT(nbttagcompound);
             }
         }
-        
+
         NBTTagList _outputs = compound.getTagList("Outputs", Constants.NBT.TAG_COMPOUND);
         for (int i = 0; i < _outputs.tagCount(); ++i)
         {
@@ -210,21 +211,21 @@ public class TileInterface extends TileEntity
             if (filters[i] != null)
             {
                 NBTTagCompound nbttagcompound = new NBTTagCompound();
-                nbttagcompound.setByte("Slot", (byte)i);
+                nbttagcompound.setByte("Slot", (byte) i);
                 filters[i].writeToNBT(nbttagcompound);
                 _filters.appendTag(nbttagcompound);
             }
         }
 
         compound.setTag("Filters", _filters);
-        
+
         NBTTagList _outputs = new NBTTagList();
         for (int i = 0; i < outputs.length; ++i)
         {
             if (outputs[i] != null)
             {
                 NBTTagCompound nbttagcompound = new NBTTagCompound();
-                nbttagcompound.setByte("Slot", (byte)i);
+                nbttagcompound.setByte("Slot", (byte) i);
                 outputs[i].writeToNBT(nbttagcompound);
                 _outputs.appendTag(nbttagcompound);
             }
@@ -310,7 +311,7 @@ public class TileInterface extends TileEntity
             @Override
             public ItemStack getStackInSlot(int index)
             {
-                if(index < 0 || index >= filters.length)
+                if (index < 0 || index >= filters.length)
                     return null;
                 return filters[index];
             }
@@ -318,13 +319,13 @@ public class TileInterface extends TileEntity
             @Override
             public ItemStack decrStackSize(int index, int count)
             {
-                if(index < 0 || index >= filters.length)
+                if (index < 0 || index >= filters.length)
                     return null;
 
                 if (filters[index] == null)
                     return null;
 
-                if(count > filters[index].stackSize)
+                if (count > filters[index].stackSize)
                     count = filters[index].stackSize;
 
                 ItemStack result = filters[index].splitStack(count);
@@ -342,7 +343,7 @@ public class TileInterface extends TileEntity
             @Override
             public ItemStack removeStackFromSlot(int index)
             {
-                if(index < 0 || index >= filters.length)
+                if (index < 0 || index >= filters.length)
                     return null;
 
                 if (filters[index] == null)

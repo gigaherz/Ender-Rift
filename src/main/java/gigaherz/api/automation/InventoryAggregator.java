@@ -1,11 +1,11 @@
 package gigaherz.api.automation;
 
+import com.google.common.collect.Lists;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.IChatComponent;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -13,29 +13,36 @@ import java.util.List;
  */
 public class InventoryAggregator implements IInventory
 {
-    List<IInventory> inventories = new ArrayList<>();
+    List<IInventory> inventories = Lists.newArrayList();
 
     @Override
     public int getSizeInventory()
     {
-        return inventories.stream().mapToInt(IInventory::getSizeInventory).sum();
+        int sum = 0;
+
+        for (IInventory inv : inventories)
+        {
+            sum += inv.getSizeInventory();
+        }
+
+        return sum;
     }
 
     @Override
     public ItemStack getStackInSlot(int index)
     {
         IInventory actual = null;
-        for(IInventory i : inventories)
+        for (IInventory i : inventories)
         {
             int size = i.getSizeInventory();
-            if(index < size)
+            if (index < size)
             {
                 actual = i;
                 break;
             }
             index -= size;
         }
-        if(actual == null)
+        if (actual == null)
             return null;
         return actual.getStackInSlot(index);
     }
@@ -44,17 +51,17 @@ public class InventoryAggregator implements IInventory
     public ItemStack decrStackSize(int index, int count)
     {
         IInventory actual = null;
-        for(IInventory i : inventories)
+        for (IInventory i : inventories)
         {
             int size = i.getSizeInventory();
-            if(index < size)
+            if (index < size)
             {
                 actual = i;
                 break;
             }
             index -= size;
         }
-        if(actual == null)
+        if (actual == null)
             return null;
         return actual.decrStackSize(index, count);
     }
@@ -63,17 +70,17 @@ public class InventoryAggregator implements IInventory
     public ItemStack removeStackFromSlot(int index)
     {
         IInventory actual = null;
-        for(IInventory i : inventories)
+        for (IInventory i : inventories)
         {
             int size = i.getSizeInventory();
-            if(index < size)
+            if (index < size)
             {
                 actual = i;
                 break;
             }
             index -= size;
         }
-        if(actual == null)
+        if (actual == null)
             return null;
         return actual.removeStackFromSlot(index);
     }
@@ -82,17 +89,17 @@ public class InventoryAggregator implements IInventory
     public void setInventorySlotContents(int index, ItemStack stack)
     {
         IInventory actual = null;
-        for(IInventory i : inventories)
+        for (IInventory i : inventories)
         {
             int size = i.getSizeInventory();
-            if(index < size)
+            if (index < size)
             {
                 actual = i;
                 break;
             }
             index -= size;
         }
-        if(actual == null)
+        if (actual == null)
             return;
 
         actual.setInventorySlotContents(index, stack);
@@ -107,7 +114,10 @@ public class InventoryAggregator implements IInventory
     @Override
     public void markDirty()
     {
-        inventories.stream().forEach(IInventory::markDirty);
+        for (IInventory inv : inventories)
+        {
+            inv.markDirty();
+        }
     }
 
     @Override
@@ -119,13 +129,19 @@ public class InventoryAggregator implements IInventory
     @Override
     public void openInventory(final EntityPlayer player)
     {
-        inventories.stream().forEach(i -> i.openInventory(player));
+        for (IInventory inv : inventories)
+        {
+            inv.openInventory(player);
+        }
     }
 
     @Override
     public void closeInventory(EntityPlayer player)
     {
-        inventories.stream().forEach(i -> i.closeInventory(player));
+        for (IInventory inv : inventories)
+        {
+            inv.closeInventory(player);
+        }
     }
 
     @Override

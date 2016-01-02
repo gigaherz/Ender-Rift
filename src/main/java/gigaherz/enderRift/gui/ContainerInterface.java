@@ -56,26 +56,26 @@ public class ContainerInterface
     @Override
     public ItemStack slotClick(int slotId, int clickedButton, int mode, EntityPlayer playerIn)
     {
-        if(slotId >= 0 && slotId < 9)
+        if (slotId >= 0 && slotId < 9)
         {
-            if(mode == 0 || mode==1) // 1 is shift-click
+            if (mode == 0 || mode == 1) // 1 is shift-click
             {
                 Slot slot = this.inventorySlots.get(slotId);
 
                 ItemStack dropping = playerIn.inventory.getItemStack();
 
-                if(dropping != null)
+                if (dropping != null)
                 {
                     ItemStack copy = dropping.copy();
                     copy.stackSize = 1;
                     slot.putStack(copy);
                 }
-                else if(slot.getStack() != null)
+                else if (slot.getStack() != null)
                 {
                     slot.putStack(null);
                 }
 
-                if(slot.getStack() != null)
+                if (slot.getStack() != null)
                     return slot.getStack().copy();
             }
 
@@ -112,7 +112,7 @@ public class ContainerInterface
         else if (slotIndex < 18)
         {
             startIndex = 18;
-            endIndex = 18+27+9;
+            endIndex = 18 + 27 + 9;
         }
         else
         {

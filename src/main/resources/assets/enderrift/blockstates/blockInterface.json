@@ -5,7 +5,7 @@
   },
   "variants": {
     "inventory": [{}],
-    "facing":{
+    "facing": {
       "up": {
         "x": 270
       },

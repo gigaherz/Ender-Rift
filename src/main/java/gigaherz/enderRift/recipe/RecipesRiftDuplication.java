@@ -9,11 +9,13 @@ import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.World;
 
-public class RecipesRiftDuplication implements IRecipe {
+public class RecipesRiftDuplication implements IRecipe
+{
     /**
      * Used to check if a recipe matches current crafting inventory
      */
-    public boolean matches(InventoryCrafting crafting, World p_77569_2_) {
+    public boolean matches(InventoryCrafting crafting, World p_77569_2_)
+    {
         if (crafting.getSizeInventory() < 9)
             return false;
 
@@ -55,7 +57,8 @@ public class RecipesRiftDuplication implements IRecipe {
         return true;
     }
 
-    private boolean slotHasItem(InventoryCrafting crafting, int slot, Item item) {
+    private boolean slotHasItem(InventoryCrafting crafting, int slot, Item item)
+    {
         ItemStack stack = crafting.getStackInSlot(slot);
         return stack != null && stack.getItem() == item;
     }
@@ -63,7 +66,8 @@ public class RecipesRiftDuplication implements IRecipe {
     /**
      * Returns an Item that is the result of this recipe
      */
-    public ItemStack getCraftingResult(InventoryCrafting crafting) {
+    public ItemStack getCraftingResult(InventoryCrafting crafting)
+    {
         ItemStack stack = crafting.getStackInSlot(4).copy();
         stack.stackSize = 2;
         return stack;
@@ -72,11 +76,13 @@ public class RecipesRiftDuplication implements IRecipe {
     /**
      * Returns the size of the recipe area
      */
-    public int getRecipeSize() {
+    public int getRecipeSize()
+    {
         return 9;
     }
 
-    public ItemStack getRecipeOutput() {
+    public ItemStack getRecipeOutput()
+    {
         return null;
     }
 

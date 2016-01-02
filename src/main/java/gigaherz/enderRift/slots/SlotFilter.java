@@ -19,24 +19,24 @@ public class SlotFilter extends Slot
     }
 
     @Override
-    public void onPickupFromSlot( final EntityPlayer par1EntityPlayer, final ItemStack par2ItemStack )
+    public void onPickupFromSlot(final EntityPlayer par1EntityPlayer, final ItemStack par2ItemStack)
     {
     }
 
     @Override
-    public ItemStack decrStackSize( final int par1 )
+    public ItemStack decrStackSize(final int par1)
     {
         return null;
     }
 
     @Override
-    public boolean isItemValid( final ItemStack par1ItemStack )
+    public boolean isItemValid(final ItemStack par1ItemStack)
     {
         return false;
     }
 
     @Override
-    public boolean canTakeStack( final EntityPlayer par1EntityPlayer )
+    public boolean canTakeStack(final EntityPlayer par1EntityPlayer)
     {
         return false;
     }

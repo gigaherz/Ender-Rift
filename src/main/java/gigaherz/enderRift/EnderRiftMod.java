@@ -7,13 +7,10 @@ import gigaherz.enderRift.items.ItemEnderRift;
 import gigaherz.enderRift.recipe.RecipesRiftDuplication;
 import net.minecraft.block.Block;
 import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.potion.Potion;
-import net.minecraft.potion.PotionEffect;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.SidedProxy;
@@ -22,13 +19,15 @@ import net.minecraftforge.fml.common.event.FMLInterModComms;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.registry.GameRegistry;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-@Mod(modid = EnderRiftMod.MODID, version = EnderRiftMod.VERSION, dependencies = "after:Waila;after:NotEnoughItems")
-public class EnderRiftMod {
+@Mod(modid = EnderRiftMod.MODID,
+        version = EnderRiftMod.VERSION,
+        dependencies = "after:Waila;after:NotEnoughItems",
+        acceptedMinecraftVersions = "1.8.8,1.8.9")
+public class EnderRiftMod
+{
     public static final String MODID = "enderrift";
     public static final String VERSION = "@VERSION";
 
@@ -58,7 +57,8 @@ public class EnderRiftMod {
         tabEnderRift = new CreativeTabs("tabEnderRift")
         {
             @Override
-            public Item getTabIconItem() {
+            public Item getTabIconItem()
+            {
                 return itemEnderRift;
             }
         };

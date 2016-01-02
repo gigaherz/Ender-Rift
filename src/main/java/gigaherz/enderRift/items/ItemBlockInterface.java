@@ -1,7 +1,6 @@
 package gigaherz.enderRift.items;
 
 import gigaherz.enderRift.blocks.BlockInterface;
-import gigaherz.enderRift.blocks.TileEnderRift;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;

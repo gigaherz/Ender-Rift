@@ -15,9 +15,11 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
-public class ClientProxy implements IModProxy {
+public class ClientProxy implements IModProxy
+{
     @Override
-    public void preInit() {
+    public void preInit()
+    {
         OBJLoader.instance.addDomain(EnderRiftMod.MODID);
         ClientRegistry.bindTileEntitySpecialRenderer(TileEnderRift.class, new TESREnderRift());
         registerItemModel(EnderRiftMod.itemEnderRift, 0, "item_rift");
@@ -53,6 +55,7 @@ public class ClientProxy implements IModProxy {
     }
 
     @Override
-    public void init() {
+    public void init()
+    {
     }
 }

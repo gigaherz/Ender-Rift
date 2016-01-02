@@ -7,7 +7,7 @@
         "all": "enderrift:blocks/block_casing"
       }
     }],
-    "assembled":{
+    "assembled": {
       "false": {
         "model": "minecraft:cube_all",
         "textures": {

@@ -30,7 +30,7 @@ public class InventorySlotsWrapper implements IInventory
     @Override
     public ItemStack getStackInSlot(int index)
     {
-        if(index > slots.length)
+        if (index > slots.length)
             return null;
         return parent.getStackInSlot(slots[index]);
     }
@@ -38,7 +38,7 @@ public class InventorySlotsWrapper implements IInventory
     @Override
     public ItemStack decrStackSize(int index, int count)
     {
-        if(index > slots.length)
+        if (index > slots.length)
             return null;
         return parent.decrStackSize(slots[index], count);
     }
@@ -46,7 +46,7 @@ public class InventorySlotsWrapper implements IInventory
     @Override
     public ItemStack removeStackFromSlot(int index)
     {
-        if(index > slots.length)
+        if (index > slots.length)
             return null;
         return parent.removeStackFromSlot(slots[index]);
     }
@@ -54,7 +54,7 @@ public class InventorySlotsWrapper implements IInventory
     @Override
     public void setInventorySlotContents(int index, ItemStack stack)
     {
-        if(index > slots.length)
+        if (index > slots.length)
             return;
         parent.setInventorySlotContents(slots[index], stack);
     }
@@ -115,7 +115,7 @@ public class InventorySlotsWrapper implements IInventory
     @Override
     public void clear()
     {
-        for(int i: slots)
+        for (int i : slots)
         {
             parent.setInventorySlotContents(i, null);
         }

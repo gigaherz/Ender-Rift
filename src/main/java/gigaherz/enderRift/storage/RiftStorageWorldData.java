@@ -10,24 +10,29 @@ import net.minecraftforge.common.util.Constants;
 import java.util.HashMap;
 import java.util.Map;
 
-public class RiftStorageWorldData extends WorldSavedData {
+public class RiftStorageWorldData extends WorldSavedData
+{
     private static final String StorageKey = "enderRiftStorageManager";
 
     private Map<Integer, RiftInventory> rifts = new HashMap<Integer, RiftInventory>();
     private int lastRiftId;
 
-    public RiftStorageWorldData() {
+    public RiftStorageWorldData()
+    {
         super(StorageKey);
     }
 
-    public RiftStorageWorldData(String s) {
+    public RiftStorageWorldData(String s)
+    {
         super(s);
     }
 
-    public static RiftStorageWorldData get(World world) {
+    public static RiftStorageWorldData get(World world)
+    {
         MapStorage storage = world.getMapStorage();
         RiftStorageWorldData instance = (RiftStorageWorldData) storage.loadData(RiftStorageWorldData.class, StorageKey);
-        if (instance == null) {
+        if (instance == null)
+        {
             instance = new RiftStorageWorldData();
             storage.setData(StorageKey, instance);
         }
@@ -35,10 +40,12 @@ public class RiftStorageWorldData extends WorldSavedData {
         return instance;
     }
 
-    public RiftInventory getRift(int id) {
+    public RiftInventory getRift(int id)
+    {
         RiftInventory rift = rifts.get(id);
 
-        if (rift == null) {
+        if (rift == null)
+        {
             rift = new RiftInventory(this);
             rifts.put(id, rift);
         }
@@ -46,19 +53,22 @@ public class RiftStorageWorldData extends WorldSavedData {
         return rift;
     }
 
-    public int getNextRiftId() {
+    public int getNextRiftId()
+    {
         markDirty();
 
         return ++lastRiftId;
     }
 
     @Override
-    public void readFromNBT(NBTTagCompound nbtTagCompound) {
+    public void readFromNBT(NBTTagCompound nbtTagCompound)
+    {
         NBTTagList nbtTagList = nbtTagCompound.getTagList("Rifts", Constants.NBT.TAG_COMPOUND);
 
         rifts.clear();
 
-        for (int i = 0; i < nbtTagList.tagCount(); ++i) {
+        for (int i = 0; i < nbtTagList.tagCount(); ++i)
+        {
             NBTTagCompound nbtTagCompound1 = nbtTagList.getCompoundTagAt(i);
             int j = nbtTagCompound1.getByte("Rift");
 
@@ -72,10 +82,12 @@ public class RiftStorageWorldData extends WorldSavedData {
     }
 
     @Override
-    public void writeToNBT(NBTTagCompound nbtTagCompound) {
+    public void writeToNBT(NBTTagCompound nbtTagCompound)
+    {
         NBTTagList nbtTagList = new NBTTagList();
 
-        for (Map.Entry<Integer, RiftInventory> entry : rifts.entrySet()) {
+        for (Map.Entry<Integer, RiftInventory> entry : rifts.entrySet())
+        {
             RiftInventory inventory = entry.getValue();
 
             NBTTagCompound nbtTagCompound1 = new NBTTagCompound();

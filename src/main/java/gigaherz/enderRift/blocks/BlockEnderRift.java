@@ -1,5 +1,6 @@
 package gigaherz.enderRift.blocks;
 
+import com.google.common.collect.Lists;
 import gigaherz.enderRift.EnderRiftMod;
 import gigaherz.enderRift.storage.RiftStorageWorldData;
 import net.minecraft.block.Block;
@@ -27,7 +28,8 @@ public class BlockEnderRift
 {
     public static final PropertyBool ASSEMBLED = PropertyBool.create("assembled");
 
-    public BlockEnderRift() {
+    public BlockEnderRift()
+    {
         super(Material.rock);
         setHardness(0.5F);
         setStepSound(Block.soundTypeMetal);
@@ -56,7 +58,8 @@ public class BlockEnderRift
     }
 
     @Override
-    public boolean isOpaqueCube() {
+    public boolean isOpaqueCube()
+    {
         return false;
     }
 
@@ -64,7 +67,7 @@ public class BlockEnderRift
     public int getLightValue(IBlockAccess world, BlockPos pos)
     {
         IBlockState state = world.getBlockState(pos);
-        if(state.getBlock() != this)
+        if (state.getBlock() != this)
             return super.getLightValue(world, pos);
         return world.getBlockState(pos).getValue(ASSEMBLED) ? 15 : 0;
     }
@@ -73,7 +76,7 @@ public class BlockEnderRift
     public int getLightOpacity(IBlockAccess world, BlockPos pos)
     {
         IBlockState state = world.getBlockState(pos);
-        if(state.getBlock() != this)
+        if (state.getBlock() != this)
             return super.getLightOpacity(world, pos);
         return state.getValue(ASSEMBLED) ? 1 : 15;
     }
@@ -98,12 +101,12 @@ public class BlockEnderRift
 
     Block getBlockXYZ(IBlockAccess world, int x, int y, int z)
     {
-        return world.getBlockState(new BlockPos(x,y,z)).getBlock();
+        return world.getBlockState(new BlockPos(x, y, z)).getBlock();
     }
 
     void setBlockXYZ(World world, int x, int y, int z, IBlockState state)
     {
-        world.setBlockState(new BlockPos(x,y,z), state);
+        world.setBlockState(new BlockPos(x, y, z), state);
     }
 
     void setBlockCorner(World world, int x, int y, int z, BlockStructure.Corner corner, boolean base)
@@ -201,18 +204,18 @@ public class BlockEnderRift
         setBlockCorner(world, x - 1, y + 1, z + 1, BlockStructure.Corner.SW, false);
         setBlockCorner(world, x + 1, y + 1, z + 1, BlockStructure.Corner.SE, false);
 
-        setBlockOther(world, x, y - 1, z - 1,  BlockStructure.Type2.SIDE_EW, true);
-        setBlockOther(world, x, y + 1, z - 1,  BlockStructure.Type2.SIDE_EW, false);
-        setBlockOther(world, x, y - 1, z + 1,  BlockStructure.Type2.SIDE_EW, true);
-        setBlockOther(world, x, y + 1, z + 1,  BlockStructure.Type2.SIDE_EW, false);
-        setBlockOther(world, x - 1, y, z - 1,  BlockStructure.Type2.VERTICAL, false);
-        setBlockOther(world, x + 1, y, z - 1,  BlockStructure.Type2.VERTICAL, false);
-        setBlockOther(world, x - 1, y, z + 1,  BlockStructure.Type2.VERTICAL, false);
-        setBlockOther(world, x + 1, y, z + 1,  BlockStructure.Type2.VERTICAL, false);
-        setBlockOther(world, x - 1, y - 1, z,  BlockStructure.Type2.SIDE_NS, true);
-        setBlockOther(world, x + 1, y - 1, z,  BlockStructure.Type2.SIDE_NS, true);
-        setBlockOther(world, x - 1, y + 1, z,  BlockStructure.Type2.SIDE_NS, false);
-        setBlockOther(world, x + 1, y + 1, z,  BlockStructure.Type2.SIDE_NS, false);
+        setBlockOther(world, x, y - 1, z - 1, BlockStructure.Type2.SIDE_EW, true);
+        setBlockOther(world, x, y + 1, z - 1, BlockStructure.Type2.SIDE_EW, false);
+        setBlockOther(world, x, y - 1, z + 1, BlockStructure.Type2.SIDE_EW, true);
+        setBlockOther(world, x, y + 1, z + 1, BlockStructure.Type2.SIDE_EW, false);
+        setBlockOther(world, x - 1, y, z - 1, BlockStructure.Type2.VERTICAL, false);
+        setBlockOther(world, x + 1, y, z - 1, BlockStructure.Type2.VERTICAL, false);
+        setBlockOther(world, x - 1, y, z + 1, BlockStructure.Type2.VERTICAL, false);
+        setBlockOther(world, x + 1, y, z + 1, BlockStructure.Type2.VERTICAL, false);
+        setBlockOther(world, x - 1, y - 1, z, BlockStructure.Type2.SIDE_NS, true);
+        setBlockOther(world, x + 1, y - 1, z, BlockStructure.Type2.SIDE_NS, true);
+        setBlockOther(world, x - 1, y + 1, z, BlockStructure.Type2.SIDE_NS, false);
+        setBlockOther(world, x + 1, y + 1, z, BlockStructure.Type2.SIDE_NS, false);
 
         world.setBlockState(pos, state.withProperty(ASSEMBLED, true));
 
@@ -270,7 +273,8 @@ public class BlockEnderRift
 
         IBlockState state = world.getBlockState(pos);
 
-        if (state.getBlock() == EnderRiftMod.blockEnderRift && state.getValue(ASSEMBLED)) {
+        if (state.getBlock() == EnderRiftMod.blockEnderRift && state.getValue(ASSEMBLED))
+        {
             world.setBlockState(pos, state.withProperty(ASSEMBLED, false));
 
             TileEnderRift rift = (TileEnderRift) world.getTileEntity(pos);
@@ -315,7 +319,7 @@ public class BlockEnderRift
     @Override
     public List<ItemStack> getDrops(IBlockAccess world, BlockPos pos, IBlockState state, int fortune)
     {
-        ArrayList<ItemStack> ret = new ArrayList<>();
+        ArrayList<ItemStack> ret = Lists.newArrayList();
 
         ret.add(new ItemStack(Item.getItemFromBlock(this), 1, 0));
 

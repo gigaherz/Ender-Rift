@@ -10,6 +10,7 @@ public interface IInventoryAutomation
 {
     /**
      * Gets the corresponding sub-inventory for the given side.
+     *
      * @param face The requested side.
      * @return Returns an inventory instance representing the requested side's slots. Can be null.
      */
@@ -17,6 +18,7 @@ public interface IInventoryAutomation
 
     /**
      * Tries to insert items into the inventory.
+     *
      * @param stack The items to insert.
      * @return Returns the remaining items it was unable to insert. Can be null.
      */
@@ -24,6 +26,7 @@ public interface IInventoryAutomation
 
     /**
      * Tries to pull from the first available stack from the inventory.
+     *
      * @param limit The maximum number of items to pull.
      * @return Returns the items that were extracted. Can be null.
      */
@@ -32,7 +35,8 @@ public interface IInventoryAutomation
     /**
      * Tries to extract a specific amount of a certain item, as defined by the provided ItemStack.
      * Will attempt to gather from more than one stack.
-     * @param stack The item to extract.
+     *
+     * @param stack  The item to extract.
      * @param wanted The quantity being requested.
      * @return Returns the items that were extracted. Can be null.
      */

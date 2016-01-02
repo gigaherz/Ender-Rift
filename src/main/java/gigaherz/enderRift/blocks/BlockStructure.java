@@ -1,5 +1,6 @@
 package gigaherz.enderRift.blocks;
 
+import com.google.common.collect.Lists;
 import gigaherz.enderRift.EnderRiftMod;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
@@ -17,7 +18,6 @@ import net.minecraft.util.IStringSerializable;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class BlockStructure
@@ -184,7 +184,7 @@ public class BlockStructure
         int y = pos.getY();
         int z = pos.getZ();
 
-        List<ItemStack> ret = new ArrayList<>();
+        List<ItemStack> ret = Lists.newArrayList();
 
         if (getBlockXYZ(world, x + 1, y + 1, z + 1) == EnderRiftMod.blockEnderRift)
             ret.add(new ItemStack(Item.getItemFromBlock(Blocks.iron_block)));
