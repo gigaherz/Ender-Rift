@@ -22,14 +22,16 @@ import net.minecraftforge.fml.common.registry.GameRegistry;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-@Mod(modid = EnderRiftMod.MODID,
+@Mod(name=EnderRiftMod.NAME,
+        modid = EnderRiftMod.MODID,
         version = EnderRiftMod.VERSION,
-        dependencies = "after:Waila;after:NotEnoughItems",
+        dependencies = "after:Waila",
         acceptedMinecraftVersions = "1.8.8,1.8.9")
 public class EnderRiftMod
 {
+    public static final String NAME = "Ender-Rift";
     public static final String MODID = "enderrift";
-    public static final String VERSION = "@VERSION";
+    public static final String VERSION = "@VERSION@";
 
     public static BlockEnderRift blockEnderRift;
     public static Block blockStructure;

@@ -51,7 +51,7 @@ public class ClientProxy implements IModProxy
     public void registerItemModel(final Item item, int meta, final String itemName)
     {
         ModelLoader.setCustomModelResourceLocation(item, meta, new ModelResourceLocation(EnderRiftMod.MODID + ":" + itemName, "inventory"));
-        ModelBakery.registerItemVariants(item, new ResourceLocation(EnderRiftMod.MODID + ":" + itemName));
+        ModelBakery.addVariantName(item, EnderRiftMod.MODID + ":" + itemName);
     }
 
     @Override

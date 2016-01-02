@@ -4,7 +4,7 @@
     "model": "enderrift:interface.obj"
   },
   "variants": {
-    "inventory": [{}],
+    "inventory": [{ "transform": "forge:default-block" }],
     "facing": {
       "up": {
         "x": 270

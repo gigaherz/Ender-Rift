@@ -5,7 +5,8 @@
       "model": "minecraft:cube_all",
       "textures": {
         "all": "enderrift:blocks/block_casing"
-      }
+      },
+      "transform": "forge:default-block"
     }],
     "assembled": {
       "false": {

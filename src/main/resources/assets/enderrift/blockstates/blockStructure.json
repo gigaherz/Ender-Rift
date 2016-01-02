@@ -4,7 +4,10 @@
     "model": "builtin/generated"
   },
   "variants": {
-    "inventory": [{ "model": "enderrift:hedron.obj" }],
+    "inventory": [{
+      "model": "enderrift:hedron.obj",
+      "transform": "forge:default-block"
+    }],
     "type1": {
       "normal": {},
       "corner": { "model": "enderrift:hedron.obj" }
