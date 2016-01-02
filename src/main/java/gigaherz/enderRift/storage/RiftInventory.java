@@ -101,13 +101,11 @@ public class RiftInventory implements IInventoryAutomation
     public ItemStack pushItems(@Nonnull ItemStack stack)
     {
         ItemStack remaining = stack.copy();
-        int firstEmpty = -1;
 
         // Try to fill existing slots first
-        for(int i=0;i<inventorySlots.size();i++)
+        for (ItemStack slot : inventorySlots)
         {
-            ItemStack slot = inventorySlots.get(i);
-            if(slot != null)
+            if (slot != null)
             {
                 int max = Math.min(remaining.getMaxStackSize(), 64);
                 int transfer = Math.min(remaining.stackSize, max - slot.stackSize);
@@ -115,18 +113,17 @@ public class RiftInventory implements IInventoryAutomation
                 {
                     slot.stackSize += transfer;
                     remaining.stackSize -= transfer;
-                    if(remaining.stackSize == 0)
+                    if (remaining.stackSize <= 0)
                         break;
                 }
             }
-            else if(firstEmpty < 0)
-            {
-                firstEmpty = i;
-            }
         }
 
-        // Then place the remaining items in the first available empty slot
-        inventorySlots.add(remaining);
+        // Then place any remaining items in the first available empty slot
+        if(remaining.stackSize > 0)
+          inventorySlots.add(remaining);
+
+        markDirty();
 
         return null;
     }
@@ -145,6 +142,7 @@ public class RiftInventory implements IInventoryAutomation
                     ItemStack pulled = slot.splitStack(available);
                     if(slot.stackSize <= 0)
                         inventorySlots.remove(i);
+                    markDirty();
                     return pulled;
                 }
             }
@@ -184,6 +182,7 @@ public class RiftInventory implements IInventoryAutomation
         if(extracted.stackSize <= 0)
             return null;
 
+        markDirty();
         return extracted;
     }
 }
