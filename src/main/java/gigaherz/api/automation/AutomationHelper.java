@@ -1,4 +1,4 @@
-package gigaherz.enderRift.api;
+package gigaherz.api.automation;
 
 import com.google.common.base.Predicate;
 import net.minecraft.inventory.IInventory;
@@ -16,7 +16,7 @@ public class AutomationHelper implements IInventoryAutomation
     IInventory parent;
 
     /**
-     * Gets an inventory autimation instance, wrapping an inventory if necessary.
+     * Gets an inventory automation instance, wrapping an inventory if necessary.
      * @param object The object to get an inventory from.
      * @param facing The face from which the automation is happening.
      * @return Returns an instance of an easy-to-automate inventory.
@@ -150,11 +150,12 @@ public class AutomationHelper implements IInventoryAutomation
      * Extracts the first matching stack, with at least as many items as requested. By default,
      * it will scan the entire inventory until the item is found, but implementations can choose
      * to use a multimap or similar for indexing large inventories.
-     * @param stack The item to extract, and the quantity being requested.
+     * @param stack The item to extract.
+     * @param wanted The quantity being requested.
      * @return Returns the matching stack, up to the specified stackSize.
      */
     @Override
-    public ItemStack extractItems(@Nonnull ItemStack stack)
+    public ItemStack extractItems(@Nonnull ItemStack stack, int wanted)
     {
         ItemStack extracted = stack.copy();
         extracted.stackSize = 0;
@@ -162,14 +163,12 @@ public class AutomationHelper implements IInventoryAutomation
         if(stack.stackSize <= 0)
             return null;
 
-        int limit = stack.stackSize;
-
         for(int i=0;i<parent.getSizeInventory();i++)
         {
             ItemStack slot = parent.getStackInSlot(i);
             if(slot != null)
             {
-                int available = Math.min(limit, slot.stackSize);
+                int available = Math.min(wanted, slot.stackSize);
                 if (ItemStack.areItemsEqual(slot, stack) && ItemStack.areItemStackTagsEqual(slot, stack) && available > 0)
                 {
                     slot.stackSize -= available;
@@ -177,8 +176,8 @@ public class AutomationHelper implements IInventoryAutomation
                     if(slot.stackSize <= 0)
                         parent.setInventorySlotContents(i, null);
 
-                    limit = extracted.stackSize - stack.stackSize;
-                    if(limit <= 0)
+                    wanted = extracted.stackSize - stack.stackSize;
+                    if(wanted <= 0)
                         break;
                 }
             }

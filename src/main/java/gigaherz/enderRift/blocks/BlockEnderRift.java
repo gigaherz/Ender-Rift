@@ -140,6 +140,8 @@ public class BlockEnderRift
             return false;
         if (getBlockXYZ(world, x + 1, y, z).isNormalCube(world, pos))
             return false;
+        if (getBlockXYZ(world, x, y - 1, z).isNormalCube(world, pos))
+            return false;
         if (getBlockXYZ(world, x, y + 1, z).isNormalCube(world, pos))
             return false;
         if (getBlockXYZ(world, x, y, z - 1).isNormalCube(world, pos))
@@ -163,8 +165,6 @@ public class BlockEnderRift
         if (getBlockXYZ(world, x + 1, y - 1, z - 1) != Blocks.iron_block)
             return false;
         if (getBlockXYZ(world, x - 1, y - 1, z) != Blocks.redstone_block)
-            return false;
-        if (getBlockXYZ(world, x, y - 1, z) != Blocks.redstone_block)
             return false;
         if (getBlockXYZ(world, x + 1, y - 1, z) != Blocks.redstone_block)
             return false;
@@ -201,7 +201,6 @@ public class BlockEnderRift
         setBlockCorner(world, x - 1, y + 1, z + 1, BlockStructure.Corner.SW, false);
         setBlockCorner(world, x + 1, y + 1, z + 1, BlockStructure.Corner.SE, false);
 
-        setBlockOther(world, x, y - 1, z,      BlockStructure.Type2.NONE, true);
         setBlockOther(world, x, y - 1, z - 1,  BlockStructure.Type2.SIDE_EW, true);
         setBlockOther(world, x, y + 1, z - 1,  BlockStructure.Type2.SIDE_EW, false);
         setBlockOther(world, x, y - 1, z + 1,  BlockStructure.Type2.SIDE_EW, true);
@@ -241,8 +240,6 @@ public class BlockEnderRift
         int x = pos.getX();
         int y = pos.getY();
         int z = pos.getZ();
-
-        restoreStructureBlockTo(world, x, y - 1, z, Blocks.redstone_block);
 
         restoreStructureBlockTo(world, x - 1, y, z - 1, Blocks.redstone_block);
         restoreStructureBlockTo(world, x + 1, y, z - 1, Blocks.redstone_block);

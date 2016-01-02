@@ -1,4 +1,4 @@
-package gigaherz.enderRift.api;
+package gigaherz.api.automation;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;

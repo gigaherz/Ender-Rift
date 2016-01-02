@@ -1,14 +1,18 @@
 package gigaherz.enderRift.storage;
 
+import com.google.common.base.Predicate;
+import gigaherz.api.automation.IInventoryAutomation;
 import gigaherz.enderRift.blocks.TileEnderRift;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.IChatComponent;
 import net.minecraftforge.common.util.Constants;
 
+import javax.annotation.Nonnull;
 import java.lang.ref.Reference;
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;
@@ -16,7 +20,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public class RiftInventory implements IInventory {
+public class RiftInventory implements IInventoryAutomation
+{
     private final List<ItemStack> inventorySlots = new ArrayList<>();
     private final RiftStorageWorldData manager;
 
@@ -31,8 +36,13 @@ public class RiftInventory implements IInventory {
         listeners.add(new WeakReference<>(e, deadListeners));
     }
 
-    @Override
-    public void markDirty() {
+    public int getSlotCount()
+    {
+        return inventorySlots.size();
+    }
+
+    public void markDirty()
+    {
         for (Reference<? extends TileEnderRift>
              ref = deadListeners.poll();
              ref != null;
@@ -52,173 +62,128 @@ public class RiftInventory implements IInventory {
         manager.markDirty();
     }
 
-    public int countInventoryStacks() {
-        int count = 0;
-        for (ItemStack stack : inventorySlots) {
-            if (stack != null)
-                count++;
-        }
-        return count;
-    }
-
-    @Override
-    public int getSizeInventory() {
-        return inventorySlots.size() + 1;
-    }
-
-    @Override
-    public ItemStack getStackInSlot(int slotIndex) {
-
-        if (slotIndex >= inventorySlots.size())
-            return null;
-
-        return inventorySlots.get(slotIndex);
-    }
-
-    @Override
-    public void setInventorySlotContents(int slotIndex, ItemStack stack) {
-        if (stack == null) {
-            if (slotIndex >= inventorySlots.size())
-                return;
-
-            inventorySlots.remove(slotIndex);
-            markDirty();
-
-            return;
-        }
-
-        if (slotIndex >= inventorySlots.size()) {
-            inventorySlots.add(stack);
-            markDirty();
-
-            return;
-        }
-
-        inventorySlots.set(slotIndex, stack);
-        markDirty();
-    }
-
-    @Override
-    public ItemStack decrStackSize(int slotIndex, int amount) {
-        ItemStack stack = getStackInSlot(slotIndex);
-
-        if (stack == null)
-            return null;
-
-        if (stack.stackSize <= amount) {
-            setInventorySlotContents(slotIndex, null);
-        } else {
-            stack = stack.splitStack(amount);
-
-            if (stack.stackSize == 0) {
-                setInventorySlotContents(slotIndex, null);
-            }
-        }
-
-        markDirty();
-        return stack;
-    }
-
-    @Override
-    public ItemStack removeStackFromSlot(int index)
+    public void readFromNBT(NBTTagCompound nbtTagCompound)
     {
-        return null;
-    }
-
-    @Override
-    public int getInventoryStackLimit() {
-        return 64;
-    }
-
-    @Override
-    public boolean isUseableByPlayer(EntityPlayer player) {
-        return true;
-    }
-
-    @Override
-    public void openInventory(EntityPlayer player)
-    {
-
-    }
-
-    @Override
-    public void closeInventory(EntityPlayer player)
-    {
-    }
-
-    @Override
-    public boolean isItemValidForSlot(int slot, ItemStack stack) {
-        return true;
-    }
-
-    @Override
-    public int getField(int id)
-    {
-        return 0;
-    }
-
-    @Override
-    public void setField(int id, int value)
-    {
-
-    }
-
-    @Override
-    public int getFieldCount()
-    {
-        return 0;
-    }
-
-    @Override
-    public void clear()
-    {
-
-    }
-
-    public void readFromNBT(NBTTagCompound nbtTagCompound) {
-        NBTTagList nbtTagList = nbtTagCompound.getTagList("Items", Constants.NBT.TAG_COMPOUND);
+        NBTTagList itemList = nbtTagCompound.getTagList("Items", Constants.NBT.TAG_COMPOUND);
 
         inventorySlots.clear();
 
-        for (int i = 0; i < nbtTagList.tagCount(); ++i) {
-            NBTTagCompound nbtTagCompound1 = nbtTagList.getCompoundTagAt(i);
-            int j = nbtTagCompound1.getInteger("Slot");
-
-            setInventorySlotContents(j, ItemStack.loadItemStackFromNBT(nbtTagCompound1));
+        for (int i = 0; i < itemList.tagCount(); ++i)
+        {
+            NBTTagCompound slot = itemList.getCompoundTagAt(i);
+            inventorySlots.add(ItemStack.loadItemStackFromNBT(slot));
         }
     }
 
     public void writeToNBT(NBTTagCompound nbtTagCompound) {
-        NBTTagList nbtTagList = new NBTTagList();
+        NBTTagList itemList = new NBTTagList();
 
-        for (int i = 0; i < getSizeInventory(); ++i) {
-            ItemStack stack = getStackInSlot(i);
-            if (stack != null) {
-                NBTTagCompound nbtTagCompound1 = new NBTTagCompound();
-                nbtTagCompound1.setInteger("Slot", i);
-                stack.writeToNBT(nbtTagCompound1);
-                nbtTagList.appendTag(nbtTagCompound1);
+        for (ItemStack stack : inventorySlots)
+        {
+            if (stack != null)
+            {
+                NBTTagCompound slot = new NBTTagCompound();
+                stack.writeToNBT(slot);
+                itemList.appendTag(slot);
             }
         }
 
-        nbtTagCompound.setTag("Items", nbtTagList);
+        nbtTagCompound.setTag("Items", itemList);
     }
 
     @Override
-    public String getName()
+    public IInventoryAutomation getInventoryForSide(@Nonnull EnumFacing face)
     {
+        return this;
+    }
+
+    @Override
+    public ItemStack pushItems(@Nonnull ItemStack stack)
+    {
+        ItemStack remaining = stack.copy();
+        int firstEmpty = -1;
+
+        // Try to fill existing slots first
+        for(int i=0;i<inventorySlots.size();i++)
+        {
+            ItemStack slot = inventorySlots.get(i);
+            if(slot != null)
+            {
+                int max = Math.min(remaining.getMaxStackSize(), 64);
+                int transfer = Math.min(remaining.stackSize, max - slot.stackSize);
+                if (transfer > 0 && ItemStack.areItemsEqual(slot, remaining) && ItemStack.areItemStackTagsEqual(slot, remaining))
+                {
+                    slot.stackSize += transfer;
+                    remaining.stackSize -= transfer;
+                    if(remaining.stackSize == 0)
+                        break;
+                }
+            }
+            else if(firstEmpty < 0)
+            {
+                firstEmpty = i;
+            }
+        }
+
+        // Then place the remaining items in the first available empty slot
+        inventorySlots.add(remaining);
+
         return null;
     }
 
     @Override
-    public boolean hasCustomName()
+    public ItemStack pullItems(int limit, Predicate<ItemStack> filter)
     {
-        return false;
+        for(int i=0;i<inventorySlots.size();i++)
+        {
+            ItemStack slot = inventorySlots.get(i);
+            if(slot != null)
+            {
+                int available = Math.min(limit, slot.stackSize);
+                if(filter.apply(slot) && available > 0)
+                {
+                    ItemStack pulled = slot.splitStack(available);
+                    if(slot.stackSize <= 0)
+                        inventorySlots.remove(i);
+                    return pulled;
+                }
+            }
+        }
+        return null;
     }
 
     @Override
-    public IChatComponent getDisplayName()
+    public ItemStack extractItems(@Nonnull ItemStack stack, int wanted)
     {
-        return null;
+        ItemStack extracted = stack.copy();
+        extracted.stackSize = 0;
+
+        if(stack.stackSize <= 0)
+            return null;
+
+        for(int i=0;i<inventorySlots.size();i++)
+        {
+            ItemStack slot = inventorySlots.get(i);
+            if(slot != null)
+            {
+                int available = Math.min(wanted, slot.stackSize);
+                if (ItemStack.areItemsEqual(slot, stack) && ItemStack.areItemStackTagsEqual(slot, stack) && available > 0)
+                {
+                    slot.stackSize -= available;
+                    extracted.stackSize += available;
+                    if(slot.stackSize <= 0)
+                        inventorySlots.remove(i);
+
+                    wanted = extracted.stackSize - stack.stackSize;
+                    if(wanted <= 0)
+                        break;
+                }
+            }
+        }
+
+        if(extracted.stackSize <= 0)
+            return null;
+
+        return extracted;
     }
 }

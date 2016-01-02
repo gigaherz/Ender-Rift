@@ -1,4 +1,4 @@
-package gigaherz.enderRift.api;
+package gigaherz.api.automation;
 
 import com.google.common.base.Predicate;
 import net.minecraft.item.ItemStack;
@@ -32,8 +32,9 @@ public interface IInventoryAutomation
     /**
      * Tries to extract a specific amount of a certain item, as defined by the provided ItemStack.
      * Will attempt to gather from more than one stack.
-     * @param stack The item to extract, and the quantity being requested.
+     * @param stack The item to extract.
+     * @param wanted The quantity being requested.
      * @return Returns the items that were extracted. Can be null.
      */
-    ItemStack extractItems(@Nonnull ItemStack stack);
+    ItemStack extractItems(@Nonnull ItemStack stack, int wanted);
 }

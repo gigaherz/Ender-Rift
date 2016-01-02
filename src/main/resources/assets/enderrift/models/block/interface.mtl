@@ -1,0 +1,6 @@
+# Rhino
+newmtl Main
+map_Kd minecraft:blocks/hopper_outside
+
+newmtl Face
+map_Kd minecraft:blocks/hopper_inside

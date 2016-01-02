@@ -1,14 +1,18 @@
-tile.enderRift.blockEnderRift.name=Ender-Rift Core
-tile.enderRift.blockStructure.name=Ender-Rift Structure
-tile.enderRift.blockStructureCorner.name=Ender-Rift Structure (Corner)
-item.enderRift.itemEnderRift.empty.name=Ender-Rift Orb (Unbound)
-item.enderRift.itemEnderRift.bound.name=Ender-Rift Orb (Bound)
+tile.enderrift.blockEnderRift.name=Ender-Rift Core
+tile.enderrift.blockStructure.name=Ender-Rift Structure
+tile.enderrift.blockStructureCorner.name=Ender-Rift Structure (Corner)
+item.enderrift.itemEnderRift.empty.name=Ender-Rift Orb (Unbound)
+item.enderrift.itemEnderRift.bound.name=Ender-Rift Orb (Bound)
+
+container.enderrift.interface=Rift Interface
+
+text.enderrift.interface.filters=Filters
 
 itemGroup.tabEnderRift=Ender-Rift
 
-text.enderRift.blockEnderRift.waila.isFormed=Is Formed? %s
-text.enderRift.blockEnderRift.waila.riftId=Rift Id: %s
-text.enderRift.blockEnderRift.waila.usedSlots=%s / %s slots used.
-text.enderRift.blockEnderRift.waila.energyUsageInsert=%s RF used by next insertion.
-text.enderRift.blockEnderRift.waila.energyUsageExtract=%s RF used by next extraction.
-text.enderRift.blockEnderRift.waila.rf=%s / %s RF.
+text.enderrift.blockEnderRift.waila.isFormed=Is Formed? %s
+text.enderrift.blockEnderRift.waila.riftId=Rift Id: %s
+text.enderrift.blockEnderRift.waila.usedSlots=%s slots used.
+text.enderrift.blockEnderRift.waila.energyUsageInsert=%s RF used by next insertion.
+text.enderrift.blockEnderRift.waila.energyUsageExtract=%s RF used by next extraction.
+text.enderrift.blockEnderRift.waila.rf=%s / %s RF.

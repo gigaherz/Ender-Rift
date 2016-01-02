@@ -1,28 +1,30 @@
 package gigaherz.enderRift.blocks;
 
 import cofh.api.energy.IEnergyReceiver;
+import com.google.common.base.Predicate;
 import gigaherz.enderRift.ConfigValues;
 import gigaherz.enderRift.EnderRiftMod;
+import gigaherz.api.automation.IInventoryAutomation;
 import gigaherz.enderRift.storage.RiftInventory;
 import gigaherz.enderRift.storage.RiftStorageWorldData;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.IChatComponent;
 import net.minecraft.util.ITickable;
+
+import javax.annotation.Nonnull;
 
 public class TileEnderRift
         extends TileEntity
-        implements IEnergyReceiver, ISidedInventory, ITickable
+        implements IEnergyReceiver, IInventoryAutomation, ITickable
 {
     public final int energyLimit = 10000000;
     public int energyBuffer = 0;
 
     public int riftId;
     RiftInventory inventory;
+    IInventoryAutomation automation;
 
     boolean alreadyMarkedDirty;
 
@@ -40,7 +42,7 @@ public class TileEnderRift
     }
 
     public double getEnergyInsert() {
-        int sizeInventory = getInventory().getSizeInventory();
+        int sizeInventory = getInventory().getSlotCount();
         int sizeInventory2 = sizeInventory * sizeInventory;
         return ConfigValues.PowerPerInsertionConstant
                 + (sizeInventory * ConfigValues.PowerPerInsertionLinear)
@@ -48,7 +50,7 @@ public class TileEnderRift
     }
 
     public double getEnergyExtract() {
-        int sizeInventory = getInventory().getSizeInventory();
+        int sizeInventory = getInventory().getSlotCount();
         int sizeInventory2 = sizeInventory * sizeInventory;
         return ConfigValues.PowerPerExtractionConstant
                 + (sizeInventory * ConfigValues.PowerPerExtractionLinear)
@@ -56,103 +58,41 @@ public class TileEnderRift
     }
 
     public int countInventoryStacks() {
-        return getInventory().countInventoryStacks();
+        return getInventory().getSlotCount();
     }
 
-    @Override
-    public int getSizeInventory() {
-        return getInventory().getSizeInventory();
-    }
-
-    @Override
-    public ItemStack getStackInSlot(int slotIndex) {
-        return getInventory().getStackInSlot(slotIndex);
-    }
-
-    @Override
-    public void setInventorySlotContents(int slot, ItemStack stack) {
-        int power = getEffectivePowerUsageToReplace(slot, stack);
-
-        getInventory().setInventorySlotContents(slot, null);
-        energyBuffer = Math.max(0, energyBuffer - power);
-
-        if (stack != null && stack.stackSize > getInventoryStackLimit()) {
-            stack.stackSize = getInventoryStackLimit();
-        }
-    }
-
-    private int getEffectivePowerUsageToReplace(int slot, ItemStack newStack) {
-        int oldCount = 0;
-        int newCount = 0;
-
-        ItemStack oldStack = getStackInSlot(slot);
-
-        if (oldStack != null) {
-            oldCount = oldStack.stackSize;
-        }
-
-        if (newStack != null) {
-            newCount = newStack.stackSize;
-        }
-
-        int itemsRemoved = 0;
-        int itemsAdded = 0;
-        if (oldStack != null && newStack != null && oldStack.isItemEqual(newStack)) {
-            itemsRemoved = oldCount;
-            itemsAdded = newCount;
-        } else if (oldCount > newCount) {
-            itemsRemoved = oldCount - newCount;
-        } else if (oldCount < newCount) {
-            itemsAdded = newCount - oldCount;
-        }
-
-        return (int) Math.ceil(getEnergyExtract() * itemsRemoved + getEnergyInsert() * itemsAdded);
-    }
-
-    @Override
-    public String getName()
+    private int getEffectivePowerUsageToInsert(int stackSize)
     {
-        return getInventory().getName();
+        return (int) Math.ceil(getEnergyInsert() * stackSize);
     }
 
-    @Override
-    public boolean hasCustomName()
+    private int getEffectivePowerUsageToExtract(int limit)
     {
-        return getInventory().hasCustomName();
+        return (int) Math.ceil(getEnergyExtract() * limit);
     }
 
-    @Override
-    public IChatComponent getDisplayName()
+    public ItemStack getRiftItem()
     {
-        return null;
+        ItemStack stack = new ItemStack(EnderRiftMod.itemEnderRift);
+
+        NBTTagCompound tag = new NBTTagCompound();
+
+        tag.setInteger("RiftId", riftId);
+
+        stack.setTagCompound(tag);
+
+        return stack;
     }
 
     @Override
-    public ItemStack decrStackSize(int slotIndex, int amount) {
-        return getInventory().decrStackSize(slotIndex, amount);
-    }
-
-    @Override
-    public ItemStack removeStackFromSlot(int index)
+    public void markDirty()
     {
-        return null;
-    }
-
-    @Override
-    public int getInventoryStackLimit() {
-        return getInventory().getInventoryStackLimit();
-    }
-
-    @Override
-    public void markDirty() {
         super.markDirty();
         getInventory().markDirty();
     }
 
-    public void setDirty() {
-        if (allAccessibleSlots != null && allAccessibleSlots.length != getSizeInventory())
-            allAccessibleSlots = null;
-
+    public void setDirty()
+    {
         if (alreadyMarkedDirty)
             return;
 
@@ -160,60 +100,15 @@ public class TileEnderRift
         super.markDirty();
     }
 
-    @Override
-    public boolean isUseableByPlayer(EntityPlayer player) {
-        return worldObj.getTileEntity(pos) == this
-                && player.getDistanceSq(pos.getX() + 0.5D, pos.getY() + 0.5D, pos.getZ() + 0.5D) <= 64.0D;
-    }
-
-    @Override
-    public void openInventory(EntityPlayer player)
+    public void readFromNBT(NBTTagCompound nbtTagCompound)
     {
-
-    }
-
-    @Override
-    public void closeInventory(EntityPlayer player)
-    {
-
-    }
-
-    @Override
-    public boolean isItemValidForSlot(int p_94041_1_, ItemStack p_94041_2_) {
-        return energyBuffer >= getEnergyInsert();
-    }
-
-    @Override
-    public int getField(int id)
-    {
-        return 0;
-    }
-
-    @Override
-    public void setField(int id, int value)
-    {
-
-    }
-
-    @Override
-    public int getFieldCount()
-    {
-        return 0;
-    }
-
-    @Override
-    public void clear()
-    {
-
-    }
-
-    public void readFromNBT(NBTTagCompound nbtTagCompound) {
         super.readFromNBT(nbtTagCompound);
         energyBuffer = nbtTagCompound.getInteger("Energy");
         riftId = nbtTagCompound.getInteger("RiftId");
     }
 
-    public void writeToNBT(NBTTagCompound nbtTagCompound) {
+    public void writeToNBT(NBTTagCompound nbtTagCompound)
+    {
         super.writeToNBT(nbtTagCompound);
         nbtTagCompound.setInteger("Energy", energyBuffer);
         nbtTagCompound.setInteger("RiftId", riftId);
@@ -251,40 +146,85 @@ public class TileEnderRift
         alreadyMarkedDirty = false;
     }
 
-    public ItemStack getRiftItem() {
-        ItemStack stack = new ItemStack(EnderRiftMod.itemEnderRift);
-
-        NBTTagCompound tag = new NBTTagCompound();
-
-        tag.setInteger("RiftId", riftId);
-
-        stack.setTagCompound(tag);
-
-        return stack;
+    @Override
+    public IInventoryAutomation getInventoryForSide(@Nonnull EnumFacing face)
+    {
+        // Save a call by not forwarding to the automation instance,
+        // since it will return "this".
+        return automation = getInventory();
     }
 
-    int[] allAccessibleSlots;
-
     @Override
-    public int[] getSlotsForFace(EnumFacing side)
+    public ItemStack pushItems(@Nonnull ItemStack stack)
     {
-        if (allAccessibleSlots == null) {
-            allAccessibleSlots = new int[getSizeInventory()];
-            for (int i = 0; i < allAccessibleSlots.length; i++)
-                allAccessibleSlots[i] = i;
+        int stackSize = stack.stackSize;
+        int cost = getEffectivePowerUsageToInsert(stackSize);
+        while(cost > this.energyBuffer && stackSize > 0)
+        {
+            stackSize--;
         }
-        return allAccessibleSlots;
+
+        if(stackSize <= 0)
+            return stack;
+
+        ItemStack temp = stack;
+        if(stackSize != stack.stackSize)
+        {
+            temp = stack.copy();
+            temp.stackSize = stackSize;
+        }
+
+        ItemStack remaining = (automation = getInventory()).pushItems(temp);
+        if(remaining != null)
+            stackSize -= remaining.stackSize;
+
+        int actualCost = getEffectivePowerUsageToInsert(stackSize);
+        this.energyBuffer -= actualCost;
+
+        return remaining;
     }
 
     @Override
-    public boolean canInsertItem(int slot, ItemStack stack, EnumFacing side)
+    public ItemStack pullItems(int limit, Predicate<ItemStack> filter)
     {
-        return this.energyBuffer >= getEffectivePowerUsageToReplace(slot, stack);
+        int cost = getEffectivePowerUsageToExtract(limit);
+        while(cost > this.energyBuffer && limit > 0)
+        {
+            limit--;
+        }
+
+        if (limit <= 0)
+            return null;
+
+        ItemStack extracted = (automation = getInventory()).pullItems(limit, filter);
+        if(extracted == null)
+            return null;
+
+        int actualCost = getEffectivePowerUsageToExtract(extracted.stackSize);
+        this.energyBuffer -= actualCost;
+
+        return extracted;
     }
 
     @Override
-    public boolean canExtractItem(int slot, ItemStack stack, EnumFacing side)
+    public ItemStack extractItems(@Nonnull ItemStack stack, int wanted)
     {
-        return this.energyBuffer >= getEffectivePowerUsageToReplace(slot, null);
+        int cost = getEffectivePowerUsageToExtract(wanted);
+        while(cost > this.energyBuffer && wanted > 0)
+        {
+            wanted--;
+        }
+
+        if (wanted <= 0)
+            return null;
+
+        ItemStack extracted = (automation = getInventory()).extractItems(stack, wanted);
+        if(extracted == null)
+            return null;
+
+        int actualCost = getEffectivePowerUsageToExtract(extracted.stackSize);
+        this.energyBuffer -= actualCost;
+
+        return extracted;
     }
 }

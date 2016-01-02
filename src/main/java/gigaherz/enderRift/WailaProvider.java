@@ -42,7 +42,7 @@ public class WailaProvider implements IWailaDataProvider {
                     currenttip.add(StatCollector.translateToLocalFormatted("text." + EnderRiftMod.MODID + ".blockEnderRift.waila.riftId", tag.getInteger("riftId")));
                     currenttip.add(StatCollector.translateToLocalFormatted("text." + EnderRiftMod.MODID + ".blockEnderRift.waila.rf", tag.getInteger("energy"), tag.getInteger("energyTotal")));
                 }
-                currenttip.add(StatCollector.translateToLocalFormatted("text." + EnderRiftMod.MODID + ".blockEnderRift.waila.usedSlots", tag.getInteger("usedSlots"), tag.getInteger("exposedSlots")));
+                currenttip.add(StatCollector.translateToLocalFormatted("text." + EnderRiftMod.MODID + ".blockEnderRift.waila.usedSlots", tag.getInteger("usedSlots")));
                 currenttip.add(StatCollector.translateToLocalFormatted("text." + EnderRiftMod.MODID + ".blockEnderRift.waila.energyUsageInsert", tag.getInteger("energyInsert")));
                 currenttip.add(StatCollector.translateToLocalFormatted("text." + EnderRiftMod.MODID + ".blockEnderRift.waila.energyUsageExtract", tag.getInteger("energyExtract")));
             } else {
@@ -78,7 +78,6 @@ public class WailaProvider implements IWailaDataProvider {
             rift = (TileEnderRift) te;
 
         tag.setInteger("usedSlots", rift.countInventoryStacks());
-        tag.setInteger("exposedSlots", rift.getSizeInventory());
         tag.setInteger("energyInsert", (int) Math.ceil(rift.getEnergyInsert()));
         tag.setInteger("energyExtract", (int) Math.ceil(rift.getEnergyExtract()));
         tag.setBoolean("isFormed", rift.getBlockMetadata() != 0);
