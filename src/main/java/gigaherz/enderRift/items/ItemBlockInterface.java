@@ -19,12 +19,6 @@ public class ItemBlockInterface extends ItemBlock
     }
 
     @Override
-    public boolean canPlaceBlockOnSide(World worldIn, BlockPos pos, EnumFacing side, EntityPlayer player, ItemStack stack)
-    {
-        return worldIn.getTileEntity(pos) instanceof TileEnderRift;
-    }
-
-    @Override
     public boolean placeBlockAt(ItemStack stack, EntityPlayer player, World world, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ, IBlockState newState)
     {
         newState = newState.withProperty(BlockInterface.FACING, side.getOpposite());

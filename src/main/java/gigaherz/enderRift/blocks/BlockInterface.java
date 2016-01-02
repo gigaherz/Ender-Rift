@@ -31,6 +31,19 @@ public class BlockInterface
     }
 
     @Override
+    public boolean isOpaqueCube() {
+        return false;
+    }
+
+    @Override
+    public void onNeighborBlockChange(World worldIn, BlockPos pos, IBlockState state, Block neighborBlock)
+    {
+        // Allow the TE to rescan the neighbouring TE
+        worldIn.getTileEntity(pos).markDirty();
+        super.onNeighborBlockChange(worldIn, pos, state, neighborBlock);
+    }
+
+    @Override
     public boolean hasTileEntity(IBlockState state)
     {
         return true;
@@ -58,29 +71,6 @@ public class BlockInterface
     public int getMetaFromState(IBlockState state)
     {
         return state.getValue(FACING).ordinal();
-    }
-
-    @Override
-    public void onNeighborBlockChange(World worldIn, BlockPos pos, IBlockState state, Block neighborBlock)
-    {
-        BlockPos parentPos = pos.offset(state.getValue(BlockInterface.FACING));
-        IBlockState parent = worldIn.getBlockState(parentPos);
-
-        if(parent.getBlock() == EnderRiftMod.blockEnderRift)
-        {
-            if(parent.getValue(BlockEnderRift.ASSEMBLED))
-            {
-                TileEntity te = worldIn.getTileEntity(parentPos);
-                if(te instanceof TileEnderRift)
-                {
-                    // keep as-is
-                    return;
-                }
-            }
-        }
-
-        dropBlockAsItem(worldIn, pos, state, 0);
-        worldIn.setBlockToAir(pos);
     }
 
     @Override

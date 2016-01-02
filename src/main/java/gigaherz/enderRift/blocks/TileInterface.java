@@ -1,5 +1,6 @@
 package gigaherz.enderRift.blocks;
 
+import gigaherz.api.automation.IInventoryAutomation;
 import gigaherz.enderRift.EnderRiftMod;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
@@ -19,20 +20,30 @@ public class TileInterface extends TileEntity
     final ItemStack[] filters = new ItemStack[FilterCount];
     final ItemStack[] outputs = new ItemStack[FilterCount];
 
-    TileEnderRift parent;
+    boolean parentSearched;
+    IInventoryAutomation parent;
 
-    public TileEnderRift getParent()
+    public IInventoryAutomation getParent()
     {
-        if(parent == null)
+        if(!parentSearched)
         {
             IBlockState state = worldObj.getBlockState(getPos());
             TileEntity te = worldObj.getTileEntity(pos.offset(state.getValue(BlockInterface.FACING)));
-            if(te instanceof TileEnderRift)
+            if(te instanceof IInventoryAutomation)
             {
-                parent = (TileEnderRift)te;
+                parent = (IInventoryAutomation)te;
             }
+            parentSearched = true;
         }
         return parent;
+    }
+
+    @Override
+    public void markDirty()
+    {
+        parentSearched = false;
+        parent = null;
+        super.markDirty();
     }
 
     @Override
@@ -70,13 +81,6 @@ public class TileInterface extends TileEntity
                outputs[i] = getParent().pushItems(outputs[i]);
             }
         }
-    }
-
-    @Override
-    public void markDirty()
-    {
-        parent = null;
-        super.markDirty();
     }
 
     @Override
