@@ -39,6 +39,7 @@ public class BlockEnderRift
                 .withProperty(ASSEMBLED, false));
     }
 
+
     @Override
     protected BlockState createBlockState()
     {

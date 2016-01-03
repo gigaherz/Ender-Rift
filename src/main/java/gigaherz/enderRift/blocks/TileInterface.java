@@ -63,7 +63,7 @@ public class TileInterface extends TileEntity
                 {
                     int free = 64;
                     outputs[i] = getParent().extractItems(filters[i], free);
-                    if(outputs[i] != null)
+                    if (outputs[i] != null)
                         anyChanged = true;
                 }
                 else if (outputs[i].isItemEqual(filters[i]))
@@ -83,7 +83,7 @@ public class TileInterface extends TileEntity
                 {
                     int stackSize = outputs[i].stackSize;
                     outputs[i] = getParent().pushItems(outputs[i]);
-                    if(outputs[i] == null || stackSize != outputs[i].stackSize)
+                    if (outputs[i] == null || stackSize != outputs[i].stackSize)
                         anyChanged = true;
                 }
             }
@@ -91,12 +91,12 @@ public class TileInterface extends TileEntity
             {
                 int stackSize = outputs[i].stackSize;
                 outputs[i] = getParent().pushItems(outputs[i]);
-                if(outputs[i] == null || stackSize != outputs[i].stackSize)
+                if (outputs[i] == null || stackSize != outputs[i].stackSize)
                     anyChanged = true;
             }
         }
 
-        if(anyChanged)
+        if (anyChanged)
             markDirty();
     }
 
@@ -306,6 +306,7 @@ public class TileInterface extends TileEntity
         {
             outputs[i] = null;
         }
+        markDirty();
     }
 
     public IInventory inventoryFilter()

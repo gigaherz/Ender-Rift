@@ -2,7 +2,6 @@ package gigaherz.enderRift;
 
 import gigaherz.enderRift.blocks.*;
 import gigaherz.enderRift.gui.GuiHandler;
-import gigaherz.enderRift.items.ItemBlockInterface;
 import gigaherz.enderRift.items.ItemEnderRift;
 import gigaherz.enderRift.recipe.RecipesRiftDuplication;
 import net.minecraft.block.Block;
@@ -22,7 +21,7 @@ import net.minecraftforge.fml.common.registry.GameRegistry;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-@Mod(name=EnderRiftMod.NAME,
+@Mod(name = EnderRiftMod.NAME,
         modid = EnderRiftMod.MODID,
         version = EnderRiftMod.VERSION,
         dependencies = "after:Waila",
@@ -36,6 +35,7 @@ public class EnderRiftMod
     public static BlockEnderRift blockEnderRift;
     public static Block blockStructure;
     public static Block blockInterface;
+    public static Block blockGenerator;
     public static Item itemEnderRift;
     public static CreativeTabs tabEnderRift;
 
@@ -75,11 +75,15 @@ public class EnderRiftMod
         GameRegistry.registerBlock(blockStructure, "blockStructure");
 
         blockInterface = new BlockInterface();
-        GameRegistry.registerBlock(blockInterface, ItemBlockInterface.class, "blockInterface");
+        GameRegistry.registerBlock(blockInterface, "blockInterface");
+
+        blockGenerator = new BlockGenerator();
+        GameRegistry.registerBlock(blockGenerator, "blockGenerator");
 
         GameRegistry.registerTileEntity(TileEnderRift.class, "tileEnderRift");
         GameRegistry.registerTileEntity(TileEnderRiftCorner.class, "tileStructureCorner");
         GameRegistry.registerTileEntity(TileInterface.class, "tileInterface");
+        GameRegistry.registerTileEntity(TileGenerator.class, "tileGenerator");
 
         proxy.preInit();
     }
@@ -114,6 +118,15 @@ public class EnderRiftMod
                 'h', Blocks.hopper,
                 'r', Blocks.redstone_block,
                 'i', Blocks.iron_block);
+
+        GameRegistry.addRecipe(new ItemStack(blockGenerator),
+                "iri",
+                "rwr",
+                "ifi",
+                'f', Blocks.furnace,
+                'w', Items.water_bucket,
+                'r', Items.redstone,
+                'i', Items.iron_ingot);
 
         GameRegistry.addRecipe(new RecipesRiftDuplication());
 

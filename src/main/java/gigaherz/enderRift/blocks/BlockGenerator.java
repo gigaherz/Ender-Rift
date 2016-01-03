@@ -16,16 +16,17 @@ import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.world.World;
 
-public class BlockInterface
+public class BlockGenerator
         extends Block
 {
-    public static final PropertyDirection FACING = PropertyDirection.create("facing");
+    // MAYBE? public static final PropertyBool POWERED
+    public static final PropertyDirection FACING = PropertyDirection.create("facing", EnumFacing.Plane.HORIZONTAL);
 
-    public BlockInterface()
+    public BlockGenerator()
     {
         super(Material.iron, MapColor.stoneColor);
         setStepSound(soundTypeMetal);
-        setUnlocalizedName(EnderRiftMod.MODID + ".blockInterface");
+        setUnlocalizedName(EnderRiftMod.MODID + ".blockGenerator");
         setCreativeTab(EnderRiftMod.tabEnderRift);
         setDefaultState(blockState.getBaseState().withProperty(FACING, EnumFacing.NORTH));
         setBlockBounds(0.0F, 0.0F, 0.0F, 1.0F, 1.0F, 1.0F);
@@ -40,14 +41,6 @@ public class BlockInterface
     }
 
     @Override
-    public void onNeighborBlockChange(World worldIn, BlockPos pos, IBlockState state, Block neighborBlock)
-    {
-        // Allow the TE to rescan the neighbouring TE
-        worldIn.getTileEntity(pos).markDirty();
-        super.onNeighborBlockChange(worldIn, pos, state, neighborBlock);
-    }
-
-    @Override
     public boolean hasTileEntity(IBlockState state)
     {
         return true;
@@ -56,7 +49,7 @@ public class BlockInterface
     @Override
     public TileEntity createTileEntity(World world, IBlockState state)
     {
-        return new TileInterface();
+        return new TileGenerator();
     }
 
     @Override
@@ -68,7 +61,7 @@ public class BlockInterface
     @Override
     public IBlockState getStateFromMeta(int meta)
     {
-        return getDefaultState().withProperty(FACING, EnumFacing.VALUES[meta & 7]);
+        return getDefaultState().withProperty(FACING, EnumFacing.HORIZONTALS[meta & 3]);
     }
 
     @Override
@@ -82,10 +75,10 @@ public class BlockInterface
     {
         TileEntity tileEntity = worldIn.getTileEntity(pos);
 
-        if (!(tileEntity instanceof TileInterface) || playerIn.isSneaking())
+        if (!(tileEntity instanceof TileGenerator) || playerIn.isSneaking())
             return false;
 
-        playerIn.openGui(EnderRiftMod.instance, GuiHandler.GUI_INTERFACE, worldIn, pos.getX(), pos.getY(), pos.getZ());
+        playerIn.openGui(EnderRiftMod.instance, GuiHandler.GUI_GENERATOR, worldIn, pos.getX(), pos.getY(), pos.getZ());
 
         return true;
     }
@@ -93,7 +86,7 @@ public class BlockInterface
     @Override
     public IBlockState onBlockPlaced(World worldIn, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer)
     {
-        return getDefaultState().withProperty(BlockInterface.FACING, facing.getOpposite());
+        return getDefaultState().withProperty(FACING, placer.getHorizontalFacing().getOpposite());
     }
 
     @Override
@@ -101,9 +94,9 @@ public class BlockInterface
     {
         TileEntity tileentity = worldIn.getTileEntity(pos);
 
-        if (tileentity instanceof TileInterface)
+        if (tileentity instanceof TileGenerator)
         {
-            InventoryHelper.dropInventoryItems(worldIn, pos, (TileInterface) tileentity);
+            InventoryHelper.dropInventoryItems(worldIn, pos, (TileGenerator) tileentity);
             worldIn.updateComparatorOutputLevel(pos, this);
         }
 

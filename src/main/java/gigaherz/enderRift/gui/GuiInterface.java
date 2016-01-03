@@ -28,11 +28,11 @@ public class GuiInterface extends GuiContainer
     @Override
     protected void drawGuiContainerForegroundLayer(int i, int j)
     {
-        mc.fontRendererObj.drawString(StatCollector.translateToLocal(this.tile.getName()), 8, 6, 0x404040);
+        String name = StatCollector.translateToLocal(this.tile.getName());
+        mc.fontRendererObj.drawString(name, (xSize - mc.fontRendererObj.getStringWidth(name)) / 2, 6, 0x404040);
         mc.fontRendererObj.drawString(StatCollector.translateToLocal(this.player.getName()), 8, ySize - 96 + 2, 0x404040);
 
-        String text = StatCollector.translateToLocal(textFilters);
-        mc.fontRendererObj.drawString(text, (xSize - mc.fontRendererObj.getStringWidth(text)) / 2, 20, 0x404040);
+        mc.fontRendererObj.drawString(StatCollector.translateToLocal(textFilters), 8, 20, 0x404040);
     }
 
     @Override

@@ -26,6 +26,7 @@ public class ClientProxy implements IModProxy
         registerBlockModelAsItem(EnderRiftMod.blockEnderRift, "blockEnderRift");
         registerBlockModelAsItem(EnderRiftMod.blockStructure, "blockStructure");
         registerBlockModelAsItem(EnderRiftMod.blockInterface, "blockInterface");
+        registerBlockModelAsItem(EnderRiftMod.blockGenerator, "blockGenerator");
 
         MinecraftForge.EVENT_BUS.register(this);
         RenderingStuffs.init();
@@ -36,7 +37,6 @@ public class ClientProxy implements IModProxy
     {
         event.map.registerSprite(new ResourceLocation(EnderRiftMod.MODID + ":blocks/rift_aura"));
     }
-
 
     public void registerBlockModelAsItem(final Block block, final String blockName)
     {

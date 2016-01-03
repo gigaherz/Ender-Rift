@@ -1,0 +1,21 @@
+# Rhino
+newmtl ControlPanelFront
+map_Kd enderrift:blocks/ctrl_panel_front
+
+newmtl GeneratorCaps
+map_Kd enderrift:blocks/generator_cap
+
+newmtl GeneratorSides
+map_Kd enderrift:blocks/generator_side
+
+newmtl Base
+map_Kd enderrift:blocks/block_rift_base
+
+newmtl Generator
+map_Kd enderrift:blocks/block_rift_base
+
+newmtl Supports
+map_Kd enderrift:blocks/block_rift_base
+
+newmtl ControlPanel
+map_Kd enderrift:blocks/block_rift_base
