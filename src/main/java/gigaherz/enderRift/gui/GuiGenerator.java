@@ -58,7 +58,7 @@ public class GuiGenerator extends GuiContainer
         }
 
         mc.fontRendererObj.drawString("Heat:", 8, 46, 0x404040);
-        mc.fontRendererObj.drawString(String.format("%d°C", tile.getHeatValue()), 12, 56, getHeatColor());
+        mc.fontRendererObj.drawString(String.format("%d C", tile.getHeatValue()), 12, 56, getHeatColor());
 
         String str = String.format("%d RF", tile.getPowerLevel());
         mc.fontRendererObj.drawString(str, xSize - 8 - mc.fontRendererObj.getStringWidth(str), 64, 0x404040);
