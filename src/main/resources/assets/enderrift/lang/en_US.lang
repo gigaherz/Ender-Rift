@@ -3,6 +3,7 @@ tile.enderrift.blockStructure.name=Ender-Rift Structure
 tile.enderrift.blockStructureCorner.name=Ender-Rift Structure (Corner)
 item.enderrift.itemEnderRift.empty.name=Ender-Rift Orb (Unbound)
 item.enderrift.itemEnderRift.bound.name=Ender-Rift Orb (Bound)
+tile.enderrift.blockInterface.name=Rift Interface
 
 container.enderrift.interface=Rift Interface
 
