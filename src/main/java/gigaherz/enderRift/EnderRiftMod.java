@@ -132,6 +132,6 @@ public class EnderRiftMod
 
         NetworkRegistry.INSTANCE.registerGuiHandler(this, guiHandler);
 
-        FMLInterModComms.sendMessage("Waila", "register", "gigaherz.enderRift.WailaProvider.callbackRegister");
+        FMLInterModComms.sendMessage("Waila", "register", "gigaherz.enderRift.WailaProviders.callbackRegister");
     }
 }

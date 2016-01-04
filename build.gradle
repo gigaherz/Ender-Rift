@@ -32,10 +32,10 @@ artifacts {
 tasks.build.dependsOn('deobfJar')
 
 minecraft {
-    version = "1.8.9-11.15.0.1671"
+    version = "1.8.9-11.15.0.1677"
     runDir = "run"
 
-    mappings = "snapshot_20160102"
+    mappings = "snapshot_20160103"
 
     replace "@VERSION@", project.version
     replaceIn "EnderRiftMod.java"

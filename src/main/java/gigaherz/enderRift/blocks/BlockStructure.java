@@ -8,6 +8,7 @@ import net.minecraft.block.properties.PropertyBool;
 import net.minecraft.block.properties.PropertyEnum;
 import net.minecraft.block.state.BlockState;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -15,6 +16,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.IStringSerializable;
+import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
@@ -222,6 +224,13 @@ public class BlockStructure
             ret.add(new ItemStack(Item.getItemFromBlock(Blocks.iron_block)));
 
         return ret;
+    }
+
+    @Override
+    public ItemStack getPickBlock(MovingObjectPosition target, World world, BlockPos pos, EntityPlayer player)
+    {
+
+        return new ItemStack(world.getBlockState(pos).getValue(TYPE1) == Type1.CORNER ? Blocks.iron_block : Blocks.redstone_block);
     }
 
     enum Type1 implements IStringSerializable

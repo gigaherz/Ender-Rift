@@ -40,24 +40,29 @@ public class GuiGenerator extends GuiContainer
         mc.fontRendererObj.drawString(name, (xSize - mc.fontRendererObj.getStringWidth(name)) / 2, 6, 0x404040);
         mc.fontRendererObj.drawString(StatCollector.translateToLocal(this.player.getName()), 8, ySize - 96 + 2, 0x404040);
 
+        String label;
         if (tile.isBurning())
         {
             if (tile.getPowerGeneration() > 0)
             {
-                mc.fontRendererObj.drawString("Generating:", 8, 22, 0x404040);
+                label = StatCollector.translateToLocal("text." + EnderRiftMod.MODID + ".generator.status.generating.label");
+                mc.fontRendererObj.drawString(label, 8, 22, 0x404040);
                 mc.fontRendererObj.drawString(String.format("%d RF/t", tile.getPowerGeneration()), 12, 32, 0x404040);
             }
             else
             {
-                mc.fontRendererObj.drawString("Heating up....", 8, 22, 0x404040);
+                label = StatCollector.translateToLocal("text." + EnderRiftMod.MODID + ".generator.status.heating");
+                mc.fontRendererObj.drawString(label, 8, 22, 0x404040);
             }
         }
         else
         {
-            mc.fontRendererObj.drawString("Idle.", 8, 22, 0x404040);
+            label = StatCollector.translateToLocal("text." + EnderRiftMod.MODID + ".generator.status.idle");
+            mc.fontRendererObj.drawString(label, 8, 22, 0x404040);
         }
 
-        mc.fontRendererObj.drawString("Heat:", 8, 46, 0x404040);
+        label = StatCollector.translateToLocal("text." + EnderRiftMod.MODID + ".generator.heat.label");
+        mc.fontRendererObj.drawString(label, 8, 46, 0x404040);
         mc.fontRendererObj.drawString(String.format("%d C", tile.getHeatValue()), 12, 56, getHeatColor());
 
         String str = String.format("%d RF", tile.getPowerLevel());
@@ -77,7 +82,7 @@ public class GuiGenerator extends GuiContainer
             return;
 
         List<String> tooltip = Lists.newArrayList();
-        tooltip.add("Energy:");
+        tooltip.add(StatCollector.translateToLocal("text." + EnderRiftMod.MODID + ".generator.energy.label"));
         tooltip.add(String.format("%d / %d RF", tile.getPowerLevel(), TileGenerator.PowerLimit));
 
         drawHoveringText(tooltip, mx - x, my - y);

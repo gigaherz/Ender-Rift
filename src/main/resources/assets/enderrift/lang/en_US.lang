@@ -13,9 +13,19 @@ text.enderrift.interface.filters=Filters
 
 itemGroup.tabEnderRift=Ender-Rift
 
-text.enderrift.blockEnderRift.waila.isFormed=Is Formed? %s
-text.enderrift.blockEnderRift.waila.riftId=Rift Id: %s
-text.enderrift.blockEnderRift.waila.usedSlots=%s slots used.
-text.enderrift.blockEnderRift.waila.energyUsageInsert=%s RF used by next insertion.
-text.enderrift.blockEnderRift.waila.energyUsageExtract=%s RF used by next extraction.
-text.enderrift.blockEnderRift.waila.rf=%s / %s RF.
+text.enderrift.rift.isFormed=Is Formed? %s
+text.enderrift.rift.riftId=Rift Id: %s
+text.enderrift.rift.usedSlots=%s slots used.
+text.enderrift.rift.energyUsageInsert=%s RF used by next insertion.
+text.enderrift.rift.energyUsageExtract=%s RF used by next extraction.
+text.enderrift.rift.rf=%s / %s RF.
+
+text.enderrift.generator.status.generating.label=Generating:
+text.enderrift.generator.status.generating=Generating: %d RF/t
+text.enderrift.generator.status.heating=Heating up....
+text.enderrift.generator.status.idle=Idle
+text.enderrift.generator.heat.label=Heat:
+text.enderrift.generator.heat=Heat: %d C
+text.enderrift.generator.energy.label=Energy:
+text.enderrift.generator.energy=Energy: %d / %d RF
+

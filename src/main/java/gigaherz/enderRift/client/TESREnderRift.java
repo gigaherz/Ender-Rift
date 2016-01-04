@@ -18,8 +18,6 @@ public class TESREnderRift extends TileEntitySpecialRenderer<TileEnderRift>
             return;
 
         EntityPlayer player = Minecraft.getMinecraft().thePlayer;
-        //float yaw2 = player.prevRotationYawHead + partialTicks*(player.rotationYawHead - player.prevRotationYawHead);
-        //float pitch2 = player.prevRotationPitch + partialTicks*(player.rotationPitch - player.prevRotationPitch);
 
         double ty = y + 0.5 - player.getEyeHeight();
         double tx = x + 0.5;
@@ -32,7 +30,7 @@ public class TESREnderRift extends TileEntitySpecialRenderer<TileEnderRift>
 
         bindTexture(TextureMap.locationBlocksTexture);
 
-        long time = te.getWorld().getWorldTime();
+        long time = te.getWorld().getTotalWorldTime();
 
         GlStateManager.disableLighting();
         GlStateManager.disableAlpha();
