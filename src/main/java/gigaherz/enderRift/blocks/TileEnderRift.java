@@ -15,11 +15,13 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
 
 import javax.annotation.Nonnull;
+import java.util.Random;
 
 public class TileEnderRift
         extends TileEntity
         implements IEnergyReceiver, IInventoryAutomation, IBrowsableInventory, ITickable
 {
+    public final Random rand = new Random();
     public final int energyLimit = 10000000;
     public int energyBuffer = 0;
 
@@ -251,5 +253,17 @@ public class TileEnderRift
     public ItemStack getStackInSlot(int index)
     {
         return inventory.getStackInSlot(index);
+    }
+
+    public ItemStack chooseRandomStack()
+    {
+        int max = inventory.getSizeInventory();
+
+        if (max <= 0)
+            return null;
+
+        int slot = rand.nextInt(max);
+
+        return getStackInSlot(slot);
     }
 }

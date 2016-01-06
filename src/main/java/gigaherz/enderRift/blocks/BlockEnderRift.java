@@ -17,6 +17,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
@@ -31,10 +32,11 @@ public class BlockEnderRift
     public BlockEnderRift()
     {
         super(Material.rock);
-        setHardness(0.5F);
-        setStepSound(Block.soundTypeMetal);
         setUnlocalizedName(EnderRiftMod.MODID + ".blockEnderRift");
         setCreativeTab(EnderRiftMod.tabEnderRift);
+        setBlockBounds(0.2F, 0.2F, 0.2F, 0.8F, 0.8F, 0.8F);
+        setHardness(0.5F);
+        setStepSound(Block.soundTypeMetal);
         setDefaultState(this.blockState.getBaseState()
                 .withProperty(ASSEMBLED, false));
     }
@@ -345,5 +347,119 @@ public class BlockEnderRift
         world.spawnEntityInWorld(entity);
 
         return true;
+    }
+
+    @Override
+    public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumFacing side, float hitX, float hitY, float hitZ)
+    {
+        if (playerIn.isSneaking())
+            return false;
+
+        int slot = playerIn.inventory.currentItem;
+        ItemStack stack = playerIn.inventory.getStackInSlot(slot);
+
+        if (stack == null || stack.getItem() == EnderRiftMod.itemEnderRift)
+            return false;
+
+        if (worldIn.isRemote)
+            return true;
+
+        if (state.getBlock() != this || !state.getValue(ASSEMBLED))
+            return false;
+
+        TileEntity te = worldIn.getTileEntity(pos);
+        if (!(te instanceof TileEnderRift))
+            return false;
+
+        TileEnderRift rift = (TileEnderRift) te;
+
+        int count = stack.stackSize;
+        ItemStack stackToPush = stack.splitStack(count);
+        ItemStack remaining = rift.pushItems(stackToPush);
+        if (remaining != null)
+        {
+            stack.stackSize += remaining.stackSize;
+        }
+
+        if (stack.stackSize <= 0)
+            stack = null;
+
+        playerIn.inventory.setInventorySlotContents(slot, stack);
+
+        return true;
+    }
+
+    @Override
+    public void onBlockClicked(World worldIn, BlockPos pos, EntityPlayer playerIn)
+    {
+
+        if (worldIn.isRemote)
+            return;
+
+        IBlockState state = worldIn.getBlockState(pos);
+        if (state.getBlock() != this || !state.getValue(ASSEMBLED))
+            return;
+
+        TileEntity te = worldIn.getTileEntity(pos);
+        if (!(te instanceof TileEnderRift))
+            return;
+
+        TileEnderRift rift = (TileEnderRift) te;
+
+        ItemStack stack = playerIn.getHeldItem();
+        if (stack != null)
+        {
+            if (stack.getItem() == EnderRiftMod.itemEnderRift)
+                return;
+        }
+        else
+        {
+            stack = rift.chooseRandomStack();
+            if (stack == null)
+                return;
+        }
+
+        int numberToExtract = playerIn.isSneaking() ? 1 : stack.getMaxStackSize();
+
+        ItemStack extracted = rift.extractItems(stack.copy(), numberToExtract);
+
+        if (extracted != null && extracted.stackSize > 0)
+        {
+            EntityItem entityItem = new EntityItem(worldIn, playerIn.posX, playerIn.posY + playerIn.getEyeHeight() / 2, playerIn.posZ, extracted);
+            worldIn.spawnEntityInWorld(entityItem);
+        }
+    }
+
+    @Override
+    public void onEntityCollidedWithBlock(World worldIn, BlockPos pos, IBlockState state, Entity entityIn)
+    {
+        if (worldIn.isRemote)
+            return;
+
+        if (!(entityIn instanceof EntityItem))
+            return;
+
+        if (state.getBlock() != this || !state.getValue(ASSEMBLED))
+            return;
+
+        TileEntity te = worldIn.getTileEntity(pos);
+        if (!(te instanceof TileEnderRift))
+            return;
+
+        TileEnderRift rift = (TileEnderRift) te;
+
+        EntityItem item = (EntityItem) entityIn;
+        ItemStack stack = item.getEntityItem().copy();
+
+        ItemStack remaining = rift.pushItems(stack);
+
+        if (remaining == null)
+        {
+            entityIn.setDead();
+        }
+        else
+        {
+            item.setEntityItemStack(remaining);
+        }
     }
 }

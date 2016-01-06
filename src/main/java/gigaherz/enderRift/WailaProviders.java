@@ -70,16 +70,13 @@ public class WailaProviders
             {
                 NBTTagCompound tag = accessor.getNBTData();
 
-                if (tag.getBoolean("isBurning"))
+                if (tag.getInteger("powerGen") > 0)
                 {
-                    if (tag.getInteger("powerGen") > 0)
-                    {
-                        currenttip.add(StatCollector.translateToLocalFormatted("text." + EnderRiftMod.MODID + ".generator.status.generating", tag.getInteger("powerGen")));
-                    }
-                    else
-                    {
-                        currenttip.add(StatCollector.translateToLocal("text." + EnderRiftMod.MODID + ".generator.status.heating"));
-                    }
+                    currenttip.add(StatCollector.translateToLocalFormatted("text." + EnderRiftMod.MODID + ".generator.status.generating", tag.getInteger("powerGen")));
+                }
+                else if (tag.getBoolean("isBurning"))
+                {
+                    currenttip.add(StatCollector.translateToLocal("text." + EnderRiftMod.MODID + ".generator.status.heating"));
                 }
                 else
                 {

@@ -18,6 +18,7 @@ import net.minecraftforge.fml.common.event.FMLInterModComms;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.registry.GameRegistry;
+import net.minecraftforge.oredict.RecipeSorter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -84,6 +85,8 @@ public class EnderRiftMod
         GameRegistry.registerTileEntity(TileEnderRiftCorner.class, "tileStructureCorner");
         GameRegistry.registerTileEntity(TileInterface.class, "tileInterface");
         GameRegistry.registerTileEntity(TileGenerator.class, "tileGenerator");
+
+        RecipeSorter.register(MODID + ":rift_duplication", RecipesRiftDuplication.class, RecipeSorter.Category.SHAPELESS, "after:minecraft:shapeless");
 
         proxy.preInit();
     }

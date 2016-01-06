@@ -41,19 +41,16 @@ public class GuiGenerator extends GuiContainer
         mc.fontRendererObj.drawString(StatCollector.translateToLocal(this.player.getName()), 8, ySize - 96 + 2, 0x404040);
 
         String label;
-        if (tile.isBurning())
+        if (tile.getPowerGeneration() > 0)
         {
-            if (tile.getPowerGeneration() > 0)
-            {
-                label = StatCollector.translateToLocal("text." + EnderRiftMod.MODID + ".generator.status.generating.label");
-                mc.fontRendererObj.drawString(label, 8, 22, 0x404040);
-                mc.fontRendererObj.drawString(String.format("%d RF/t", tile.getPowerGeneration()), 12, 32, 0x404040);
-            }
-            else
-            {
-                label = StatCollector.translateToLocal("text." + EnderRiftMod.MODID + ".generator.status.heating");
-                mc.fontRendererObj.drawString(label, 8, 22, 0x404040);
-            }
+            label = StatCollector.translateToLocal("text." + EnderRiftMod.MODID + ".generator.status.generating.label");
+            mc.fontRendererObj.drawString(label, 8, 22, 0x404040);
+            mc.fontRendererObj.drawString(String.format("%d RF/t", tile.getPowerGeneration()), 12, 32, 0x404040);
+        }
+        else if (tile.isBurning())
+        {
+            label = StatCollector.translateToLocal("text." + EnderRiftMod.MODID + ".generator.status.heating");
+            mc.fontRendererObj.drawString(label, 8, 22, 0x404040);
         }
         else
         {

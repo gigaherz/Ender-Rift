@@ -4,7 +4,6 @@ import gigaherz.enderRift.blocks.TileGenerator;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
-import net.minecraft.inventory.ContainerFurnace;
 import net.minecraft.inventory.ICrafting;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
@@ -22,8 +21,6 @@ public class ContainerGenerator
         prevFields = new int[tile.getFieldCount()];
 
         addSlotToContainer(new Slot(tileEntity, 0, 80, 53));
-
-        ContainerFurnace f;
 
         bindPlayerInventory(playerInventory);
     }
