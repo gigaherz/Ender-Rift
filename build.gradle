@@ -14,7 +14,7 @@ buildscript {
 
 apply plugin: 'net.minecraftforge.gradle.forge'
 
-version = "0.70"
+version = "0.71"
 group= "gigaherz.enderRift"
 archivesBaseName = "EnderRift"
 
@@ -32,10 +32,10 @@ artifacts {
 tasks.build.dependsOn('deobfJar')
 
 minecraft {
-    version = "1.8.9-11.15.0.1677"
+    version = "1.8.9-11.15.0.1710"
     runDir = "run"
 
-    mappings = "snapshot_20160103"
+    mappings = "snapshot_20160120"
 
     replace "@VERSION@", project.version
     replaceIn "EnderRiftMod.java"

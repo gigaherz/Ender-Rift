@@ -2,6 +2,8 @@ package gigaherz.enderRift.blocks;
 
 import cofh.api.energy.IEnergyProvider;
 import cofh.api.energy.IEnergyReceiver;
+import gigaherz.api.automation.AutomationHelper;
+import gigaherz.api.automation.IInventoryAutomation;
 import gigaherz.enderRift.EnderRiftMod;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
@@ -34,6 +36,17 @@ public class TileGenerator extends TileEntity
     int currentItemBurnTime;
     int powerLevel;
     int timeInterval;
+
+    private IInventoryAutomation automation;
+
+    public IInventoryAutomation getAutomation()
+    {
+        if (automation == null)
+        {
+            automation = new AutomationHelper(this);
+        }
+        return automation;
+    }
 
     @Override
     public void update()
@@ -117,11 +130,11 @@ public class TileGenerator extends TileEntity
                     if (r == null || wanted == 0)
                         continue;
 
-                    int given = Math.min(wanted, wanted * accepted / sendPower);
+                    int given = Math.min(Math.min(powerLevel, wanted), wanted * accepted / sendPower);
                     int received = r.receiveEnergy(from, given, false);
                     powerLevel -= received;
-                    accepted -= received;
-                    sendPower -= received;
+                    if(powerLevel <= 0)
+                        break;
                 }
                 anyChanged = true;
             }

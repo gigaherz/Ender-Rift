@@ -31,20 +31,6 @@ public class RenderingStuffs
 {
     static Map<String, IFlexibleBakedModel> loadedModels = Maps.newHashMap();
 
-    // A vertex format with normals that doesn't break the OBJ loader.
-    // FIXME: Replace with DefaultvertexFormats.POSITION_TEX_COLOR_NORMAL when it works.
-    public static final VertexFormat CUSTOM_FORMAT;
-
-    static
-    {
-        CUSTOM_FORMAT = new VertexFormat();
-        CUSTOM_FORMAT.addElement(new VertexFormatElement(0, VertexFormatElement.EnumType.FLOAT, VertexFormatElement.EnumUsage.POSITION, 3));
-        CUSTOM_FORMAT.addElement(new VertexFormatElement(0, VertexFormatElement.EnumType.UBYTE, VertexFormatElement.EnumUsage.COLOR, 4));
-        CUSTOM_FORMAT.addElement(new VertexFormatElement(0, VertexFormatElement.EnumType.FLOAT, VertexFormatElement.EnumUsage.UV, 2));
-        CUSTOM_FORMAT.addElement(new VertexFormatElement(0, VertexFormatElement.EnumType.BYTE, VertexFormatElement.EnumUsage.NORMAL, 3));
-        CUSTOM_FORMAT.addElement(new VertexFormatElement(0, VertexFormatElement.EnumType.BYTE, VertexFormatElement.EnumUsage.PADDING, 1));
-    }
-
     public static void init()
     {
         IResourceManager rm = Minecraft.getMinecraft().getResourceManager();

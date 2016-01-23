@@ -33,7 +33,7 @@ public class ClientProxy implements IModProxy
     }
 
     @SubscribeEvent
-    public void onTextureStitchEvent(TextureStitchEvent event)
+    public void onTextureStitchEvent(TextureStitchEvent.Pre event)
     {
         event.map.registerSprite(new ResourceLocation(EnderRiftMod.MODID + ":blocks/rift_aura"));
     }
