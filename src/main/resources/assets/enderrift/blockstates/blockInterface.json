@@ -7,21 +7,21 @@
     "inventory": [{ "transform": "forge:default-block" }],
     "facing": {
       "up": {
-        "x": 270
-      },
-      "down": {
         "x": 90
       },
-      "east": {
-        "y": 90
+      "down": {
+        "x": 270
       },
-      "west": {
+      "east": {
         "y": 270
       },
+      "west": {
+        "y": 90
+      },
       "north": {
+        "y": 180
       },
       "south": {
-        "x": 180
       }
     }
   }

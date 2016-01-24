@@ -93,17 +93,17 @@ public class EnderRiftMod
         riftInterface = new BlockInterface();
         GameRegistry.registerBlock(riftInterface, "blockInterface");
 
-        generator = new BlockGenerator();
-        GameRegistry.registerBlock(generator, "blockGenerator");
-
         browser = new BlockBrowser();
         GameRegistry.registerBlock(browser, "blockBrowser");
+
+        generator = new BlockGenerator();
+        GameRegistry.registerBlock(generator, "blockGenerator");
 
         GameRegistry.registerTileEntity(TileEnderRift.class, "tileEnderRift");
         GameRegistry.registerTileEntity(TileEnderRiftCorner.class, "tileStructureCorner");
         GameRegistry.registerTileEntity(TileInterface.class, "tileInterface");
-        GameRegistry.registerTileEntity(TileGenerator.class, "tileGenerator");
         GameRegistry.registerTileEntity(TileBrowser.class, "tileBrowser");
+        GameRegistry.registerTileEntity(TileGenerator.class, "tileGenerator");
 
         RecipeSorter.register(MODID + ":rift_duplication", RecipesRiftDuplication.class, RecipeSorter.Category.SHAPELESS, "after:minecraft:shapeless");
 

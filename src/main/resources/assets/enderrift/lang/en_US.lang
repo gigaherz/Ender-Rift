@@ -1,6 +1,7 @@
 tile.enderrift.blockEnderRift.name=Ender-Rift Core
 tile.enderrift.blockStructure.name=Ender-Rift Structure
 tile.enderrift.blockInterface.name=Rift Interface
+tile.enderrift.blockBrowser.name=Rift Browser
 tile.enderrift.blockGenerator.name=Rudimentary Generator
 
 item.enderrift.itemEnderRift.empty.name=Ender-Rift Orb (Unbound)

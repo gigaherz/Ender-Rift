@@ -33,6 +33,7 @@ public class ClientProxy implements IModProxy
         registerBlockModelAsItem(EnderRiftMod.structure, "blockStructure");
         registerBlockModelAsItem(EnderRiftMod.riftInterface, "blockInterface");
         registerBlockModelAsItem(EnderRiftMod.generator, "blockGenerator");
+        registerBlockModelAsItem(EnderRiftMod.browser, "blockBrowser");
 
         MinecraftForge.EVENT_BUS.register(this);
         RenderingStuffs.init();
