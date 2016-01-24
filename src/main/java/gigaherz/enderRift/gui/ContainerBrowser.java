@@ -5,14 +5,12 @@ import gigaherz.api.automation.IBrowsableInventory;
 import gigaherz.enderRift.EnderRiftMod;
 import gigaherz.enderRift.blocks.TileBrowser;
 import gigaherz.enderRift.network.SetSpecialSlot;
-import gigaherz.enderRift.slots.SlotFake;
+import gigaherz.enderRift.slots.SlotFakeClient;
+import gigaherz.enderRift.slots.SlotFakeServer;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.inventory.Container;
-import net.minecraft.inventory.ICrafting;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.Slot;
+import net.minecraft.inventory.*;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.IChatComponent;
 
@@ -21,14 +19,16 @@ import java.util.List;
 public class ContainerBrowser
         extends Container
 {
-    public final FakeInventory fakeInventory;
+    public final FakeInventoryClient fakeInventoryClient;
+    public final FakeInventoryServer fakeInventoryServer;
     protected TileBrowser tile;
     int prevChangeCount;
+    int actualSlotCount;
 
     final static int Left = 8;
-    final static int Top = 33;
+    final static int Top = 18;
     final static int SlotWidth = 18;
-    final static int SlotHeight = 28;
+    final static int SlotHeight = 18;
 
     final static int FakeRows = 3;
     final static int FakeColumns = 9;
@@ -38,21 +38,36 @@ public class ContainerBrowser
     final static int PlayerColumns = 9;
     final static int PlayerSlots = PlayerRows * PlayerColumns;
 
-    public ContainerBrowser(TileBrowser tileEntity, InventoryPlayer playerInventory)
+    public ContainerBrowser(TileBrowser tileEntity, InventoryPlayer playerInventory, boolean isClient)
     {
         this.tile = tileEntity;
 
-        fakeInventory = new FakeInventory(FakeSlots);
-        prevChangeCount = tile.changeCount;
-
-
-        for (int y = 0; y < FakeRows; y++)
+        if(isClient)
         {
-            for (int x = 0; x < FakeColumns; x++)
+            fakeInventoryClient = new FakeInventoryClient(FakeSlots);
+            fakeInventoryServer = null;
+            for (int y = 0; y < FakeRows; y++)
             {
-                addSlotToContainer(new Slot(fakeInventory,
-                        x + y * FakeColumns,
-                        Left + x * SlotWidth, Top + y * SlotHeight));
+                for (int x = 0; x < FakeColumns; x++)
+                {
+                    addSlotToContainer(new SlotFakeClient(fakeInventoryClient,
+                            x + y * FakeColumns,
+                            Left + x * SlotWidth, Top + y * SlotHeight));
+                }
+            }
+        }
+        else
+        {
+            fakeInventoryClient = null;
+            fakeInventoryServer = new FakeInventoryServer();
+            for (int y = 0; y < FakeRows; y++)
+            {
+                for (int x = 0; x < FakeColumns; x++)
+                {
+                    addSlotToContainer(new SlotFakeServer(fakeInventoryServer,
+                            x + y * FakeColumns,
+                            Left + x * SlotWidth, Top + y * SlotHeight));
+                }
             }
         }
 
@@ -87,9 +102,17 @@ public class ContainerBrowser
     @Override
     public void detectAndSendChanges()
     {
-        if(prevChangeCount != tile.changeCount)
+        if(prevChangeCount != tile.changeCount && !tile.getWorld().isRemote)
         {
-            fakeInventory.refresh();
+            fakeInventoryServer.refresh();
+            prevChangeCount = tile.changeCount;
+
+            actualSlotCount = fakeInventoryServer.getSizeInventory();
+
+            for (ICrafting crafter : this.crafters)
+            {
+                crafter.sendProgressBarUpdate(this, 0, actualSlotCount);
+            }
         }
 
         for (int i = 0; i < this.inventorySlots.size(); ++i)
@@ -105,8 +128,8 @@ public class ContainerBrowser
 
                 for (ICrafting crafter : this.crafters)
                 {
-                    if (slot instanceof SlotFake && crafter instanceof EntityPlayerMP)
-                        sendSpecialSlotContents((EntityPlayerMP) crafter, this, i, current);
+                    if(i < FakeSlots)
+                        EnderRiftMod.channel.sendTo(new SetSpecialSlot(windowId, i, current), (EntityPlayerMP) crafter);
                     else
                         crafter.sendSlotContents(this, i, current);
                 }
@@ -114,9 +137,16 @@ public class ContainerBrowser
         }
     }
 
-    private void sendSpecialSlotContents(EntityPlayerMP crafter, ContainerBrowser containerEssentializer, int i, ItemStack current)
+    @Override
+    public void updateProgressBar(int id, int data)
     {
-        EnderRiftMod.channel.sendTo(new SetSpecialSlot(containerEssentializer.windowId, i, current), crafter);
+        if(id == 0)
+            actualSlotCount = data;
+    }
+
+    public void setScrollPosition(int scrollPosition)
+    {
+        this.fakeInventoryServer.setScroll(scrollPosition);
     }
 
     @Override
@@ -128,18 +158,10 @@ public class ContainerBrowser
     @Override
     public ItemStack transferStackInSlot(EntityPlayer player, int slotIndex)
     {
-        Slot slot = this.inventorySlots.get(slotIndex);
-        if (slot == null || !slot.getHasStack())
-        {
-            return null;
-        }
+        return null;
 
-        ItemStack stack = slot.getStack();
-        ItemStack stackCopy = stack.copy();
-
-        int startIndex;
-        int endIndex;
-
+        /*
+        int startIndex, endIndex;
         if (slotIndex < FakeSlots)
         {
             startIndex = FakeSlots;
@@ -150,6 +172,15 @@ public class ContainerBrowser
             startIndex = 0;
             endIndex = startIndex + FakeSlots;
         }
+
+        Slot slot = this.inventorySlots.get(slotIndex);
+        if (slot == null || !slot.getHasStack())
+        {
+            return null;
+        }
+
+        ItemStack stack = slot.getStack();
+        ItemStack stackCopy = stack.copy();
 
         if (!this.mergeItemStack(stack, startIndex, endIndex, false))
         {
@@ -172,19 +203,17 @@ public class ContainerBrowser
 
         slot.onPickupFromSlot(player, stack);
         return stackCopy;
+        */
     }
 
-    private class FakeInventory implements IInventory
+    public class FakeInventoryServer implements IInventory
     {
-        final int slots;
-        final List<ItemStack> singleItems = Lists.newArrayList();
-        final List<ItemStack> accumulated = Lists.newArrayList();
+        final List<ItemStack> slots = Lists.newArrayList();
 
         int scroll;
 
-        public FakeInventory(int slots)
+        public FakeInventoryServer()
         {
-            this.slots = slots;
         }
 
         void setScroll(int scroll)
@@ -196,11 +225,7 @@ public class ContainerBrowser
         {
             IBrowsableInventory inv = tile.getParent();
 
-            for(int i=0;i<slots;i++)
-            {
-                singleItems.clear();
-                accumulated.clear();
-            }
+            slots.clear();
 
             if(inv == null)
                 return;
@@ -209,22 +234,25 @@ public class ContainerBrowser
             for(int j=0;j<invSlots;j++)
             {
                 ItemStack invStack = inv.getStackInSlot(j);
-                for(int i = 0; i< accumulated.size(); i++)
-                {
-                    ItemStack cachedStack = accumulated.get(i);
+                if(invStack == null)
+                    continue;
 
-                    if (cachedStack == null)
-                    {
-                        ItemStack stack = invStack.copy();
-                        ItemStack single = stack.copy();
-                        single.stackSize = 1;
-                        singleItems.add(single);
-                        accumulated.add(stack);
-                    }
-                    else if (ItemStack.areItemsEqual(cachedStack,invStack) && ItemStack.areItemStackTagsEqual(cachedStack,invStack))
+                boolean found = false;
+
+                for (ItemStack cachedStack : slots)
+                {
+                    if (ItemStack.areItemsEqual(cachedStack, invStack) && ItemStack.areItemStackTagsEqual(cachedStack, invStack))
                     {
                         cachedStack.stackSize += invStack.stackSize;
+                        found = true;
+                        break;
                     }
+                }
+
+                if (!found)
+                {
+                    ItemStack stack = invStack.copy();
+                    slots.add(stack);
                 }
             }
         }
@@ -232,23 +260,144 @@ public class ContainerBrowser
         @Override
         public int getSizeInventory()
         {
-            return singleItems.size() - scroll;
+            return slots.size() - scroll;
         }
 
         @Override
         public ItemStack getStackInSlot(int index)
         {
-            if(index >= singleItems.size())
+            if((index+scroll) >= slots.size())
                 return null;
-            return singleItems.get(index);
+            return slots.get(index+scroll);
+        }
+
+        @Override
+        public ItemStack decrStackSize(int index, int count)
+        {
+            return null;
+        }
+
+        @Override
+        public ItemStack removeStackFromSlot(int index)
+        {
+            return null;
+        }
+
+        @Override
+        public void setInventorySlotContents(int index, ItemStack invStack)
+        {
+        }
+
+        @Override
+        public int getInventoryStackLimit()
+        {
+            return 0;
+        }
+
+        @Override
+        public void markDirty()
+        {
+
+        }
+
+        @Override
+        public boolean isUseableByPlayer(EntityPlayer player)
+        {
+            return false;
+        }
+
+        @Override
+        public void openInventory(EntityPlayer player)
+        {
+
+        }
+
+        @Override
+        public void closeInventory(EntityPlayer player)
+        {
+
+        }
+
+        @Override
+        public boolean isItemValidForSlot(int index, ItemStack stack)
+        {
+            return false;
+        }
+
+        @Override
+        public int getField(int id)
+        {
+            return 0;
+        }
+
+        @Override
+        public void setField(int id, int value)
+        {
+
+        }
+
+        @Override
+        public int getFieldCount()
+        {
+            return 0;
+        }
+
+        @Override
+        public void clear()
+        {
+
+        }
+
+        @Override
+        public String getName()
+        {
+            return null;
+        }
+
+        @Override
+        public boolean hasCustomName()
+        {
+            return false;
+        }
+
+        @Override
+        public IChatComponent getDisplayName()
+        {
+            return null;
+        }
+    }
+
+    public class FakeInventoryClient implements IInventory
+    {
+        ItemStack[] totals;
+        ItemStack[] singles;
+
+        public FakeInventoryClient(int slots)
+        {
+            totals = new ItemStack[slots];
+            singles = new ItemStack[slots];
+        }
+
+        @Override
+        public int getSizeInventory()
+        {
+            return totals.length;
+        }
+
+        @Override
+        public ItemStack getStackInSlot(int index)
+        {
+            if(index >= totals.length)
+                return null;
+            return singles[index];
         }
 
         public int getStackSizeForSlot(int index)
         {
-            if(index >= singleItems.size())
+            if(index >= totals.length)
                 return 0;
 
-            ItemStack stack = accumulated.get(index);
+            ItemStack stack = totals[index];
             if(stack == null)
                 return 0;
 
@@ -270,7 +419,20 @@ public class ContainerBrowser
         @Override
         public void setInventorySlotContents(int index, ItemStack stack)
         {
+            if(index >= totals.length)
+                return;
 
+            totals[index] = stack;
+            if(stack != null)
+            {
+                ItemStack single = stack.copy();
+                single.stackSize = 1;
+                singles[index] = single;
+            }
+            else
+            {
+                singles[index] = null;
+            }
         }
 
         @Override

@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import gigaherz.enderRift.EnderRiftMod;
 import gigaherz.enderRift.blocks.TileGenerator;
 import net.minecraft.client.gui.inventory.GuiContainer;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.StatCollector;
@@ -88,7 +89,7 @@ public class GuiGenerator extends GuiContainer
     @Override
     protected void drawGuiContainerBackgroundLayer(float f, int i, int j)
     {
-        GL11.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+        GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f);
 
         int x = (width - xSize) / 2;
         int y = (height - ySize) / 2;

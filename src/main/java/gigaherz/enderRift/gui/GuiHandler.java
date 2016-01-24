@@ -37,7 +37,7 @@ public class GuiHandler implements IGuiHandler
             case GUI_BROWSER:
                 if (tileEntity instanceof TileBrowser)
                 {
-                    return new ContainerBrowser((TileBrowser) tileEntity, player.inventory);
+                    return new ContainerBrowser((TileBrowser) tileEntity, player.inventory, false);
                 }
                 break;
         }

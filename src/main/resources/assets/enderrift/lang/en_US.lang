@@ -8,6 +8,7 @@ item.enderrift.itemEnderRift.bound.name=Ender-Rift Orb (Bound)
 
 container.enderrift.interface=Rift Interface
 container.enderrift.generator=Rudimentary Generator
+container.enderrift.browser=Rift Browser
 
 text.enderrift.interface.filters=Filters
 

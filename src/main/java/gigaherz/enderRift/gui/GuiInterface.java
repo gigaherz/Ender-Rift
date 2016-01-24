@@ -2,8 +2,18 @@ package gigaherz.enderRift.gui;
 
 import gigaherz.enderRift.EnderRiftMod;
 import gigaherz.enderRift.blocks.TileInterface;
+import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.inventory.GuiContainer;
+import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.RenderHelper;
+import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.WorldRenderer;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraft.inventory.Container;
+import net.minecraft.inventory.Slot;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.StatCollector;
 import org.lwjgl.opengl.GL11;
@@ -29,17 +39,17 @@ public class GuiInterface extends GuiContainer
     protected void drawGuiContainerForegroundLayer(int i, int j)
     {
         String name = StatCollector.translateToLocal(this.tile.getName());
-        mc.fontRendererObj.drawString(name, (xSize - mc.fontRendererObj.getStringWidth(name)) / 2, 6, 0x404040);
-        mc.fontRendererObj.drawString(StatCollector.translateToLocal(this.player.getName()), 8, ySize - 96 + 2, 0x404040);
+        fontRendererObj.drawString(name, (xSize - fontRendererObj.getStringWidth(name)) / 2, 6, 0x404040);
+        fontRendererObj.drawString(StatCollector.translateToLocal(this.player.getName()), 8, ySize - 96 + 2, 0x404040);
 
-        mc.fontRendererObj.drawString(StatCollector.translateToLocal(textFilters), 8, 20, 0x404040);
+        fontRendererObj.drawString(StatCollector.translateToLocal(textFilters), 8, 20, 0x404040);
     }
 
     @Override
     protected void drawGuiContainerBackgroundLayer(float f, int i, int j)
     {
         mc.renderEngine.bindTexture(guiTextureLocation);
-        GL11.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+        GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f);
         int x = (width - xSize) / 2;
         int y = (height - ySize) / 2;
         this.drawTexturedModalRect(x, y, 0, 0, xSize, ySize);

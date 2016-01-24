@@ -1,7 +1,10 @@
 {
   "forge_marker": 1,
   "defaults": {
-    "model": "enderrift:interface.obj"
+    "model": "enderrift:interface.obj",
+    "textures": {
+      "#Face": "enderrift:blocks/browser"
+    }
   },
   "variants": {
     "inventory": [{ "transform": "forge:default-block" }],
@@ -21,7 +24,7 @@
       "north": {
       },
       "south": {
-        "x": 180
+        "y": 180
       }
     }
   }

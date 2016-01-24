@@ -3,6 +3,7 @@ package gigaherz.enderRift;
 import gigaherz.enderRift.blocks.*;
 import gigaherz.enderRift.gui.GuiHandler;
 import gigaherz.enderRift.items.ItemEnderRift;
+import gigaherz.enderRift.network.SetScrollPosition;
 import gigaherz.enderRift.network.SetSpecialSlot;
 import gigaherz.enderRift.recipe.RecipesRiftDuplication;
 import gigaherz.enderRift.rift.RiftStructure;
@@ -25,6 +26,9 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.oredict.RecipeSorter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import java.text.DecimalFormat;
+import java.text.Format;
 
 @Mod(name = EnderRiftMod.NAME,
         modid = EnderRiftMod.MODID,
@@ -56,6 +60,8 @@ public class EnderRiftMod
     public static SimpleNetworkWrapper channel;
 
     private GuiHandler guiHandler = new GuiHandler();
+
+    public static final Format prettyNumberFormatter = new DecimalFormat("#.#");
 
     public static final Logger logger = LogManager.getLogger(MODID);
 
@@ -105,6 +111,7 @@ public class EnderRiftMod
 
         int messageNumber = 0;
         channel.registerMessage(SetSpecialSlot.Handler.class, SetSpecialSlot.class, messageNumber++, Side.CLIENT);
+        channel.registerMessage(SetScrollPosition.Handler.class, SetScrollPosition.class, messageNumber++, Side.SERVER);
         logger.debug("Final message number: " + messageNumber);
 
         proxy.preInit();
