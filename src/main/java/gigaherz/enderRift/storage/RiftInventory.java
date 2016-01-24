@@ -67,7 +67,7 @@ public class RiftInventory implements IInventoryAutomation, IBrowsableInventory
             }
             else
             {
-                rift.setDirty();
+                rift.markDirty();
             }
         }
 

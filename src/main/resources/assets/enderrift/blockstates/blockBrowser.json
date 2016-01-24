@@ -1,0 +1,28 @@
+{
+  "forge_marker": 1,
+  "defaults": {
+    "model": "enderrift:interface.obj"
+  },
+  "variants": {
+    "inventory": [{ "transform": "forge:default-block" }],
+    "facing": {
+      "up": {
+        "x": 270
+      },
+      "down": {
+        "x": 90
+      },
+      "east": {
+        "y": 90
+      },
+      "west": {
+        "y": 270
+      },
+      "north": {
+      },
+      "south": {
+        "x": 180
+      }
+    }
+  }
+}

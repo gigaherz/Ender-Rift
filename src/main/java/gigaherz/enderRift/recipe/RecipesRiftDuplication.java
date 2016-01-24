@@ -23,7 +23,7 @@ public class RecipesRiftDuplication implements IRecipe
         if (stack == null)
             return false;
 
-        if (stack.getItem() != EnderRiftMod.itemEnderRift)
+        if (stack.getItem() != EnderRiftMod.riftOrb)
             return false;
 
         NBTTagCompound tag = stack.getTagCompound();

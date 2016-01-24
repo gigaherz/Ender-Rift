@@ -2,6 +2,7 @@ package gigaherz.enderRift.blocks;
 
 import com.google.common.collect.Lists;
 import gigaherz.enderRift.EnderRiftMod;
+import gigaherz.enderRift.rift.RiftStructure;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.PropertyBool;
@@ -9,8 +10,6 @@ import net.minecraft.block.properties.PropertyEnum;
 import net.minecraft.block.state.BlockState;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
@@ -157,72 +156,14 @@ public class BlockStructure
     {
         super.breakBlock(worldIn, pos, state);
 
-        for (int yy = -1; yy <= 1; yy++)
-        {
-            for (int xx = -1; xx <= 1; xx++)
-            {
-                for (int zz = -1; zz <= 1; zz++)
-                {
-                    BlockPos pos2 = new BlockPos(pos.getX() + xx, pos.getY() + yy, pos.getZ() + zz);
-                    if (worldIn.getBlockState(pos2).getBlock() == EnderRiftMod.blockEnderRift)
-                    {
-                        EnderRiftMod.blockEnderRift.breakStructure(worldIn, pos2);
-                        return;
-                    }
-                }
-            }
-        }
-    }
-
-    Block getBlockXYZ(IBlockAccess world, int x, int y, int z)
-    {
-        return world.getBlockState(new BlockPos(x, y, z)).getBlock();
+        RiftStructure.breakStructure(worldIn, pos);
     }
 
     @Override
     public List<ItemStack> getDrops(IBlockAccess world, BlockPos pos, IBlockState state, int fortune)
     {
-        int x = pos.getX();
-        int y = pos.getY();
-        int z = pos.getZ();
-
         List<ItemStack> ret = Lists.newArrayList();
-
-        if (getBlockXYZ(world, x + 1, y + 1, z + 1) == EnderRiftMod.blockEnderRift)
-            ret.add(new ItemStack(Item.getItemFromBlock(Blocks.iron_block)));
-        else if (getBlockXYZ(world, x, y + 1, z + 1) == EnderRiftMod.blockEnderRift)
-            ret.add(new ItemStack(Item.getItemFromBlock(Blocks.redstone_block)));
-        else if (getBlockXYZ(world, x - 1, y + 1, z + 1) == EnderRiftMod.blockEnderRift)
-            ret.add(new ItemStack(Item.getItemFromBlock(Blocks.iron_block)));
-        else if (getBlockXYZ(world, x + 1, y + 1, z) == EnderRiftMod.blockEnderRift)
-            ret.add(new ItemStack(Item.getItemFromBlock(Blocks.redstone_block)));
-        else if (getBlockXYZ(world, x, y + 1, z) == EnderRiftMod.blockEnderRift)
-            ret.add(new ItemStack(Item.getItemFromBlock(Blocks.redstone_block)));
-        else if (getBlockXYZ(world, x - 1, y + 1, z) == EnderRiftMod.blockEnderRift)
-            ret.add(new ItemStack(Item.getItemFromBlock(Blocks.redstone_block)));
-        else if (getBlockXYZ(world, x + 1, y + 1, z - 1) == EnderRiftMod.blockEnderRift)
-            ret.add(new ItemStack(Item.getItemFromBlock(Blocks.iron_block)));
-        else if (getBlockXYZ(world, x, y + 1, z - 1) == EnderRiftMod.blockEnderRift)
-            ret.add(new ItemStack(Item.getItemFromBlock(Blocks.redstone_block)));
-        else if (getBlockXYZ(world, x - 1, y + 1, z - 1) == EnderRiftMod.blockEnderRift)
-            ret.add(new ItemStack(Item.getItemFromBlock(Blocks.iron_block)));
-        else if (getBlockXYZ(world, x + 1, y - 1, z + 1) == EnderRiftMod.blockEnderRift)
-            ret.add(new ItemStack(Item.getItemFromBlock(Blocks.iron_block)));
-        else if (getBlockXYZ(world, x, y - 1, z + 1) == EnderRiftMod.blockEnderRift)
-            ret.add(new ItemStack(Item.getItemFromBlock(Blocks.redstone_block)));
-        else if (getBlockXYZ(world, x - 1, y - 1, z + 1) == EnderRiftMod.blockEnderRift)
-            ret.add(new ItemStack(Item.getItemFromBlock(Blocks.iron_block)));
-        else if (getBlockXYZ(world, x + 1, y - 1, z) == EnderRiftMod.blockEnderRift)
-            ret.add(new ItemStack(Item.getItemFromBlock(Blocks.redstone_block)));
-        else if (getBlockXYZ(world, x - 1, y - 1, z) == EnderRiftMod.blockEnderRift)
-            ret.add(new ItemStack(Item.getItemFromBlock(Blocks.redstone_block)));
-        else if (getBlockXYZ(world, x + 1, y - 1, z - 1) == EnderRiftMod.blockEnderRift)
-            ret.add(new ItemStack(Item.getItemFromBlock(Blocks.iron_block)));
-        else if (getBlockXYZ(world, x, y - 1, z - 1) == EnderRiftMod.blockEnderRift)
-            ret.add(new ItemStack(Item.getItemFromBlock(Blocks.redstone_block)));
-        else if (getBlockXYZ(world, x - 1, y - 1, z - 1) == EnderRiftMod.blockEnderRift)
-            ret.add(new ItemStack(Item.getItemFromBlock(Blocks.iron_block)));
-
+        ret.add(new ItemStack(RiftStructure.getOriginalBlock((World)world, pos)));
         return ret;
     }
 
@@ -230,10 +171,26 @@ public class BlockStructure
     public ItemStack getPickBlock(MovingObjectPosition target, World world, BlockPos pos, EntityPlayer player)
     {
 
-        return new ItemStack(world.getBlockState(pos).getValue(TYPE1) == Type1.CORNER ? Blocks.iron_block : Blocks.redstone_block);
+        return new ItemStack(RiftStructure.getOriginalBlock(world, pos));
     }
 
-    enum Type1 implements IStringSerializable
+    public IBlockState cornerState(Corner corner, boolean base)
+    {
+        return getDefaultState()
+                .withProperty(BlockStructure.TYPE1, BlockStructure.Type1.CORNER)
+                .withProperty(BlockStructure.CORNER, corner)
+                .withProperty(BlockStructure.BASE, base);
+    }
+
+    public IBlockState edgeState(Type2 type2, boolean base)
+    {
+        return getDefaultState()
+                .withProperty(BlockStructure.TYPE1, BlockStructure.Type1.NORMAL)
+                .withProperty(BlockStructure.TYPE2, type2)
+                .withProperty(BlockStructure.BASE, base);
+    }
+
+    public enum Type1 implements IStringSerializable
     {
         NORMAL("normal"),
         CORNER("corner");
@@ -260,7 +217,7 @@ public class BlockStructure
         public static Type1[] values = values();
     }
 
-    enum Type2 implements IStringSerializable
+    public enum Type2 implements IStringSerializable
     {
         NONE("none"),
         VERTICAL("vertical"),
@@ -289,7 +246,7 @@ public class BlockStructure
         public static Type2[] values = values();
     }
 
-    enum Corner implements IStringSerializable
+    public enum Corner implements IStringSerializable
     {
         NE("ne"),
         NW("nw"),

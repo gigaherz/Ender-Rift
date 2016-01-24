@@ -19,20 +19,35 @@ import java.util.Random;
 
 public class TileEnderRift
         extends TileEntity
-        implements IEnergyReceiver, IInventoryAutomation, IBrowsableInventory, ITickable
+        implements IEnergyReceiver, IInventoryAutomation, IBrowsableInventory
 {
     public final Random rand = new Random();
     public final int energyLimit = 10000000;
-    public int energyBuffer = 0;
 
-    public int riftId;
-    RiftInventory inventory;
-    IInventoryAutomation automation;
+    private int energyBuffer = 0;
 
-    boolean alreadyMarkedDirty;
+    private int riftId;
+    private RiftInventory inventory;
 
-    RiftInventory getInventory()
+    public void assemble(int id)
     {
+        inventory = null;
+        riftId = id;
+        markDirty();
+    }
+
+    public void unassemble()
+    {
+        inventory = null;
+        riftId = -1;
+        markDirty();
+    }
+
+    public RiftInventory getInventory()
+    {
+        if(riftId < 0)
+            return null;
+
         if (inventory == null)
         {
             inventory = RiftStorageWorldData.get(worldObj).getRift(riftId);
@@ -82,7 +97,7 @@ public class TileEnderRift
 
     public ItemStack getRiftItem()
     {
-        ItemStack stack = new ItemStack(EnderRiftMod.itemEnderRift);
+        ItemStack stack = new ItemStack(EnderRiftMod.riftOrb);
 
         NBTTagCompound tag = new NBTTagCompound();
 
@@ -91,22 +106,6 @@ public class TileEnderRift
         stack.setTagCompound(tag);
 
         return stack;
-    }
-
-    @Override
-    public void markDirty()
-    {
-        super.markDirty();
-        getInventory().markDirty();
-    }
-
-    public void setDirty()
-    {
-        if (alreadyMarkedDirty)
-            return;
-
-        alreadyMarkedDirty = true;
-        super.markDirty();
     }
 
     public void readFromNBT(NBTTagCompound nbtTagCompound)
@@ -131,7 +130,7 @@ public class TileEnderRift
         {
             energyBuffer += receive;
 
-            this.setDirty();
+            this.markDirty();
         }
 
         return receive;
@@ -156,17 +155,9 @@ public class TileEnderRift
     }
 
     @Override
-    public void update()
-    {
-        alreadyMarkedDirty = false;
-    }
-
-    @Override
     public IInventoryAutomation getInventoryForSide(@Nonnull EnumFacing face)
     {
-        // Save a call by not forwarding to the automation instance,
-        // since it will return "this".
-        return automation = getInventory();
+        return getInventory();
     }
 
     @Override
@@ -189,7 +180,7 @@ public class TileEnderRift
             temp.stackSize = stackSize;
         }
 
-        ItemStack remaining = (automation = getInventory()).pushItems(temp);
+        ItemStack remaining = getInventory().pushItems(temp);
         if (remaining != null)
             stackSize -= remaining.stackSize;
 
@@ -211,7 +202,7 @@ public class TileEnderRift
         if (limit <= 0)
             return null;
 
-        ItemStack extracted = (automation = getInventory()).pullItems(limit, filter);
+        ItemStack extracted = getInventory().pullItems(limit, filter);
         if (extracted == null)
             return null;
 
@@ -233,7 +224,7 @@ public class TileEnderRift
         if (wanted <= 0)
             return null;
 
-        ItemStack extracted = (automation = getInventory()).extractItems(stack, wanted);
+        ItemStack extracted = getInventory().extractItems(stack, wanted);
         if (extracted == null)
             return null;
 
@@ -265,5 +256,10 @@ public class TileEnderRift
         int slot = rand.nextInt(max);
 
         return getStackInSlot(slot);
+    }
+
+    public int getRiftId()
+    {
+        return riftId;
     }
 }

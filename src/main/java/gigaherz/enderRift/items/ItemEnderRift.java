@@ -2,6 +2,7 @@ package gigaherz.enderRift.items;
 
 import gigaherz.enderRift.EnderRiftMod;
 import gigaherz.enderRift.blocks.BlockEnderRift;
+import gigaherz.enderRift.rift.RiftStructure;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
@@ -52,7 +53,7 @@ public class ItemEnderRift extends Item
 
         IBlockState state = worldIn.getBlockState(pos);
 
-        if (state.getBlock() != EnderRiftMod.blockEnderRift)
+        if (state.getBlock() != EnderRiftMod.rift)
             return false;
 
         if (state.getValue(BlockEnderRift.ASSEMBLED))
@@ -60,13 +61,13 @@ public class ItemEnderRift extends Item
             NBTTagCompound tag = stack.getTagCompound();
             if (tag == null || !tag.hasKey("RiftId"))
             {
-                if (!EnderRiftMod.blockEnderRift.tryDuplicateRift(worldIn, pos, playerIn))
+                if (!RiftStructure.duplicateOrb(worldIn, pos, playerIn))
                     return false;
             }
         }
         else
         {
-            if (!EnderRiftMod.blockEnderRift.tryCompleteStructure(worldIn, pos, stack))
+            if (!RiftStructure.assemble(worldIn, pos, stack))
                 return false;
         }
 

@@ -3,7 +3,9 @@ package gigaherz.enderRift;
 import gigaherz.enderRift.blocks.*;
 import gigaherz.enderRift.gui.GuiHandler;
 import gigaherz.enderRift.items.ItemEnderRift;
+import gigaherz.enderRift.network.SetSpecialSlot;
 import gigaherz.enderRift.recipe.RecipesRiftDuplication;
+import gigaherz.enderRift.rift.RiftStructure;
 import net.minecraft.block.Block;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.init.Blocks;
@@ -17,7 +19,9 @@ import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLInterModComms;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
+import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import net.minecraftforge.fml.common.registry.GameRegistry;
+import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.oredict.RecipeSorter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -32,12 +36,15 @@ public class EnderRiftMod
     public static final String NAME = "Ender-Rift";
     public static final String MODID = "enderrift";
     public static final String VERSION = "@VERSION@";
+    public static final String CHANNEL = "enderrift";
 
-    public static BlockEnderRift blockEnderRift;
-    public static Block blockStructure;
-    public static Block blockInterface;
-    public static Block blockGenerator;
-    public static Item itemEnderRift;
+    public static BlockEnderRift rift;
+    public static BlockStructure structure;
+    public static Block riftInterface;
+    public static Block generator;
+    public static Block browser;
+    public static Item riftOrb;
+
     public static CreativeTabs tabEnderRift;
 
     @Mod.Instance(value = EnderRiftMod.MODID)
@@ -45,6 +52,8 @@ public class EnderRiftMod
 
     @SidedProxy(clientSide = "gigaherz.enderRift.client.ClientProxy", serverSide = "gigaherz.enderRift.server.ServerProxy")
     public static IModProxy proxy;
+
+    public static SimpleNetworkWrapper channel;
 
     private GuiHandler guiHandler = new GuiHandler();
 
@@ -62,31 +71,41 @@ public class EnderRiftMod
             @Override
             public Item getTabIconItem()
             {
-                return itemEnderRift;
+                return riftOrb;
             }
         };
 
-        itemEnderRift = new ItemEnderRift().setUnlocalizedName(MODID + ".itemEnderRift");
-        GameRegistry.registerItem(itemEnderRift, "itemEnderRift");
+        riftOrb = new ItemEnderRift().setUnlocalizedName(MODID + ".itemEnderRift");
+        GameRegistry.registerItem(riftOrb, "itemEnderRift");
 
-        blockEnderRift = new BlockEnderRift();
-        GameRegistry.registerBlock(blockEnderRift, "blockEnderRift");
+        rift = new BlockEnderRift();
+        GameRegistry.registerBlock(rift, "blockEnderRift");
 
-        blockStructure = new BlockStructure();
-        GameRegistry.registerBlock(blockStructure, "blockStructure");
+        structure = new BlockStructure();
+        GameRegistry.registerBlock(structure, "blockStructure");
 
-        blockInterface = new BlockInterface();
-        GameRegistry.registerBlock(blockInterface, "blockInterface");
+        riftInterface = new BlockInterface();
+        GameRegistry.registerBlock(riftInterface, "blockInterface");
 
-        blockGenerator = new BlockGenerator();
-        GameRegistry.registerBlock(blockGenerator, "blockGenerator");
+        generator = new BlockGenerator();
+        GameRegistry.registerBlock(generator, "blockGenerator");
+
+        browser = new BlockBrowser();
+        GameRegistry.registerBlock(browser, "blockBrowser");
 
         GameRegistry.registerTileEntity(TileEnderRift.class, "tileEnderRift");
         GameRegistry.registerTileEntity(TileEnderRiftCorner.class, "tileStructureCorner");
         GameRegistry.registerTileEntity(TileInterface.class, "tileInterface");
         GameRegistry.registerTileEntity(TileGenerator.class, "tileGenerator");
+        GameRegistry.registerTileEntity(TileBrowser.class, "tileBrowser");
 
         RecipeSorter.register(MODID + ":rift_duplication", RecipesRiftDuplication.class, RecipeSorter.Category.SHAPELESS, "after:minecraft:shapeless");
+
+        channel = NetworkRegistry.INSTANCE.newSimpleChannel(CHANNEL);
+
+        int messageNumber = 0;
+        channel.registerMessage(SetSpecialSlot.Handler.class, SetSpecialSlot.class, messageNumber++, Side.CLIENT);
+        logger.debug("Final message number: " + messageNumber);
 
         proxy.preInit();
     }
@@ -96,8 +115,10 @@ public class EnderRiftMod
     {
         proxy.init();
 
+        RiftStructure.init();
+
         // Recipes
-        GameRegistry.addRecipe(new ItemStack(itemEnderRift),
+        GameRegistry.addRecipe(new ItemStack(riftOrb),
                 "aba",
                 "bcb",
                 "aba",
@@ -105,7 +126,7 @@ public class EnderRiftMod
                 'b', Items.ender_pearl,
                 'c', Items.ender_eye);
 
-        GameRegistry.addRecipe(new ItemStack(blockEnderRift),
+        GameRegistry.addRecipe(new ItemStack(rift),
                 "oho",
                 "r r",
                 "oco",
@@ -114,7 +135,7 @@ public class EnderRiftMod
                 'r', Blocks.redstone_block,
                 'c', Blocks.ender_chest);
 
-        GameRegistry.addRecipe(new ItemStack(blockInterface),
+        GameRegistry.addRecipe(new ItemStack(riftInterface),
                 "iri",
                 "rhr",
                 "iri",
@@ -122,7 +143,7 @@ public class EnderRiftMod
                 'r', Blocks.redstone_block,
                 'i', Blocks.iron_block);
 
-        GameRegistry.addRecipe(new ItemStack(blockGenerator),
+        GameRegistry.addRecipe(new ItemStack(generator),
                 "iri",
                 "rwr",
                 "ifi",

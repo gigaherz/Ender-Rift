@@ -116,7 +116,7 @@ public class WailaProviders
         @Override
         public ItemStack getWailaStack(IWailaDataAccessor accessor, IWailaConfigHandler config)
         {
-            return new ItemStack(EnderRiftMod.blockStructure);
+            return new ItemStack(EnderRiftMod.structure);
         }
 
         @Override
@@ -150,7 +150,7 @@ public class WailaProviders
         @Override
         public ItemStack getWailaStack(IWailaDataAccessor accessor, IWailaConfigHandler config)
         {
-            return new ItemStack(EnderRiftMod.blockStructure);
+            return new ItemStack(EnderRiftMod.structure);
         }
 
         @Override
@@ -207,7 +207,7 @@ public class WailaProviders
             tag.setInteger("energyInsert", (int) Math.ceil(rift.getEnergyInsert()));
             tag.setInteger("energyExtract", (int) Math.ceil(rift.getEnergyExtract()));
             tag.setBoolean("isFormed", rift.getBlockMetadata() != 0);
-            tag.setInteger("riftId", rift.riftId);
+            tag.setInteger("riftId", rift.getRiftId());
             tag.setInteger("energy", rift.getEnergyStored(EnumFacing.NORTH));
             tag.setInteger("energyTotal", rift.getMaxEnergyStored(EnumFacing.NORTH));
 

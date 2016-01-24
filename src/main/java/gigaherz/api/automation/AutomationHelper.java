@@ -11,7 +11,7 @@ import javax.annotation.Nonnull;
 /**
  * Provides a basic implementation for automatable inventory.
  */
-public class AutomationHelper implements IInventoryAutomation
+public class AutomationHelper implements IInventoryAutomation, IBrowsableInventory
 {
     IInventory parent;
 
@@ -191,5 +191,17 @@ public class AutomationHelper implements IInventoryAutomation
             return null;
 
         return extracted;
+    }
+
+    @Override
+    public int getSizeInventory()
+    {
+        return parent.getSizeInventory();
+    }
+
+    @Override
+    public ItemStack getStackInSlot(int index)
+    {
+        return parent.getStackInSlot(index);
     }
 }
