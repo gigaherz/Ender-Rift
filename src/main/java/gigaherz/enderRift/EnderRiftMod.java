@@ -4,10 +4,12 @@ import gigaherz.enderRift.blocks.*;
 import gigaherz.enderRift.gui.GuiHandler;
 import gigaherz.enderRift.items.ItemEnderRift;
 import gigaherz.enderRift.network.SetScrollPosition;
+import gigaherz.enderRift.network.SetSortMode;
 import gigaherz.enderRift.network.SetSpecialSlot;
 import gigaherz.enderRift.recipe.RecipesRiftDuplication;
 import gigaherz.enderRift.rift.RiftStructure;
 import net.minecraft.block.Block;
+import net.minecraft.client.renderer.EnumFaceDirection;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
@@ -112,6 +114,7 @@ public class EnderRiftMod
         int messageNumber = 0;
         channel.registerMessage(SetSpecialSlot.Handler.class, SetSpecialSlot.class, messageNumber++, Side.CLIENT);
         channel.registerMessage(SetScrollPosition.Handler.class, SetScrollPosition.class, messageNumber++, Side.SERVER);
+        channel.registerMessage(SetSortMode.Handler.class, SetSortMode.class, messageNumber++, Side.SERVER);
         logger.debug("Final message number: " + messageNumber);
 
         proxy.preInit();

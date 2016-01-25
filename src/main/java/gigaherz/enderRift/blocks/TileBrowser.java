@@ -10,11 +10,21 @@ import net.minecraft.util.EnumFacing;
 public class TileBrowser extends TileEntity
 {
     boolean parentSearched;
-    IBrowsableInventory parent;
+    IInventoryAutomation automation;
 
     public int changeCount = 1;
 
     public IBrowsableInventory getParent()
+    {
+        IInventoryAutomation automation = getAutomation();
+        if(automation instanceof IBrowsableInventory)
+        {
+            return (IBrowsableInventory)automation;
+        }
+        return null;
+    }
+
+    public IInventoryAutomation getAutomation()
     {
         if (!parentSearched)
         {
@@ -23,15 +33,11 @@ public class TileBrowser extends TileEntity
             TileEntity te = worldObj.getTileEntity(pos.offset(facing));
             if (te != null)
             {
-                IInventoryAutomation inv = AutomationHelper.get(te, facing.getOpposite());
-                if(inv instanceof IBrowsableInventory)
-                {
-                    parent = (IBrowsableInventory)inv;
-                }
+                automation = AutomationHelper.get(te, facing.getOpposite());
             }
             parentSearched = true;
         }
-        return parent;
+        return automation;
     }
 
     @Override
@@ -39,7 +45,7 @@ public class TileBrowser extends TileEntity
     {
         changeCount++;
         parentSearched = false;
-        parent = null;
+        automation = null;
         super.markDirty();
     }
 }

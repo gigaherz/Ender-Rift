@@ -198,4 +198,34 @@ public class RiftInventory implements IInventoryAutomation, IBrowsableInventory
         markDirty();
         return extracted;
     }
+
+    @Override
+    public ItemStack simulateExtraction(@Nonnull ItemStack stack, int wanted)
+    {
+        ItemStack extracted = stack.copy();
+        extracted.stackSize = 0;
+
+        if (stack.stackSize <= 0)
+            return null;
+
+        for (ItemStack slot : inventorySlots)
+        {
+            if (slot != null)
+            {
+                int available = Math.min(wanted, slot.stackSize);
+                if (ItemStack.areItemsEqual(slot, stack) && ItemStack.areItemStackTagsEqual(slot, stack) && available > 0)
+                {
+                    extracted.stackSize += available;
+                    wanted = extracted.stackSize - stack.stackSize;
+                    if (wanted <= 0)
+                        break;
+                }
+            }
+        }
+
+        if (extracted.stackSize <= 0)
+            return null;
+
+        return extracted;
+    }
 }

@@ -2,8 +2,12 @@ package gigaherz.enderRift.gui;
 
 import com.google.common.collect.Lists;
 import gigaherz.api.automation.IBrowsableInventory;
+import gigaherz.api.automation.IInventoryAutomation;
 import gigaherz.enderRift.EnderRiftMod;
 import gigaherz.enderRift.blocks.TileBrowser;
+import gigaherz.enderRift.misc.SortMode;
+import gigaherz.enderRift.network.SetScrollPosition;
+import gigaherz.enderRift.network.SetSortMode;
 import gigaherz.enderRift.network.SetSpecialSlot;
 import gigaherz.enderRift.slots.SlotFakeClient;
 import gigaherz.enderRift.slots.SlotFakeServer;
@@ -14,6 +18,7 @@ import net.minecraft.inventory.*;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.IChatComponent;
 
+import java.util.Comparator;
 import java.util.List;
 
 public class ContainerBrowser
@@ -24,6 +29,8 @@ public class ContainerBrowser
     protected TileBrowser tile;
     int prevChangeCount;
     int actualSlotCount;
+    public int scroll;
+    public SortMode sortMode = SortMode.StackSize;
 
     final static int Left = 8;
     final static int Top = 18;
@@ -107,7 +114,7 @@ public class ContainerBrowser
             fakeInventoryServer.refresh();
             prevChangeCount = tile.changeCount;
 
-            actualSlotCount = fakeInventoryServer.getSizeInventory();
+            actualSlotCount = fakeInventoryServer.getRealSizeInventory();
 
             for (ICrafting crafter : this.crafters)
             {
@@ -138,6 +145,12 @@ public class ContainerBrowser
     }
 
     @Override
+    public void putStacksInSlots(ItemStack[] p_75131_1_)
+    {
+        //super.putStacksInSlots(p_75131_1_);
+    }
+
+    @Override
     public void updateProgressBar(int id, int data)
     {
         if(id == 0)
@@ -146,7 +159,26 @@ public class ContainerBrowser
 
     public void setScrollPosition(int scrollPosition)
     {
-        this.fakeInventoryServer.setScroll(scrollPosition);
+        this.scroll = scrollPosition;
+
+        if (tile.getWorld().isRemote)
+        {
+            EnderRiftMod.channel.sendToServer(new SetScrollPosition(windowId, scrollPosition));
+        }
+    }
+
+    public void setSortMode(SortMode sortMode)
+    {
+        this.sortMode = sortMode;
+
+        if(!tile.getWorld().isRemote)
+        {
+            fakeInventoryServer.resort();
+        }
+        else
+        {
+            EnderRiftMod.channel.sendToServer(new SetSortMode(windowId, sortMode));
+        }
     }
 
     @Override
@@ -156,69 +188,174 @@ public class ContainerBrowser
     }
 
     @Override
-    public ItemStack transferStackInSlot(EntityPlayer player, int slotIndex)
+    public ItemStack slotClick(int slotId, int clickedButton, int mode, EntityPlayer playerIn)
     {
-        return null;
+        InventoryPlayer inventoryPlayer = playerIn.inventory;
 
-        /*
-        int startIndex, endIndex;
-        if (slotIndex < FakeSlots)
+        if (slotId >= 0 && slotId < FakeSlots)
         {
-            startIndex = FakeSlots;
-            endIndex = startIndex + PlayerSlots;
-        }
-        else
-        {
-            startIndex = 0;
-            endIndex = startIndex + FakeSlots;
-        }
+            IInventoryAutomation parent = tile.getAutomation();
+            if (parent == null)
+                return null;
 
-        Slot slot = this.inventorySlots.get(slotIndex);
-        if (slot == null || !slot.getHasStack())
-        {
+            Slot slot = this.inventorySlots.get(slotId);
+            ItemStack existing = slot.getStack();
+
+            if(mode == 0)
+            {
+                int amount = 1;
+                ItemStack dropping = inventoryPlayer.getItemStack();
+
+                if (dropping != null && ItemStack.areItemsEqual(dropping, existing))
+                {
+                    if (clickedButton == 0)
+                    {
+                        if (dropping.stackSize < dropping.getMaxStackSize())
+                        {
+                            ItemStack extracted = parent.extractItems(existing, amount);
+                            if (extracted != null)
+                                dropping.stackSize += extracted.stackSize;
+                        }
+                    }
+                    else
+                    {
+                        ItemStack push = dropping.copy();
+                        push.stackSize = amount;
+                        ItemStack remaining = parent.pushItems(push);
+
+                        dropping.stackSize -= push.stackSize;
+
+                        if(remaining != null)
+                            dropping.stackSize += remaining.stackSize;
+
+                        if(dropping.stackSize <= 0)
+                            dropping = null;
+
+                        inventoryPlayer.setItemStack(dropping);
+                    }
+                }
+                else if (dropping != null)
+                {
+                    if (clickedButton == 0)
+                    {
+                        ItemStack remaining = parent.pushItems(dropping);
+                        inventoryPlayer.setItemStack(remaining);
+                    }
+                    else
+                    {
+                        ItemStack push = dropping.copy();
+                        push.stackSize = amount;
+                        ItemStack remaining = parent.pushItems(push);
+
+                        dropping.stackSize -= push.stackSize;
+
+                        if(remaining != null)
+                            dropping.stackSize += remaining.stackSize;
+
+                        if(dropping.stackSize <= 0)
+                            dropping = null;
+
+                        inventoryPlayer.setItemStack(dropping);
+                    }
+                }
+                else if(existing != null)
+                {
+                    ItemStack extracted = parent.extractItems(existing, amount);
+                    inventoryPlayer.setItemStack(extracted);
+                }
+
+                detectAndSendChanges();
+                return slot.getStack();
+            }
+            else if (mode == 1)
+            {
+                int amount = existing.getMaxStackSize();
+                if (clickedButton != 0 && amount > 1)
+                    amount /= 2;
+
+                if(amount == 0)
+                    return null;
+
+                ItemStack extracted = parent.simulateExtraction(existing, amount);
+
+                if (extracted != null)
+                {
+                    ItemStack remaining = addToPlayer(extracted);
+                    if (remaining != null)
+                        amount -= remaining.stackSize;
+
+                    if (amount > 0)
+                    {
+                        parent.extractItems(existing, amount);
+
+                        detectAndSendChanges();
+                    }
+                }
+            }
+
             return null;
         }
 
-        ItemStack stack = slot.getStack();
+        return super.slotClick(slotId, clickedButton, mode, playerIn);
+    }
+
+    public ItemStack addToPlayer(ItemStack stack)
+    {
+        int startIndex = FakeSlots;
+        int endIndex = startIndex + PlayerSlots;
+
         ItemStack stackCopy = stack.copy();
 
-        if (!this.mergeItemStack(stack, startIndex, endIndex, false))
+        if (!this.mergeItemStack(stackCopy, startIndex, endIndex, false))
         {
             return null;
         }
 
-        if (stack.stackSize == 0)
+        if (stackCopy.stackSize <= 0)
         {
-            slot.putStack(null);
+            return null;
+        }
+
+        return stackCopy;
+    }
+
+
+    @Override
+    public ItemStack transferStackInSlot(EntityPlayer player, int slotIndex)
+    {
+        if (slotIndex < FakeSlots)
+        {
+            // Shouldn't even happen, handled above.
+            return null;
         }
         else
         {
-            slot.onSlotChanged();
-        }
+            Slot slot = this.inventorySlots.get(slotIndex);
+            if (slot == null || !slot.getHasStack())
+            {
+                return null;
+            }
 
-        if (stack.stackSize == stackCopy.stackSize)
-        {
-            return null;
-        }
+            IInventoryAutomation parent = tile.getAutomation();
+            if (parent == null)
+                return null;
 
-        slot.onPickupFromSlot(player, stack);
-        return stackCopy;
-        */
+            ItemStack stack = slot.getStack();
+
+            ItemStack remaining = parent.pushItems(stack);
+
+            slot.putStack(remaining);
+
+            return remaining;
+        }
     }
 
     public class FakeInventoryServer implements IInventory
     {
         final List<ItemStack> slots = Lists.newArrayList();
 
-        int scroll;
-
         public FakeInventoryServer()
         {
-        }
-
-        void setScroll(int scroll)
-        {
-            this.scroll = scroll;
         }
 
         public void refresh()
@@ -255,6 +392,45 @@ public class ContainerBrowser
                     slots.add(stack);
                 }
             }
+
+            resort();
+        }
+
+        public void resort()
+        {
+            if(sortMode == null)
+                return;
+            switch(sortMode)
+            {
+                case Alphabetic:
+                    slots.sort(new Comparator<ItemStack>()
+                    {
+                        @Override
+                        public int compare(ItemStack a, ItemStack b)
+                        {
+                            return a.getDisplayName().compareToIgnoreCase(b.getDisplayName());
+                        }
+                    });
+                    break;
+                case StackSize:
+                    slots.sort(new Comparator<ItemStack>()
+                    {
+                        @Override
+                        public int compare(ItemStack a, ItemStack b)
+                        {
+                            int diff = a.stackSize - b.stackSize;
+                            if(diff > 0) return -1;
+                            if(diff < 0) return 1;
+                            return 0;
+                        }
+                    });
+                    break;
+            }
+        }
+
+        public int getRealSizeInventory()
+        {
+            return slots.size();
         }
 
         @Override
@@ -365,6 +541,7 @@ public class ContainerBrowser
         {
             return null;
         }
+
     }
 
     public class FakeInventoryClient implements IInventory

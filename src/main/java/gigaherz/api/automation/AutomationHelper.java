@@ -194,6 +194,37 @@ public class AutomationHelper implements IInventoryAutomation, IBrowsableInvento
     }
 
     @Override
+    public ItemStack simulateExtraction(@Nonnull ItemStack stack, int wanted)
+    {
+        ItemStack extracted = stack.copy();
+        extracted.stackSize = 0;
+
+        if (stack.stackSize <= 0)
+            return null;
+
+        for (int i = 0; i < parent.getSizeInventory(); i++)
+        {
+            ItemStack slot = parent.getStackInSlot(i);
+            if (slot != null)
+            {
+                int available = Math.min(wanted, slot.stackSize);
+                if (ItemStack.areItemsEqual(slot, stack) && ItemStack.areItemStackTagsEqual(slot, stack) && available > 0)
+                {
+                    extracted.stackSize += available;
+                    wanted = extracted.stackSize - stack.stackSize;
+                    if (wanted <= 0)
+                        break;
+                }
+            }
+        }
+
+        if (extracted.stackSize <= 0)
+            return null;
+
+        return extracted;
+    }
+
+    @Override
     public int getSizeInventory()
     {
         return parent.getSizeInventory();

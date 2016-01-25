@@ -2,7 +2,8 @@ package gigaherz.enderRift.gui;
 
 import gigaherz.enderRift.EnderRiftMod;
 import gigaherz.enderRift.blocks.TileBrowser;
-import gigaherz.enderRift.network.SetScrollPosition;
+import gigaherz.enderRift.misc.SortMode;
+import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
@@ -11,6 +12,7 @@ import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.StatCollector;
+import org.lwjgl.input.Mouse;
 
 import java.io.IOException;
 
@@ -20,6 +22,9 @@ public class GuiBrowser extends GuiContainer
     protected TileBrowser tile;
     protected ResourceLocation backgroundTexture;
     protected ResourceLocation tabsTexture;
+
+    boolean isDragging;
+    int scrollY;
 
     static final String textBrowser= "container." + EnderRiftMod.MODID + ".browser";
 
@@ -35,6 +40,52 @@ public class GuiBrowser extends GuiContainer
     }
 
     @Override
+    public void initGui()
+    {
+        super.initGui();
+
+        int x = (width - xSize) / 2;
+        int y = (height - ySize) / 2;
+
+        GuiButton btn = new GuiButton(1, x - 22, y + 12, 20, 20, "");
+        buttonList.add(btn);
+
+        changeSorting(btn, SortMode.StackSize);
+    }
+
+    @Override
+    protected void actionPerformed(GuiButton guibutton)
+    {
+        SortMode mode = ((ContainerBrowser)inventorySlots).sortMode;
+        switch(mode)
+        {
+            case Alphabetic:
+                mode = SortMode.StackSize;
+                break;
+            case StackSize:
+                mode = SortMode.Alphabetic;
+                break;
+        }
+
+        changeSorting(guibutton, mode);
+    }
+
+    private void changeSorting(GuiButton guibutton, SortMode mode)
+    {
+        switch(mode)
+        {
+            case Alphabetic:
+                guibutton.displayString = "Az";
+                break;
+            case StackSize:
+                guibutton.displayString = "#";
+                break;
+        }
+
+        ((ContainerBrowser)inventorySlots).setSortMode(mode);
+    }
+
+    @Override
     protected void drawGuiContainerBackgroundLayer(float partialTicks, int xMouse, int yMouse)
     {
         int x = (width - xSize) / 2;
@@ -43,13 +94,12 @@ public class GuiBrowser extends GuiContainer
         mc.renderEngine.bindTexture(backgroundTexture);
         GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f);
         this.drawTexturedModalRect(x, y, 0, 0, xSize, ySize);
+        this.drawTexturedModalRect(x-27, y+8, 194, 0, 27, 28);
 
         // 174, 18, 12, 62
         mc.renderEngine.bindTexture(tabsTexture);
 
-        int actualSlotCount = ((ContainerBrowser) inventorySlots).actualSlotCount;
-
-        boolean isEnabled = actualSlotCount > ContainerBrowser.FakeSlots;
+        boolean isEnabled = needsScrollBar();
         if(isEnabled)
             this.drawTexturedModalRect(x + 174, y + 18 + scrollY, 232, 0, 12, 15);
         else
@@ -120,8 +170,41 @@ public class GuiBrowser extends GuiContainer
         this.zLevel = 0.0F;
     }
 
-    boolean isDragging;
-    int scrollY;
+    private boolean needsScrollBar()
+    {
+        int actualSlotCount = ((ContainerBrowser) inventorySlots).actualSlotCount;
+
+        return actualSlotCount > ContainerBrowser.FakeSlots;
+    }
+
+    @Override
+    public void handleMouseInput() throws IOException
+    {
+        super.handleMouseInput();
+        int i = Mouse.getEventDWheel();
+
+        final ContainerBrowser container =  ((ContainerBrowser) inventorySlots);
+        final int h = 62;
+        final int bitHeight = 15;
+        final int actualSlotCount = container.actualSlotCount;
+        final int rows = (int)Math.ceil(actualSlotCount / 9.0);
+
+        if (i != 0 && rows > ContainerBrowser.FakeRows)
+        {
+            int scrollRows = rows - ContainerBrowser.FakeRows;
+
+            int row = container.scroll / 9;
+
+            if (i > 0) row -= 1;
+            else if (i < 0) row += 1;
+
+            row = Math.max(0, Math.min(scrollRows, row));
+
+            scrollY = row * (h-bitHeight) / scrollRows;
+
+            container.setScrollPosition(row * 9);
+        }
+    }
 
     @Override
     protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException
@@ -153,11 +236,13 @@ public class GuiBrowser extends GuiContainer
         boolean isEnabled = scrollRows > 0;
         if(isEnabled)
         {
-            int row = (int)Math.round(Math.max(0, Math.min(scrollRows, (my-bitHeight/2.0) * scrollRows / (h-bitHeight))));
+            double offset = (my-bitHeight/2.0) * scrollRows / (h-bitHeight);
+            int row = Math.round(Math.max(0, Math.min(scrollRows, (int)offset)));
 
             scrollY = row * (h-bitHeight) / scrollRows;
 
-            EnderRiftMod.channel.sendToServer(new SetScrollPosition(inventorySlots.windowId, row * 9));
+            final ContainerBrowser container =  ((ContainerBrowser) inventorySlots);
+            container.setScrollPosition(row * 9);
         }
     }
 

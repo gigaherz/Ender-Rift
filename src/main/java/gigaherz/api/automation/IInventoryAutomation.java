@@ -41,4 +41,14 @@ public interface IInventoryAutomation
      * @return Returns the items that were extracted. Can be null.
      */
     ItemStack extractItems(@Nonnull ItemStack stack, int wanted);
+
+    /**
+     * Pretends to extract a specific amount of a certain item, but does not actually perform the extraction.
+     * Will attempt to gather from more than one stack.
+     *
+     * @param stack  The item to extract.
+     * @param wanted The quantity being requested.
+     * @return Returns the items that were extracted. Can be null.
+     */
+    ItemStack simulateExtraction(@Nonnull ItemStack stack, int wanted);
 }

@@ -235,6 +235,25 @@ public class TileEnderRift
     }
 
     @Override
+    public ItemStack simulateExtraction(@Nonnull ItemStack stack, int wanted)
+    {
+        int cost = getEffectivePowerUsageToExtract(wanted);
+        while (cost > this.energyBuffer && wanted > 0)
+        {
+            wanted--;
+        }
+
+        if (wanted <= 0)
+            return null;
+
+        ItemStack extracted = getInventory().simulateExtraction(stack, wanted);
+        if (extracted == null)
+            return null;
+
+        return extracted;
+    }
+
+    @Override
     public int getSizeInventory()
     {
         return inventory.getSizeInventory();
