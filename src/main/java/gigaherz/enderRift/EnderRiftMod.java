@@ -1,5 +1,6 @@
 package gigaherz.enderRift;
 
+import gigaherz.api.automation.CapabilityAutomation;
 import gigaherz.enderRift.blocks.*;
 import gigaherz.enderRift.gui.GuiHandler;
 import gigaherz.enderRift.items.ItemEnderRift;
@@ -9,7 +10,6 @@ import gigaherz.enderRift.network.SetSpecialSlot;
 import gigaherz.enderRift.recipe.RecipesRiftDuplication;
 import gigaherz.enderRift.rift.RiftStructure;
 import net.minecraft.block.Block;
-import net.minecraft.client.renderer.EnumFaceDirection;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
@@ -28,9 +28,6 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.oredict.RecipeSorter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
-import java.text.DecimalFormat;
-import java.text.Format;
 
 @Mod(name = EnderRiftMod.NAME,
         modid = EnderRiftMod.MODID,
@@ -63,16 +60,15 @@ public class EnderRiftMod
 
     private GuiHandler guiHandler = new GuiHandler();
 
-    public static final Format prettyNumberFormatter = new DecimalFormat("#.#");
-
     public static final Logger logger = LogManager.getLogger(MODID);
 
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event)
     {
         Configuration config = new Configuration(event.getSuggestedConfigurationFile());
-
         ConfigValues.readConfig(config);
+
+        CapabilityAutomation.register();
 
         tabEnderRift = new CreativeTabs("tabEnderRift")
         {

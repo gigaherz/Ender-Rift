@@ -163,7 +163,7 @@ public class BlockStructure
     public List<ItemStack> getDrops(IBlockAccess world, BlockPos pos, IBlockState state, int fortune)
     {
         List<ItemStack> ret = Lists.newArrayList();
-        ret.add(new ItemStack(RiftStructure.getOriginalBlock((World)world, pos)));
+        ret.add(new ItemStack(RiftStructure.getOriginalBlock((World) world, pos)));
         return ret;
     }
 

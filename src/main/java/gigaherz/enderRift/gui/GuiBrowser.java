@@ -26,7 +26,7 @@ public class GuiBrowser extends GuiContainer
     boolean isDragging;
     int scrollY;
 
-    static final String textBrowser= "container." + EnderRiftMod.MODID + ".browser";
+    static final String textBrowser = "container." + EnderRiftMod.MODID + ".browser";
 
     public GuiBrowser(InventoryPlayer playerInventory, TileBrowser tileEntity)
     {
@@ -56,8 +56,8 @@ public class GuiBrowser extends GuiContainer
     @Override
     protected void actionPerformed(GuiButton guibutton)
     {
-        SortMode mode = ((ContainerBrowser)inventorySlots).sortMode;
-        switch(mode)
+        SortMode mode = ((ContainerBrowser) inventorySlots).sortMode;
+        switch (mode)
         {
             case Alphabetic:
                 mode = SortMode.StackSize;
@@ -72,7 +72,7 @@ public class GuiBrowser extends GuiContainer
 
     private void changeSorting(GuiButton guibutton, SortMode mode)
     {
-        switch(mode)
+        switch (mode)
         {
             case Alphabetic:
                 guibutton.displayString = "Az";
@@ -82,7 +82,7 @@ public class GuiBrowser extends GuiContainer
                 break;
         }
 
-        ((ContainerBrowser)inventorySlots).setSortMode(mode);
+        ((ContainerBrowser) inventorySlots).setSortMode(mode);
     }
 
     @Override
@@ -94,13 +94,13 @@ public class GuiBrowser extends GuiContainer
         mc.renderEngine.bindTexture(backgroundTexture);
         GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f);
         this.drawTexturedModalRect(x, y, 0, 0, xSize, ySize);
-        this.drawTexturedModalRect(x-27, y+8, 194, 0, 27, 28);
+        this.drawTexturedModalRect(x - 27, y + 8, 194, 0, 27, 28);
 
         // 174, 18, 12, 62
         mc.renderEngine.bindTexture(tabsTexture);
 
         boolean isEnabled = needsScrollBar();
-        if(isEnabled)
+        if (isEnabled)
             this.drawTexturedModalRect(x + 174, y + 18 + scrollY, 232, 0, 12, 15);
         else
             this.drawTexturedModalRect(x + 174, y + 18, 244, 0, 12, 15);
@@ -138,9 +138,9 @@ public class GuiBrowser extends GuiContainer
 
         if (stack != null)
         {
-            int count = ((ContainerBrowser)inventorySlots).fakeInventoryClient.getStackSizeForSlot(slotIn.slotNumber);
+            int count = ((ContainerBrowser) inventorySlots).fakeInventoryClient.getStackSizeForSlot(slotIn.slotNumber);
 
-            if(count != 1)
+            if (count != 1)
             {
                 String s;
                 if (count >= 1000000000)
@@ -183,11 +183,11 @@ public class GuiBrowser extends GuiContainer
         super.handleMouseInput();
         int i = Mouse.getEventDWheel();
 
-        final ContainerBrowser container =  ((ContainerBrowser) inventorySlots);
+        final ContainerBrowser container = ((ContainerBrowser) inventorySlots);
         final int h = 62;
         final int bitHeight = 15;
         final int actualSlotCount = container.actualSlotCount;
-        final int rows = (int)Math.ceil(actualSlotCount / 9.0);
+        final int rows = (int) Math.ceil(actualSlotCount / 9.0);
 
         if (i != 0 && rows > ContainerBrowser.FakeRows)
         {
@@ -200,7 +200,7 @@ public class GuiBrowser extends GuiContainer
 
             row = Math.max(0, Math.min(scrollRows, row));
 
-            scrollY = row * (h-bitHeight) / scrollRows;
+            scrollY = row * (h - bitHeight) / scrollRows;
 
             container.setScrollPosition(row * 9);
         }
@@ -214,9 +214,9 @@ public class GuiBrowser extends GuiContainer
 
         final int w = 12;
         final int h = 62;
-        int mx = mouseX-174-x;
-        int my = mouseY-18-y;
-        if(mx >= 0 && mx < w && my >= 0 && my < h)
+        int mx = mouseX - 174 - x;
+        int my = mouseY - 18 - y;
+        if (mx >= 0 && mx < w && my >= 0 && my < h)
         {
             updateScrollPos(my);
             isDragging = true;
@@ -230,18 +230,18 @@ public class GuiBrowser extends GuiContainer
         final int h = 62;
         final int bitHeight = 15;
         final int actualSlotCount = ((ContainerBrowser) inventorySlots).actualSlotCount;
-        final int rows = (int)Math.ceil(actualSlotCount / 9.0);
+        final int rows = (int) Math.ceil(actualSlotCount / 9.0);
         final int scrollRows = rows - ContainerBrowser.FakeRows;
 
         boolean isEnabled = scrollRows > 0;
-        if(isEnabled)
+        if (isEnabled)
         {
-            double offset = (my-bitHeight/2.0) * scrollRows / (h-bitHeight);
-            int row = Math.round(Math.max(0, Math.min(scrollRows, (int)offset)));
+            double offset = (my - bitHeight / 2.0) * scrollRows / (h - bitHeight);
+            int row = Math.round(Math.max(0, Math.min(scrollRows, (int) offset)));
 
-            scrollY = row * (h-bitHeight) / scrollRows;
+            scrollY = row * (h - bitHeight) / scrollRows;
 
-            final ContainerBrowser container =  ((ContainerBrowser) inventorySlots);
+            final ContainerBrowser container = ((ContainerBrowser) inventorySlots);
             container.setScrollPosition(row * 9);
         }
     }
@@ -250,7 +250,7 @@ public class GuiBrowser extends GuiContainer
     protected void mouseClickMove(int mouseX, int mouseY, int clickedMouseButton, long timeSinceLastClick)
     {
         int y = (height - ySize) / 2;
-        int my = mouseY-18-y;
+        int my = mouseY - 18 - y;
         if (isDragging)
         {
             updateScrollPos(my);
@@ -263,8 +263,8 @@ public class GuiBrowser extends GuiContainer
     protected void mouseReleased(int mouseX, int mouseY, int state)
     {
         int y = (height - ySize) / 2;
-        int my = mouseY-18-y;
-        if(isDragging)
+        int my = mouseY - 18 - y;
+        if (isDragging)
         {
             updateScrollPos(my);
             isDragging = false;

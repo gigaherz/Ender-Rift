@@ -45,7 +45,7 @@ public class SetSortMode
         public IMessage onMessage(final SetSortMode message, MessageContext ctx)
         {
             final EntityPlayerMP player = ctx.getServerHandler().playerEntity;
-            final WorldServer world = (WorldServer)player.worldObj;
+            final WorldServer world = (WorldServer) player.worldObj;
 
             world.addScheduledTask(new Runnable()
             {
@@ -56,7 +56,7 @@ public class SetSortMode
                             && player.openContainer.windowId == message.windowId
                             && player.openContainer instanceof ContainerBrowser)
                     {
-                        ((ContainerBrowser)player.openContainer).setSortMode(message.sortMode);
+                        ((ContainerBrowser) player.openContainer).setSortMode(message.sortMode);
                     }
                 }
             });

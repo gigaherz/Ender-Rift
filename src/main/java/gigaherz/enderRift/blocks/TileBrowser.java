@@ -17,9 +17,9 @@ public class TileBrowser extends TileEntity
     public IBrowsableInventory getParent()
     {
         IInventoryAutomation automation = getAutomation();
-        if(automation instanceof IBrowsableInventory)
+        if (automation instanceof IBrowsableInventory)
         {
-            return (IBrowsableInventory)automation;
+            return (IBrowsableInventory) automation;
         }
         return null;
     }

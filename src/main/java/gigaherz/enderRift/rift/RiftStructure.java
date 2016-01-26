@@ -23,21 +23,21 @@ public class RiftStructure
 
     public static void init()
     {
-        StructurePattern = new Block[] {
+        StructurePattern = new Block[]{
                 // Bottom
-                Blocks.iron_block,     Blocks.redstone_block, Blocks.iron_block,
-                Blocks.redstone_block, Blocks.air,            Blocks.redstone_block,
-                Blocks.iron_block,     Blocks.redstone_block, Blocks.iron_block,
+                Blocks.iron_block, Blocks.redstone_block, Blocks.iron_block,
+                Blocks.redstone_block, Blocks.air, Blocks.redstone_block,
+                Blocks.iron_block, Blocks.redstone_block, Blocks.iron_block,
 
                 // Middle
-                Blocks.redstone_block, Blocks.air,            Blocks.redstone_block,
-                Blocks.air,            EnderRiftMod.rift,     Blocks.air,
-                Blocks.redstone_block, Blocks.air,            Blocks.redstone_block,
+                Blocks.redstone_block, Blocks.air, Blocks.redstone_block,
+                Blocks.air, EnderRiftMod.rift, Blocks.air,
+                Blocks.redstone_block, Blocks.air, Blocks.redstone_block,
 
                 // Top
-                Blocks.iron_block,     Blocks.redstone_block, Blocks.iron_block,
-                Blocks.redstone_block, Blocks.air,            Blocks.redstone_block,
-                Blocks.iron_block,     Blocks.redstone_block, Blocks.iron_block,
+                Blocks.iron_block, Blocks.redstone_block, Blocks.iron_block,
+                Blocks.redstone_block, Blocks.air, Blocks.redstone_block,
+                Blocks.iron_block, Blocks.redstone_block, Blocks.iron_block,
         };
     }
 
@@ -91,17 +91,17 @@ public class RiftStructure
             {
                 for (int xx = 0; xx <= 2; xx++)
                 {
-                    BlockPos bp = pos.add(xx-1, yy-1, zz-1);
+                    BlockPos bp = pos.add(xx - 1, yy - 1, zz - 1);
                     Block b = StructurePattern[yy * 9 + zz * 3 + xx];
                     Block w = world.getBlockState(bp).getBlock();
-                    if(b == Blocks.air)
+                    if (b == Blocks.air)
                     {
-                        if(!w.isAir(world, bp))
+                        if (!w.isAir(world, bp))
                             return false;
                     }
                     else if (b != EnderRiftMod.rift)
                     {
-                        if(b != w)
+                        if (b != w)
                             return false;
                     }
                 }
@@ -164,9 +164,9 @@ public class RiftStructure
                 for (int xx = 0; xx <= 2; xx++)
                 {
                     Block b = StructurePattern[yy * 9 + zz * 3 + xx];
-                    if(b != Blocks.air && b != EnderRiftMod.rift)
+                    if (b != Blocks.air && b != EnderRiftMod.rift)
                     {
-                        BlockPos bp = pos.add(xx-1, yy-1, zz-1);
+                        BlockPos bp = pos.add(xx - 1, yy - 1, zz - 1);
                         if (world.getBlockState(bp).getBlock() == EnderRiftMod.structure)
                             world.setBlockState(bp, b.getDefaultState());
                     }

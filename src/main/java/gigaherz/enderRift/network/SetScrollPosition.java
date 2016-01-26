@@ -1,17 +1,9 @@
 package gigaherz.enderRift.network;
 
-import gigaherz.enderRift.EnderRiftMod;
 import gigaherz.enderRift.gui.ContainerBrowser;
 import io.netty.buffer.ByteBuf;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
-import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
@@ -52,7 +44,7 @@ public class SetScrollPosition
         public IMessage onMessage(final SetScrollPosition message, MessageContext ctx)
         {
             final EntityPlayerMP player = ctx.getServerHandler().playerEntity;
-            final WorldServer world = (WorldServer)player.worldObj;
+            final WorldServer world = (WorldServer) player.worldObj;
 
             world.addScheduledTask(new Runnable()
             {
@@ -63,7 +55,7 @@ public class SetScrollPosition
                             && player.openContainer.windowId == message.windowId
                             && player.openContainer instanceof ContainerBrowser)
                     {
-                        ((ContainerBrowser)player.openContainer).setScrollPosition(message.position);
+                        ((ContainerBrowser) player.openContainer).setScrollPosition(message.position);
                     }
                 }
             });

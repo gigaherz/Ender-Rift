@@ -50,7 +50,7 @@ public class BlockBrowser
     public void onNeighborChange(IBlockAccess world, BlockPos pos, BlockPos neighbor)
     {
         IBlockState state = world.getBlockState(pos);
-        if(neighbor.equals(pos.offset(state.getValue(FACING))))
+        if (neighbor.equals(pos.offset(state.getValue(FACING))))
             world.getTileEntity(pos).markDirty();
         super.onNeighborChange(world, pos, neighbor);
     }

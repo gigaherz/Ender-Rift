@@ -12,7 +12,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.ITickable;
 
 import javax.annotation.Nonnull;
 import java.util.Random;
@@ -45,7 +44,7 @@ public class TileEnderRift
 
     public RiftInventory getInventory()
     {
-        if(riftId < 0)
+        if (riftId < 0)
             return null;
 
         if (inventory == null)

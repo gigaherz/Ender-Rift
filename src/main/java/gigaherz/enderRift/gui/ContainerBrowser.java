@@ -14,7 +14,10 @@ import gigaherz.enderRift.slots.SlotFakeServer;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.inventory.*;
+import net.minecraft.inventory.Container;
+import net.minecraft.inventory.ICrafting;
+import net.minecraft.inventory.IInventory;
+import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.IChatComponent;
 
@@ -49,7 +52,7 @@ public class ContainerBrowser
     {
         this.tile = tileEntity;
 
-        if(isClient)
+        if (isClient)
         {
             fakeInventoryClient = new FakeInventoryClient(FakeSlots);
             fakeInventoryServer = null;
@@ -109,7 +112,7 @@ public class ContainerBrowser
     @Override
     public void detectAndSendChanges()
     {
-        if(prevChangeCount != tile.changeCount && !tile.getWorld().isRemote)
+        if (prevChangeCount != tile.changeCount && !tile.getWorld().isRemote)
         {
             fakeInventoryServer.refresh();
             prevChangeCount = tile.changeCount;
@@ -135,7 +138,7 @@ public class ContainerBrowser
 
                 for (ICrafting crafter : this.crafters)
                 {
-                    if(i < FakeSlots)
+                    if (i < FakeSlots)
                         EnderRiftMod.channel.sendTo(new SetSpecialSlot(windowId, i, current), (EntityPlayerMP) crafter);
                     else
                         crafter.sendSlotContents(this, i, current);
@@ -153,7 +156,7 @@ public class ContainerBrowser
     @Override
     public void updateProgressBar(int id, int data)
     {
-        if(id == 0)
+        if (id == 0)
             actualSlotCount = data;
     }
 
@@ -171,7 +174,7 @@ public class ContainerBrowser
     {
         this.sortMode = sortMode;
 
-        if(!tile.getWorld().isRemote)
+        if (!tile.getWorld().isRemote)
         {
             fakeInventoryServer.resort();
         }
@@ -201,7 +204,7 @@ public class ContainerBrowser
             Slot slot = this.inventorySlots.get(slotId);
             ItemStack existing = slot.getStack();
 
-            if(mode == 0)
+            if (mode == 0)
             {
                 int amount = 1;
                 ItemStack dropping = inventoryPlayer.getItemStack();
@@ -225,10 +228,10 @@ public class ContainerBrowser
 
                         dropping.stackSize -= push.stackSize;
 
-                        if(remaining != null)
+                        if (remaining != null)
                             dropping.stackSize += remaining.stackSize;
 
-                        if(dropping.stackSize <= 0)
+                        if (dropping.stackSize <= 0)
                             dropping = null;
 
                         inventoryPlayer.setItemStack(dropping);
@@ -249,16 +252,16 @@ public class ContainerBrowser
 
                         dropping.stackSize -= push.stackSize;
 
-                        if(remaining != null)
+                        if (remaining != null)
                             dropping.stackSize += remaining.stackSize;
 
-                        if(dropping.stackSize <= 0)
+                        if (dropping.stackSize <= 0)
                             dropping = null;
 
                         inventoryPlayer.setItemStack(dropping);
                     }
                 }
-                else if(existing != null)
+                else if (existing != null)
                 {
                     ItemStack extracted = parent.extractItems(existing, amount);
                     inventoryPlayer.setItemStack(extracted);
@@ -267,13 +270,13 @@ public class ContainerBrowser
                 detectAndSendChanges();
                 return slot.getStack();
             }
-            else if (mode == 1)
+            else if (mode == 1 && existing != null)
             {
                 int amount = existing.getMaxStackSize();
                 if (clickedButton != 0 && amount > 1)
                     amount /= 2;
 
-                if(amount == 0)
+                if (amount == 0)
                     return null;
 
                 ItemStack extracted = parent.simulateExtraction(existing, amount);
@@ -364,14 +367,14 @@ public class ContainerBrowser
 
             slots.clear();
 
-            if(inv == null)
+            if (inv == null)
                 return;
 
             int invSlots = inv.getSizeInventory();
-            for(int j=0;j<invSlots;j++)
+            for (int j = 0; j < invSlots; j++)
             {
                 ItemStack invStack = inv.getStackInSlot(j);
-                if(invStack == null)
+                if (invStack == null)
                     continue;
 
                 boolean found = false;
@@ -398,9 +401,9 @@ public class ContainerBrowser
 
         public void resort()
         {
-            if(sortMode == null)
+            if (sortMode == null)
                 return;
-            switch(sortMode)
+            switch (sortMode)
             {
                 case Alphabetic:
                     slots.sort(new Comparator<ItemStack>()
@@ -419,8 +422,8 @@ public class ContainerBrowser
                         public int compare(ItemStack a, ItemStack b)
                         {
                             int diff = a.stackSize - b.stackSize;
-                            if(diff > 0) return -1;
-                            if(diff < 0) return 1;
+                            if (diff > 0) return -1;
+                            if (diff < 0) return 1;
                             return 0;
                         }
                     });
@@ -442,9 +445,9 @@ public class ContainerBrowser
         @Override
         public ItemStack getStackInSlot(int index)
         {
-            if((index+scroll) >= slots.size())
+            if ((index + scroll) >= slots.size())
                 return null;
-            return slots.get(index+scroll);
+            return slots.get(index + scroll);
         }
 
         @Override
@@ -541,7 +544,6 @@ public class ContainerBrowser
         {
             return null;
         }
-
     }
 
     public class FakeInventoryClient implements IInventory
@@ -564,18 +566,18 @@ public class ContainerBrowser
         @Override
         public ItemStack getStackInSlot(int index)
         {
-            if(index >= totals.length)
+            if (index >= totals.length)
                 return null;
             return singles[index];
         }
 
         public int getStackSizeForSlot(int index)
         {
-            if(index >= totals.length)
+            if (index >= totals.length)
                 return 0;
 
             ItemStack stack = totals[index];
-            if(stack == null)
+            if (stack == null)
                 return 0;
 
             return stack.stackSize;
@@ -596,11 +598,11 @@ public class ContainerBrowser
         @Override
         public void setInventorySlotContents(int index, ItemStack stack)
         {
-            if(index >= totals.length)
+            if (index >= totals.length)
                 return;
 
             totals[index] = stack;
-            if(stack != null)
+            if (stack != null)
             {
                 ItemStack single = stack.copy();
                 single.stackSize = 1;
