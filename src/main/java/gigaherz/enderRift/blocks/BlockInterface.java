@@ -14,6 +14,7 @@ import net.minecraft.inventory.InventoryHelper;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
 public class BlockInterface
@@ -42,9 +43,17 @@ public class BlockInterface
     @Override
     public void onNeighborBlockChange(World worldIn, BlockPos pos, IBlockState state, Block neighborBlock)
     {
-        // Allow the TE to rescan the neighbouring TE
-        worldIn.getTileEntity(pos).markDirty();
-        super.onNeighborBlockChange(worldIn, pos, state, neighborBlock);
+        TileEntity te = worldIn.getTileEntity(pos);
+        if (te != null)
+            te.markDirty();
+    }
+
+    @Override
+    public void onNeighborChange(IBlockAccess world, BlockPos pos, BlockPos neighbor)
+    {
+        IBlockState state = world.getBlockState(pos);
+        if (neighbor.equals(pos.offset(state.getValue(FACING))))
+            ((TileInterface) world.getTileEntity(pos)).broadcastDirty();
     }
 
     @Override

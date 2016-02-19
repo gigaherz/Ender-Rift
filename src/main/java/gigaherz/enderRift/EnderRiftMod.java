@@ -32,8 +32,7 @@ import org.apache.logging.log4j.Logger;
 @Mod(name = EnderRiftMod.NAME,
         modid = EnderRiftMod.MODID,
         version = EnderRiftMod.VERSION,
-        dependencies = "after:Waila",
-        acceptedMinecraftVersions = "1.8.8,1.8.9")
+        dependencies = "after:Waila")
 public class EnderRiftMod
 {
     public static final String NAME = "Ender-Rift";
@@ -46,6 +45,7 @@ public class EnderRiftMod
     public static Block riftInterface;
     public static Block generator;
     public static Block browser;
+    public static Block extension;
     public static Item riftOrb;
 
     public static CreativeTabs tabEnderRift;
@@ -97,11 +97,15 @@ public class EnderRiftMod
         generator = new BlockGenerator();
         GameRegistry.registerBlock(generator, "blockGenerator");
 
+        extension = new BlockProxy();
+        GameRegistry.registerBlock(extension, "blockProxy");
+
         GameRegistry.registerTileEntity(TileEnderRift.class, "tileEnderRift");
         GameRegistry.registerTileEntity(TileEnderRiftCorner.class, "tileStructureCorner");
         GameRegistry.registerTileEntity(TileInterface.class, "tileInterface");
         GameRegistry.registerTileEntity(TileBrowser.class, "tileBrowser");
         GameRegistry.registerTileEntity(TileGenerator.class, "tileGenerator");
+        GameRegistry.registerTileEntity(TileProxy.class, "tileProxy");
 
         RecipeSorter.register(MODID + ":rift_duplication", RecipesRiftDuplication.class, RecipeSorter.Category.SHAPELESS, "after:minecraft:shapeless");
 
@@ -148,6 +152,15 @@ public class EnderRiftMod
                 'h', Blocks.hopper,
                 'r', Blocks.redstone_block,
                 'i', Blocks.iron_block);
+
+        GameRegistry.addRecipe(new ItemStack(browser),
+                "igi",
+                "gfg",
+                "iri",
+                'f', riftInterface,
+                'g', Items.glowstone_dust,
+                'r', Items.redstone,
+                'i', Items.iron_ingot);
 
         GameRegistry.addRecipe(new ItemStack(generator),
                 "iri",

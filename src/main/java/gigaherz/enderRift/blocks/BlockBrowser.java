@@ -42,8 +42,9 @@ public class BlockBrowser
     @Override
     public void onNeighborBlockChange(World worldIn, BlockPos pos, IBlockState state, Block neighborBlock)
     {
-        worldIn.getTileEntity(pos).markDirty();
-        super.onNeighborBlockChange(worldIn, pos, state, neighborBlock);
+        TileEntity te = worldIn.getTileEntity(pos);
+        if (te != null)
+            te.markDirty();
     }
 
     @Override
@@ -51,8 +52,7 @@ public class BlockBrowser
     {
         IBlockState state = world.getBlockState(pos);
         if (neighbor.equals(pos.offset(state.getValue(FACING))))
-            world.getTileEntity(pos).markDirty();
-        super.onNeighborChange(world, pos, neighbor);
+            ((TileBrowser) world.getTileEntity(pos)).broadcastDirty();
     }
 
     @Override

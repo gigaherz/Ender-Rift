@@ -1,5 +1,9 @@
 package gigaherz.enderRift.blocks;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
+import gigaherz.api.automation.AutomationAggregator;
+import gigaherz.api.automation.AutomationHelper;
 import gigaherz.api.automation.IInventoryAutomation;
 import gigaherz.enderRift.EnderRiftMod;
 import net.minecraft.block.state.IBlockState;
@@ -9,48 +13,96 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.IChatComponent;
 import net.minecraft.util.ITickable;
+import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants;
 
+import java.util.List;
+import java.util.Set;
+
 public class TileInterface extends TileEntity
-        implements IInventory, ITickable
+        implements IInventory, ITickable, IBrowserExtension
 {
     static final int FilterCount = 9;
 
     final ItemStack[] filters = new ItemStack[FilterCount];
     final ItemStack[] outputs = new ItemStack[FilterCount];
 
-    boolean parentSearched;
-    IInventoryAutomation parent;
+    boolean needsRefresh = true;
+    final AutomationAggregator aggregator = new AutomationAggregator();
 
-    public IInventoryAutomation getParent()
+    public IInventoryAutomation getAutomation()
     {
-        if (!parentSearched)
+        if (needsRefresh)
         {
             IBlockState state = worldObj.getBlockState(getPos());
-            TileEntity te = worldObj.getTileEntity(pos.offset(state.getValue(BlockInterface.FACING)));
-            if (te instanceof IInventoryAutomation)
+            EnumFacing facing = state.getValue(BlockInterface.FACING);
+            TileEntity te = worldObj.getTileEntity(pos.offset(facing));
+            if (te != null)
             {
-                parent = (IInventoryAutomation) te;
+                if (te instanceof IBrowserExtension)
+                {
+                    List<IInventoryAutomation> seen = Lists.newArrayList();
+                    Set<BlockPos> scanned = Sets.newHashSet();
+                    scanned.add(this.pos);
+
+                    ((IBrowserExtension) te).gatherNeighbours(seen, scanned, facing.getOpposite(), 1);
+
+                    aggregator.addAll(seen);
+                }
+                else
+                {
+                    IInventoryAutomation automated = AutomationHelper.get(te, facing.getOpposite());
+                    if (automated != null)
+                        aggregator.add(automated);
+                }
             }
-            parentSearched = true;
+            needsRefresh = false;
         }
-        return parent;
+
+        return aggregator;
     }
 
     @Override
     public void markDirty()
     {
-        parentSearched = false;
-        parent = null;
+        broadcastDirty();
         super.markDirty();
+    }
+
+    public void broadcastDirty()
+    {
+        Set<BlockPos> scanned = Sets.newHashSet();
+        scanned.add(pos);
+        this.markDirty(scanned, 0);
+    }
+
+    @Override
+    public void markDirty(Set<BlockPos> scanned, int distance)
+    {
+        needsRefresh = true;
+        aggregator.clear();
+    }
+
+    @Override
+    public void gatherNeighbours(List<IInventoryAutomation> seen, Set<BlockPos> scanned, EnumFacing faceFrom, int distance)
+    {
+        // Do nothing here, it's the proxies that matter
+    }
+
+    @Override
+    public boolean shouldRefresh(World world, BlockPos pos, IBlockState oldState, IBlockState newSate)
+    {
+        return oldState.getBlock() != newSate.getBlock();
     }
 
     @Override
     public void update()
     {
-        if (getParent() == null)
+        if (getAutomation() == null)
             return;
 
         boolean anyChanged = false;
@@ -62,7 +114,7 @@ public class TileInterface extends TileEntity
                 if (outputs[i] == null)
                 {
                     int free = 64;
-                    outputs[i] = getParent().extractItems(filters[i], free);
+                    outputs[i] = getAutomation().extractItems(filters[i], free);
                     if (outputs[i] != null)
                         anyChanged = true;
                 }
@@ -71,7 +123,7 @@ public class TileInterface extends TileEntity
                     int free = outputs[i].getMaxStackSize() - outputs[i].stackSize;
                     if (free > 0)
                     {
-                        ItemStack extracted = getParent().extractItems(filters[i], free);
+                        ItemStack extracted = getAutomation().extractItems(filters[i], free);
                         if (extracted != null)
                         {
                             outputs[i].stackSize += extracted.stackSize;
@@ -82,7 +134,7 @@ public class TileInterface extends TileEntity
                 else if (outputs[i] != null)
                 {
                     int stackSize = outputs[i].stackSize;
-                    outputs[i] = getParent().pushItems(outputs[i]);
+                    outputs[i] = getAutomation().pushItems(outputs[i]);
                     if (outputs[i] == null || stackSize != outputs[i].stackSize)
                         anyChanged = true;
                 }
@@ -90,7 +142,7 @@ public class TileInterface extends TileEntity
             else if (outputs[i] != null)
             {
                 int stackSize = outputs[i].stackSize;
-                outputs[i] = getParent().pushItems(outputs[i]);
+                outputs[i] = getAutomation().pushItems(outputs[i]);
                 if (outputs[i] == null || stackSize != outputs[i].stackSize)
                     anyChanged = true;
             }

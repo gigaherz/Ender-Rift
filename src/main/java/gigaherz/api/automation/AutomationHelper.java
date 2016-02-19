@@ -58,6 +58,27 @@ public abstract class AutomationHelper implements IInventoryAutomation, IBrowsab
         return null;
     }
 
+    public static boolean isAutomatable(Object object, EnumFacing facing)
+    {
+        // If the inventory is already automated, return it.
+        if (object instanceof IInventoryAutomation)
+            return true;
+
+        // If the inventory is better sided, make use of it.
+        if (object instanceof ICapabilityProvider)
+        {
+            ICapabilityProvider cap = (ICapabilityProvider) object;
+
+            if (cap.hasCapability(CapabilityAutomation.AUTOMATION_CAPABILITY, facing))
+                return true;
+
+            if (cap.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, facing))
+                return true;
+        }
+
+        return object instanceof ISidedInventory || object instanceof IInventory;
+    }
+
     private static class ItemHandlerWrapper extends AutomationHelper
     {
         IItemHandler parent;
@@ -136,19 +157,16 @@ public abstract class AutomationHelper implements IInventoryAutomation, IBrowsab
                 ItemStack slot = parent.getStackInSlot(i);
                 if (slot != null)
                 {
-                    int available = Math.min(wanted, slot.stackSize);
-                    if (available > 0 && ItemStack.areItemsEqual(slot, stack) && ItemStack.areItemStackTagsEqual(slot, stack))
+                    int requested = Math.min(wanted, slot.stackSize);
+                    if (requested > 0 && ItemStack.areItemsEqual(slot, stack) && ItemStack.areItemStackTagsEqual(slot, stack))
                     {
-                        ItemStack obtained = parent.extractItem(i, available, simulate);
+                        ItemStack obtained = parent.extractItem(i, requested, simulate);
 
-                        if (obtained != null)
-                            available = obtained.stackSize;
-                        else
-                            available = 0;
+                        int returned = (obtained != null) ? obtained.stackSize : 0;
 
-                        extracted.stackSize += available;
+                        extracted.stackSize += returned;
 
-                        wanted -= available;
+                        wanted -= returned;
                         if (wanted <= 0)
                             break;
                     }

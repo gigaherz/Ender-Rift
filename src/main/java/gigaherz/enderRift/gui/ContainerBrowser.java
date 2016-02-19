@@ -112,10 +112,10 @@ public class ContainerBrowser
     @Override
     public void detectAndSendChanges()
     {
-        if (prevChangeCount != tile.changeCount && !tile.getWorld().isRemote)
+        if (prevChangeCount != tile.getChangeCount() && !tile.getWorld().isRemote)
         {
             fakeInventoryServer.refresh();
-            prevChangeCount = tile.changeCount;
+            prevChangeCount = tile.getChangeCount();
 
             actualSlotCount = fakeInventoryServer.getRealSizeInventory();
 
@@ -363,7 +363,7 @@ public class ContainerBrowser
 
         public void refresh()
         {
-            IBrowsableInventory inv = tile.getParent();
+            IBrowsableInventory inv = tile.getBrowsable();
 
             slots.clear();
 
@@ -424,7 +424,7 @@ public class ContainerBrowser
                             int diff = a.stackSize - b.stackSize;
                             if (diff > 0) return -1;
                             if (diff < 0) return 1;
-                            return 0;
+                            return a.getDisplayName().compareToIgnoreCase(b.getDisplayName());
                         }
                     });
                     break;

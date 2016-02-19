@@ -3,6 +3,7 @@ package gigaherz.enderRift.blocks;
 import cofh.api.energy.IEnergyProvider;
 import cofh.api.energy.IEnergyReceiver;
 import gigaherz.enderRift.EnderRiftMod;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
@@ -10,9 +11,11 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityFurnace;
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.IChatComponent;
 import net.minecraft.util.ITickable;
+import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants;
 
 public class TileGenerator extends TileEntity
@@ -34,6 +37,12 @@ public class TileGenerator extends TileEntity
     int currentItemBurnTime;
     int powerLevel;
     int timeInterval;
+
+    @Override
+    public boolean shouldRefresh(World world, BlockPos pos, IBlockState oldState, IBlockState newSate)
+    {
+        return oldState.getBlock() != newSate.getBlock();
+    }
 
     @Override
     public void update()

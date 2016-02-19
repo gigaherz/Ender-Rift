@@ -63,6 +63,8 @@ public class TileEnderRift
 
     public double getEnergyInsert()
     {
+        if (getInventory() == null)
+            return 0;
         int sizeInventory = getInventory().getSizeInventory();
         int sizeInventory2 = sizeInventory * sizeInventory;
         return ConfigValues.PowerPerInsertionConstant
@@ -72,6 +74,8 @@ public class TileEnderRift
 
     public double getEnergyExtract()
     {
+        if (getInventory() == null)
+            return 0;
         int sizeInventory = getInventory().getSizeInventory();
         int sizeInventory2 = sizeInventory * sizeInventory;
         return ConfigValues.PowerPerExtractionConstant
@@ -162,6 +166,9 @@ public class TileEnderRift
     @Override
     public ItemStack pushItems(@Nonnull ItemStack stack)
     {
+        if (getInventory() == null)
+            return stack;
+
         int stackSize = stack.stackSize;
         int cost = getEffectivePowerUsageToInsert(stackSize);
         while (cost > this.energyBuffer && stackSize > 0)
@@ -192,6 +199,9 @@ public class TileEnderRift
     @Override
     public ItemStack pullItems(int limit, Predicate<ItemStack> filter)
     {
+        if (getInventory() == null)
+            return null;
+
         int cost = getEffectivePowerUsageToExtract(limit);
         while (cost > this.energyBuffer && limit > 0)
         {
@@ -214,6 +224,9 @@ public class TileEnderRift
     @Override
     public ItemStack extractItems(@Nonnull ItemStack stack, int wanted)
     {
+        if (getInventory() == null)
+            return null;
+
         int cost = getEffectivePowerUsageToExtract(wanted);
         while (cost > this.energyBuffer && wanted > 0)
         {
@@ -236,6 +249,9 @@ public class TileEnderRift
     @Override
     public ItemStack simulateExtraction(@Nonnull ItemStack stack, int wanted)
     {
+        if (getInventory() == null)
+            return null;
+
         int cost = getEffectivePowerUsageToExtract(wanted);
         while (cost > this.energyBuffer && wanted > 0)
         {
@@ -255,18 +271,27 @@ public class TileEnderRift
     @Override
     public int getSizeInventory()
     {
-        return inventory.getSizeInventory();
+        if (getInventory() == null)
+            return 0;
+
+        return getInventory().getSizeInventory();
     }
 
     @Override
     public ItemStack getStackInSlot(int index)
     {
-        return inventory.getStackInSlot(index);
+        if (getInventory() == null)
+            return null;
+
+        return getInventory().getStackInSlot(index);
     }
 
     public ItemStack chooseRandomStack()
     {
-        int max = inventory.getSizeInventory();
+        if (getInventory() == null)
+            return null;
+
+        int max = getInventory().getSizeInventory();
 
         if (max <= 0)
             return null;

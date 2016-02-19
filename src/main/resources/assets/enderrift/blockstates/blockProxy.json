@@ -1,0 +1,83 @@
+{
+  "forge_marker": 1,
+  "defaults": {
+    "model": "enderrift:proxy_main.obj",
+    "textures": {
+      "#Face": "enderrift:blocks/browser"
+    }
+  },
+  "variants": {
+    "inventory": [{ "transform": "forge:default-block" }],
+    "up": {
+      "false": {
+      },
+      "true": {
+        "submodel": {
+          "up": {
+            "model": "enderrift:proxy_connection.obj",
+            "x": 90
+          }
+        }
+      }
+    },
+    "down": {
+      "false": {
+      },
+      "true": {
+        "submodel": {
+          "down": {
+            "model": "enderrift:proxy_connection.obj",
+            "x": 270
+          }
+        }
+      }
+    },
+    "east": {
+      "false": {
+      },
+      "true": {
+        "submodel": {
+          "east": {
+            "model": "enderrift:proxy_connection.obj",
+            "y": 270
+          }
+        }
+      }
+    },
+    "west": {
+      "false": {
+      },
+      "true": {
+        "submodel": {
+          "west": {
+            "model": "enderrift:proxy_connection.obj",
+            "y": 90
+          }
+        }
+      }
+    },
+    "north": {
+      "false": {
+      },
+      "true": {
+        "submodel": {
+          "north": {
+            "model": "enderrift:proxy_connection.obj",
+            "y": 180
+          }
+        }
+      }
+    },
+    "south": {
+      "false": {
+      },
+      "true": {
+        "submodel": {
+          "south": {
+            "model": "enderrift:proxy_connection.obj"
+          }
+        }
+      }
+    }
+  }
+}
