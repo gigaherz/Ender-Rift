@@ -6,15 +6,13 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.world.IBlockAccess;
 
 /**
- * Implement this interface on blocks which have some debug method which can be activated via a tool or other means.
- *
- * @author King Lemming
+ * Implement this interface on blocks which have a GUI that needs a tool (e.g., Multimeter) to open.
  *
  */
-public interface IBlockDebug {
+public interface IBlockConfigGui {
 
 	/**
-	 * This function debugs a block.
+	 * This function will open a GUI if the player has permission.
 	 *
 	 * @param world
 	 *            Reference to the world.
@@ -23,8 +21,9 @@ public interface IBlockDebug {
 	 * @param side
 	 *            The side of the block.
 	 * @param player
-	 *            Player doing the debugging.
+	 *            Player doing the configuring.
+	 * @return True if the GUI was opened.
 	 */
-	void debugBlock(IBlockAccess world, BlockPos pos, EnumFacing side, EntityPlayer player);
-
+	public boolean openConfigGui(IBlockAccess world, BlockPos pos, EnumFacing side, EntityPlayer player);
+	
 }
