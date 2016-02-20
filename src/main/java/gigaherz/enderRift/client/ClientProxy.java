@@ -7,7 +7,6 @@ import gigaherz.enderRift.network.SetSpecialSlot;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.inventory.GuiContainerCreative;
-import net.minecraft.client.resources.model.ModelBakery;
 import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
@@ -34,6 +33,7 @@ public class ClientProxy implements IModProxy
         registerBlockModelAsItem(EnderRiftMod.riftInterface, "blockInterface");
         registerBlockModelAsItem(EnderRiftMod.generator, "blockGenerator");
         registerBlockModelAsItem(EnderRiftMod.browser, "blockBrowser");
+        registerBlockModelAsItem(EnderRiftMod.extension, "blockProxy");
 
         MinecraftForge.EVENT_BUS.register(this);
         RenderingStuffs.init();
@@ -58,7 +58,6 @@ public class ClientProxy implements IModProxy
     public void registerItemModel(final Item item, int meta, final String itemName)
     {
         ModelLoader.setCustomModelResourceLocation(item, meta, new ModelResourceLocation(EnderRiftMod.MODID + ":" + itemName, "inventory"));
-        ModelBakery.addVariantName(item, EnderRiftMod.MODID + ":" + itemName);
     }
 
     @Override

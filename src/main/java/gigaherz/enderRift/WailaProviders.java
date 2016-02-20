@@ -102,7 +102,7 @@ public class WailaProviders
             TileGenerator rift = (TileGenerator) te;
 
             tag.setBoolean("isBurning", rift.isBurning());
-            tag.setInteger("powerGen", rift.getPowerGeneration());
+            tag.setInteger("powerGen", rift.getGenerationPower());
             tag.setInteger("energy", rift.getField(2));
             tag.setInteger("heat", rift.getField(3));
 

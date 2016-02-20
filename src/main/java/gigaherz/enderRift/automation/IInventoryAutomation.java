@@ -1,4 +1,4 @@
-package gigaherz.api.automation;
+package gigaherz.enderRift.automation;
 
 import com.google.common.base.Predicate;
 import net.minecraft.item.ItemStack;
@@ -8,6 +8,26 @@ import javax.annotation.Nonnull;
 
 public interface IInventoryAutomation
 {
+    /**
+     * Gets the current number of slots in the inventory.
+     * Named after the IInventory method for convenience.
+     *
+     * @return Returns the number of slots.
+     */
+    int getSizeInventory();
+
+    /**
+     * Gets the contents of the slot in the inventory.
+     * Named after the IInventory method for convenience.
+     * This stack should only ever be used for display,
+     * WARNING: IMPORTANT ---> DO NOT MODIFY THE STACK! <--- IMPORTANT: WARNING
+     * You should always use the IInventoryAutomation methods to add/remove items!
+     *
+     * @param index The index of the slot to peek at.
+     * @return Returns the stack contained in the slot. DO NOT MODIFY!
+     */
+    ItemStack getStackInSlot(int index);
+
     /**
      * Gets the corresponding sub-inventory for the given side.
      *
@@ -36,19 +56,10 @@ public interface IInventoryAutomation
      * Tries to extract a specific amount of a certain item, as defined by the provided ItemStack.
      * Will attempt to gather from more than one stack.
      *
-     * @param stack  The item to extract.
-     * @param wanted The quantity being requested.
+     * @param stack    The item to extract.
+     * @param wanted   The quantity being requested.
+     * @param simulate
      * @return Returns the items that were extracted. Can be null.
      */
-    ItemStack extractItems(@Nonnull ItemStack stack, int wanted);
-
-    /**
-     * Pretends to extract a specific amount of a certain item, but does not actually perform the extraction.
-     * Will attempt to gather from more than one stack.
-     *
-     * @param stack  The item to extract.
-     * @param wanted The quantity being requested.
-     * @return Returns the items that were extracted. Can be null.
-     */
-    ItemStack simulateExtraction(@Nonnull ItemStack stack, int wanted);
+    ItemStack extractItems(@Nonnull ItemStack stack, int wanted, boolean simulate);
 }

@@ -1,13 +1,14 @@
 package gigaherz.enderRift.blocks;
 
+import com.google.common.collect.Queues;
 import com.google.common.collect.Sets;
-import gigaherz.api.automation.AutomationHelper;
-import gigaherz.api.automation.IInventoryAutomation;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
+import org.apache.commons.lang3.tuple.Pair;
+import org.apache.commons.lang3.tuple.Triple;
 
-import java.util.List;
+import java.util.Queue;
 import java.util.Set;
 
 public class TileProxy extends TileEntity implements IBrowserExtension
@@ -24,41 +25,53 @@ public class TileProxy extends TileEntity implements IBrowserExtension
     public void broadcastDirty()
     {
         Set<BlockPos> scanned = Sets.newHashSet();
-        scanned.add(pos);
-        this.markDirty(scanned, 0);
-    }
+        Queue<Pair<BlockPos, Integer>> pending = Queues.newArrayDeque();
 
-    @Override
-    public void gatherNeighbours(List<IInventoryAutomation> seen, Set<BlockPos> scanned, EnumFacing faceFrom, int distance)
-    {
-        for (EnumFacing facing : EnumFacing.VALUES)
+        pending.add(Pair.of(this.pos, 0));
+
+        while (pending.size() > 0)
         {
-            BlockPos pos2 = pos.offset(facing);
-            if (!scanned.contains(pos2))
+            Pair<BlockPos, Integer> pair = pending.remove();
+            BlockPos pos2 = pair.getLeft();
+
+            if (scanned.contains(pos2))
             {
-                scanned.add(pos2);
-                TileEntity te = worldObj.getTileEntity(pos2);
-                if (te != null)
-                {
-                    if (distance < MAX_SCAN_DISTANCE)
-                    {
-                        if (te instanceof IBrowserExtension)
-                        {
-                            ((IBrowserExtension) te).gatherNeighbours(seen, scanned, facing.getOpposite(), distance + 1);
-                        }
-                        else
-                        {
-                            IInventoryAutomation automated = AutomationHelper.get(te, facing.getOpposite());
-                            if (automated != null) seen.add(automated);
-                        }
-                    }
-                }
+                continue;
+            }
+
+            scanned.add(pos2);
+
+            int distance = pair.getRight();
+
+            if (distance >= TileProxy.MAX_SCAN_DISTANCE)
+            {
+                continue;
+            }
+
+            TileEntity te = worldObj.getTileEntity(pos2);
+            if (te instanceof IBrowserExtension)
+            {
+                ((IBrowserExtension) te).markDirty(scanned, distance + 1, pending);
             }
         }
     }
 
     @Override
-    public void markDirty(Set<BlockPos> scanned, int distance)
+    public void gatherNeighbours(Queue<Triple<BlockPos, EnumFacing, Integer>> pending, EnumFacing faceFrom, int distance)
+    {
+        if (worldObj == null)
+            return;
+
+        for (EnumFacing facing : EnumFacing.VALUES)
+        {
+            BlockPos pos2 = pos.offset(facing);
+
+            pending.add(Triple.of(pos2, facing, distance));
+        }
+    }
+
+    @Override
+    public void markDirty(Set<BlockPos> scanned, int distance, Queue<Pair<BlockPos, Integer>> pending)
     {
         if (worldObj == null)
             return;
@@ -68,17 +81,9 @@ public class TileProxy extends TileEntity implements IBrowserExtension
             BlockPos pos2 = pos.offset(facing);
             if (!scanned.contains(pos2))
             {
-                scanned.add(pos2);
-                TileEntity te = worldObj.getTileEntity(pos2);
-                if (te != null)
+                if (distance < MAX_SCAN_DISTANCE)
                 {
-                    if (te instanceof IBrowserExtension)
-                    {
-                        if (distance < MAX_SCAN_DISTANCE)
-                        {
-                            ((IBrowserExtension) te).markDirty(scanned, distance + 1);
-                        }
-                    }
+                    pending.add(Pair.of(pos2, distance));
                 }
             }
         }

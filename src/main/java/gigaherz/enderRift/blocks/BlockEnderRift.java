@@ -207,7 +207,7 @@ public class BlockEnderRift
 
         int numberToExtract = playerIn.isSneaking() ? 1 : stack.getMaxStackSize();
 
-        ItemStack extracted = rift.extractItems(stack.copy(), numberToExtract);
+        ItemStack extracted = rift.extractItems(stack.copy(), numberToExtract, false);
 
         if (extracted != null && extracted.stackSize > 0)
         {

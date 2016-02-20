@@ -41,11 +41,11 @@ public class GuiGenerator extends GuiContainer
         mc.fontRendererObj.drawString(StatCollector.translateToLocal(this.player.getName()), 8, ySize - 96 + 2, 0x404040);
 
         String label;
-        if (tile.getPowerGeneration() > 0)
+        if (tile.getGenerationPower() > 0)
         {
             label = StatCollector.translateToLocal("text." + EnderRiftMod.MODID + ".generator.status.generating.label");
             mc.fontRendererObj.drawString(label, 8, 22, 0x404040);
-            mc.fontRendererObj.drawString(String.format("%d RF/t", tile.getPowerGeneration()), 12, 32, 0x404040);
+            mc.fontRendererObj.drawString(String.format("%d RF/t", tile.getGenerationPower()), 12, 32, 0x404040);
         }
         else if (tile.isBurning())
         {
@@ -62,7 +62,7 @@ public class GuiGenerator extends GuiContainer
         mc.fontRendererObj.drawString(label, 8, 46, 0x404040);
         mc.fontRendererObj.drawString(String.format("%d C", tile.getHeatValue()), 12, 56, getHeatColor());
 
-        String str = String.format("%d RF", tile.getPowerLevel());
+        String str = String.format("%d RF", tile.getContainedEnergy());
         mc.fontRendererObj.drawString(str, xSize - 8 - mc.fontRendererObj.getStringWidth(str), 64, 0x404040);
 
         drawBarTooltip(i, j, xSize - 14 - 8, 20);
@@ -80,7 +80,7 @@ public class GuiGenerator extends GuiContainer
 
         List<String> tooltip = Lists.newArrayList();
         tooltip.add(StatCollector.translateToLocal("text." + EnderRiftMod.MODID + ".generator.energy.label"));
-        tooltip.add(String.format("%d / %d RF", tile.getPowerLevel(), TileGenerator.PowerLimit));
+        tooltip.add(String.format("%d / %d RF", tile.getContainedEnergy(), TileGenerator.PowerLimit));
 
         drawHoveringText(tooltip, mx - x, my - y);
     }
@@ -102,7 +102,7 @@ public class GuiGenerator extends GuiContainer
             this.drawTexturedModalRect(x + 80, y + 36 + 12 - k, 176, 12 - k, 14, k + 1);
         }
 
-        drawEnergyBar(x + xSize - 14 - 8, y + 20, tile.getPowerLevel(), TileGenerator.PowerLimit);
+        drawEnergyBar(x + xSize - 14 - 8, y + 20, tile.getContainedEnergy(), TileGenerator.PowerLimit);
     }
 
     private void drawEnergyBar(int x, int y, int powerLevel, int powerLimit)

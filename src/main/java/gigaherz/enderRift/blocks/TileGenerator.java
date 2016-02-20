@@ -35,7 +35,7 @@ public class TileGenerator extends TileEntity
     int heatLevel;
     int burnTimeRemaining;
     int currentItemBurnTime;
-    int powerLevel;
+    int containedEnergy;
     int timeInterval;
 
     @Override
@@ -75,14 +75,14 @@ public class TileGenerator extends TileEntity
             }
         }
 
-        if (heatLevel >= MinHeat && powerLevel < PowerLimit)
+        if (heatLevel >= MinHeat && containedEnergy < PowerLimit)
         {
-            int powerGen = getPowerGeneration();
-            powerLevel = Math.min(powerLevel + powerGen, PowerLimit);
+            int powerGen = getGenerationPower();
+            containedEnergy = Math.min(containedEnergy + powerGen, PowerLimit);
             anyChanged = true;
         }
 
-        if (burnTimeRemaining <= 0 && powerLevel < PowerLimit)
+        if (burnTimeRemaining <= 0 && containedEnergy < PowerLimit)
         {
             if (inputs[0] != null)
             {
@@ -95,7 +95,7 @@ public class TileGenerator extends TileEntity
             }
         }
 
-        int sendPower = Math.min(PowerTransferMax, powerLevel);
+        int sendPower = Math.min(PowerTransferMax, containedEnergy);
         if (sendPower > 0)
         {
             IEnergyReceiver[] receivers = new IEnergyReceiver[6];
@@ -126,10 +126,10 @@ public class TileGenerator extends TileEntity
                     if (r == null || wanted == 0)
                         continue;
 
-                    int given = Math.min(Math.min(powerLevel, wanted), wanted * accepted / sendPower);
+                    int given = Math.min(Math.min(containedEnergy, wanted), wanted * accepted / sendPower);
                     int received = r.receiveEnergy(from, given, false);
-                    powerLevel -= received;
-                    if (powerLevel <= 0)
+                    containedEnergy -= received;
+                    if (containedEnergy <= 0)
                         break;
                 }
                 anyChanged = true;
@@ -246,7 +246,7 @@ public class TileGenerator extends TileEntity
         heatLevel = compound.getInteger("heatLevel");
         burnTimeRemaining = compound.getInteger("burnTimeRemaining");
         currentItemBurnTime = compound.getInteger("currentItemBurnTime");
-        powerLevel = compound.getInteger("powerLevel");
+        containedEnergy = compound.getInteger("powerLevel");
         timeInterval = compound.getInteger("timeInterval");
     }
 
@@ -272,7 +272,7 @@ public class TileGenerator extends TileEntity
         compound.setInteger("heatLevel", heatLevel);
         compound.setInteger("burnTimeRemaining", burnTimeRemaining);
         compound.setInteger("currentItemBurnTime", currentItemBurnTime);
-        compound.setInteger("powerLevel", powerLevel);
+        compound.setInteger("powerLevel", containedEnergy);
         compound.setInteger("timeInterval", timeInterval);
     }
 
@@ -315,7 +315,7 @@ public class TileGenerator extends TileEntity
             case 1:
                 return currentItemBurnTime;
             case 2:
-                return powerLevel;
+                return containedEnergy;
             case 3:
                 return heatLevel;
         }
@@ -334,7 +334,7 @@ public class TileGenerator extends TileEntity
                 currentItemBurnTime = value;
                 break;
             case 2:
-                powerLevel = value;
+                containedEnergy = value;
                 break;
             case 3:
                 heatLevel = value;
@@ -363,16 +363,16 @@ public class TileGenerator extends TileEntity
     @Override
     public int extractEnergy(EnumFacing facing, int maxExtract, boolean simulate)
     {
-        int powerToExtract = Math.min(powerLevel, maxExtract);
+        int powerToExtract = Math.min(containedEnergy, maxExtract);
         if (!simulate)
-            powerLevel -= powerToExtract;
+            containedEnergy -= powerToExtract;
         return powerToExtract;
     }
 
     @Override
     public int getEnergyStored(EnumFacing facing)
     {
-        return powerLevel;
+        return containedEnergy;
     }
 
     @Override
@@ -397,15 +397,15 @@ public class TileGenerator extends TileEntity
         return heatLevel;
     }
 
-    public int getPowerGeneration()
+    public int getGenerationPower()
     {
         if (heatLevel < MinHeat)
             return 0;
         return Math.max(0, Math.round(PowerGenMin + (PowerGenMax - PowerGenMin) * (heatLevel - MinHeat) / (float) (MaxHeat - MinHeat)));
     }
 
-    public int getPowerLevel()
+    public int getContainedEnergy()
     {
-        return powerLevel;
+        return containedEnergy;
     }
 }

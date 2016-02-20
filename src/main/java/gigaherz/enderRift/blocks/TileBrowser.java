@@ -1,64 +1,86 @@
 package gigaherz.enderRift.blocks;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Queues;
 import com.google.common.collect.Sets;
-import gigaherz.api.automation.AutomationAggregator;
-import gigaherz.api.automation.AutomationHelper;
-import gigaherz.api.automation.IBrowsableInventory;
-import gigaherz.api.automation.IInventoryAutomation;
+import gigaherz.enderRift.EnderRiftMod;
+import gigaherz.enderRift.automation.AutomationAggregator;
+import gigaherz.enderRift.automation.AutomationHelper;
+import gigaherz.enderRift.automation.IInventoryAutomation;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
+import org.apache.commons.lang3.tuple.Pair;
+import org.apache.commons.lang3.tuple.Triple;
 
 import java.util.List;
+import java.util.Queue;
 import java.util.Set;
 
 public class TileBrowser extends TileEntity implements IBrowserExtension
 {
-    boolean needsRefresh = true;
-    final AutomationAggregator aggregator = new AutomationAggregator();
-
     private int changeCount = 1;
-
-    public IBrowsableInventory getBrowsable()
-    {
-        IInventoryAutomation automation = getAutomation();
-        if (automation instanceof IBrowsableInventory)
-        {
-            return (IBrowsableInventory) automation;
-        }
-        return null;
-    }
 
     public IInventoryAutomation getAutomation()
     {
-        if (needsRefresh)
+        AutomationAggregator aggregator = new AutomationAggregator();
+
+        List<IInventoryAutomation> seen = Lists.newArrayList();
+        Set<BlockPos> scanned = Sets.newHashSet();
+        Queue<Triple<BlockPos, EnumFacing, Integer>> pending = Queues.newArrayDeque();
+
+        IBlockState state = worldObj.getBlockState(getPos());
+        EnumFacing facing = state.getValue(BlockInterface.FACING);
+        pending.add(Triple.of(this.pos, facing, 0));
+
+        int biggestScan = 0;
+        int loops = 0;
+        int skipped = 0;
+        while (pending.size() > 0)
         {
-            IBlockState state = worldObj.getBlockState(getPos());
-            EnumFacing facing = state.getValue(BlockBrowser.FACING);
-            TileEntity te = worldObj.getTileEntity(pos.offset(facing));
+            biggestScan = Math.max(biggestScan, pending.size());
+            loops++;
+
+            Triple<BlockPos, EnumFacing, Integer> pair = pending.remove();
+            BlockPos pos2 = pair.getLeft();
+
+            if (scanned.contains(pos2))
+            {
+                skipped++;
+                continue;
+            }
+
+            scanned.add(pos2);
+
+            int distance = pair.getRight();
+
+            if (distance >= TileProxy.MAX_SCAN_DISTANCE)
+            {
+                skipped++;
+                continue;
+            }
+
+            facing = pair.getMiddle();
+
+            TileEntity te = worldObj.getTileEntity(pos2);
             if (te != null)
             {
                 if (te instanceof IBrowserExtension)
                 {
-                    List<IInventoryAutomation> seen = Lists.newArrayList();
-                    Set<BlockPos> browserSet = Sets.newHashSet();
-                    browserSet.add(this.pos);
-
-                    ((IBrowserExtension) te).gatherNeighbours(seen, browserSet, facing.getOpposite(), 1);
-
-                    aggregator.addAll(seen);
+                    ((IBrowserExtension) te).gatherNeighbours(pending, facing.getOpposite(), distance + 1);
                 }
                 else
                 {
                     IInventoryAutomation automated = AutomationHelper.get(te, facing.getOpposite());
-                    if (automated != null)
-                        aggregator.add(automated);
+                    if (automated != null) seen.add(automated);
                 }
             }
-            needsRefresh = false;
         }
+
+        EnderRiftMod.logger.warn("Scanned " + loops + " tiles, with up to " + biggestScan + " queued at a time, and " + skipped + " skipped.");
+
+        aggregator.addAll(seen);
 
         return aggregator;
     }
@@ -66,15 +88,8 @@ public class TileBrowser extends TileEntity implements IBrowserExtension
     @Override
     public void markDirty()
     {
-        broadcastDirty();
+        changeCount++;
         super.markDirty();
-    }
-
-    public void broadcastDirty()
-    {
-        Set<BlockPos> scanned = Sets.newHashSet();
-        scanned.add(pos);
-        this.markDirty(scanned, 0);
     }
 
     public int getChangeCount()
@@ -83,16 +98,14 @@ public class TileBrowser extends TileEntity implements IBrowserExtension
     }
 
     @Override
-    public void markDirty(Set<BlockPos> scanned, int distance)
+    public void markDirty(Set<BlockPos> scanned, int distance, Queue<Pair<BlockPos, Integer>> pending)
     {
         changeCount++;
-        needsRefresh = true;
-        aggregator.clear();
     }
 
     @Override
-    public void gatherNeighbours(List<IInventoryAutomation> seen, Set<BlockPos> scanned, EnumFacing faceFrom, int distance)
+    public void gatherNeighbours(Queue<Triple<BlockPos, EnumFacing, Integer>> pending, EnumFacing faceFrom, int distance)
     {
-        // Do nothing here, it's the proxies that matter
+        pending.add(Triple.of(this.pos.offset(faceFrom.getOpposite()), faceFrom, distance));
     }
 }

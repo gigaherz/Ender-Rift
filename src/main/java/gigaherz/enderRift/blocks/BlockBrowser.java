@@ -52,7 +52,7 @@ public class BlockBrowser
     {
         IBlockState state = world.getBlockState(pos);
         if (neighbor.equals(pos.offset(state.getValue(FACING))))
-            ((TileBrowser) world.getTileEntity(pos)).broadcastDirty();
+            world.getTileEntity(pos).markDirty();
     }
 
     @Override

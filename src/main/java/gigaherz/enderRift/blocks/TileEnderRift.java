@@ -2,10 +2,9 @@ package gigaherz.enderRift.blocks;
 
 import cofh.api.energy.IEnergyReceiver;
 import com.google.common.base.Predicate;
-import gigaherz.api.automation.IBrowsableInventory;
-import gigaherz.api.automation.IInventoryAutomation;
 import gigaherz.enderRift.ConfigValues;
 import gigaherz.enderRift.EnderRiftMod;
+import gigaherz.enderRift.automation.IInventoryAutomation;
 import gigaherz.enderRift.storage.RiftInventory;
 import gigaherz.enderRift.storage.RiftStorageWorldData;
 import net.minecraft.item.ItemStack;
@@ -18,7 +17,7 @@ import java.util.Random;
 
 public class TileEnderRift
         extends TileEntity
-        implements IEnergyReceiver, IInventoryAutomation, IBrowsableInventory
+        implements IEnergyReceiver, IInventoryAutomation
 {
     public final Random rand = new Random();
     public final int energyLimit = 10000000;
@@ -222,7 +221,7 @@ public class TileEnderRift
     }
 
     @Override
-    public ItemStack extractItems(@Nonnull ItemStack stack, int wanted)
+    public ItemStack extractItems(@Nonnull ItemStack stack, int wanted, boolean simulate)
     {
         if (getInventory() == null)
             return null;
@@ -236,34 +235,15 @@ public class TileEnderRift
         if (wanted <= 0)
             return null;
 
-        ItemStack extracted = getInventory().extractItems(stack, wanted);
+        ItemStack extracted = getInventory().extractItems(stack, wanted, simulate);
         if (extracted == null)
             return null;
 
-        int actualCost = getEffectivePowerUsageToExtract(extracted.stackSize);
-        this.energyBuffer -= actualCost;
-
-        return extracted;
-    }
-
-    @Override
-    public ItemStack simulateExtraction(@Nonnull ItemStack stack, int wanted)
-    {
-        if (getInventory() == null)
-            return null;
-
-        int cost = getEffectivePowerUsageToExtract(wanted);
-        while (cost > this.energyBuffer && wanted > 0)
+        if (!simulate)
         {
-            wanted--;
+            int actualCost = getEffectivePowerUsageToExtract(extracted.stackSize);
+            this.energyBuffer -= actualCost;
         }
-
-        if (wanted <= 0)
-            return null;
-
-        ItemStack extracted = getInventory().simulateExtraction(stack, wanted);
-        if (extracted == null)
-            return null;
 
         return extracted;
     }

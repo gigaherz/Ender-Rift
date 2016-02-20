@@ -1,4 +1,4 @@
-package gigaherz.api.automation;
+package gigaherz.enderRift.automation;
 
 import com.google.common.base.Predicate;
 import com.google.common.collect.Lists;
@@ -8,7 +8,7 @@ import net.minecraft.util.EnumFacing;
 import javax.annotation.Nonnull;
 import java.util.List;
 
-public class AutomationAggregator implements IInventoryAutomation, IBrowsableInventory
+public class AutomationAggregator implements IInventoryAutomation
 {
     final List<IInventoryAutomation> aggregated = Lists.newArrayList();
 
@@ -34,10 +34,7 @@ public class AutomationAggregator implements IInventoryAutomation, IBrowsableInv
         int sum = 0;
         for (IInventoryAutomation inv : aggregated)
         {
-            if (inv instanceof IBrowsableInventory)
-            {
-                sum += ((IBrowsableInventory) inv).getSizeInventory();
-            }
+            sum += inv.getSizeInventory();
         }
         return sum;
     }
@@ -47,17 +44,13 @@ public class AutomationAggregator implements IInventoryAutomation, IBrowsableInv
     {
         for (IInventoryAutomation inv : aggregated)
         {
-            if (inv instanceof IBrowsableInventory)
+            int size = inv.getSizeInventory();
+            if (index < size)
             {
-                IBrowsableInventory browsable = ((IBrowsableInventory) inv);
-                int size = browsable.getSizeInventory();
-                if (index < size)
-                {
-                    return browsable.getStackInSlot(index);
-                }
-
-                index -= size;
+                return inv.getStackInSlot(index);
             }
+
+            index -= size;
         }
         return null;
     }
@@ -99,7 +92,7 @@ public class AutomationAggregator implements IInventoryAutomation, IBrowsableInv
     }
 
     @Override
-    public ItemStack extractItems(@Nonnull ItemStack stack, int wanted)
+    public ItemStack extractItems(@Nonnull ItemStack stack, int wanted, boolean simulate)
     {
         wanted = Math.min(wanted, stack.getMaxStackSize());
 
@@ -109,48 +102,20 @@ public class AutomationAggregator implements IInventoryAutomation, IBrowsableInv
         for (int i = 0; i < aggregated.size(); i++)
         {
             IInventoryAutomation inv = aggregated.get(i);
-            ItemStack obtained = inv.extractItems(stack, wanted);
+            ItemStack obtained = inv.extractItems(stack, wanted, simulate);
             if (obtained != null)
             {
-                if (extracted != null)
-                {
-                    extracted.stackSize += obtained.stackSize;
-                }
-                else
-                {
-                    extracted = obtained;
-                }
-                wanted -= obtained.stackSize;
-                if (wanted <= 0) break;
-            }
-        }
-        return extracted;
-    }
-
-    @Override
-    public ItemStack simulateExtraction(@Nonnull ItemStack stack, int wanted)
-    {
-        wanted = Math.min(wanted, stack.getMaxStackSize());
-
-        ItemStack extracted = null;
-
-        // DO NOT CHANGE BACK TO FOREACH, CAUSES ConcurrentModificationException
-        for (int i = 0; i < aggregated.size(); i++)
-        {
-            IInventoryAutomation inv = aggregated.get(i);
-            ItemStack obtained = inv.simulateExtraction(stack, wanted);
-            if (obtained != null)
-            {
-                if (extracted != null)
-                {
-                    extracted.stackSize += obtained.stackSize;
-                }
-                else
+                if (extracted == null)
                 {
                     extracted = obtained.copy();
                 }
+                else
+                {
+                    extracted.stackSize += obtained.stackSize;
+                }
                 wanted -= obtained.stackSize;
-                if (wanted <= 0) break;
+                if (wanted <= 0)
+                    break;
             }
         }
         return extracted;

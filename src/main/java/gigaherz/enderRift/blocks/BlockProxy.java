@@ -1,7 +1,7 @@
 package gigaherz.enderRift.blocks;
 
-import gigaherz.api.automation.AutomationHelper;
 import gigaherz.enderRift.EnderRiftMod;
+import gigaherz.enderRift.automation.AutomationHelper;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
@@ -39,6 +39,12 @@ public class BlockProxy extends Block
         setBlockBounds(0.0F, 0.0F, 0.0F, 1.0F, 1.0F, 1.0F);
         setHardness(3.0F);
         setResistance(8.0F);
+    }
+
+    @Override
+    public boolean isOpaqueCube()
+    {
+        return false;
     }
 
     @Override

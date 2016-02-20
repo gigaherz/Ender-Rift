@@ -1,9 +1,8 @@
 package gigaherz.enderRift.gui;
 
 import com.google.common.collect.Lists;
-import gigaherz.api.automation.IBrowsableInventory;
-import gigaherz.api.automation.IInventoryAutomation;
 import gigaherz.enderRift.EnderRiftMod;
+import gigaherz.enderRift.automation.IInventoryAutomation;
 import gigaherz.enderRift.blocks.TileBrowser;
 import gigaherz.enderRift.misc.SortMode;
 import gigaherz.enderRift.network.SetScrollPosition;
@@ -215,9 +214,12 @@ public class ContainerBrowser
                     {
                         if (dropping.stackSize < dropping.getMaxStackSize())
                         {
-                            ItemStack extracted = parent.extractItems(existing, amount);
+                            ItemStack extracted = parent.extractItems(existing, amount, false);
                             if (extracted != null)
+                            {
                                 dropping.stackSize += extracted.stackSize;
+                                tile.markDirty();
+                            }
                         }
                     }
                     else
@@ -229,7 +231,15 @@ public class ContainerBrowser
                         dropping.stackSize -= push.stackSize;
 
                         if (remaining != null)
+                        {
+                            if (push.stackSize != remaining.stackSize)
+                                tile.markDirty();
                             dropping.stackSize += remaining.stackSize;
+                        }
+                        else
+                        {
+                            tile.markDirty();
+                        }
 
                         if (dropping.stackSize <= 0)
                             dropping = null;
@@ -242,6 +252,15 @@ public class ContainerBrowser
                     if (clickedButton == 0)
                     {
                         ItemStack remaining = parent.pushItems(dropping);
+                        if (remaining != null)
+                        {
+                            if (dropping.stackSize != remaining.stackSize)
+                                tile.markDirty();
+                        }
+                        else
+                        {
+                            tile.markDirty();
+                        }
                         inventoryPlayer.setItemStack(remaining);
                     }
                     else
@@ -253,7 +272,15 @@ public class ContainerBrowser
                         dropping.stackSize -= push.stackSize;
 
                         if (remaining != null)
+                        {
+                            if (push.stackSize != remaining.stackSize)
+                                tile.markDirty();
                             dropping.stackSize += remaining.stackSize;
+                        }
+                        else
+                        {
+                            tile.markDirty();
+                        }
 
                         if (dropping.stackSize <= 0)
                             dropping = null;
@@ -263,7 +290,9 @@ public class ContainerBrowser
                 }
                 else if (existing != null)
                 {
-                    ItemStack extracted = parent.extractItems(existing, amount);
+                    ItemStack extracted = parent.extractItems(existing, amount, false);
+                    if (extracted != null)
+                        tile.markDirty();
                     inventoryPlayer.setItemStack(extracted);
                 }
 
@@ -279,18 +308,20 @@ public class ContainerBrowser
                 if (amount == 0)
                     return null;
 
-                ItemStack extracted = parent.simulateExtraction(existing, amount);
+                ItemStack remaining = simulateAddToPlayer(existing, amount);
 
-                if (extracted != null)
+                if (remaining != null)
+                    amount -= remaining.stackSize;
+
+                if (amount > 0)
                 {
-                    ItemStack remaining = addToPlayer(extracted);
-                    if (remaining != null)
-                        amount -= remaining.stackSize;
+                    ItemStack finalExtract = parent.extractItems(existing, amount, false);
 
-                    if (amount > 0)
+                    if (finalExtract != null)
                     {
-                        parent.extractItems(existing, amount);
+                        addToPlayer(finalExtract);
 
+                        tile.markDirty();
                         detectAndSendChanges();
                     }
                 }
@@ -302,16 +333,17 @@ public class ContainerBrowser
         return super.slotClick(slotId, clickedButton, mode, playerIn);
     }
 
-    public ItemStack addToPlayer(ItemStack stack)
+    public ItemStack simulateAddToPlayer(ItemStack stack, int amount)
     {
         int startIndex = FakeSlots;
         int endIndex = startIndex + PlayerSlots;
 
         ItemStack stackCopy = stack.copy();
+        stackCopy.stackSize = amount;
 
-        if (!this.mergeItemStack(stackCopy, startIndex, endIndex, false))
+        if (!this.simulateInsertStack(stackCopy, startIndex, endIndex))
         {
-            return null;
+            return stackCopy;
         }
 
         if (stackCopy.stackSize <= 0)
@@ -322,6 +354,75 @@ public class ContainerBrowser
         return stackCopy;
     }
 
+    protected boolean simulateInsertStack(ItemStack stack, int startIndex, int endIndex)
+    {
+        boolean canInsert = false;
+
+        if (stack.isStackable())
+        {
+            for (int i = startIndex; stack.stackSize > 0 && i < endIndex; i++)
+            {
+                Slot slot = this.inventorySlots.get(i);
+                ItemStack stackInSlot = slot.getStack();
+
+                if (stackInSlot != null && stackInSlot.stackSize < stackInSlot.getMaxStackSize() &&
+                        ItemStack.areItemsEqual(stackInSlot, stack) && ItemStack.areItemStackTagsEqual(stack, stackInSlot))
+                {
+                    int j = stackInSlot.stackSize + stack.stackSize;
+
+                    if (j <= stack.getMaxStackSize())
+                    {
+                        stack.stackSize = 0;
+                        canInsert = true;
+                    }
+                    else
+                    {
+                        stack.stackSize -= stack.getMaxStackSize() - stackInSlot.stackSize;
+                        canInsert = true;
+                    }
+                }
+            }
+        }
+
+        if (stack.stackSize > 0)
+        {
+            for (int i = startIndex; i < endIndex; i++)
+            {
+                Slot slot = this.inventorySlots.get(i);
+                ItemStack stackInSlot = slot.getStack();
+
+                if (stackInSlot == null && slot.isItemValid(stack))
+                {
+                    stack.stackSize = 0;
+                    canInsert = true;
+                    break;
+                }
+            }
+        }
+
+        return canInsert;
+    }
+
+
+    public ItemStack addToPlayer(ItemStack stack)
+    {
+        int startIndex = FakeSlots;
+        int endIndex = startIndex + PlayerSlots;
+
+        ItemStack stackCopy = stack.copy();
+
+        if (!this.mergeItemStack(stackCopy, startIndex, endIndex, false))
+        {
+            return stackCopy;
+        }
+
+        if (stackCopy.stackSize <= 0)
+        {
+            return null;
+        }
+
+        return stackCopy;
+    }
 
     @Override
     public ItemStack transferStackInSlot(EntityPlayer player, int slotIndex)
@@ -347,6 +448,16 @@ public class ContainerBrowser
 
             ItemStack remaining = parent.pushItems(stack);
 
+            if (remaining != null)
+            {
+                if (remaining.stackSize != stack.stackSize)
+                    tile.markDirty();
+            }
+            else
+            {
+                tile.markDirty();
+            }
+
             slot.putStack(remaining);
 
             return remaining;
@@ -363,7 +474,7 @@ public class ContainerBrowser
 
         public void refresh()
         {
-            IBrowsableInventory inv = tile.getBrowsable();
+            IInventoryAutomation inv = tile.getAutomation();
 
             slots.clear();
 

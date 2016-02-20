@@ -1,6 +1,7 @@
-package gigaherz.api.automation;
+package gigaherz.enderRift.automation;
 
 import com.google.common.base.Predicate;
+import gigaherz.enderRift.EnderRiftMod;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.ISidedInventory;
@@ -16,7 +17,7 @@ import javax.annotation.Nonnull;
 /**
  * Provides a basic implementation for automatable inventory.
  */
-public abstract class AutomationHelper implements IInventoryAutomation, IBrowsableInventory
+public abstract class AutomationHelper implements IInventoryAutomation
 {
     /**
      * Gets an inventory automation instance, wrapping an inventory if necessary.
@@ -31,13 +32,10 @@ public abstract class AutomationHelper implements IInventoryAutomation, IBrowsab
         if (object instanceof IInventoryAutomation)
             return ((IInventoryAutomation) object).getInventoryForSide(facing);
 
-        // If the inventory is better sided, make use of it.
+        // If the inventory implements IItemHandler, wrap it.
         if (object instanceof ICapabilityProvider)
         {
             ICapabilityProvider cap = (ICapabilityProvider) object;
-
-            if (cap.hasCapability(CapabilityAutomation.AUTOMATION_CAPABILITY, facing))
-                return cap.getCapability(CapabilityAutomation.AUTOMATION_CAPABILITY, facing);
 
             if (cap.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, facing))
                 return new ItemHandlerWrapper(cap.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, facing));
@@ -68,9 +66,6 @@ public abstract class AutomationHelper implements IInventoryAutomation, IBrowsab
         if (object instanceof ICapabilityProvider)
         {
             ICapabilityProvider cap = (ICapabilityProvider) object;
-
-            if (cap.hasCapability(CapabilityAutomation.AUTOMATION_CAPABILITY, facing))
-                return true;
 
             if (cap.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, facing))
                 return true;
@@ -133,18 +128,7 @@ public abstract class AutomationHelper implements IInventoryAutomation, IBrowsab
         }
 
         @Override
-        public ItemStack extractItems(@Nonnull ItemStack stack, int wanted)
-        {
-            return extractItems(stack, wanted, false);
-        }
-
-        @Override
-        public ItemStack simulateExtraction(@Nonnull ItemStack stack, int wanted)
-        {
-            return extractItems(stack, wanted, true);
-        }
-
-        private ItemStack extractItems(@Nonnull ItemStack stack, int wanted, boolean simulate)
+        public ItemStack extractItems(@Nonnull ItemStack stack, int wanted, boolean simulate)
         {
             if (stack.stackSize <= 0 || wanted <= 0)
                 return null;
@@ -162,10 +146,21 @@ public abstract class AutomationHelper implements IInventoryAutomation, IBrowsab
                     {
                         ItemStack obtained = parent.extractItem(i, requested, simulate);
 
+                        if (obtained != null && !simulate)
+                        {
+                            int remaining = slot.stackSize - obtained.stackSize;
+                            int found = 0;
+                            slot = parent.getStackInSlot(i);
+                            if (slot != null)
+                                found = slot.stackSize;
+
+                            if (found != remaining)
+                                EnderRiftMod.logger.warn("DAFUQ, Found an incorrect number of items in the slot " + i + " after extraction! Found: " + found + " expected " + remaining);
+                        }
+
                         int returned = (obtained != null) ? obtained.stackSize : 0;
 
                         extracted.stackSize += returned;
-
                         wanted -= returned;
                         if (wanted <= 0)
                             break;
@@ -284,7 +279,7 @@ public abstract class AutomationHelper implements IInventoryAutomation, IBrowsab
         }
 
         @Override
-        public ItemStack extractItems(@Nonnull ItemStack stack, int wanted)
+        public ItemStack extractItems(@Nonnull ItemStack stack, int wanted, boolean simulate)
         {
             ItemStack extracted = stack.copy();
             extracted.stackSize = 0;
@@ -300,41 +295,13 @@ public abstract class AutomationHelper implements IInventoryAutomation, IBrowsab
                     int available = Math.min(wanted, slot.stackSize);
                     if (available > 0 && ItemStack.areItemsEqual(slot, stack) && ItemStack.areItemStackTagsEqual(slot, stack))
                     {
-                        slot.stackSize -= available;
-                        extracted.stackSize += available;
-                        if (slot.stackSize <= 0)
-                            parent.setInventorySlotContents(i, null);
+                        if (!simulate)
+                        {
+                            slot.stackSize -= available;
+                            if (slot.stackSize <= 0)
+                                parent.setInventorySlotContents(i, null);
+                        }
 
-                        wanted -= available;
-                        if (wanted <= 0)
-                            break;
-                    }
-                }
-            }
-
-            if (extracted.stackSize <= 0)
-                return null;
-
-            return extracted;
-        }
-
-        @Override
-        public ItemStack simulateExtraction(@Nonnull ItemStack stack, int wanted)
-        {
-            ItemStack extracted = stack.copy();
-            extracted.stackSize = 0;
-
-            if (stack.stackSize <= 0)
-                return null;
-
-            for (int i = 0; i < parent.getSizeInventory(); i++)
-            {
-                ItemStack slot = parent.getStackInSlot(i);
-                if (slot != null)
-                {
-                    int available = Math.min(wanted, slot.stackSize);
-                    if (available > 0 && ItemStack.areItemsEqual(slot, stack) && ItemStack.areItemStackTagsEqual(slot, stack))
-                    {
                         extracted.stackSize += available;
                         wanted -= available;
                         if (wanted <= 0)
@@ -431,7 +398,7 @@ public abstract class AutomationHelper implements IInventoryAutomation, IBrowsab
         @Override
         public boolean isUseableByPlayer(EntityPlayer player)
         {
-            return false;
+            return parent.isUseableByPlayer(player);
         }
 
         @Override
@@ -481,19 +448,19 @@ public abstract class AutomationHelper implements IInventoryAutomation, IBrowsab
         @Override
         public String getName()
         {
-            return null;
+            return parent.getName();
         }
 
         @Override
         public boolean hasCustomName()
         {
-            return false;
+            return parent.hasCustomName();
         }
 
         @Override
         public IChatComponent getDisplayName()
         {
-            return null;
+            return parent.getDisplayName();
         }
     }
 }

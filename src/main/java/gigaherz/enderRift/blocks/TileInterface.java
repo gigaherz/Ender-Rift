@@ -1,11 +1,12 @@
 package gigaherz.enderRift.blocks;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Queues;
 import com.google.common.collect.Sets;
-import gigaherz.api.automation.AutomationAggregator;
-import gigaherz.api.automation.AutomationHelper;
-import gigaherz.api.automation.IInventoryAutomation;
 import gigaherz.enderRift.EnderRiftMod;
+import gigaherz.enderRift.automation.AutomationAggregator;
+import gigaherz.enderRift.automation.AutomationHelper;
+import gigaherz.enderRift.automation.IInventoryAutomation;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
@@ -19,8 +20,11 @@ import net.minecraft.util.IChatComponent;
 import net.minecraft.util.ITickable;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants;
+import org.apache.commons.lang3.tuple.Pair;
+import org.apache.commons.lang3.tuple.Triple;
 
 import java.util.List;
+import java.util.Queue;
 import java.util.Set;
 
 public class TileInterface extends TileEntity
@@ -31,37 +35,55 @@ public class TileInterface extends TileEntity
     final ItemStack[] filters = new ItemStack[FilterCount];
     final ItemStack[] outputs = new ItemStack[FilterCount];
 
-    boolean needsRefresh = true;
-    final AutomationAggregator aggregator = new AutomationAggregator();
-
     public IInventoryAutomation getAutomation()
     {
-        if (needsRefresh)
+        AutomationAggregator aggregator = new AutomationAggregator();
+
+        List<IInventoryAutomation> seen = Lists.newArrayList();
+        Set<BlockPos> scanned = Sets.newHashSet();
+        Queue<Triple<BlockPos, EnumFacing, Integer>> pending = Queues.newArrayDeque();
+
+        IBlockState state = worldObj.getBlockState(getPos());
+        EnumFacing facing = state.getValue(BlockInterface.FACING);
+        pending.add(Triple.of(this.pos, facing, 0));
+
+        while (pending.size() > 0)
         {
-            IBlockState state = worldObj.getBlockState(getPos());
-            EnumFacing facing = state.getValue(BlockInterface.FACING);
-            TileEntity te = worldObj.getTileEntity(pos.offset(facing));
+            Triple<BlockPos, EnumFacing, Integer> pair = pending.remove();
+            BlockPos pos2 = pair.getLeft();
+
+            if (scanned.contains(pos2))
+            {
+                continue;
+            }
+
+            scanned.add(pos2);
+
+            int distance = pair.getRight();
+
+            if (distance >= TileProxy.MAX_SCAN_DISTANCE)
+            {
+                continue;
+            }
+
+            facing = pair.getMiddle();
+
+            TileEntity te = worldObj.getTileEntity(pos2);
             if (te != null)
             {
                 if (te instanceof IBrowserExtension)
                 {
-                    List<IInventoryAutomation> seen = Lists.newArrayList();
-                    Set<BlockPos> scanned = Sets.newHashSet();
-                    scanned.add(this.pos);
-
-                    ((IBrowserExtension) te).gatherNeighbours(seen, scanned, facing.getOpposite(), 1);
-
-                    aggregator.addAll(seen);
+                    ((IBrowserExtension) te).gatherNeighbours(pending, facing.getOpposite(), distance + 1);
                 }
                 else
                 {
                     IInventoryAutomation automated = AutomationHelper.get(te, facing.getOpposite());
-                    if (automated != null)
-                        aggregator.add(automated);
+                    if (automated != null) seen.add(automated);
                 }
             }
-            needsRefresh = false;
         }
+
+        aggregator.addAll(seen);
 
         return aggregator;
     }
@@ -69,28 +91,19 @@ public class TileInterface extends TileEntity
     @Override
     public void markDirty()
     {
-        broadcastDirty();
         super.markDirty();
     }
 
-    public void broadcastDirty()
+    @Override
+    public void markDirty(Set<BlockPos> scanned, int distance, Queue<Pair<BlockPos, Integer>> pending)
     {
-        Set<BlockPos> scanned = Sets.newHashSet();
-        scanned.add(pos);
-        this.markDirty(scanned, 0);
+        // Do nothing here
     }
 
     @Override
-    public void markDirty(Set<BlockPos> scanned, int distance)
+    public void gatherNeighbours(Queue<Triple<BlockPos, EnumFacing, Integer>> pending, EnumFacing faceFrom, int distance)
     {
-        needsRefresh = true;
-        aggregator.clear();
-    }
-
-    @Override
-    public void gatherNeighbours(List<IInventoryAutomation> seen, Set<BlockPos> scanned, EnumFacing faceFrom, int distance)
-    {
-        // Do nothing here, it's the proxies that matter
+        pending.add(Triple.of(this.pos.offset(faceFrom.getOpposite()), faceFrom, distance));
     }
 
     @Override
@@ -114,7 +127,7 @@ public class TileInterface extends TileEntity
                 if (outputs[i] == null)
                 {
                     int free = 64;
-                    outputs[i] = getAutomation().extractItems(filters[i], free);
+                    outputs[i] = getAutomation().extractItems(filters[i], free, false);
                     if (outputs[i] != null)
                         anyChanged = true;
                 }
@@ -123,7 +136,7 @@ public class TileInterface extends TileEntity
                     int free = outputs[i].getMaxStackSize() - outputs[i].stackSize;
                     if (free > 0)
                     {
-                        ItemStack extracted = getAutomation().extractItems(filters[i], free);
+                        ItemStack extracted = getAutomation().extractItems(filters[i], free, false);
                         if (extracted != null)
                         {
                             outputs[i].stackSize += extracted.stackSize;
