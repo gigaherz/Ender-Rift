@@ -127,7 +127,7 @@ public class TileGenerator extends TileEntity
                         continue;
 
                     int given = Math.min(Math.min(containedEnergy, wanted), wanted * accepted / sendPower);
-                    int received = r.receiveEnergy(from, given, false);
+                    int received = Math.min(given, r.receiveEnergy(from, given, false));
                     containedEnergy -= received;
                     if (containedEnergy <= 0)
                         break;

@@ -142,21 +142,28 @@ public class EnderRiftMod
                 'r', Blocks.redstone_block,
                 'c', Blocks.ender_chest);
 
-        GameRegistry.addRecipe(new ItemStack(riftInterface),
+        GameRegistry.addRecipe(new ItemStack(extension),
                 "iri",
                 "rhr",
                 "iri",
                 'h', Blocks.hopper,
-                'r', Blocks.redstone_block,
-                'i', Blocks.iron_block);
+                'r', Items.redstone,
+                'i', Items.iron_ingot);
+
+        GameRegistry.addRecipe(new ItemStack(riftInterface),
+                "ir ",
+                "rer",
+                "ir ",
+                'e', extension,
+                'r', Items.redstone,
+                'i', Items.iron_ingot);
 
         GameRegistry.addRecipe(new ItemStack(browser),
-                "igi",
-                "gfg",
-                "iri",
-                'f', riftInterface,
+                "ig ",
+                "geg",
+                "ig ",
+                'e', extension,
                 'g', Items.glowstone_dust,
-                'r', Items.redstone,
                 'i', Items.iron_ingot);
 
         GameRegistry.addRecipe(new ItemStack(generator),
