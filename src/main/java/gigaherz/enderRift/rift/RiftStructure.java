@@ -182,12 +182,11 @@ public class RiftStructure
 
             TileEnderRift rift = (TileEnderRift) world.getTileEntity(pos);
 
-            rift.unassemble();
-
             ItemStack stack = rift.getRiftItem();
-
             Entity entity = new EntityItem(world, pos.getX(), pos.getY(), pos.getZ(), stack);
             world.spawnEntityInWorld(entity);
+
+            rift.unassemble();
         }
     }
 

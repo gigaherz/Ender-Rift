@@ -2,7 +2,6 @@ package gigaherz.enderRift.automation;
 
 import com.google.common.base.Predicate;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumFacing;
 
 import javax.annotation.Nonnull;
 

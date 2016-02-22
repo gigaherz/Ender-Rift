@@ -8,10 +8,13 @@ import gigaherz.enderRift.automation.IAutomationProvider;
 import gigaherz.enderRift.automation.IInventoryAutomation;
 import gigaherz.enderRift.storage.RiftInventory;
 import gigaherz.enderRift.storage.RiftStorageWorldData;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.world.World;
 
 import javax.annotation.Nonnull;
 import java.util.Random;
@@ -58,6 +61,12 @@ public class TileEnderRift
     }
 
     @Override
+    public boolean shouldRefresh(World world, BlockPos pos, IBlockState oldState, IBlockState newSate)
+    {
+        return oldState.getBlock() != newSate.getBlock();
+    }
+
+    @Override
     public boolean shouldRenderInPass(int pass)
     {
         return pass == 1;
@@ -92,12 +101,12 @@ public class TileEnderRift
 
     private int getEffectivePowerUsageToInsert(int stackSize)
     {
-        return (int) Math.ceil(getEnergyInsert() * stackSize);
+        return worldObj.isRemote ? 0 : (int) Math.ceil(getEnergyInsert() * stackSize);
     }
 
     private int getEffectivePowerUsageToExtract(int limit)
     {
-        return (int) Math.ceil(getEnergyExtract() * limit);
+        return worldObj.isRemote ? 0 : (int) Math.ceil(getEnergyExtract() * limit);
     }
 
     public ItemStack getRiftItem()
