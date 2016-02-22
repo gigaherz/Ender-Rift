@@ -3,7 +3,6 @@ package gigaherz.enderRift.blocks;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Queues;
 import com.google.common.collect.Sets;
-import gigaherz.enderRift.EnderRiftMod;
 import gigaherz.enderRift.automation.AutomationAggregator;
 import gigaherz.enderRift.automation.AutomationHelper;
 import gigaherz.enderRift.automation.IInventoryAutomation;
@@ -34,20 +33,13 @@ public class TileBrowser extends TileEntity implements IBrowserExtension
         EnumFacing facing = state.getValue(BlockInterface.FACING);
         pending.add(Triple.of(this.pos, facing, 0));
 
-        int biggestScan = 0;
-        int loops = 0;
-        int skipped = 0;
         while (pending.size() > 0)
         {
-            biggestScan = Math.max(biggestScan, pending.size());
-            loops++;
-
             Triple<BlockPos, EnumFacing, Integer> pair = pending.remove();
             BlockPos pos2 = pair.getLeft();
 
             if (scanned.contains(pos2))
             {
-                skipped++;
                 continue;
             }
 
@@ -57,7 +49,6 @@ public class TileBrowser extends TileEntity implements IBrowserExtension
 
             if (distance >= TileProxy.MAX_SCAN_DISTANCE)
             {
-                skipped++;
                 continue;
             }
 
@@ -77,8 +68,6 @@ public class TileBrowser extends TileEntity implements IBrowserExtension
                 }
             }
         }
-
-        EnderRiftMod.logger.warn("Scanned " + loops + " tiles, with up to " + biggestScan + " queued at a time, and " + skipped + " skipped.");
 
         aggregator.addAll(seen);
 

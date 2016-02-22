@@ -7,7 +7,6 @@ import gigaherz.enderRift.blocks.TileEnderRift;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
-import net.minecraft.util.EnumFacing;
 import net.minecraftforge.common.util.Constants;
 
 import javax.annotation.Nonnull;
@@ -101,12 +100,6 @@ public class RiftInventory implements IInventoryAutomation
     public ItemStack getStackInSlot(int index)
     {
         return inventorySlots.get(index);
-    }
-
-    @Override
-    public IInventoryAutomation getInventoryForSide(@Nonnull EnumFacing face)
-    {
-        return this;
     }
 
     @Override

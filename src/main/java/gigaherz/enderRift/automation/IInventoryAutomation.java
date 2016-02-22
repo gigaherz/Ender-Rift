@@ -28,13 +28,6 @@ public interface IInventoryAutomation
      */
     ItemStack getStackInSlot(int index);
 
-    /**
-     * Gets the corresponding sub-inventory for the given side.
-     *
-     * @param face The requested side.
-     * @return Returns an inventory instance representing the requested side's slots. Can be null.
-     */
-    IInventoryAutomation getInventoryForSide(@Nonnull EnumFacing face);
 
     /**
      * Tries to insert items into the inventory.

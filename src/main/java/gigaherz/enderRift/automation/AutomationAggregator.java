@@ -3,7 +3,6 @@ package gigaherz.enderRift.automation;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Lists;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumFacing;
 
 import javax.annotation.Nonnull;
 import java.util.List;
@@ -21,11 +20,6 @@ public class AutomationAggregator implements IInventoryAutomation
     public void add(IInventoryAutomation inv)
     {
         aggregated.add(inv);
-    }
-
-    public void clear()
-    {
-        aggregated.clear();
     }
 
     @Override
@@ -53,12 +47,6 @@ public class AutomationAggregator implements IInventoryAutomation
             index -= size;
         }
         return null;
-    }
-
-    @Override
-    public IInventoryAutomation getInventoryForSide(@Nonnull EnumFacing face)
-    {
-        return this;
     }
 
     @Override

@@ -4,6 +4,7 @@ import gigaherz.enderRift.EnderRiftMod;
 import gigaherz.enderRift.IModProxy;
 import gigaherz.enderRift.blocks.TileEnderRift;
 import gigaherz.enderRift.network.SetSpecialSlot;
+import gigaherz.enderRift.network.UpdateField;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.inventory.GuiContainerCreative;
@@ -113,6 +114,31 @@ public class ClientProxy implements IModProxy
             {
                 entityplayer.openContainer.putStackInSlot(message.slot, message.stack);
             }
+        }
+    }
+
+    @Override
+    public void handleUpdateField(final UpdateField message)
+    {
+        Minecraft.getMinecraft().addScheduledTask(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                ClientProxy.this.handleUpdateField2(message);
+            }
+        });
+    }
+
+    void handleUpdateField2(UpdateField message)
+    {
+        Minecraft gameController = Minecraft.getMinecraft();
+
+        EntityPlayer entityplayer = gameController.thePlayer;
+
+        if (message.windowId >= 0)
+        {
+            entityplayer.openContainer.updateProgressBar(message.field, message.value);
         }
     }
 }

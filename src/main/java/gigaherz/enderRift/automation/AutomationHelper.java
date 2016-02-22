@@ -29,8 +29,8 @@ public abstract class AutomationHelper implements IInventoryAutomation
     public static IInventoryAutomation get(Object object, EnumFacing facing)
     {
         // If the inventory is already automated, return it.
-        if (object instanceof IInventoryAutomation)
-            return ((IInventoryAutomation) object).getInventoryForSide(facing);
+        if (object instanceof IAutomationProvider)
+            return ((IAutomationProvider) object).getAutomation(facing);
 
         // If the inventory implements IItemHandler, wrap it.
         if (object instanceof ICapabilityProvider)
@@ -59,7 +59,7 @@ public abstract class AutomationHelper implements IInventoryAutomation
     public static boolean isAutomatable(Object object, EnumFacing facing)
     {
         // If the inventory is already automated, return it.
-        if (object instanceof IInventoryAutomation)
+        if (object instanceof IAutomationProvider)
             return true;
 
         // If the inventory is better sided, make use of it.
@@ -81,12 +81,6 @@ public abstract class AutomationHelper implements IInventoryAutomation
         private ItemHandlerWrapper(IItemHandler parent)
         {
             this.parent = parent;
-        }
-
-        @Override
-        public IInventoryAutomation getInventoryForSide(@Nonnull EnumFacing face)
-        {
-            return this;
         }
 
         @Override
@@ -194,12 +188,6 @@ public abstract class AutomationHelper implements IInventoryAutomation
         private IInventoryWrapper(IInventory parent)
         {
             this.parent = parent;
-        }
-
-        @Override
-        public IInventoryAutomation getInventoryForSide(@Nonnull EnumFacing face)
-        {
-            return this;
         }
 
         @Override

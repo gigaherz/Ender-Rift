@@ -161,7 +161,7 @@ public class BlockEnderRift
 
         int count = stack.stackSize;
         ItemStack stackToPush = stack.splitStack(count);
-        ItemStack remaining = rift.pushItems(stackToPush);
+        ItemStack remaining = rift.getAutomation(null).pushItems(stackToPush);
         if (remaining != null)
         {
             stack.stackSize += remaining.stackSize;
@@ -207,7 +207,7 @@ public class BlockEnderRift
 
         int numberToExtract = playerIn.isSneaking() ? 1 : stack.getMaxStackSize();
 
-        ItemStack extracted = rift.extractItems(stack.copy(), numberToExtract, false);
+        ItemStack extracted = rift.getAutomation(null).extractItems(stack.copy(), numberToExtract, false);
 
         if (extracted != null && extracted.stackSize > 0)
         {
@@ -237,7 +237,7 @@ public class BlockEnderRift
         EntityItem item = (EntityItem) entityIn;
         ItemStack stack = item.getEntityItem().copy();
 
-        ItemStack remaining = rift.pushItems(stack);
+        ItemStack remaining = rift.getAutomation(null).pushItems(stack);
 
         if (remaining == null)
         {

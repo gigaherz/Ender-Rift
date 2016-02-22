@@ -1,7 +1,10 @@
 package gigaherz.enderRift.gui;
 
+import gigaherz.enderRift.EnderRiftMod;
 import gigaherz.enderRift.blocks.TileGenerator;
+import gigaherz.enderRift.network.UpdateField;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.ICrafting;
@@ -48,14 +51,17 @@ public class ContainerGenerator
     {
         super.detectAndSendChanges();
 
-        for (ICrafting watcher : this.crafters)
+        for (int i = 0; i < prevFields.length; i++)
         {
-            for (int i = 0; i < prevFields.length; i++)
+            int field = this.tile.getField(i);
+            if (prevFields[i] != field)
             {
-                int field = this.tile.getField(i);
-                if (prevFields[i] != field)
+                for (ICrafting watcher : this.crafters)
                 {
-                    watcher.sendProgressBarUpdate(this, i, field);
+                    if (watcher instanceof EntityPlayerMP)
+                    {
+                        EnderRiftMod.channel.sendTo(new UpdateField(this.windowId, i, field), (EntityPlayerMP) watcher);
+                    }
                 }
             }
         }

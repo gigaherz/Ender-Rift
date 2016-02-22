@@ -4,6 +4,7 @@ import cofh.api.energy.IEnergyReceiver;
 import com.google.common.base.Predicate;
 import gigaherz.enderRift.ConfigValues;
 import gigaherz.enderRift.EnderRiftMod;
+import gigaherz.enderRift.automation.IAutomationProvider;
 import gigaherz.enderRift.automation.IInventoryAutomation;
 import gigaherz.enderRift.storage.RiftInventory;
 import gigaherz.enderRift.storage.RiftStorageWorldData;
@@ -17,7 +18,7 @@ import java.util.Random;
 
 public class TileEnderRift
         extends TileEntity
-        implements IEnergyReceiver, IInventoryAutomation
+        implements IEnergyReceiver, IAutomationProvider
 {
     public final Random rand = new Random();
     public final int energyLimit = 10000000;
@@ -26,6 +27,8 @@ public class TileEnderRift
 
     private int riftId;
     private RiftInventory inventory;
+
+    private AutomationEnergyWrapper automation = new AutomationEnergyWrapper();
 
     public void assemble(int id)
     {
@@ -157,113 +160,116 @@ public class TileEnderRift
     }
 
     @Override
-    public IInventoryAutomation getInventoryForSide(@Nonnull EnumFacing face)
+    public IInventoryAutomation getAutomation(EnumFacing face)
     {
-        return getInventory();
+        return automation;
     }
 
-    @Override
-    public ItemStack pushItems(@Nonnull ItemStack stack)
+    class AutomationEnergyWrapper implements IInventoryAutomation
     {
-        if (getInventory() == null)
-            return stack;
-
-        int stackSize = stack.stackSize;
-        int cost = getEffectivePowerUsageToInsert(stackSize);
-        while (cost > this.energyBuffer && stackSize > 0)
+        @Override
+        public ItemStack pushItems(@Nonnull ItemStack stack)
         {
-            stackSize--;
+            if (getInventory() == null)
+                return stack;
+
+            int stackSize = stack.stackSize;
+            int cost = getEffectivePowerUsageToInsert(stackSize);
+            while (cost > energyBuffer && stackSize > 0)
+            {
+                stackSize--;
+            }
+
+            if (stackSize <= 0)
+                return stack;
+
+            ItemStack temp = stack;
+            if (stackSize != stack.stackSize)
+            {
+                temp = stack.copy();
+                temp.stackSize = stackSize;
+            }
+
+            ItemStack remaining = getInventory().pushItems(temp);
+            if (remaining != null)
+                stackSize -= remaining.stackSize;
+
+            int actualCost = getEffectivePowerUsageToInsert(stackSize);
+            energyBuffer -= actualCost;
+
+            return remaining;
         }
 
-        if (stackSize <= 0)
-            return stack;
-
-        ItemStack temp = stack;
-        if (stackSize != stack.stackSize)
+        @Override
+        public ItemStack pullItems(int limit, Predicate<ItemStack> filter)
         {
-            temp = stack.copy();
-            temp.stackSize = stackSize;
-        }
+            if (getInventory() == null)
+                return null;
 
-        ItemStack remaining = getInventory().pushItems(temp);
-        if (remaining != null)
-            stackSize -= remaining.stackSize;
+            int cost = getEffectivePowerUsageToExtract(limit);
+            while (cost > energyBuffer && limit > 0)
+            {
+                limit--;
+            }
 
-        int actualCost = getEffectivePowerUsageToInsert(stackSize);
-        this.energyBuffer -= actualCost;
+            if (limit <= 0)
+                return null;
 
-        return remaining;
-    }
+            ItemStack extracted = getInventory().pullItems(limit, filter);
+            if (extracted == null)
+                return null;
 
-    @Override
-    public ItemStack pullItems(int limit, Predicate<ItemStack> filter)
-    {
-        if (getInventory() == null)
-            return null;
-
-        int cost = getEffectivePowerUsageToExtract(limit);
-        while (cost > this.energyBuffer && limit > 0)
-        {
-            limit--;
-        }
-
-        if (limit <= 0)
-            return null;
-
-        ItemStack extracted = getInventory().pullItems(limit, filter);
-        if (extracted == null)
-            return null;
-
-        int actualCost = getEffectivePowerUsageToExtract(extracted.stackSize);
-        this.energyBuffer -= actualCost;
-
-        return extracted;
-    }
-
-    @Override
-    public ItemStack extractItems(@Nonnull ItemStack stack, int wanted, boolean simulate)
-    {
-        if (getInventory() == null)
-            return null;
-
-        int cost = getEffectivePowerUsageToExtract(wanted);
-        while (cost > this.energyBuffer && wanted > 0)
-        {
-            wanted--;
-        }
-
-        if (wanted <= 0)
-            return null;
-
-        ItemStack extracted = getInventory().extractItems(stack, wanted, simulate);
-        if (extracted == null)
-            return null;
-
-        if (!simulate)
-        {
             int actualCost = getEffectivePowerUsageToExtract(extracted.stackSize);
-            this.energyBuffer -= actualCost;
+            energyBuffer -= actualCost;
+
+            return extracted;
         }
 
-        return extracted;
-    }
+        @Override
+        public ItemStack extractItems(@Nonnull ItemStack stack, int wanted, boolean simulate)
+        {
+            if (getInventory() == null)
+                return null;
 
-    @Override
-    public int getSizeInventory()
-    {
-        if (getInventory() == null)
-            return 0;
+            int cost = getEffectivePowerUsageToExtract(wanted);
+            while (cost > energyBuffer && wanted > 0)
+            {
+                wanted--;
+            }
 
-        return getInventory().getSizeInventory();
-    }
+            if (wanted <= 0)
+                return null;
 
-    @Override
-    public ItemStack getStackInSlot(int index)
-    {
-        if (getInventory() == null)
-            return null;
+            ItemStack extracted = getInventory().extractItems(stack, wanted, simulate);
+            if (extracted == null)
+                return null;
 
-        return getInventory().getStackInSlot(index);
+            if (!simulate)
+            {
+                int actualCost = getEffectivePowerUsageToExtract(extracted.stackSize);
+                energyBuffer -= actualCost;
+            }
+
+            return extracted;
+        }
+
+        @Override
+        public int getSizeInventory()
+        {
+            if (getInventory() == null)
+                return 0;
+
+            return getInventory().getSizeInventory();
+        }
+
+        @Override
+        public ItemStack getStackInSlot(int index)
+        {
+            if (getInventory() == null)
+                return null;
+
+            return getInventory().getStackInSlot(index);
+        }
     }
 
     public ItemStack chooseRandomStack()
@@ -278,7 +284,7 @@ public class TileEnderRift
 
         int slot = rand.nextInt(max);
 
-        return getStackInSlot(slot);
+        return automation.getStackInSlot(slot);
     }
 
     public int getRiftId()
