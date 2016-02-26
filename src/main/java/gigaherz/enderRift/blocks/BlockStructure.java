@@ -9,6 +9,7 @@ import net.minecraft.block.properties.PropertyBool;
 import net.minecraft.block.properties.PropertyEnum;
 import net.minecraft.block.state.BlockState;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
@@ -105,13 +106,49 @@ public class BlockStructure
     }
 
     @Override
+    public void setBlockBoundsBasedOnState(IBlockAccess worldIn, BlockPos pos)
+    {
+        IBlockState state = worldIn.getBlockState(pos);
+        AxisAlignedBB aabb = getBB(pos, state);
+        setBlockBounds(
+                (float)aabb.minX - pos.getX(),
+                (float)aabb.minY - pos.getY(),
+                (float)aabb.minZ - pos.getZ(),
+                (float)aabb.maxX - pos.getX(),
+                (float)aabb.maxY - pos.getY(),
+                (float)aabb.maxZ - pos.getZ());
+    }
+
+    @Override
     public AxisAlignedBB getSelectedBoundingBox(World worldIn, BlockPos pos)
+    {
+        IBlockState state = getActualState(worldIn.getBlockState(pos), worldIn, pos);
+        return getBB(pos, state);
+    }
+
+    @Override
+    public AxisAlignedBB getCollisionBoundingBox(World worldIn, BlockPos pos, IBlockState state)
+    {
+        return getBB(pos, state);
+    }
+
+    @Override
+    public void addCollisionBoxesToList(World worldIn, BlockPos pos, IBlockState state, AxisAlignedBB mask, List<AxisAlignedBB> list, Entity collidingEntity)
+    {
+        AxisAlignedBB bounds = getBB(pos, state);
+
+        if (bounds != null && mask.intersectsWith(bounds))
+        {
+            list.add(bounds);
+        }
+    }
+
+    public AxisAlignedBB getBB(BlockPos pos, IBlockState state)
     {
         int x = pos.getX();
         int y = pos.getY();
         int z = pos.getZ();
 
-        IBlockState state = worldIn.getBlockState(pos);
         if (state.getValue(TYPE1) == Type1.NORMAL)
         {
             Type2 d = state.getValue(TYPE2);
@@ -149,14 +186,6 @@ public class BlockStructure
         return new AxisAlignedBB(
                 x + 0 / 16.0f, y + 0 / 16.0f, z + 0 / 16.0f,
                 x + 16 / 16.0f, y + 16 / 16.0f, z + 16 / 16.0f);
-    }
-
-    @Override
-    public void breakBlock(World worldIn, BlockPos pos, IBlockState state)
-    {
-        super.breakBlock(worldIn, pos, state);
-
-        RiftStructure.breakStructure(worldIn, pos);
     }
 
     @Override
