@@ -39,6 +39,7 @@ public class BlockStructure
         setDefaultState(this.blockState.getBaseState()
                 .withProperty(TYPE1, Type1.NORMAL).withProperty(TYPE2, Type2.NONE)
                 .withProperty(CORNER, Corner.values[0]).withProperty(BASE, false));
+        setLightOpacity(0);
     }
 
     @Override
@@ -55,6 +56,18 @@ public class BlockStructure
 
     @Override
     public boolean isOpaqueCube()
+    {
+        return false;
+    }
+
+    @Override
+    public boolean isFullCube()
+    {
+        return false;
+    }
+
+    @Override
+    public boolean canBeReplacedByLeaves(IBlockAccess world, BlockPos pos)
     {
         return false;
     }
@@ -100,55 +113,45 @@ public class BlockStructure
     }
 
     @Override
-    public IBlockState getActualState(IBlockState state, IBlockAccess worldIn, BlockPos pos)
-    {
-        return super.getActualState(state, worldIn, pos);
-    }
-
-    @Override
     public void setBlockBoundsBasedOnState(IBlockAccess worldIn, BlockPos pos)
     {
         IBlockState state = worldIn.getBlockState(pos);
-        AxisAlignedBB aabb = getBB(pos, state);
+        AxisAlignedBB aabb = getBB(0, 0, 0, state);
         setBlockBounds(
-                (float)aabb.minX - pos.getX(),
-                (float)aabb.minY - pos.getY(),
-                (float)aabb.minZ - pos.getZ(),
-                (float)aabb.maxX - pos.getX(),
-                (float)aabb.maxY - pos.getY(),
-                (float)aabb.maxZ - pos.getZ());
+                (float)aabb.minX,
+                (float)aabb.minY,
+                (float)aabb.minZ,
+                (float)aabb.maxX,
+                (float)aabb.maxY,
+                (float)aabb.maxZ);
     }
 
     @Override
     public AxisAlignedBB getSelectedBoundingBox(World worldIn, BlockPos pos)
     {
         IBlockState state = getActualState(worldIn.getBlockState(pos), worldIn, pos);
-        return getBB(pos, state);
+        return getBB(pos.getX(), pos.getY(), pos.getZ(), state);
     }
 
     @Override
     public AxisAlignedBB getCollisionBoundingBox(World worldIn, BlockPos pos, IBlockState state)
     {
-        return getBB(pos, state);
+        return getBB(pos.getX(), pos.getY(), pos.getZ(), state);
     }
 
     @Override
     public void addCollisionBoxesToList(World worldIn, BlockPos pos, IBlockState state, AxisAlignedBB mask, List<AxisAlignedBB> list, Entity collidingEntity)
     {
-        AxisAlignedBB bounds = getBB(pos, state);
+        AxisAlignedBB aabb = getBB(pos.getX(), pos.getY(), pos.getZ(), state);
 
-        if (bounds != null && mask.intersectsWith(bounds))
+        if (aabb != null && mask.intersectsWith(aabb))
         {
-            list.add(bounds);
+            list.add(aabb);
         }
     }
 
-    public AxisAlignedBB getBB(BlockPos pos, IBlockState state)
+    public AxisAlignedBB getBB(int x, int y, int z, IBlockState state)
     {
-        int x = pos.getX();
-        int y = pos.getY();
-        int z = pos.getZ();
-
         if (state.getValue(TYPE1) == Type1.NORMAL)
         {
             Type2 d = state.getValue(TYPE2);
