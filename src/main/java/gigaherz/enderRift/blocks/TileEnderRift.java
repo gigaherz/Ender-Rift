@@ -1,7 +1,8 @@
 package gigaherz.enderRift.blocks;
 
-import cofh.api.energy.IEnergyReceiver;
 import com.google.common.base.Predicate;
+import gigaherz.capabilities.api.energy.EnergyBuffer;
+import gigaherz.capabilities.api.energy.IEnergyHandler;
 import gigaherz.enderRift.ConfigValues;
 import gigaherz.enderRift.EnderRiftMod;
 import gigaherz.enderRift.automation.IAutomationProvider;
@@ -21,12 +22,11 @@ import java.util.Random;
 
 public class TileEnderRift
         extends TileEntity
-        implements IEnergyReceiver, IAutomationProvider
+        implements IAutomationProvider
 {
     public final Random rand = new Random();
-    public final int energyLimit = 10000000;
 
-    private int energyBuffer = 0;
+    private EnergyBuffer energyBuffer = new EnergyBuffer(10000000);
 
     private int riftId;
     private RiftInventory inventory;
@@ -59,6 +59,8 @@ public class TileEnderRift
         }
         return inventory;
     }
+
+    public IEnergyHandler getEnergyBuffer() { return energyBuffer; }
 
     @Override
     public boolean shouldRefresh(World world, BlockPos pos, IBlockState oldState, IBlockState newSate)
@@ -125,47 +127,15 @@ public class TileEnderRift
     public void readFromNBT(NBTTagCompound nbtTagCompound)
     {
         super.readFromNBT(nbtTagCompound);
-        energyBuffer = nbtTagCompound.getInteger("Energy");
+        energyBuffer.setEnergy(nbtTagCompound.getInteger("Energy"));
         riftId = nbtTagCompound.getInteger("RiftId");
     }
 
     public void writeToNBT(NBTTagCompound nbtTagCompound)
     {
         super.writeToNBT(nbtTagCompound);
-        nbtTagCompound.setInteger("Energy", energyBuffer);
+        nbtTagCompound.setInteger("Energy", energyBuffer.getEnergy());
         nbtTagCompound.setInteger("RiftId", riftId);
-    }
-
-    @Override
-    public int receiveEnergy(EnumFacing from, int maxReceive, boolean simulate)
-    {
-        int receive = Math.min(maxReceive, energyLimit - energyBuffer);
-        if (!simulate && receive > 0)
-        {
-            energyBuffer += receive;
-
-            this.markDirty();
-        }
-
-        return receive;
-    }
-
-    @Override
-    public int getEnergyStored(EnumFacing from)
-    {
-        return energyBuffer;
-    }
-
-    @Override
-    public int getMaxEnergyStored(EnumFacing from)
-    {
-        return energyLimit;
-    }
-
-    @Override
-    public boolean canConnectEnergy(EnumFacing from)
-    {
-        return false;
     }
 
     @Override
@@ -184,7 +154,7 @@ public class TileEnderRift
 
             int stackSize = stack.stackSize;
             int cost = getEffectivePowerUsageToInsert(stackSize);
-            while (cost > energyBuffer && stackSize > 0)
+            while (cost > energyBuffer.getEnergy() && stackSize > 0)
             {
                 stackSize--;
             }
@@ -204,7 +174,7 @@ public class TileEnderRift
                 stackSize -= remaining.stackSize;
 
             int actualCost = getEffectivePowerUsageToInsert(stackSize);
-            energyBuffer -= actualCost;
+            energyBuffer.extractEnergy(actualCost, false);
 
             return remaining;
         }
@@ -216,7 +186,7 @@ public class TileEnderRift
                 return null;
 
             int cost = getEffectivePowerUsageToExtract(limit);
-            while (cost > energyBuffer && limit > 0)
+            while (cost > energyBuffer.getEnergy() && limit > 0)
             {
                 limit--;
             }
@@ -229,7 +199,7 @@ public class TileEnderRift
                 return null;
 
             int actualCost = getEffectivePowerUsageToExtract(extracted.stackSize);
-            energyBuffer -= actualCost;
+            energyBuffer.extractEnergy(actualCost, false);
 
             return extracted;
         }
@@ -241,7 +211,7 @@ public class TileEnderRift
                 return null;
 
             int cost = getEffectivePowerUsageToExtract(wanted);
-            while (cost > energyBuffer && wanted > 0)
+            while (cost > energyBuffer.getEnergy() && wanted > 0)
             {
                 wanted--;
             }
@@ -256,7 +226,7 @@ public class TileEnderRift
             if (!simulate)
             {
                 int actualCost = getEffectivePowerUsageToExtract(extracted.stackSize);
-                energyBuffer -= actualCost;
+                energyBuffer.extractEnergy(actualCost, false);
             }
 
             return extracted;

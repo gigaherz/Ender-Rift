@@ -208,8 +208,8 @@ public class WailaProviders
             tag.setInteger("energyExtract", (int) Math.ceil(rift.getEnergyExtract()));
             tag.setBoolean("isFormed", rift.getBlockMetadata() != 0);
             tag.setInteger("riftId", rift.getRiftId());
-            tag.setInteger("energy", rift.getEnergyStored(EnumFacing.NORTH));
-            tag.setInteger("energyTotal", rift.getMaxEnergyStored(EnumFacing.NORTH));
+            tag.setInteger("energy", rift.getEnergyBuffer().getEnergy());
+            tag.setInteger("energyTotal", rift.getEnergyBuffer().getCapacity());
 
             return tag;
         }

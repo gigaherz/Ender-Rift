@@ -2,6 +2,9 @@ package gigaherz.enderRift.blocks;
 
 import cofh.api.energy.IEnergyProvider;
 import cofh.api.energy.IEnergyReceiver;
+import gigaherz.capabilities.api.energy.CapabilityEnergy;
+import gigaherz.capabilities.api.energy.IEnergyHandler;
+import gigaherz.capabilities.api.energy.compat.RFWrapper;
 import gigaherz.enderRift.EnderRiftMod;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
@@ -16,6 +19,7 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.IChatComponent;
 import net.minecraft.util.ITickable;
 import net.minecraft.world.World;
+import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.Constants;
 
 public class TileGenerator extends TileEntity
@@ -37,6 +41,25 @@ public class TileGenerator extends TileEntity
     int currentItemBurnTime;
     int containedEnergy;
     int timeInterval;
+
+    RFWrapper energyCapability = RFWrapper.wrap(this, null);
+
+    @Override
+    public boolean hasCapability(Capability<?> capability, EnumFacing facing)
+    {
+        if(capability == CapabilityEnergy.ENERGY_HANDLER_CAPABILITY)
+            return true;
+        return super.hasCapability(capability, facing);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public <T> T getCapability(Capability<T> capability, EnumFacing facing)
+    {
+        if(capability == CapabilityEnergy.ENERGY_HANDLER_CAPABILITY)
+            return (T)energyCapability;
+        return super.getCapability(capability, facing);
+    }
 
     @Override
     public boolean shouldRefresh(World world, BlockPos pos, IBlockState oldState, IBlockState newSate)
@@ -98,36 +121,46 @@ public class TileGenerator extends TileEntity
         int sendPower = Math.min(PowerTransferMax, containedEnergy);
         if (sendPower > 0)
         {
-            IEnergyReceiver[] receivers = new IEnergyReceiver[6];
+            IEnergyHandler[] handlers = new IEnergyHandler[6];
             int[] wantedSide = new int[6];
             int accepted = 0;
             for (EnumFacing neighbor : EnumFacing.VALUES)
             {
                 TileEntity e = worldObj.getTileEntity(pos.offset(neighbor));
-                if (e instanceof IEnergyReceiver)
+                EnumFacing from = neighbor.getOpposite();
+
+                if(e == null)
+                    continue;
+
+                IEnergyHandler handler = null;
+                if(e.hasCapability(CapabilityEnergy.ENERGY_HANDLER_CAPABILITY, from))
                 {
-                    IEnergyReceiver r = (IEnergyReceiver) e;
-                    EnumFacing from = neighbor.getOpposite();
-                    if (r.canConnectEnergy(from))
-                    {
-                        receivers[from.ordinal()] = r;
-                        int wanted = r.receiveEnergy(from, sendPower, true);
-                        wantedSide[from.ordinal()] = wanted;
-                        accepted += wanted;
-                    }
+                    handler = e.getCapability(CapabilityEnergy.ENERGY_HANDLER_CAPABILITY, from);
+                }
+                else if (e instanceof IEnergyReceiver)
+                {
+                    handler = RFWrapper.wrap(e, from);
+                }
+
+                if(handler != null)
+                {
+                    handlers[from.ordinal()] = handler;
+                    int wanted = handler.insertEnergy(sendPower, true);
+                    wantedSide[from.ordinal()] = wanted;
+                    accepted += wanted;
                 }
             }
             if (accepted > 0)
             {
                 for (EnumFacing from : EnumFacing.VALUES)
                 {
-                    IEnergyReceiver r = receivers[from.ordinal()];
+                    IEnergyHandler handler = handlers[from.ordinal()];
                     int wanted = wantedSide[from.ordinal()];
-                    if (r == null || wanted == 0)
+                    if (handler == null || wanted == 0)
                         continue;
 
                     int given = Math.min(Math.min(containedEnergy, wanted), wanted * accepted / sendPower);
-                    int received = Math.min(given, r.receiveEnergy(from, given, false));
+                    int received = Math.min(given, handler.insertEnergy(given, false));
                     containedEnergy -= received;
                     if (containedEnergy <= 0)
                         break;

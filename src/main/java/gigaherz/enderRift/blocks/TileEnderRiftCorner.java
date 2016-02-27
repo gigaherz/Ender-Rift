@@ -1,11 +1,15 @@
 package gigaherz.enderRift.blocks;
 
 import cofh.api.energy.IEnergyReceiver;
+import gigaherz.capabilities.api.energy.CapabilityEnergy;
+import gigaherz.capabilities.api.energy.IEnergyHandler;
+import gigaherz.capabilities.api.energy.compat.RFWrapper;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
+import net.minecraftforge.common.capabilities.Capability;
 
 public class TileEnderRiftCorner
         extends TileEntity
@@ -16,7 +20,24 @@ public class TileEnderRiftCorner
     int zParent;
     TileEnderRift energyParent;
 
-    public IEnergyReceiver getParent()
+    @Override
+    public boolean hasCapability(Capability<?> capability, EnumFacing facing)
+    {
+        if(capability == CapabilityEnergy.ENERGY_HANDLER_CAPABILITY)
+            return getParent() != null;
+        return super.hasCapability(capability, facing);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public <T> T getCapability(Capability<T> capability, EnumFacing facing)
+    {
+        if(capability == CapabilityEnergy.ENERGY_HANDLER_CAPABILITY)
+            return (T)getParent();
+        return super.getCapability(capability, facing);
+    }
+
+    public IEnergyHandler getParent()
     {
         if (energyParent == null)
         {
@@ -51,7 +72,7 @@ public class TileEnderRiftCorner
                 energyParent = (TileEnderRift) te;
             }
         }
-        return energyParent;
+        return energyParent.getEnergyBuffer();
     }
 
     public void readFromNBT(NBTTagCompound nbtTagCompound)
@@ -67,33 +88,33 @@ public class TileEnderRiftCorner
     @Override
     public int receiveEnergy(EnumFacing from, int maxReceive, boolean simulate)
     {
-        IEnergyReceiver parent = getParent();
+        IEnergyHandler parent = getParent();
         if (parent == null)
             return 0;
-        return parent.receiveEnergy(from, maxReceive, simulate);
+        return parent.insertEnergy(maxReceive, simulate);
     }
 
     @Override
     public int getEnergyStored(EnumFacing from)
     {
-        IEnergyReceiver parent = getParent();
+        IEnergyHandler parent = getParent();
         if (parent == null)
             return 0;
-        return getParent().getEnergyStored(from);
+        return getParent().getEnergy();
     }
 
     @Override
     public int getMaxEnergyStored(EnumFacing from)
     {
-        IEnergyReceiver parent = getParent();
+        IEnergyHandler parent = getParent();
         if (parent == null)
             return 0;
-        return getParent().getMaxEnergyStored(from);
+        return getParent().getCapacity();
     }
 
     @Override
     public boolean canConnectEnergy(EnumFacing from)
     {
-        return true;
+        return getParent() != null;
     }
 }
