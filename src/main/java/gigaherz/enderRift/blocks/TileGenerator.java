@@ -1,10 +1,8 @@
 package gigaherz.enderRift.blocks;
 
-import cofh.api.energy.IEnergyProvider;
-import cofh.api.energy.IEnergyReceiver;
 import gigaherz.capabilities.api.energy.CapabilityEnergy;
+import gigaherz.capabilities.api.energy.EnergyBuffer;
 import gigaherz.capabilities.api.energy.IEnergyHandler;
-import gigaherz.capabilities.api.energy.compat.RFWrapper;
 import gigaherz.enderRift.EnderRiftMod;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
@@ -23,7 +21,7 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.Constants;
 
 public class TileGenerator extends TileEntity
-        implements IInventory, ITickable, IEnergyProvider
+        implements IInventory, ITickable
 {
     public static final int SlotCount = 1;
     public static final int PowerLimit = 100000;
@@ -42,7 +40,7 @@ public class TileGenerator extends TileEntity
     int containedEnergy;
     int timeInterval;
 
-    RFWrapper energyCapability = RFWrapper.wrap(this, null);
+    EnergyBuffer energyCapability = new EnergyBuffer(PowerLimit);
 
     @Override
     public boolean hasCapability(Capability<?> capability, EnumFacing facing)
@@ -136,10 +134,6 @@ public class TileGenerator extends TileEntity
                 if(e.hasCapability(CapabilityEnergy.ENERGY_HANDLER_CAPABILITY, from))
                 {
                     handler = e.getCapability(CapabilityEnergy.ENERGY_HANDLER_CAPABILITY, from);
-                }
-                else if (e instanceof IEnergyReceiver)
-                {
-                    handler = RFWrapper.wrap(e, from);
                 }
 
                 if(handler != null)
@@ -391,33 +385,6 @@ public class TileGenerator extends TileEntity
             inputs[i] = null;
         }
         markDirty();
-    }
-
-    @Override
-    public int extractEnergy(EnumFacing facing, int maxExtract, boolean simulate)
-    {
-        int powerToExtract = Math.min(containedEnergy, maxExtract);
-        if (!simulate)
-            containedEnergy -= powerToExtract;
-        return powerToExtract;
-    }
-
-    @Override
-    public int getEnergyStored(EnumFacing facing)
-    {
-        return containedEnergy;
-    }
-
-    @Override
-    public int getMaxEnergyStored(EnumFacing facing)
-    {
-        return PowerLimit;
-    }
-
-    @Override
-    public boolean canConnectEnergy(EnumFacing facing)
-    {
-        return true;
     }
 
     public boolean isBurning()

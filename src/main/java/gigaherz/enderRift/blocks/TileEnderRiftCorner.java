@@ -1,9 +1,7 @@
 package gigaherz.enderRift.blocks;
 
-import cofh.api.energy.IEnergyReceiver;
 import gigaherz.capabilities.api.energy.CapabilityEnergy;
 import gigaherz.capabilities.api.energy.IEnergyHandler;
-import gigaherz.capabilities.api.energy.compat.RFWrapper;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
@@ -13,7 +11,6 @@ import net.minecraftforge.common.capabilities.Capability;
 
 public class TileEnderRiftCorner
         extends TileEntity
-        implements IEnergyReceiver
 {
     int xParent = 0;
     int yParent;
@@ -83,38 +80,5 @@ public class TileEnderRiftCorner
     public void writeToNBT(NBTTagCompound nbtTagCompound)
     {
         super.writeToNBT(nbtTagCompound);
-    }
-
-    @Override
-    public int receiveEnergy(EnumFacing from, int maxReceive, boolean simulate)
-    {
-        IEnergyHandler parent = getParent();
-        if (parent == null)
-            return 0;
-        return parent.insertEnergy(maxReceive, simulate);
-    }
-
-    @Override
-    public int getEnergyStored(EnumFacing from)
-    {
-        IEnergyHandler parent = getParent();
-        if (parent == null)
-            return 0;
-        return getParent().getEnergy();
-    }
-
-    @Override
-    public int getMaxEnergyStored(EnumFacing from)
-    {
-        IEnergyHandler parent = getParent();
-        if (parent == null)
-            return 0;
-        return getParent().getCapacity();
-    }
-
-    @Override
-    public boolean canConnectEnergy(EnumFacing from)
-    {
-        return getParent() != null;
     }
 }
