@@ -5,6 +5,7 @@ import gigaherz.enderRift.EnderRiftMod;
 import gigaherz.enderRift.automation.IInventoryAutomation;
 import gigaherz.enderRift.blocks.TileBrowser;
 import gigaherz.enderRift.misc.SortMode;
+import gigaherz.enderRift.network.SetFilterText;
 import gigaherz.enderRift.network.SetScrollPosition;
 import gigaherz.enderRift.network.SetSortMode;
 import gigaherz.enderRift.network.SetSpecialSlot;
@@ -14,6 +15,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.*;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.text.ITextComponent;
 
@@ -30,6 +32,7 @@ public class ContainerBrowser
     int actualSlotCount;
     public int scroll;
     public SortMode sortMode = SortMode.StackSize;
+    private String filterText = "";
 
     final static int Left = 8;
     final static int Top = 18;
@@ -177,6 +180,20 @@ public class ContainerBrowser
         else
         {
             EnderRiftMod.channel.sendToServer(new SetSortMode(windowId, sortMode));
+        }
+    }
+
+    public void setFilterText(String text)
+    {
+        this.filterText = text;
+
+        if (!tile.getWorld().isRemote)
+        {
+            fakeInventoryServer.refresh();
+        }
+        else
+        {
+            EnderRiftMod.channel.sendToServer(new SetFilterText(windowId, filterText));
         }
     }
 
@@ -401,7 +418,6 @@ public class ContainerBrowser
         return canInsert;
     }
 
-
     public ItemStack addToPlayer(ItemStack stack)
     {
         int startIndex = FakeSlots;
@@ -474,6 +490,9 @@ public class ContainerBrowser
         {
             IInventoryAutomation inv = tile.getAutomation();
 
+            final List<ItemStack> slotsSeen = Lists.newArrayList();
+            final List<String> itemData = Lists.newArrayList();
+
             slots.clear();
 
             if (inv == null)
@@ -488,7 +507,7 @@ public class ContainerBrowser
 
                 boolean found = false;
 
-                for (ItemStack cachedStack : slots)
+                for (ItemStack cachedStack : slotsSeen)
                 {
                     if (ItemStack.areItemsEqual(cachedStack, invStack) && ItemStack.areItemStackTagsEqual(cachedStack, invStack))
                     {
@@ -501,7 +520,31 @@ public class ContainerBrowser
                 if (!found)
                 {
                     ItemStack stack = invStack.copy();
-                    slots.add(stack);
+                    slotsSeen.add(stack);
+
+                    boolean matchesSearch = true;
+                    if (filterText != null && filterText.length() > 0)
+                    {
+                        itemData.clear();
+                        Item item = invStack.getItem();
+                        itemData.add(stack.getDisplayName());
+                        itemData.add(Item.itemRegistry.getNameForObject(item).toString());
+                        item.addInformation(stack, null, itemData, false);
+                        matchesSearch = false;
+                        for(String s : itemData)
+                        {
+                            if(s.contains(filterText))
+                            {
+                                matchesSearch = true;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (matchesSearch)
+                    {
+                        slots.add(stack);
+                    }
                 }
             }
 

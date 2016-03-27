@@ -4,10 +4,7 @@ import gigaherz.capabilities.api.energy.CapabilityEnergy;
 import gigaherz.enderRift.blocks.*;
 import gigaherz.enderRift.gui.GuiHandler;
 import gigaherz.enderRift.items.ItemEnderRift;
-import gigaherz.enderRift.network.SetScrollPosition;
-import gigaherz.enderRift.network.SetSortMode;
-import gigaherz.enderRift.network.SetSpecialSlot;
-import gigaherz.enderRift.network.UpdateField;
+import gigaherz.enderRift.network.*;
 import gigaherz.enderRift.recipe.RecipesRiftDuplication;
 import gigaherz.enderRift.rift.RiftStructure;
 import net.minecraft.block.Block;
@@ -116,6 +113,7 @@ public class EnderRiftMod
         channel.registerMessage(SetSpecialSlot.Handler.class, SetSpecialSlot.class, messageNumber++, Side.CLIENT);
         channel.registerMessage(SetScrollPosition.Handler.class, SetScrollPosition.class, messageNumber++, Side.SERVER);
         channel.registerMessage(SetSortMode.Handler.class, SetSortMode.class, messageNumber++, Side.SERVER);
+        channel.registerMessage(SetFilterText.Handler.class, SetFilterText.class, messageNumber++, Side.SERVER);
         channel.registerMessage(UpdateField.Handler.class, UpdateField.class, messageNumber++, Side.CLIENT);
         logger.debug("Final message number: " + messageNumber);
 
