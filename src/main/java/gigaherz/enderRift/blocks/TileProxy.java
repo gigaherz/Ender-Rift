@@ -3,7 +3,7 @@ package gigaherz.enderRift.blocks;
 import com.google.common.collect.Queues;
 import com.google.common.collect.Sets;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.EnumFacing;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.lang3.tuple.Triple;

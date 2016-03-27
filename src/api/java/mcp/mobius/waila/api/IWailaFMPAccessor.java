@@ -3,8 +3,8 @@ package mcp.mobius.waila.api;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.MovingObjectPosition;
-import net.minecraft.util.Vec3;
+import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
 /**
@@ -23,7 +23,7 @@ public interface IWailaFMPAccessor
 
     TileEntity getTileEntity();
 
-    MovingObjectPosition getPosition();
+    RayTraceResult getPosition();
 
     NBTTagCompound getNBTData();
 
@@ -33,7 +33,7 @@ public interface IWailaFMPAccessor
 
     double getPartialFrame();
 
-    Vec3 getRenderingPosition();
+    Vec3d getRenderingPosition();
 
     String getID();
 }

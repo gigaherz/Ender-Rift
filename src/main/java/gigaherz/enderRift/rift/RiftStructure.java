@@ -14,7 +14,7 @@ import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 public class RiftStructure
@@ -96,7 +96,8 @@ public class RiftStructure
                     Block w = world.getBlockState(bp).getBlock();
                     if (b == Blocks.air)
                     {
-                        if (!w.isAir(world, bp))
+                        IBlockState st = world.getBlockState(bp);
+                        if (!w.isAir(st, world, bp))
                             return false;
                     }
                     else if (b != EnderRiftMod.rift)

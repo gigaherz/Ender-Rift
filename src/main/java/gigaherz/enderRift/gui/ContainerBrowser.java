@@ -13,12 +13,9 @@ import gigaherz.enderRift.slots.SlotFakeServer;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.inventory.Container;
-import net.minecraft.inventory.ICrafting;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.Slot;
+import net.minecraft.inventory.*;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.IChatComponent;
+import net.minecraft.util.text.ITextComponent;
 
 import java.util.Comparator;
 import java.util.List;
@@ -190,9 +187,9 @@ public class ContainerBrowser
     }
 
     @Override
-    public ItemStack slotClick(int slotId, int clickedButton, int mode, EntityPlayer playerIn)
+    public ItemStack slotClick(int slotId, int dragType, ClickType clickTypeIn, EntityPlayer player)
     {
-        InventoryPlayer inventoryPlayer = playerIn.inventory;
+        InventoryPlayer inventoryPlayer = player.inventory;
 
         if (slotId >= 0 && slotId < FakeSlots)
         {
@@ -203,14 +200,14 @@ public class ContainerBrowser
             Slot slot = this.inventorySlots.get(slotId);
             ItemStack existing = slot.getStack();
 
-            if (mode == 0)
+            if (clickTypeIn == ClickType.PICKUP)
             {
                 int amount = 1;
                 ItemStack dropping = inventoryPlayer.getItemStack();
 
                 if (dropping != null && ItemStack.areItemsEqual(dropping, existing))
                 {
-                    if (clickedButton == 0)
+                    if (dragType == 0)
                     {
                         if (dropping.stackSize < dropping.getMaxStackSize())
                         {
@@ -249,7 +246,7 @@ public class ContainerBrowser
                 }
                 else if (dropping != null)
                 {
-                    if (clickedButton == 0)
+                    if (dragType == 0)
                     {
                         ItemStack remaining = parent.pushItems(dropping);
                         if (remaining != null)
@@ -299,10 +296,10 @@ public class ContainerBrowser
                 detectAndSendChanges();
                 return slot.getStack();
             }
-            else if (mode == 1 && existing != null)
+            else if (clickTypeIn == ClickType.QUICK_MOVE && existing != null)
             {
                 int amount = existing.getMaxStackSize();
-                if (clickedButton != 0 && amount > 1)
+                if (dragType != 0 && amount > 1)
                     amount /= 2;
 
                 if (amount == 0)
@@ -327,10 +324,11 @@ public class ContainerBrowser
                 }
             }
 
-            return null;
+            if(clickTypeIn != ClickType.CLONE)
+                return null;
         }
 
-        return super.slotClick(slotId, clickedButton, mode, playerIn);
+        return super.slotClick(slotId, dragType, clickTypeIn, player);
     }
 
     public ItemStack simulateAddToPlayer(ItemStack stack, int amount)
@@ -651,7 +649,7 @@ public class ContainerBrowser
         }
 
         @Override
-        public IChatComponent getDisplayName()
+        public ITextComponent getDisplayName()
         {
             return null;
         }
@@ -798,7 +796,7 @@ public class ContainerBrowser
         }
 
         @Override
-        public IChatComponent getDisplayName()
+        public ITextComponent getDisplayName()
         {
             return null;
         }

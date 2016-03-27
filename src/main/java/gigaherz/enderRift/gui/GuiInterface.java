@@ -6,7 +6,7 @@ import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.StatCollector;
+import net.minecraft.util.text.translation.I18n;
 
 public class GuiInterface extends GuiContainer
 {
@@ -28,11 +28,11 @@ public class GuiInterface extends GuiContainer
     @Override
     protected void drawGuiContainerForegroundLayer(int i, int j)
     {
-        String name = StatCollector.translateToLocal(this.tile.getName());
+        String name = I18n.translateToLocal(this.tile.getName());
         fontRendererObj.drawString(name, (xSize - fontRendererObj.getStringWidth(name)) / 2, 6, 0x404040);
-        fontRendererObj.drawString(StatCollector.translateToLocal(this.player.getName()), 8, ySize - 96 + 2, 0x404040);
+        fontRendererObj.drawString(I18n.translateToLocal(this.player.getName()), 8, ySize - 96 + 2, 0x404040);
 
-        fontRendererObj.drawString(StatCollector.translateToLocal(textFilters), 8, 20, 0x404040);
+        fontRendererObj.drawString(I18n.translateToLocal(textFilters), 8, 20, 0x404040);
     }
 
     @Override

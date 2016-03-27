@@ -8,7 +8,7 @@ import gigaherz.enderRift.network.UpdateField;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.inventory.GuiContainerCreative;
-import net.minecraft.client.resources.model.ModelResourceLocation;
+import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
@@ -26,7 +26,7 @@ public class ClientProxy implements IModProxy
     @Override
     public void preInit()
     {
-        OBJLoader.instance.addDomain(EnderRiftMod.MODID);
+        OBJLoader.INSTANCE.addDomain(EnderRiftMod.MODID);
         ClientRegistry.bindTileEntitySpecialRenderer(TileEnderRift.class, new TESREnderRift());
         registerItemModel(EnderRiftMod.riftOrb, 0, "item_rift");
         registerBlockModelAsItem(EnderRiftMod.rift, "blockEnderRift");
@@ -43,7 +43,7 @@ public class ClientProxy implements IModProxy
     @SubscribeEvent
     public void onTextureStitchEvent(TextureStitchEvent.Pre event)
     {
-        event.map.registerSprite(new ResourceLocation(EnderRiftMod.MODID + ":blocks/rift_aura"));
+        event.getMap().registerSprite(new ResourceLocation(EnderRiftMod.MODID + ":blocks/rift_aura"));
     }
 
     public void registerBlockModelAsItem(final Block block, final String blockName)

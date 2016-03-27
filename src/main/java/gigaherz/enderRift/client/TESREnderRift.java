@@ -3,10 +3,10 @@ package gigaherz.enderRift.client;
 import gigaherz.enderRift.blocks.TileEnderRift;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraftforge.client.model.IFlexibleBakedModel;
 import org.lwjgl.opengl.GL11;
 
 public class TESREnderRift extends TileEntitySpecialRenderer<TileEnderRift>
@@ -26,7 +26,7 @@ public class TESREnderRift extends TileEntitySpecialRenderer<TileEnderRift>
         float xz = (float) Math.sqrt(tx * tx + tz * tz);
         float pitch = (float) Math.atan2(ty, xz);
 
-        IFlexibleBakedModel model = RenderingStuffs.loadModel("enderrift:block/sphere.obj");
+        IBakedModel model = RenderingStuffs.loadModel("enderrift:block/sphere.obj");
 
         bindTexture(TextureMap.locationBlocksTexture);
 

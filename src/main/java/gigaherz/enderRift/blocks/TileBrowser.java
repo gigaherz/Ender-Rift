@@ -8,8 +8,8 @@ import gigaherz.enderRift.automation.AutomationHelper;
 import gigaherz.enderRift.automation.IInventoryAutomation;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.math.BlockPos;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.lang3.tuple.Triple;
 

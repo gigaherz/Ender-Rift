@@ -8,7 +8,9 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumActionResult;
+import net.minecraft.util.EnumHand;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.world.World;
 
@@ -43,18 +45,18 @@ public class ItemEnderRift extends Item
     }
 
     @Override
-    public boolean onItemUse(ItemStack stack, EntityPlayer playerIn, World worldIn, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ)
+    public EnumActionResult onItemUse(ItemStack stack, EntityPlayer playerIn, World worldIn, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ)
     {
         if (worldIn.isRemote)
-            return true;
+            return EnumActionResult.SUCCESS;
 
-        if (!playerIn.canPlayerEdit(pos, side, stack))
-            return false;
+        if (!playerIn.canPlayerEdit(pos, facing, stack))
+            return EnumActionResult.PASS;
 
         IBlockState state = worldIn.getBlockState(pos);
 
         if (state.getBlock() != EnderRiftMod.rift)
-            return false;
+            return EnumActionResult.PASS;
 
         if (state.getValue(BlockEnderRift.ASSEMBLED))
         {
@@ -62,13 +64,13 @@ public class ItemEnderRift extends Item
             if (tag == null || !tag.hasKey("RiftId"))
             {
                 if (!RiftStructure.duplicateOrb(worldIn, pos, playerIn))
-                    return false;
+                    return EnumActionResult.PASS;
             }
         }
         else
         {
             if (!RiftStructure.assemble(worldIn, pos, stack))
-                return false;
+                return EnumActionResult.PASS;
         }
 
         if (!playerIn.capabilities.isCreativeMode)
@@ -76,6 +78,6 @@ public class ItemEnderRift extends Item
             --stack.stackSize;
         }
 
-        return true;
+        return EnumActionResult.SUCCESS;
     }
 }

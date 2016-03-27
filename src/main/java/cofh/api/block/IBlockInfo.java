@@ -3,9 +3,9 @@ package cofh.api.block;
 import java.util.List;
 
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.IChatComponent;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.ITextComponent;
 import net.minecraft.world.IBlockAccess;
 import cofh.api.tileentity.ITileInfo;
 
@@ -34,6 +34,6 @@ public interface IBlockInfo {
 	 * @param debug
 	 *            If true, the block should return "debug" information.
 	 */
-	void getBlockInfo(IBlockAccess world, BlockPos pos, EnumFacing side, EntityPlayer player, List<IChatComponent> info, boolean debug);
+	void getBlockInfo(IBlockAccess world, BlockPos pos, EnumFacing side, EntityPlayer player, List<ITextComponent> info, boolean debug);
 
 }

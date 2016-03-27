@@ -3,13 +3,14 @@ package gigaherz.enderRift.blocks;
 import gigaherz.enderRift.EnderRiftMod;
 import gigaherz.enderRift.automation.AutomationHelper;
 import net.minecraft.block.Block;
+import net.minecraft.block.SoundType;
 import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.PropertyBool;
-import net.minecraft.block.state.BlockState;
+import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
@@ -26,7 +27,7 @@ public class BlockProxy extends Block
     public BlockProxy()
     {
         super(Material.iron, MapColor.grayColor);
-        setStepSound(soundTypeMetal);
+        setSoundType(SoundType.METAL);
         setUnlocalizedName(EnderRiftMod.MODID + ".blockProxy");
         setCreativeTab(EnderRiftMod.tabEnderRift);
         setDefaultState(blockState.getBaseState()
@@ -36,13 +37,12 @@ public class BlockProxy extends Block
                 .withProperty(EAST, false)
                 .withProperty(UP, false)
                 .withProperty(DOWN, false));
-        setBlockBounds(0.0F, 0.0F, 0.0F, 1.0F, 1.0F, 1.0F);
         setHardness(3.0F);
         setResistance(8.0F);
     }
 
     @Override
-    public boolean isOpaqueCube()
+    public boolean isOpaqueCube(IBlockState state)
     {
         return false;
     }
@@ -62,14 +62,13 @@ public class BlockProxy extends Block
     @Override
     public IBlockState getActualState(IBlockState state, IBlockAccess worldIn, BlockPos pos)
     {
-        IBlockState updated = state
+        return state
                 .withProperty(NORTH, isConnectable(worldIn, pos, EnumFacing.NORTH))
                 .withProperty(SOUTH, isConnectable(worldIn, pos, EnumFacing.SOUTH))
                 .withProperty(WEST, isConnectable(worldIn, pos, EnumFacing.WEST))
                 .withProperty(EAST, isConnectable(worldIn, pos, EnumFacing.EAST))
                 .withProperty(UP, isConnectable(worldIn, pos, EnumFacing.UP))
                 .withProperty(DOWN, isConnectable(worldIn, pos, EnumFacing.DOWN));
-        return updated;
     }
 
     private boolean isConnectable(IBlockAccess worldIn, BlockPos pos, EnumFacing facing)
@@ -83,9 +82,9 @@ public class BlockProxy extends Block
     }
 
     @Override
-    protected BlockState createBlockState()
+    protected BlockStateContainer createBlockState()
     {
-        return new BlockState(this, NORTH, SOUTH, WEST, EAST, UP, DOWN);
+        return new BlockStateContainer(this, NORTH, SOUTH, WEST, EAST, UP, DOWN);
     }
 
     @Override

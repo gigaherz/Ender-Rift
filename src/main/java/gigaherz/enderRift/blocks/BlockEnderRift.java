@@ -4,17 +4,19 @@ import com.google.common.collect.Lists;
 import gigaherz.enderRift.EnderRiftMod;
 import gigaherz.enderRift.rift.RiftStructure;
 import net.minecraft.block.Block;
+import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.PropertyBool;
-import net.minecraft.block.state.BlockState;
+import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumHand;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
@@ -31,18 +33,17 @@ public class BlockEnderRift
         super(Material.rock);
         setUnlocalizedName(EnderRiftMod.MODID + ".blockEnderRift");
         setCreativeTab(EnderRiftMod.tabEnderRift);
-        setBlockBounds(0.2F, 0.2F, 0.2F, 0.8F, 0.8F, 0.8F);
         setHardness(0.5F);
-        setStepSound(Block.soundTypeMetal);
+        setSoundType(SoundType.METAL);
         setDefaultState(this.blockState.getBaseState()
                 .withProperty(ASSEMBLED, false));
     }
 
 
     @Override
-    protected BlockState createBlockState()
+    protected BlockStateContainer createBlockState()
     {
-        return new BlockState(this, ASSEMBLED);
+        return new BlockStateContainer(this, ASSEMBLED);
     }
 
     @Override
@@ -58,26 +59,24 @@ public class BlockEnderRift
     }
 
     @Override
-    public boolean isOpaqueCube()
+    public boolean isOpaqueCube(IBlockState state)
     {
         return false;
     }
 
     @Override
-    public int getLightValue(IBlockAccess world, BlockPos pos)
+    public int getLightValue(IBlockState state)
     {
-        IBlockState state = world.getBlockState(pos);
         if (state.getBlock() != this)
-            return super.getLightValue(world, pos);
-        return world.getBlockState(pos).getValue(ASSEMBLED) ? 15 : 0;
+            return super.getLightValue(state);
+        return state.getValue(ASSEMBLED) ? 15 : 0;
     }
 
     @Override
-    public int getLightOpacity(IBlockAccess world, BlockPos pos)
+    public int getLightOpacity(IBlockState state)
     {
-        IBlockState state = world.getBlockState(pos);
         if (state.getBlock() != this)
-            return super.getLightOpacity(world, pos);
+            return super.getLightOpacity(state);
         return state.getValue(ASSEMBLED) ? 1 : 15;
     }
 
@@ -94,16 +93,10 @@ public class BlockEnderRift
     }
 
     @Override
-    public int getRenderType()
-    {
-        return super.getRenderType();
-    }
-
-    @Override
-    public boolean removedByPlayer(World world, BlockPos pos, EntityPlayer player, boolean willHarvest)
+    public boolean removedByPlayer(IBlockState state, World world, BlockPos pos, EntityPlayer player, boolean willHarvest)
     {
         //If it will harvest, delay deletion of the block until after getDrops
-        return willHarvest || super.removedByPlayer(world, pos, player, false);
+        return willHarvest || super.removedByPlayer(state, world, pos, player, false);
     }
 
     @Override
@@ -122,9 +115,9 @@ public class BlockEnderRift
     }
 
     @Override
-    public void harvestBlock(World worldIn, EntityPlayer player, BlockPos pos, IBlockState state, TileEntity te)
+    public void harvestBlock(World worldIn, EntityPlayer player, BlockPos pos, IBlockState state, TileEntity te, ItemStack stack)
     {
-        super.harvestBlock(worldIn, player, pos, state, te);
+        super.harvestBlock(worldIn, player, pos, state, te, stack);
         worldIn.setBlockToAir(pos);
     }
 
@@ -136,7 +129,7 @@ public class BlockEnderRift
     }
 
     @Override
-    public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumFacing side, float hitX, float hitY, float hitZ)
+    public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ)
     {
         if (playerIn.isSneaking())
             return false;
@@ -192,7 +185,7 @@ public class BlockEnderRift
 
         TileEnderRift rift = (TileEnderRift) te;
 
-        ItemStack stack = playerIn.getHeldItem();
+        ItemStack stack = playerIn.getHeldItem(EnumHand.MAIN_HAND);
         if (stack != null)
         {
             if (stack.getItem() == EnderRiftMod.riftOrb)

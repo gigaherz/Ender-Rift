@@ -4,19 +4,20 @@ import com.google.common.collect.Lists;
 import gigaherz.enderRift.EnderRiftMod;
 import gigaherz.enderRift.rift.RiftStructure;
 import net.minecraft.block.Block;
+import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.PropertyBool;
 import net.minecraft.block.properties.PropertyEnum;
-import net.minecraft.block.state.BlockState;
+import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.BlockPos;
 import net.minecraft.util.IStringSerializable;
-import net.minecraft.util.MovingObjectPosition;
+import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
@@ -33,9 +34,8 @@ public class BlockStructure
     public BlockStructure()
     {
         super(Material.rock);
-        setHardness(0.5F).setStepSound(Block.soundTypeMetal);
+        setSoundType(SoundType.METAL);
         setUnlocalizedName(EnderRiftMod.MODID + ".blockStructure");
-        setBlockBounds(0 / 16.0f, 0 / 16.0f, 0 / 16.0f, 16 / 16.0f, 16 / 16.0f, 16 / 16.0f);
         setDefaultState(this.blockState.getBaseState()
                 .withProperty(TYPE1, Type1.NORMAL).withProperty(TYPE2, Type2.NONE)
                 .withProperty(CORNER, Corner.values[0]).withProperty(BASE, false));
@@ -55,27 +55,27 @@ public class BlockStructure
     }
 
     @Override
-    public boolean isOpaqueCube()
+    public boolean isOpaqueCube(IBlockState state)
     {
         return false;
     }
 
     @Override
-    public boolean isFullCube()
+    public boolean isFullCube(IBlockState state)
     {
         return false;
     }
 
     @Override
-    public boolean canBeReplacedByLeaves(IBlockAccess world, BlockPos pos)
+    public boolean canBeReplacedByLeaves(IBlockState state, IBlockAccess world, BlockPos pos)
     {
         return false;
     }
 
     @Override
-    protected BlockState createBlockState()
+    protected BlockStateContainer createBlockState()
     {
-        return new BlockState(this, TYPE1, TYPE2, CORNER, BASE);
+        return new BlockStateContainer(this, TYPE1, TYPE2, CORNER, BASE);
     }
 
     @Override
@@ -113,40 +113,26 @@ public class BlockStructure
     }
 
     @Override
-    public void setBlockBoundsBasedOnState(IBlockAccess worldIn, BlockPos pos)
+    public AxisAlignedBB getSelectedBoundingBox(IBlockState state, World worldIn, BlockPos pos)
     {
-        IBlockState state = worldIn.getBlockState(pos);
-        AxisAlignedBB aabb = getBB(0, 0, 0, state);
-        setBlockBounds(
-                (float)aabb.minX,
-                (float)aabb.minY,
-                (float)aabb.minZ,
-                (float)aabb.maxX,
-                (float)aabb.maxY,
-                (float)aabb.maxZ);
-    }
-
-    @Override
-    public AxisAlignedBB getSelectedBoundingBox(World worldIn, BlockPos pos)
-    {
-        IBlockState state = getActualState(worldIn.getBlockState(pos), worldIn, pos);
+        state = getActualState(worldIn.getBlockState(pos), worldIn, pos);
         return getBB(pos.getX(), pos.getY(), pos.getZ(), state);
     }
 
     @Override
-    public AxisAlignedBB getCollisionBoundingBox(World worldIn, BlockPos pos, IBlockState state)
+    public AxisAlignedBB getCollisionBoundingBox(IBlockState blockState, World worldIn, BlockPos pos)
     {
-        return getBB(pos.getX(), pos.getY(), pos.getZ(), state);
+        return getBB(pos.getX(), pos.getY(), pos.getZ(), blockState);
     }
 
     @Override
-    public void addCollisionBoxesToList(World worldIn, BlockPos pos, IBlockState state, AxisAlignedBB mask, List<AxisAlignedBB> list, Entity collidingEntity)
+    public void addCollisionBoxToList(IBlockState state, World worldIn, BlockPos pos, AxisAlignedBB entityBox, List<AxisAlignedBB> collidingBoxes, Entity entityIn)
     {
         AxisAlignedBB aabb = getBB(pos.getX(), pos.getY(), pos.getZ(), state);
 
-        if (aabb != null && mask.intersectsWith(aabb))
+        if (aabb != null && entityBox.intersectsWith(aabb))
         {
-            list.add(aabb);
+            collidingBoxes.add(aabb);
         }
     }
 
@@ -200,9 +186,8 @@ public class BlockStructure
     }
 
     @Override
-    public ItemStack getPickBlock(MovingObjectPosition target, World world, BlockPos pos, EntityPlayer player)
+    public ItemStack getPickBlock(IBlockState state, RayTraceResult target, World world, BlockPos pos, EntityPlayer player)
     {
-
         return new ItemStack(RiftStructure.getOriginalBlock(world, pos));
     }
 

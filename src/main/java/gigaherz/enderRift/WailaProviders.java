@@ -12,9 +12,8 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.BlockPos;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.StatCollector;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.translation.I18n;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.Optional;
 
@@ -72,19 +71,19 @@ public class WailaProviders
 
                 if (tag.getInteger("powerGen") > 0)
                 {
-                    currenttip.add(StatCollector.translateToLocalFormatted("text." + EnderRiftMod.MODID + ".generator.status.generating", tag.getInteger("powerGen")));
+                    currenttip.add(I18n.translateToLocalFormatted("text." + EnderRiftMod.MODID + ".generator.status.generating", tag.getInteger("powerGen")));
                 }
                 else if (tag.getBoolean("isBurning"))
                 {
-                    currenttip.add(StatCollector.translateToLocal("text." + EnderRiftMod.MODID + ".generator.status.heating"));
+                    currenttip.add(I18n.translateToLocal("text." + EnderRiftMod.MODID + ".generator.status.heating"));
                 }
                 else
                 {
-                    currenttip.add(StatCollector.translateToLocal("text." + EnderRiftMod.MODID + ".generator.status.idle"));
+                    currenttip.add(I18n.translateToLocal("text." + EnderRiftMod.MODID + ".generator.status.idle"));
                 }
 
-                currenttip.add(StatCollector.translateToLocalFormatted("text." + EnderRiftMod.MODID + ".generator.heat", tag.getInteger("heat")));
-                currenttip.add(StatCollector.translateToLocalFormatted("text." + EnderRiftMod.MODID + ".generator.energy", tag.getInteger("energy"), TileGenerator.PowerLimit));
+                currenttip.add(I18n.translateToLocalFormatted("text." + EnderRiftMod.MODID + ".generator.heat", tag.getInteger("heat")));
+                currenttip.add(I18n.translateToLocalFormatted("text." + EnderRiftMod.MODID + ".generator.energy", tag.getInteger("energy"), TileGenerator.PowerLimit));
             }
 
             return currenttip;
@@ -168,19 +167,19 @@ public class WailaProviders
 
                 if (tag != null && tag.hasKey("isFormed"))
                 {
-                    currenttip.add(StatCollector.translateToLocalFormatted("text." + EnderRiftMod.MODID + ".rift.isFormed", tag.getBoolean("isFormed")));
+                    currenttip.add(I18n.translateToLocalFormatted("text." + EnderRiftMod.MODID + ".rift.isFormed", tag.getBoolean("isFormed")));
                     if (tag.getBoolean("isFormed"))
                     {
-                        currenttip.add(StatCollector.translateToLocalFormatted("text." + EnderRiftMod.MODID + ".rift.riftId", tag.getInteger("riftId")));
-                        currenttip.add(StatCollector.translateToLocalFormatted("text." + EnderRiftMod.MODID + ".rift.rf", tag.getInteger("energy"), tag.getInteger("energyTotal")));
+                        currenttip.add(I18n.translateToLocalFormatted("text." + EnderRiftMod.MODID + ".rift.riftId", tag.getInteger("riftId")));
+                        currenttip.add(I18n.translateToLocalFormatted("text." + EnderRiftMod.MODID + ".rift.rf", tag.getInteger("energy"), tag.getInteger("energyTotal")));
                     }
-                    currenttip.add(StatCollector.translateToLocalFormatted("text." + EnderRiftMod.MODID + ".rift.usedSlots", tag.getInteger("usedSlots")));
-                    currenttip.add(StatCollector.translateToLocalFormatted("text." + EnderRiftMod.MODID + ".rift.energyUsageInsert", tag.getInteger("energyInsert")));
-                    currenttip.add(StatCollector.translateToLocalFormatted("text." + EnderRiftMod.MODID + ".rift.energyUsageExtract", tag.getInteger("energyExtract")));
+                    currenttip.add(I18n.translateToLocalFormatted("text." + EnderRiftMod.MODID + ".rift.usedSlots", tag.getInteger("usedSlots")));
+                    currenttip.add(I18n.translateToLocalFormatted("text." + EnderRiftMod.MODID + ".rift.energyUsageInsert", tag.getInteger("energyInsert")));
+                    currenttip.add(I18n.translateToLocalFormatted("text." + EnderRiftMod.MODID + ".rift.energyUsageExtract", tag.getInteger("energyExtract")));
                 }
                 else
                 {
-                    currenttip.add(StatCollector.translateToLocalFormatted("text." + EnderRiftMod.MODID + ".rift.waila.isFormed", false));
+                    currenttip.add(I18n.translateToLocalFormatted("text." + EnderRiftMod.MODID + ".rift.waila.isFormed", false));
                 }
             }
 

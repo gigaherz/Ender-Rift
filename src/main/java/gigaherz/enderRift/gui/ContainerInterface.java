@@ -4,6 +4,7 @@ import gigaherz.enderRift.blocks.TileInterface;
 import gigaherz.enderRift.slots.SlotFilter;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraft.inventory.ClickType;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
@@ -54,15 +55,16 @@ public class ContainerInterface
     }
 
     @Override
-    public ItemStack slotClick(int slotId, int clickedButton, int mode, EntityPlayer playerIn)
+    public ItemStack slotClick(int slotId, int dragType, ClickType clickTypeIn, EntityPlayer player)
     {
         if (slotId >= 0 && slotId < 9)
         {
-            if (mode == 0 || mode == 1) // 1 is shift-click
+            if (clickTypeIn == ClickType.PICKUP || clickTypeIn == ClickType.PICKUP_ALL ||
+                clickTypeIn == ClickType.SWAP) // 1 is shift-click
             {
                 Slot slot = this.inventorySlots.get(slotId);
 
-                ItemStack dropping = playerIn.inventory.getItemStack();
+                ItemStack dropping = player.inventory.getItemStack();
 
                 if (dropping != null)
                 {
@@ -82,7 +84,7 @@ public class ContainerInterface
             return null;
         }
 
-        return super.slotClick(slotId, clickedButton, mode, playerIn);
+        return super.slotClick(slotId, dragType, clickTypeIn, player);
     }
 
     @Override

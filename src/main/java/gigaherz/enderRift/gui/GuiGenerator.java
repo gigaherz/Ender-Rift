@@ -7,7 +7,7 @@ import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.StatCollector;
+import net.minecraft.util.text.translation.I18n;
 
 import java.util.List;
 
@@ -36,29 +36,29 @@ public class GuiGenerator extends GuiContainer
     @Override
     protected void drawGuiContainerForegroundLayer(int i, int j)
     {
-        String name = StatCollector.translateToLocal(this.tile.getName());
+        String name = I18n.translateToLocal(this.tile.getName());
         mc.fontRendererObj.drawString(name, (xSize - mc.fontRendererObj.getStringWidth(name)) / 2, 6, 0x404040);
-        mc.fontRendererObj.drawString(StatCollector.translateToLocal(this.player.getName()), 8, ySize - 96 + 2, 0x404040);
+        mc.fontRendererObj.drawString(I18n.translateToLocal(this.player.getName()), 8, ySize - 96 + 2, 0x404040);
 
         String label;
         if (tile.getGenerationPower() > 0)
         {
-            label = StatCollector.translateToLocal("text." + EnderRiftMod.MODID + ".generator.status.generating.label");
+            label = I18n.translateToLocal("text." + EnderRiftMod.MODID + ".generator.status.generating.label");
             mc.fontRendererObj.drawString(label, 8, 22, 0x404040);
             mc.fontRendererObj.drawString(String.format("%d RF/t", tile.getGenerationPower()), 12, 32, 0x404040);
         }
         else if (tile.isBurning())
         {
-            label = StatCollector.translateToLocal("text." + EnderRiftMod.MODID + ".generator.status.heating");
+            label = I18n.translateToLocal("text." + EnderRiftMod.MODID + ".generator.status.heating");
             mc.fontRendererObj.drawString(label, 8, 22, 0x404040);
         }
         else
         {
-            label = StatCollector.translateToLocal("text." + EnderRiftMod.MODID + ".generator.status.idle");
+            label = I18n.translateToLocal("text." + EnderRiftMod.MODID + ".generator.status.idle");
             mc.fontRendererObj.drawString(label, 8, 22, 0x404040);
         }
 
-        label = StatCollector.translateToLocal("text." + EnderRiftMod.MODID + ".generator.heat.label");
+        label = I18n.translateToLocal("text." + EnderRiftMod.MODID + ".generator.heat.label");
         mc.fontRendererObj.drawString(label, 8, 46, 0x404040);
         mc.fontRendererObj.drawString(String.format("%d C", tile.getHeatValue()), 12, 56, getHeatColor());
 
@@ -79,7 +79,7 @@ public class GuiGenerator extends GuiContainer
             return;
 
         List<String> tooltip = Lists.newArrayList();
-        tooltip.add(StatCollector.translateToLocal("text." + EnderRiftMod.MODID + ".generator.energy.label"));
+        tooltip.add(I18n.translateToLocal("text." + EnderRiftMod.MODID + ".generator.energy.label"));
         tooltip.add(String.format("%d / %d RF", tile.getContainedEnergy(), TileGenerator.PowerLimit));
 
         drawHoveringText(tooltip, mx - x, my - y);
