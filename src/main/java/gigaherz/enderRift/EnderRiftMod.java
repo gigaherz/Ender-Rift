@@ -116,6 +116,7 @@ public class EnderRiftMod
         channel.registerMessage(SetSpecialSlot.Handler.class, SetSpecialSlot.class, messageNumber++, Side.CLIENT);
         channel.registerMessage(SetScrollPosition.Handler.class, SetScrollPosition.class, messageNumber++, Side.SERVER);
         channel.registerMessage(SetSortMode.Handler.class, SetSortMode.class, messageNumber++, Side.SERVER);
+        channel.registerMessage(SetFilterText.Handler.class, SetFilterText.class, messageNumber++, Side.SERVER);
         channel.registerMessage(UpdateField.Handler.class, UpdateField.class, messageNumber++, Side.CLIENT);
         logger.debug("Final message number: " + messageNumber);
 

@@ -4,6 +4,7 @@ import gigaherz.enderRift.EnderRiftMod;
 import gigaherz.enderRift.blocks.TileBrowser;
 import gigaherz.enderRift.misc.SortMode;
 import net.minecraft.client.gui.GuiButton;
+import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
@@ -12,12 +13,15 @@ import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.StatCollector;
+import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 
 import java.io.IOException;
 
 public class GuiBrowser extends GuiContainer
 {
+    private static final String textBrowser = "container." + EnderRiftMod.MODID + ".browser";
+
     protected InventoryPlayer player;
     protected TileBrowser tile;
     protected ResourceLocation backgroundTexture;
@@ -26,7 +30,7 @@ public class GuiBrowser extends GuiContainer
     boolean isDragging;
     int scrollY;
 
-    static final String textBrowser = "container." + EnderRiftMod.MODID + ".browser";
+    private GuiTextField searchField;
 
     public GuiBrowser(InventoryPlayer playerInventory, TileBrowser tileEntity)
     {
@@ -50,7 +54,50 @@ public class GuiBrowser extends GuiContainer
         GuiButton btn = new GuiButton(1, x - 22, y + 12, 20, 20, "");
         buttonList.add(btn);
 
+        Keyboard.enableRepeatEvents(true);
+        this.searchField = new GuiTextField(2, this.fontRendererObj, x + 114, y + 6, 71, this.fontRendererObj.FONT_HEIGHT)
+        {
+            @Override
+            public void mouseClicked(int mouseX, int mouseY, int mouseButton)
+            {
+                if(mouseButton == 1 && getText() != null && getText().length() > 0)
+                {
+                    setText("");
+                    updateSearchFilter();
+                }
+                super.mouseClicked(mouseX, mouseY, mouseButton);
+            }
+        };
+        this.searchField.setMaxStringLength(15);
+        this.searchField.setEnableBackgroundDrawing(false);
+        this.searchField.setVisible(true);
+        this.searchField.setTextColor(16777215);
+        this.searchField.setCanLoseFocus(false);
+        this.searchField.setFocused(true);
+        this.searchField.setText("");
+
         changeSorting(btn, SortMode.StackSize);
+    }
+
+    @Override
+    protected void keyTyped(char typedChar, int keyCode) throws IOException
+    {
+        if (!this.checkHotbarKeys(keyCode))
+        {
+            if (this.searchField.textboxKeyTyped(typedChar, keyCode))
+            {
+                this.updateSearchFilter();
+            }
+            else
+            {
+                super.keyTyped(typedChar, keyCode);
+            }
+        }
+    }
+
+    private void updateSearchFilter()
+    {
+        ((ContainerBrowser) inventorySlots).setFilterText(this.searchField.getText());
     }
 
     @Override
@@ -104,6 +151,8 @@ public class GuiBrowser extends GuiContainer
             this.drawTexturedModalRect(x + 174, y + 18 + scrollY, 232, 0, 12, 15);
         else
             this.drawTexturedModalRect(x + 174, y + 18, 244, 0, 12, 15);
+
+        this.searchField.drawTextBox();
     }
 
     @Override
@@ -114,7 +163,7 @@ public class GuiBrowser extends GuiContainer
         RenderHelper.disableStandardItemLighting();
 
         String name = StatCollector.translateToLocal(textBrowser);
-        mc.fontRendererObj.drawString(name, (xSize - mc.fontRendererObj.getStringWidth(name)) / 2, 6, 0x404040);
+        mc.fontRendererObj.drawString(name, 8, 6, 0x404040);
         mc.fontRendererObj.drawString(StatCollector.translateToLocal(this.player.getName()), 8, ySize - 96 + 2, 0x404040);
     }
 
@@ -212,16 +261,31 @@ public class GuiBrowser extends GuiContainer
         int x = (width - xSize) / 2;
         int y = (height - ySize) / 2;
 
-        final int w = 12;
-        final int h = 62;
-        int mx = mouseX - 174 - x;
-        int my = mouseY - 18 - y;
-        if (mx >= 0 && mx < w && my >= 0 && my < h)
         {
-            updateScrollPos(my);
-            isDragging = true;
-            return;
+            final int w = 12;
+            final int h = 62;
+            int mx = mouseX - 174 - x;
+            int my = mouseY - 18 - y;
+            if (mx >= 0 && mx < w && my >= 0 && my < h)
+            {
+                updateScrollPos(my);
+                isDragging = true;
+                return;
+            }
         }
+
+        {
+            final int w = searchField.width;
+            final int h = searchField.height;
+            int mx = mouseX - searchField.xPosition;
+            int my = mouseY - searchField.yPosition;
+            if (mx >= 0 && mx < w && my >= 0 && my < h)
+            {
+                searchField.mouseClicked(mx, my, mouseButton);
+                return;
+            }
+        }
+
         super.mouseClicked(mouseX, mouseY, mouseButton);
     }
 
