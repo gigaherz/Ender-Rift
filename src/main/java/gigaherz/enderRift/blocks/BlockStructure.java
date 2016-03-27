@@ -136,6 +136,12 @@ public class BlockStructure
         }
     }
 
+    @Override
+    public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos)
+    {
+        return getBB(pos.getX(), pos.getY(), pos.getZ(), state);
+    }
+
     public AxisAlignedBB getBB(int x, int y, int z, IBlockState state)
     {
         if (state.getValue(TYPE1) == Type1.NORMAL)
