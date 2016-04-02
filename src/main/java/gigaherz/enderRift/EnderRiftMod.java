@@ -29,7 +29,7 @@ import org.apache.logging.log4j.Logger;
 @Mod(name = EnderRiftMod.NAME,
         modid = EnderRiftMod.MODID,
         version = EnderRiftMod.VERSION,
-        dependencies = "after:Waila")
+        dependencies = "after:Waila,required-after:Forge@[12.16.0.1825,)")
 public class EnderRiftMod
 {
     public static final String NAME = "Ender-Rift";
