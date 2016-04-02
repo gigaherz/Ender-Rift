@@ -20,13 +20,13 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
 public class BlockBrowser
-        extends Block
+        extends BlockRegistered
 {
     public static final PropertyDirection FACING = PropertyDirection.create("facing");
 
-    public BlockBrowser()
+    public BlockBrowser(String name)
     {
-        super(Material.iron, MapColor.stoneColor);
+        super(name, Material.iron, MapColor.stoneColor);
         setSoundType(SoundType.METAL);
         setUnlocalizedName(EnderRiftMod.MODID + ".blockBrowser");
         setCreativeTab(EnderRiftMod.tabEnderRift);

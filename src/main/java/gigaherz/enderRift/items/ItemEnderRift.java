@@ -16,10 +16,11 @@ import net.minecraft.world.World;
 
 import java.util.List;
 
-public class ItemEnderRift extends Item
+public class ItemEnderRift extends ItemRegistered
 {
-    public ItemEnderRift()
+    public ItemEnderRift(String name)
     {
+        super(name);
         this.maxStackSize = 16;
         this.setCreativeTab(EnderRiftMod.tabEnderRift);
     }

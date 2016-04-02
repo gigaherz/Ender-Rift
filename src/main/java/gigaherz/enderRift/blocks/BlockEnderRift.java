@@ -24,13 +24,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class BlockEnderRift
-        extends Block
+        extends BlockRegistered
 {
     public static final PropertyBool ASSEMBLED = PropertyBool.create("assembled");
 
-    public BlockEnderRift()
+    public BlockEnderRift(String name)
     {
-        super(Material.rock);
+        super(name, Material.rock);
         setUnlocalizedName(EnderRiftMod.MODID + ".blockEnderRift");
         setCreativeTab(EnderRiftMod.tabEnderRift);
         setHardness(0.5F);

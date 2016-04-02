@@ -7,7 +7,6 @@ import gigaherz.enderRift.items.ItemEnderRift;
 import gigaherz.enderRift.network.*;
 import gigaherz.enderRift.recipe.RecipesRiftDuplication;
 import gigaherz.enderRift.rift.RiftStructure;
-import net.minecraft.block.Block;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
@@ -40,10 +39,10 @@ public class EnderRiftMod
 
     public static BlockEnderRift rift;
     public static BlockStructure structure;
-    public static Block riftInterface;
-    public static Block generator;
-    public static Block browser;
-    public static Block extension;
+    public static BlockRegistered riftInterface;
+    public static BlockRegistered generator;
+    public static BlockRegistered browser;
+    public static BlockRegistered extension;
     public static Item riftOrb;
 
     public static CreativeTabs tabEnderRift;
@@ -77,35 +76,38 @@ public class EnderRiftMod
             }
         };
 
-        riftOrb = new ItemEnderRift().setUnlocalizedName(MODID + ".itemEnderRift");
-        GameRegistry.registerItem(riftOrb, "itemEnderRift");
+        riftOrb = new ItemEnderRift("itemEnderRift");
+        GameRegistry.register(riftOrb);
 
-        rift = new BlockEnderRift();
-        GameRegistry.registerBlock(rift, "blockEnderRift");
-
-        structure = new BlockStructure();
-        GameRegistry.registerBlock(structure, "blockStructure");
-
-        riftInterface = new BlockInterface();
-        GameRegistry.registerBlock(riftInterface, "blockInterface");
-
-        browser = new BlockBrowser();
-        GameRegistry.registerBlock(browser, "blockBrowser");
-
-        generator = new BlockGenerator();
-        GameRegistry.registerBlock(generator, "blockGenerator");
-
-        extension = new BlockProxy();
-        GameRegistry.registerBlock(extension, "blockProxy");
-
+        rift = new BlockEnderRift("blockEnderRift");
+        GameRegistry.register(rift);
+        GameRegistry.register(rift.createItemBlock());
         GameRegistry.registerTileEntity(TileEnderRift.class, "tileEnderRift");
-        GameRegistry.registerTileEntity(TileEnderRiftCorner.class, "tileStructureCorner");
-        GameRegistry.registerTileEntity(TileInterface.class, "tileInterface");
-        GameRegistry.registerTileEntity(TileBrowser.class, "tileBrowser");
-        GameRegistry.registerTileEntity(TileGenerator.class, "tileGenerator");
-        GameRegistry.registerTileEntity(TileProxy.class, "tileProxy");
 
-        RecipeSorter.register(MODID + ":rift_duplication", RecipesRiftDuplication.class, RecipeSorter.Category.SHAPELESS, "after:minecraft:shapeless");
+        structure = new BlockStructure("blockStructure");
+        GameRegistry.register(structure);
+        GameRegistry.register(structure.createItemBlock());
+        GameRegistry.registerTileEntity(TileEnderRiftCorner.class, "tileStructureCorner");
+
+        riftInterface = new BlockInterface("blockInterface");
+        GameRegistry.register(riftInterface);
+        GameRegistry.register(riftInterface.createItemBlock());
+        GameRegistry.registerTileEntity(TileInterface.class, "tileInterface");
+
+        browser = new BlockBrowser("blockBrowser");
+        GameRegistry.register(browser);
+        GameRegistry.register(browser.createItemBlock());
+        GameRegistry.registerTileEntity(TileBrowser.class, "tileBrowser");
+
+        generator = new BlockGenerator("blockGenerator");
+        GameRegistry.register(generator);
+        GameRegistry.register(generator.createItemBlock());
+        GameRegistry.registerTileEntity(TileGenerator.class, "tileGenerator");
+
+        extension = new BlockProxy("blockProxy");
+        GameRegistry.register(extension);
+        GameRegistry.register(extension.createItemBlock());
+        GameRegistry.registerTileEntity(TileProxy.class, "tileProxy");
 
         channel = NetworkRegistry.INSTANCE.newSimpleChannel(CHANNEL);
 
@@ -179,6 +181,7 @@ public class EnderRiftMod
                 'i', Items.iron_ingot);
 
         GameRegistry.addRecipe(new RecipesRiftDuplication());
+        RecipeSorter.register(MODID + ":rift_duplication", RecipesRiftDuplication.class, RecipeSorter.Category.SHAPELESS, "after:minecraft:shapeless");
 
         NetworkRegistry.INSTANCE.registerGuiHandler(this, guiHandler);
 

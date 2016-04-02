@@ -20,14 +20,14 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 public class BlockGenerator
-        extends Block
+        extends BlockRegistered
 {
     // MAYBE? public static final PropertyBool POWERED
     public static final PropertyDirection FACING = PropertyDirection.create("facing", EnumFacing.Plane.HORIZONTAL);
 
-    public BlockGenerator()
+    public BlockGenerator(String name)
     {
-        super(Material.iron, MapColor.stoneColor);
+        super(name, Material.iron, MapColor.stoneColor);
         setSoundType(SoundType.METAL);
         setUnlocalizedName(EnderRiftMod.MODID + ".blockGenerator");
         setCreativeTab(EnderRiftMod.tabEnderRift);
