@@ -13,6 +13,7 @@ import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.fml.common.Mod;
@@ -79,26 +80,26 @@ public class EnderRiftMod
             }
         };
 
-        riftOrb = new ItemEnderRift().setUnlocalizedName(MODID + ".itemEnderRift");
-        GameRegistry.registerItem(riftOrb, "itemEnderRift");
+        riftOrb = new ItemEnderRift("itemEnderRift").setUnlocalizedName(MODID + ".itemEnderRift");
+        GameRegistry.registerItem(riftOrb);
 
-        rift = new BlockEnderRift();
-        GameRegistry.registerBlock(rift, "blockEnderRift");
+        rift = new BlockEnderRift("blockEnderRift");
+        GameRegistry.registerBlock(rift);
 
-        structure = new BlockStructure();
-        GameRegistry.registerBlock(structure, null, "blockStructure");
+        structure = new BlockStructure("blockStructure");
+        GameRegistry.registerBlock(structure, (Class<? extends ItemBlock>)null);
 
-        riftInterface = new BlockInterface();
-        GameRegistry.registerBlock(riftInterface, "blockInterface");
+        riftInterface = new BlockInterface("blockInterface");
+        GameRegistry.registerBlock(riftInterface);
 
-        browser = new BlockBrowser();
-        GameRegistry.registerBlock(browser, BlockBrowser.AsItem.class, "blockBrowser");
+        browser = new BlockBrowser("blockBrowser");
+        GameRegistry.registerBlock(browser, BlockBrowser.AsItem.class);
 
-        generator = new BlockGenerator();
-        GameRegistry.registerBlock(generator, "blockGenerator");
+        generator = new BlockGenerator("blockGenerator");
+        GameRegistry.registerBlock(generator);
 
-        extension = new BlockProxy();
-        GameRegistry.registerBlock(extension, "blockProxy");
+        extension = new BlockProxy("blockProxy");
+        GameRegistry.registerBlock(extension);
 
         GameRegistry.registerTileEntity(TileEnderRift.class, "tileEnderRift");
         GameRegistry.registerTileEntity(TileEnderRiftCorner.class, "tileStructureCorner");

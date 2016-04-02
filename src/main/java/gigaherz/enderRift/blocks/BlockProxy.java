@@ -14,7 +14,7 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
-public class BlockProxy extends Block
+public class BlockProxy extends BlockRegistered
 {
     public static final PropertyBool NORTH = PropertyBool.create("north");
     public static final PropertyBool SOUTH = PropertyBool.create("south");
@@ -23,9 +23,9 @@ public class BlockProxy extends Block
     public static final PropertyBool UP = PropertyBool.create("up");
     public static final PropertyBool DOWN = PropertyBool.create("down");
 
-    public BlockProxy()
+    public BlockProxy(String name)
     {
-        super(Material.iron, MapColor.grayColor);
+        super(name, Material.iron, MapColor.grayColor);
         setStepSound(soundTypeMetal);
         setUnlocalizedName(EnderRiftMod.MODID + ".blockProxy");
         setCreativeTab(EnderRiftMod.tabEnderRift);

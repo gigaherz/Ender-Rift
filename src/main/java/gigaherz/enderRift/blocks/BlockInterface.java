@@ -20,13 +20,13 @@ import net.minecraft.world.World;
 import net.minecraftforge.items.IItemHandler;
 
 public class BlockInterface
-        extends Block
+        extends BlockRegistered
 {
     public static final PropertyDirection FACING = PropertyDirection.create("facing");
 
-    public BlockInterface()
+    public BlockInterface(String name)
     {
-        super(Material.iron, MapColor.stoneColor);
+        super(name, Material.iron, MapColor.stoneColor);
         setStepSound(soundTypeMetal);
         setUnlocalizedName(EnderRiftMod.MODID + ".blockInterface");
         setCreativeTab(EnderRiftMod.tabEnderRift);

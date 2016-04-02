@@ -23,16 +23,16 @@ import net.minecraft.world.World;
 import java.util.List;
 
 public class BlockStructure
-        extends Block
+        extends BlockRegistered
 {
     public static final PropertyEnum<Type1> TYPE1 = PropertyEnum.create("type1", Type1.class);
     public static final PropertyEnum<Type2> TYPE2 = PropertyEnum.create("type2", Type2.class);
     public static final PropertyEnum<Corner> CORNER = PropertyEnum.create("corner", Corner.class);
     public static final PropertyBool BASE = PropertyBool.create("base");
 
-    public BlockStructure()
+    public BlockStructure(String name)
     {
-        super(Material.rock);
+        super(name, Material.rock);
         setHardness(0.5F).setStepSound(Block.soundTypeMetal);
         setUnlocalizedName(EnderRiftMod.MODID + ".blockStructure");
         setBlockBounds(0 / 16.0f, 0 / 16.0f, 0 / 16.0f, 16 / 16.0f, 16 / 16.0f, 16 / 16.0f);

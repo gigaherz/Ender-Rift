@@ -24,7 +24,7 @@ import net.minecraft.world.World;
 import java.util.List;
 
 public class BlockBrowser
-        extends Block
+        extends BlockRegistered
 {
     public static final PropertyDirection FACING = PropertyDirection.create("facing");
     public static final PropertyBool CRAFTING = PropertyBool.create("crafting");
@@ -32,9 +32,9 @@ public class BlockBrowser
     private static final String unlocStandard = EnderRiftMod.MODID + ".blockBrowser";
     private static final String unlocCrafting = EnderRiftMod.MODID + ".blockCraftingBrowser";
 
-    public BlockBrowser()
+    public BlockBrowser(String name)
     {
-        super(Material.iron, MapColor.stoneColor);
+        super(name, Material.iron, MapColor.stoneColor);
         setStepSound(soundTypeMetal);
         setUnlocalizedName(unlocStandard);
         setCreativeTab(EnderRiftMod.tabEnderRift);
