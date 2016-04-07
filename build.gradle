@@ -14,15 +14,15 @@ buildscript {
 
 apply plugin: 'net.minecraftforge.gradle.forge'
 
-version = "0.11.2"
+version = "0.11.3"
 group= "gigaherz.enderRift"
 archivesBaseName = "EnderRift"
 
 minecraft {
-    version = "1.9-12.16.0.1825-1.9"
+    version = "1.9-12.16.0.1854-1.9"
     runDir = "run"
 
-    mappings = "snapshot_20160402"
+    mappings = "snapshot_20160407"
 
     replace "@VERSION@", project.version
     replaceIn "EnderRiftMod.java"

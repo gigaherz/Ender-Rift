@@ -29,7 +29,8 @@ import org.apache.logging.log4j.Logger;
 @Mod(name = EnderRiftMod.NAME,
         modid = EnderRiftMod.MODID,
         version = EnderRiftMod.VERSION,
-        dependencies = "after:Waila,required-after:Forge@[12.16.0.1825,)")
+        dependencies = "after:Waila;required-after:Forge@[12.16.0.1825,)",
+        updateJSON = "https://raw.githubusercontent.com/gigaherz/Ender-Rift/master/update.json")
 public class EnderRiftMod
 {
     public static final String NAME = "Ender-Rift";
@@ -86,7 +87,6 @@ public class EnderRiftMod
 
         structure = new BlockStructure("blockStructure");
         GameRegistry.register(structure);
-        GameRegistry.register(structure.createItemBlock());
         GameRegistry.registerTileEntity(TileEnderRiftCorner.class, "tileStructureCorner");
 
         riftInterface = new BlockInterface("blockInterface");
