@@ -113,36 +113,7 @@ public class BlockStructure
     }
 
     @Override
-    public AxisAlignedBB getSelectedBoundingBox(IBlockState state, World worldIn, BlockPos pos)
-    {
-        state = getActualState(worldIn.getBlockState(pos), worldIn, pos);
-        return getBB(pos.getX(), pos.getY(), pos.getZ(), state);
-    }
-
-    @Override
-    public AxisAlignedBB getCollisionBoundingBox(IBlockState blockState, World worldIn, BlockPos pos)
-    {
-        return getBB(pos.getX(), pos.getY(), pos.getZ(), blockState);
-    }
-
-    @Override
-    public void addCollisionBoxToList(IBlockState state, World worldIn, BlockPos pos, AxisAlignedBB entityBox, List<AxisAlignedBB> collidingBoxes, Entity entityIn)
-    {
-        AxisAlignedBB aabb = getBB(pos.getX(), pos.getY(), pos.getZ(), state);
-
-        if (aabb != null && entityBox.intersectsWith(aabb))
-        {
-            collidingBoxes.add(aabb);
-        }
-    }
-
-    @Override
     public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos)
-    {
-        return getBB(pos.getX(), pos.getY(), pos.getZ(), state);
-    }
-
-    public AxisAlignedBB getBB(int x, int y, int z, IBlockState state)
     {
         if (state.getValue(TYPE1) == Type1.NORMAL)
         {
@@ -151,36 +122,41 @@ public class BlockStructure
             {
                 case NONE: // base center
                     return new AxisAlignedBB(
-                            x + 0 / 16.0f, y + 0 / 16.0f, z + 0 / 16.0f,
-                            x + 16 / 16.0f, y + 4 / 16.0f, z + 16 / 16.0f);
+                            0 / 16.0f, 0 / 16.0f, 0 / 16.0f,
+                            16 / 16.0f, 4 / 16.0f, 16 / 16.0f);
                 case SIDE_EW:
                     if (!state.getValue(BASE))
                         return new AxisAlignedBB(
-                                x + 0 / 16.0f, y + 4 / 16.0f, z + 4 / 16.0f,
-                                x + 16 / 16.0f, y + 12 / 16.0f, z + 12 / 16.0f);
+                                0 / 16.0f, 4 / 16.0f, 4 / 16.0f,
+                                16 / 16.0f, 12 / 16.0f, 12 / 16.0f);
                     else
                         return new AxisAlignedBB(
-                                x + 0 / 16.0f, y + 0 / 16.0f, z + 0 / 16.0f,
-                                x + 16 / 16.0f, y + 12 / 16.0f, z + 16 / 16.0f);
+                                0 / 16.0f, 0 / 16.0f, 0 / 16.0f,
+                                16 / 16.0f, 12 / 16.0f, 16 / 16.0f);
                 case VERTICAL:
                     return new AxisAlignedBB(
-                            x + 4 / 16.0f, y + 0 / 16.0f, z + 4 / 16.0f,
-                            x + 12 / 16.0f, y + 16 / 16.0f, z + 12 / 16.0f);
+                            4 / 16.0f, 0 / 16.0f, 4 / 16.0f,
+                            12 / 16.0f, 16 / 16.0f, 12 / 16.0f);
                 case SIDE_NS:
                     if (!state.getValue(BASE))
                         return new AxisAlignedBB(
-                                x + 4 / 16.0f, y + 4 / 16.0f, z + 0 / 16.0f,
-                                x + 12 / 16.0f, y + 12 / 16.0f, z + 16 / 16.0f);
+                                4 / 16.0f, 4 / 16.0f, 0 / 16.0f,
+                                12 / 16.0f, 12 / 16.0f, 16 / 16.0f);
                     else
                         return new AxisAlignedBB(
-                                x + 0 / 16.0f, y + 0 / 16.0f, z + 0 / 16.0f,
-                                x + 16 / 16.0f, y + 12 / 16.0f, z + 16 / 16.0f);
+                                0 / 16.0f, 0 / 16.0f, 0 / 16.0f,
+                                16 / 16.0f, 12 / 16.0f, 16 / 16.0f);
             }
         }
 
-        return new AxisAlignedBB(
-                x + 0 / 16.0f, y + 0 / 16.0f, z + 0 / 16.0f,
-                x + 16 / 16.0f, y + 16 / 16.0f, z + 16 / 16.0f);
+        return FULL_BLOCK_AABB;
+    }
+
+    @Override
+    public void breakBlock(World worldIn, BlockPos pos, IBlockState state)
+    {
+        super.breakBlock(worldIn, pos, state);
+        RiftStructure.breakStructure(worldIn, pos);
     }
 
     @Override

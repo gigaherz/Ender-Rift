@@ -1,10 +1,11 @@
 {
   "homepage": "https://github.com/gigaherz/Ender-Rift",
   "promos": {
-    "1.9-latest": "0.11.3",
-    "1.9-recommended": "0.11.3"
+    "1.9-latest": "0.12.0",
+    "1.9-recommended": "0.12.0"
   },
   "1.9": {
+    "0.12.0": "Rework the structure assembly process to allow having blocks in the \"holes\". Fix dismantling structures when a structure block breaks. Fix structure block bounding boxes.",
     "0.11.3": "Update Checker support"
   }
 }
