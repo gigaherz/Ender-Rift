@@ -116,7 +116,7 @@ public class WailaProviders
         @Override
         public ItemStack getWailaStack(IWailaDataAccessor accessor, IWailaConfigHandler config)
         {
-            return new ItemStack(EnderRiftMod.structure);
+            return new ItemStack(EnderRiftMod.rift);
         }
 
         @Override

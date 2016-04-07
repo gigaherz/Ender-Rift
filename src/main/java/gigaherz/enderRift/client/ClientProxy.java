@@ -30,7 +30,6 @@ public class ClientProxy implements IModProxy
         ClientRegistry.bindTileEntitySpecialRenderer(TileEnderRift.class, new TESREnderRift());
         registerItemModel(EnderRiftMod.riftOrb, 0, "item_rift");
         registerBlockModelAsItem(EnderRiftMod.rift, "blockEnderRift");
-        registerBlockModelAsItem(EnderRiftMod.structure, "blockStructure");
         registerBlockModelAsItem(EnderRiftMod.riftInterface, "blockInterface");
         registerBlockModelAsItem(EnderRiftMod.generator, "blockGenerator");
         registerBlockModelAsItem(EnderRiftMod.browser, "blockBrowser");

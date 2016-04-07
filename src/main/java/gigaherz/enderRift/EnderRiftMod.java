@@ -4,10 +4,7 @@ import gigaherz.capabilities.api.energy.CapabilityEnergy;
 import gigaherz.enderRift.blocks.*;
 import gigaherz.enderRift.gui.GuiHandler;
 import gigaherz.enderRift.items.ItemEnderRift;
-import gigaherz.enderRift.network.SetScrollPosition;
-import gigaherz.enderRift.network.SetSortMode;
-import gigaherz.enderRift.network.SetSpecialSlot;
-import gigaherz.enderRift.network.UpdateField;
+import gigaherz.enderRift.network.*;
 import gigaherz.enderRift.recipe.RecipesRiftDuplication;
 import gigaherz.enderRift.rift.RiftStructure;
 import net.minecraft.block.Block;
@@ -87,7 +84,7 @@ public class EnderRiftMod
         GameRegistry.registerBlock(rift, "blockEnderRift");
 
         structure = new BlockStructure();
-        GameRegistry.registerBlock(structure, "blockStructure");
+        GameRegistry.registerBlock(structure, null, "blockStructure");
 
         riftInterface = new BlockInterface();
         GameRegistry.registerBlock(riftInterface, "blockInterface");
