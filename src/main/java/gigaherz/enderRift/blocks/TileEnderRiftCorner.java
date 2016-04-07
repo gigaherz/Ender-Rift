@@ -6,7 +6,6 @@ import gigaherz.capabilities.api.energy.IEnergyHandler;
 import gigaherz.capabilities.api.energy.compat.RFWrapper;
 import gigaherz.enderRift.EnderRiftMod;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
@@ -16,9 +15,6 @@ public class TileEnderRiftCorner
         extends TileEntity
         implements IEnergyReceiver
 {
-    int xParent = 0;
-    int yParent;
-    int zParent;
     TileEnderRift energyParent;
 
     @Override
@@ -46,47 +42,46 @@ public class TileEnderRiftCorner
             if (state.getBlock() != EnderRiftMod.structure)
                 return null;
 
-            boolean base = state.getValue(BlockStructure.BASE);
-            BlockStructure.Corner corner = state.getValue(BlockStructure.CORNER);
-            xParent = pos.getX();
-            yParent = pos.getY() + (base ? 1 : -1);
-            zParent = pos.getZ();
-            switch (corner)
-            {
-                case NE:
-                    xParent -= 1;
-                    zParent += 1;
-                    break;
-                case NW:
-                    xParent += 1;
-                    zParent += 1;
-                    break;
-                case SE:
-                    xParent -= 1;
-                    zParent -= 1;
-                    break;
-                case SW:
-                    xParent += 1;
-                    zParent -= 1;
-                    break;
-            }
-            TileEntity te = worldObj.getTileEntity(new BlockPos(xParent, yParent, zParent));
+            TileEntity te = worldObj.getTileEntity(getRiftFromCorner(state, pos));
             if (te instanceof TileEnderRift)
             {
                 energyParent = (TileEnderRift) te;
+            }
+            else
+            {
+                return null;
             }
         }
         return energyParent.getEnergyBuffer();
     }
 
-    public void readFromNBT(NBTTagCompound nbtTagCompound)
+    private static BlockPos getRiftFromCorner(IBlockState state, BlockPos pos)
     {
-        super.readFromNBT(nbtTagCompound);
-    }
-
-    public void writeToNBT(NBTTagCompound nbtTagCompound)
-    {
-        super.writeToNBT(nbtTagCompound);
+        boolean base = state.getValue(BlockStructure.BASE);
+        BlockStructure.Corner corner = state.getValue(BlockStructure.CORNER);
+        int xParent = pos.getX();
+        int yParent = pos.getY() + (base ? 1 : -1);
+        int zParent = pos.getZ();
+        switch (corner)
+        {
+            case NE:
+                xParent -= 1;
+                zParent += 1;
+                break;
+            case NW:
+                xParent += 1;
+                zParent += 1;
+                break;
+            case SE:
+                xParent -= 1;
+                zParent -= 1;
+                break;
+            case SW:
+                xParent += 1;
+                zParent -= 1;
+                break;
+        }
+        return new BlockPos(xParent, yParent, zParent);
     }
 
     @Override
