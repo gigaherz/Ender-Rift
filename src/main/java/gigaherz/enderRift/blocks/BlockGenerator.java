@@ -2,7 +2,6 @@ package gigaherz.enderRift.blocks;
 
 import gigaherz.enderRift.EnderRiftMod;
 import gigaherz.enderRift.gui.GuiHandler;
-import net.minecraft.block.Block;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
@@ -27,7 +26,7 @@ public class BlockGenerator
 
     public BlockGenerator(String name)
     {
-        super(name, Material.iron, MapColor.stoneColor);
+        super(name, Material.IRON, MapColor.STONE);
         setSoundType(SoundType.METAL);
         setUnlocalizedName(EnderRiftMod.MODID + ".blockGenerator");
         setCreativeTab(EnderRiftMod.tabEnderRift);

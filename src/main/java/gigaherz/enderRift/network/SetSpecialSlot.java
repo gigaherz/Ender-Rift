@@ -38,7 +38,7 @@ public class SetSpecialSlot
         if (count > 0)
         {
             int meta = buf.readInt();
-            Item item = Item.itemRegistry.getObject(new ResourceLocation(ByteBufUtils.readUTF8String(buf)));
+            Item item = Item.REGISTRY.getObject(new ResourceLocation(ByteBufUtils.readUTF8String(buf)));
             boolean hasTag = buf.readBoolean();
             stack = new ItemStack(item, count, meta);
             if (hasTag)
@@ -62,7 +62,7 @@ public class SetSpecialSlot
         {
             buf.writeInt(stack.stackSize);
             buf.writeInt(stack.getItemDamage());
-            ByteBufUtils.writeUTF8String(buf, Item.itemRegistry.getNameForObject(stack.getItem()).toString());
+            ByteBufUtils.writeUTF8String(buf, Item.REGISTRY.getNameForObject(stack.getItem()).toString());
             NBTTagCompound tag = stack.getTagCompound();
             buf.writeBoolean(tag != null);
             if (tag != null)

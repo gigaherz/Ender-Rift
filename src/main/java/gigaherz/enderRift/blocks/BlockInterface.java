@@ -14,11 +14,12 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.InventoryHelper;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.EnumFacing;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraftforge.items.ItemHandlerHelper;
 
 public class BlockInterface
         extends BlockRegistered
@@ -27,7 +28,7 @@ public class BlockInterface
 
     public BlockInterface(String name)
     {
-        super(name, Material.iron, MapColor.stoneColor);
+        super(name, Material.IRON, MapColor.STONE);
         setSoundType(SoundType.METAL);
         setUnlocalizedName(EnderRiftMod.MODID + ".blockInterface");
         setCreativeTab(EnderRiftMod.tabEnderRift);

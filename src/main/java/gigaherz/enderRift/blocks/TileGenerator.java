@@ -12,9 +12,9 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityFurnace;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.Capability;
@@ -45,7 +45,7 @@ public class TileGenerator extends TileEntity
     @Override
     public boolean hasCapability(Capability<?> capability, EnumFacing facing)
     {
-        if(capability == CapabilityEnergy.ENERGY_HANDLER_CAPABILITY)
+        if (capability == CapabilityEnergy.ENERGY_HANDLER_CAPABILITY)
             return true;
         return super.hasCapability(capability, facing);
     }
@@ -54,8 +54,8 @@ public class TileGenerator extends TileEntity
     @Override
     public <T> T getCapability(Capability<T> capability, EnumFacing facing)
     {
-        if(capability == CapabilityEnergy.ENERGY_HANDLER_CAPABILITY)
-            return (T)energyCapability;
+        if (capability == CapabilityEnergy.ENERGY_HANDLER_CAPABILITY)
+            return (T) energyCapability;
         return super.getCapability(capability, facing);
     }
 
@@ -127,16 +127,16 @@ public class TileGenerator extends TileEntity
                 TileEntity e = worldObj.getTileEntity(pos.offset(neighbor));
                 EnumFacing from = neighbor.getOpposite();
 
-                if(e == null)
+                if (e == null)
                     continue;
 
                 IEnergyHandler handler = null;
-                if(e.hasCapability(CapabilityEnergy.ENERGY_HANDLER_CAPABILITY, from))
+                if (e.hasCapability(CapabilityEnergy.ENERGY_HANDLER_CAPABILITY, from))
                 {
                     handler = e.getCapability(CapabilityEnergy.ENERGY_HANDLER_CAPABILITY, from);
                 }
 
-                if(handler != null)
+                if (handler != null)
                 {
                     handlers[from.ordinal()] = handler;
                     int wanted = handler.insertEnergy(sendPower, true);

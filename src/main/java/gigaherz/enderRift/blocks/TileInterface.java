@@ -14,9 +14,9 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.Capability;
@@ -169,7 +169,7 @@ public class TileInterface extends TileEntity
                 else if (outputs[i] != null)
                 {
                     int stackSize = outputs[i].stackSize;
-                    outputs[i] = getAutomation().pushItems(outputs[i]);
+                    outputs[i] = getAutomation().insertItems(outputs[i]);
                     if (outputs[i] == null || stackSize != outputs[i].stackSize)
                         anyChanged = true;
                 }
@@ -177,7 +177,7 @@ public class TileInterface extends TileEntity
             else if (outputs[i] != null)
             {
                 int stackSize = outputs[i].stackSize;
-                outputs[i] = getAutomation().pushItems(outputs[i]);
+                outputs[i] = getAutomation().insertItems(outputs[i]);
                 if (outputs[i] == null || stackSize != outputs[i].stackSize)
                     anyChanged = true;
             }

@@ -10,8 +10,8 @@ import net.minecraft.block.properties.PropertyBool;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
@@ -26,7 +26,7 @@ public class BlockProxy extends BlockRegistered
 
     public BlockProxy(String name)
     {
-        super(name, Material.iron, MapColor.grayColor);
+        super(name, Material.IRON, MapColor.GRAY);
         setSoundType(SoundType.METAL);
         setUnlocalizedName(EnderRiftMod.MODID + ".blockProxy");
         setCreativeTab(EnderRiftMod.tabEnderRift);

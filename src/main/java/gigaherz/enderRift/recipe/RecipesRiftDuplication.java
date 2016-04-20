@@ -30,28 +30,28 @@ public class RecipesRiftDuplication implements IRecipe
         if (tag == null || !tag.hasKey("RiftId"))
             return false;
 
-        if (!slotHasItem(crafting, 0, Items.magma_cream))
+        if (!slotHasItem(crafting, 0, Items.MAGMA_CREAM))
             return false;
 
-        if (!slotHasItem(crafting, 1, Items.ender_pearl))
+        if (!slotHasItem(crafting, 1, Items.ENDER_PEARL))
             return false;
 
-        if (!slotHasItem(crafting, 2, Items.magma_cream))
+        if (!slotHasItem(crafting, 2, Items.MAGMA_CREAM))
             return false;
 
-        if (!slotHasItem(crafting, 3, Items.ender_pearl))
+        if (!slotHasItem(crafting, 3, Items.ENDER_PEARL))
             return false;
 
-        if (!slotHasItem(crafting, 5, Items.ender_pearl))
+        if (!slotHasItem(crafting, 5, Items.ENDER_PEARL))
             return false;
 
-        if (!slotHasItem(crafting, 6, Items.magma_cream))
+        if (!slotHasItem(crafting, 6, Items.MAGMA_CREAM))
             return false;
 
-        if (!slotHasItem(crafting, 7, Items.ender_pearl))
+        if (!slotHasItem(crafting, 7, Items.ENDER_PEARL))
             return false;
 
-        if (!slotHasItem(crafting, 8, Items.magma_cream))
+        if (!slotHasItem(crafting, 8, Items.MAGMA_CREAM))
             return false;
 
         return true;

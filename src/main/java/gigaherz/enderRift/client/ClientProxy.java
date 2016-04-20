@@ -27,7 +27,7 @@ public class ClientProxy implements IModProxy
     public void preInit()
     {
         OBJLoader.INSTANCE.addDomain(EnderRiftMod.MODID);
-        ClientRegistry.bindTileEntitySpecialRenderer(TileEnderRift.class, new TESREnderRift());
+        ClientRegistry.bindTileEntitySpecialRenderer(TileEnderRift.class, new RenderRift());
         registerItemModel(EnderRiftMod.riftOrb, 0, "item_rift");
         registerBlockModelAsItem(EnderRiftMod.rift, "blockEnderRift");
         registerBlockModelAsItem(EnderRiftMod.riftInterface, "blockInterface");
@@ -95,7 +95,7 @@ public class ClientProxy implements IModProxy
             if (gameController.currentScreen instanceof GuiContainerCreative)
             {
                 GuiContainerCreative guicontainercreative = (GuiContainerCreative) gameController.currentScreen;
-                flag = guicontainercreative.getSelectedTabIndex() != CreativeTabs.tabInventory.getTabIndex();
+                flag = guicontainercreative.getSelectedTabIndex() != CreativeTabs.INVENTORY.getTabIndex();
             }
 
             if (message.windowId == 0 && message.slot >= 36 && message.slot < 45)

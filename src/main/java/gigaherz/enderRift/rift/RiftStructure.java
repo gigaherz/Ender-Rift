@@ -26,19 +26,19 @@ public class RiftStructure
     {
         StructurePattern = new Block[]{
                 // Bottom
-                Blocks.iron_block, Blocks.redstone_block, Blocks.iron_block,
-                Blocks.redstone_block, null, Blocks.redstone_block,
-                Blocks.iron_block, Blocks.redstone_block, Blocks.iron_block,
+                Blocks.IRON_BLOCK, Blocks.REDSTONE_BLOCK, Blocks.IRON_BLOCK,
+                Blocks.REDSTONE_BLOCK, null, Blocks.REDSTONE_BLOCK,
+                Blocks.IRON_BLOCK, Blocks.REDSTONE_BLOCK, Blocks.IRON_BLOCK,
 
                 // Middle
-                Blocks.redstone_block, null, Blocks.redstone_block,
+                Blocks.REDSTONE_BLOCK, null, Blocks.REDSTONE_BLOCK,
                 null, EnderRiftMod.rift, null,
-                Blocks.redstone_block, null, Blocks.redstone_block,
+                Blocks.REDSTONE_BLOCK, null, Blocks.REDSTONE_BLOCK,
 
                 // Top
-                Blocks.iron_block, Blocks.redstone_block, Blocks.iron_block,
-                Blocks.redstone_block, null, Blocks.redstone_block,
-                Blocks.iron_block, Blocks.redstone_block, Blocks.iron_block,
+                Blocks.IRON_BLOCK, Blocks.REDSTONE_BLOCK, Blocks.IRON_BLOCK,
+                Blocks.REDSTONE_BLOCK, null, Blocks.REDSTONE_BLOCK,
+                Blocks.IRON_BLOCK, Blocks.REDSTONE_BLOCK, Blocks.IRON_BLOCK,
         };
 
         StructureStates = new IBlockState[]{
@@ -62,7 +62,7 @@ public class RiftStructure
                 null,
                 EnderRiftMod.structure.edgeState(BlockStructure.Type2.VERTICAL, false),
 
-                null,null,null,
+                null, null, null,
 
                 EnderRiftMod.structure.edgeState(BlockStructure.Type2.VERTICAL, false),
                 null,
@@ -138,7 +138,7 @@ public class RiftStructure
                     Block w = world.getBlockState(bp).getBlock();
                     if (b != null)
                     {
-                        if (b == Blocks.air)
+                        if (b == Blocks.AIR)
                         {
                             IBlockState st = world.getBlockState(bp);
                             if (!w.isAir(st, world, bp))
@@ -168,7 +168,7 @@ public class RiftStructure
                 for (int xx = 0; xx <= 2; xx++)
                 {
                     IBlockState bs = StructureStates[yy * 9 + zz * 3 + xx];
-                    if(bs == null)
+                    if (bs == null)
                         continue;
 
                     BlockPos bp = pos.add(xx - 1, yy - 1, zz - 1);
@@ -202,7 +202,7 @@ public class RiftStructure
                 for (int xx = 0; xx <= 2; xx++)
                 {
                     Block b = StructurePattern[yy * 9 + zz * 3 + xx];
-                    if (b != null && b != Blocks.air && b != EnderRiftMod.rift)
+                    if (b != null && b != Blocks.AIR && b != EnderRiftMod.rift)
                     {
                         BlockPos bp = pos.add(xx - 1, yy - 1, zz - 1);
                         if (world.getBlockState(bp).getBlock() == EnderRiftMod.structure)

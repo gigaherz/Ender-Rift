@@ -2,8 +2,8 @@ package gigaherz.enderRift.blocks;
 
 import com.google.common.collect.Lists;
 import gigaherz.enderRift.EnderRiftMod;
+import gigaherz.enderRift.automation.CapabilityAutomation;
 import gigaherz.enderRift.rift.RiftStructure;
-import net.minecraft.block.Block;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.PropertyBool;
@@ -30,7 +30,7 @@ public class BlockEnderRift
 
     public BlockEnderRift(String name)
     {
-        super(name, Material.rock);
+        super(name, Material.ROCK);
         setUnlocalizedName(EnderRiftMod.MODID + ".blockEnderRift");
         setCreativeTab(EnderRiftMod.tabEnderRift);
         setHardness(0.5F);
@@ -154,7 +154,7 @@ public class BlockEnderRift
 
         int count = stack.stackSize;
         ItemStack stackToPush = stack.splitStack(count);
-        ItemStack remaining = rift.getAutomation(null).pushItems(stackToPush);
+        ItemStack remaining = rift.getCapability(CapabilityAutomation.INSTANCE, null).insertItems(stackToPush);
         if (remaining != null)
         {
             stack.stackSize += remaining.stackSize;
@@ -200,7 +200,7 @@ public class BlockEnderRift
 
         int numberToExtract = playerIn.isSneaking() ? 1 : stack.getMaxStackSize();
 
-        ItemStack extracted = rift.getAutomation(null).extractItems(stack.copy(), numberToExtract, false);
+        ItemStack extracted = rift.getCapability(CapabilityAutomation.INSTANCE, null).extractItems(stack.copy(), numberToExtract, false);
 
         if (extracted != null && extracted.stackSize > 0)
         {
@@ -230,7 +230,7 @@ public class BlockEnderRift
         EntityItem item = (EntityItem) entityIn;
         ItemStack stack = item.getEntityItem().copy();
 
-        ItemStack remaining = rift.getAutomation(null).pushItems(stack);
+        ItemStack remaining = rift.getCapability(CapabilityAutomation.INSTANCE, null).insertItems(stack);
 
         if (remaining == null)
         {

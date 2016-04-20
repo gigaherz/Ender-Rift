@@ -16,14 +16,12 @@ import net.minecraft.client.resources.IResourceManagerReloadListener;
 import net.minecraft.crash.CrashReport;
 import net.minecraft.util.ReportedException;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.client.model.Attributes;
 import net.minecraftforge.client.model.IModel;
 import net.minecraftforge.client.model.ModelLoaderRegistry;
 import net.minecraftforge.client.model.pipeline.LightUtil;
 import org.lwjgl.opengl.GL11;
 
 import javax.annotation.Nullable;
-import java.io.IOException;
 import java.util.Map;
 
 public class RenderingStuffs

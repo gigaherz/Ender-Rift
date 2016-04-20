@@ -60,7 +60,7 @@ public class ContainerInterface
         if (slotId >= 0 && slotId < 9)
         {
             if (clickTypeIn == ClickType.PICKUP || clickTypeIn == ClickType.PICKUP_ALL ||
-                clickTypeIn == ClickType.SWAP) // 1 is shift-click
+                    clickTypeIn == ClickType.SWAP) // 1 is shift-click
             {
                 Slot slot = this.inventorySlots.get(slotId);
 

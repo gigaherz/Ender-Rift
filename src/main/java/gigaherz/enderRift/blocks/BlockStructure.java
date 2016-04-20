@@ -3,14 +3,12 @@ package gigaherz.enderRift.blocks;
 import com.google.common.collect.Lists;
 import gigaherz.enderRift.EnderRiftMod;
 import gigaherz.enderRift.rift.RiftStructure;
-import net.minecraft.block.Block;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.PropertyBool;
 import net.minecraft.block.properties.PropertyEnum;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
@@ -33,7 +31,7 @@ public class BlockStructure
 
     public BlockStructure(String name)
     {
-        super(name, Material.rock);
+        super(name, Material.ROCK);
         setSoundType(SoundType.METAL);
         setUnlocalizedName(EnderRiftMod.MODID + ".blockStructure");
         setDefaultState(this.blockState.getBaseState()

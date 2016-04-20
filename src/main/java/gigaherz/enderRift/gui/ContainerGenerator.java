@@ -56,7 +56,7 @@ public class ContainerGenerator
             int field = this.tile.getField(i);
             if (prevFields[i] != field)
             {
-                for (ICrafting watcher : this.crafters)
+                for (ICrafting watcher : this.listeners)
                 {
                     if (watcher instanceof EntityPlayerMP)
                     {

@@ -1,6 +1,7 @@
 package gigaherz.enderRift;
 
 import gigaherz.capabilities.api.energy.CapabilityEnergy;
+import gigaherz.enderRift.automation.CapabilityAutomation;
 import gigaherz.enderRift.blocks.*;
 import gigaherz.enderRift.gui.GuiHandler;
 import gigaherz.enderRift.items.ItemEnderRift;
@@ -67,6 +68,7 @@ public class EnderRiftMod
         ConfigValues.readConfig(config);
 
         CapabilityEnergy.enable();
+        CapabilityAutomation.register();
 
         tabEnderRift = new CreativeTabs("tabEnderRift")
         {
@@ -134,51 +136,51 @@ public class EnderRiftMod
                 "aba",
                 "bcb",
                 "aba",
-                'a', Items.magma_cream,
-                'b', Items.ender_pearl,
-                'c', Items.ender_eye);
+                'a', Items.MAGMA_CREAM,
+                'b', Items.ENDER_PEARL,
+                'c', Items.ENDER_EYE);
 
         GameRegistry.addRecipe(new ItemStack(rift),
                 "oho",
                 "r r",
                 "oco",
-                'o', Blocks.obsidian,
-                'h', Blocks.hopper,
-                'r', Blocks.redstone_block,
-                'c', Blocks.ender_chest);
+                'o', Blocks.OBSIDIAN,
+                'h', Blocks.HOPPER,
+                'r', Blocks.REDSTONE_BLOCK,
+                'c', Blocks.ENDER_CHEST);
 
         GameRegistry.addRecipe(new ItemStack(extension),
                 "iri",
                 "rhr",
                 "iri",
-                'h', Blocks.hopper,
-                'r', Items.redstone,
-                'i', Items.iron_ingot);
+                'h', Blocks.HOPPER,
+                'r', Items.REDSTONE,
+                'i', Items.IRON_INGOT);
 
         GameRegistry.addRecipe(new ItemStack(riftInterface),
                 "ir ",
                 "rer",
                 "ir ",
                 'e', extension,
-                'r', Items.redstone,
-                'i', Items.iron_ingot);
+                'r', Items.REDSTONE,
+                'i', Items.IRON_INGOT);
 
         GameRegistry.addRecipe(new ItemStack(browser),
                 "ig ",
                 "geg",
                 "ig ",
                 'e', extension,
-                'g', Items.glowstone_dust,
-                'i', Items.iron_ingot);
+                'g', Items.GLOWSTONE_DUST,
+                'i', Items.IRON_INGOT);
 
         GameRegistry.addRecipe(new ItemStack(generator),
                 "iri",
                 "rwr",
                 "ifi",
-                'f', Blocks.furnace,
-                'w', Items.water_bucket,
-                'r', Items.redstone,
-                'i', Items.iron_ingot);
+                'f', Blocks.FURNACE,
+                'w', Items.WATER_BUCKET,
+                'r', Items.REDSTONE,
+                'i', Items.IRON_INGOT);
 
         GameRegistry.addRecipe(new RecipesRiftDuplication());
         RecipeSorter.register(MODID + ":rift_duplication", RecipesRiftDuplication.class, RecipeSorter.Category.SHAPELESS, "after:minecraft:shapeless");

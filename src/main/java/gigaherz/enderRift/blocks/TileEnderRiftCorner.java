@@ -4,8 +4,8 @@ import gigaherz.capabilities.api.energy.CapabilityEnergy;
 import gigaherz.capabilities.api.energy.IEnergyHandler;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.common.capabilities.Capability;
 
 public class TileEnderRiftCorner
@@ -16,7 +16,7 @@ public class TileEnderRiftCorner
     @Override
     public boolean hasCapability(Capability<?> capability, EnumFacing facing)
     {
-        if(capability == CapabilityEnergy.ENERGY_HANDLER_CAPABILITY)
+        if (capability == CapabilityEnergy.ENERGY_HANDLER_CAPABILITY)
             return getParent() != null;
         return super.hasCapability(capability, facing);
     }
@@ -25,8 +25,8 @@ public class TileEnderRiftCorner
     @Override
     public <T> T getCapability(Capability<T> capability, EnumFacing facing)
     {
-        if(capability == CapabilityEnergy.ENERGY_HANDLER_CAPABILITY)
-            return (T)getParent();
+        if (capability == CapabilityEnergy.ENERGY_HANDLER_CAPABILITY)
+            return (T) getParent();
         return super.getCapability(capability, facing);
     }
 

@@ -26,7 +26,7 @@ public class BlockBrowser
 
     public BlockBrowser(String name)
     {
-        super(name, Material.iron, MapColor.stoneColor);
+        super(name, Material.IRON, MapColor.STONE);
         setSoundType(SoundType.METAL);
         setUnlocalizedName(EnderRiftMod.MODID + ".blockBrowser");
         setCreativeTab(EnderRiftMod.tabEnderRift);
