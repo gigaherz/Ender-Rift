@@ -66,6 +66,9 @@ public class TileInterface extends TileEntity
         Queue<Triple<BlockPos, EnumFacing, Integer>> pending = Queues.newArrayDeque();
 
         IBlockState state = worldObj.getBlockState(getPos());
+        if (state.getBlock() != EnderRiftMod.riftInterface)
+            return aggregator;
+
         EnumFacing facing = state.getValue(BlockInterface.FACING);
         pending.add(Triple.of(this.pos, facing, 0));
 

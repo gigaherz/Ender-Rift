@@ -4,6 +4,7 @@ import cofh.api.energy.IEnergyReceiver;
 import gigaherz.capabilities.api.energy.CapabilityEnergy;
 import gigaherz.capabilities.api.energy.IEnergyHandler;
 import gigaherz.capabilities.api.energy.compat.RFWrapper;
+import gigaherz.enderRift.EnderRiftMod;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
@@ -42,6 +43,9 @@ public class TileEnderRiftCorner
         if (energyParent == null)
         {
             IBlockState state = worldObj.getBlockState(pos);
+            if (state.getBlock() != EnderRiftMod.structure)
+                return null;
+
             boolean base = state.getValue(BlockStructure.BASE);
             BlockStructure.Corner corner = state.getValue(BlockStructure.CORNER);
             xParent = pos.getX();
