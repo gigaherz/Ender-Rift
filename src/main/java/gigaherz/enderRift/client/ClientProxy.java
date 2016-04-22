@@ -68,14 +68,7 @@ public class ClientProxy implements IModProxy
     @Override
     public void handleSetSpecialSlot(final SetSpecialSlot message)
     {
-        Minecraft.getMinecraft().addScheduledTask(new Runnable()
-        {
-            @Override
-            public void run()
-            {
-                ClientProxy.this.handleSetSpecialSlot2(message);
-            }
-        });
+        Minecraft.getMinecraft().addScheduledTask(() -> ClientProxy.this.handleSetSpecialSlot2(message));
     }
 
     void handleSetSpecialSlot2(SetSpecialSlot message)
@@ -119,14 +112,7 @@ public class ClientProxy implements IModProxy
     @Override
     public void handleUpdateField(final UpdateField message)
     {
-        Minecraft.getMinecraft().addScheduledTask(new Runnable()
-        {
-            @Override
-            public void run()
-            {
-                ClientProxy.this.handleUpdateField2(message);
-            }
-        });
+        Minecraft.getMinecraft().addScheduledTask(() -> ClientProxy.this.handleUpdateField2(message));
     }
 
     void handleUpdateField2(UpdateField message)

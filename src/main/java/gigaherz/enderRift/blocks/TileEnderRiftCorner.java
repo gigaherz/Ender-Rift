@@ -2,6 +2,7 @@ package gigaherz.enderRift.blocks;
 
 import gigaherz.capabilities.api.energy.CapabilityEnergy;
 import gigaherz.capabilities.api.energy.IEnergyHandler;
+import gigaherz.enderRift.EnderRiftMod;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
@@ -35,6 +36,9 @@ public class TileEnderRiftCorner
         if (energyParent == null)
         {
             IBlockState state = worldObj.getBlockState(pos);
+            if (state.getBlock() != EnderRiftMod.structure)
+                return null;
+
             TileEntity te = worldObj.getTileEntity(getRiftFromCorner(state, pos));
             if (te instanceof TileEnderRift)
             {

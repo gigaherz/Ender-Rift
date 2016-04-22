@@ -3,6 +3,7 @@ package gigaherz.enderRift.blocks;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Queues;
 import com.google.common.collect.Sets;
+import gigaherz.enderRift.EnderRiftMod;
 import gigaherz.enderRift.automation.AutomationAggregator;
 import gigaherz.enderRift.automation.AutomationHelper;
 import gigaherz.enderRift.automation.IInventoryAutomation;
@@ -30,6 +31,9 @@ public class TileBrowser extends TileEntity implements IBrowserExtension
         Queue<Triple<BlockPos, EnumFacing, Integer>> pending = Queues.newArrayDeque();
 
         IBlockState state = worldObj.getBlockState(getPos());
+        if (state.getBlock() != EnderRiftMod.browser)
+            return aggregator;
+
         EnumFacing facing = state.getValue(BlockInterface.FACING);
         pending.add(Triple.of(this.pos, facing, 0));
 
