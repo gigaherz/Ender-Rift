@@ -19,6 +19,7 @@ import net.minecraft.inventory.ICrafting;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.network.play.server.SPacketSetSlot;
 import net.minecraftforge.items.IItemHandlerModifiable;
 
 import java.util.List;
@@ -34,6 +35,7 @@ public class ContainerBrowser
     public int scroll;
     public SortMode sortMode = SortMode.StackSize;
     private String filterText = "";
+    private ItemStack stackInCursor;
 
     final static int Left = 8;
     final static int Top = 18;
@@ -140,6 +142,23 @@ public class ContainerBrowser
                 }
             }
         }
+
+        for (ICrafting crafter : this.listeners)
+        {
+            if (!(crafter instanceof EntityPlayerMP))
+                continue;
+
+            EntityPlayerMP player = (EntityPlayerMP)crafter;
+            ItemStack newStack = player.inventory.getItemStack();
+
+            if (!ItemStack.areItemStacksEqual(stackInCursor, newStack))
+            {
+                stackInCursor = newStack == null ? null : newStack.copy();
+
+                player.playerNetServerHandler.sendPacket(new SPacketSetSlot(-1, -1, newStack));
+            }
+        }
+
     }
 
     @Override
@@ -437,6 +456,13 @@ public class ContainerBrowser
     @Override
     public ItemStack transferStackInSlot(EntityPlayer player, int slotIndex)
     {
+        Slot slot = this.inventorySlots.get(slotIndex);
+
+        if (slot == null || !slot.getHasStack())
+        {
+            return null;
+        }
+
         if (slotIndex < FakeSlots)
         {
             // Shouldn't even happen, handled above.
@@ -444,33 +470,34 @@ public class ContainerBrowser
         }
         else
         {
-            Slot slot = this.inventorySlots.get(slotIndex);
-            if (slot == null || !slot.getHasStack())
-            {
-                return null;
-            }
-
             IInventoryAutomation parent = tile.getAutomation();
             if (parent == null)
                 return null;
 
             ItemStack stack = slot.getStack();
+            ItemStack stackCopy = stack.copy();
 
             ItemStack remaining = parent.insertItems(stack);
-
             if (remaining != null)
             {
-                if (remaining.stackSize != stack.stackSize)
-                    tile.markDirty();
+                if (remaining.stackSize == stackCopy.stackSize)
+                {
+                    return null;
+                }
+
+                tile.markDirty();
+                stack.stackSize = remaining.stackSize;
+                slot.onSlotChanged();
             }
             else
             {
                 tile.markDirty();
+                stack.stackSize = 0;
+                slot.putStack(null);
             }
 
-            slot.putStack(remaining);
-
-            return remaining;
+            slot.onPickupFromSlot(player, stack);
+            return stackCopy;
         }
     }
 
