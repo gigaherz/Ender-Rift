@@ -192,6 +192,14 @@ public class BlockStructure
     }
 
     @Override
+    public void breakBlock(World worldIn, BlockPos pos, IBlockState state)
+    {
+        super.breakBlock(worldIn, pos, state);
+
+        RiftStructure.breakStructure(worldIn, pos);
+    }
+
+    @Override
     public List<ItemStack> getDrops(IBlockAccess world, BlockPos pos, IBlockState state, int fortune)
     {
         List<ItemStack> ret = Lists.newArrayList();
