@@ -16,7 +16,7 @@ apply plugin: 'net.minecraftforge.gradle.forge'
 
 version = "0.12.1"
 group= "gigaherz.enderRift"
-archivesBaseName = "EnderRift"
+archivesBaseName = "EnderRift-1.9"
 
 minecraft {
     version = "1.9-12.16.0.1865-1.9"
