@@ -233,49 +233,9 @@ public class ContainerBrowser
 
             if (clickTypeIn == ClickType.PICKUP)
             {
-                int amount = 1;
                 ItemStack dropping = inventoryPlayer.getItemStack();
 
-                if (dropping != null && ItemStack.areItemsEqual(dropping, existing))
-                {
-                    if (dragType == 0)
-                    {
-                        if (dropping.stackSize < dropping.getMaxStackSize())
-                        {
-                            ItemStack extracted = parent.extractItems(existing, amount, false);
-                            if (extracted != null)
-                            {
-                                dropping.stackSize += extracted.stackSize;
-                                tile.markDirty();
-                            }
-                        }
-                    }
-                    else
-                    {
-                        ItemStack push = dropping.copy();
-                        push.stackSize = amount;
-                        ItemStack remaining = parent.insertItems(push);
-
-                        dropping.stackSize -= push.stackSize;
-
-                        if (remaining != null)
-                        {
-                            if (push.stackSize != remaining.stackSize)
-                                tile.markDirty();
-                            dropping.stackSize += remaining.stackSize;
-                        }
-                        else
-                        {
-                            tile.markDirty();
-                        }
-
-                        if (dropping.stackSize <= 0)
-                            dropping = null;
-
-                        inventoryPlayer.setItemStack(dropping);
-                    }
-                }
-                else if (dropping != null)
+                if (dropping != null)
                 {
                     if (dragType == 0)
                     {
@@ -293,6 +253,8 @@ public class ContainerBrowser
                     }
                     else
                     {
+                        int amount = 1;
+
                         ItemStack push = dropping.copy();
                         push.stackSize = amount;
                         ItemStack remaining = parent.insertItems(push);
@@ -318,6 +280,10 @@ public class ContainerBrowser
                 }
                 else if (existing != null)
                 {
+                    int amount = dragType == 0
+                            ? existing.getMaxStackSize()
+                            : existing.getMaxStackSize() / 2;
+
                     ItemStack extracted = parent.extractItems(existing, amount, false);
                     if (extracted != null)
                         tile.markDirty();
