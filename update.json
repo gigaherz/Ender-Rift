@@ -1,11 +1,18 @@
 {
   "homepage": "https://github.com/gigaherz/Ender-Rift",
   "promos": {
-    "1.9-latest": "0.12.0",
-    "1.9-recommended": "0.12.0"
+    "1.9-latest": "0.12.2",
+    "1.9-recommended": "0.12.2",
+    "1.9-latest": "0.12.2",,
+    "1.9-recommended": "0.12.2"
   },
   "1.9": {
+    "0.12.2": "Fixed interacting with the rift browser in complex situations such as with the Storage Drawers.",
+    "0.12.1": "Protect TileEntities from calls to worldObj.getBlockState returning "air", during the tick when the block has been broken, but the TE is still being used by something else.",
     "0.12.0": "Rework the structure assembly process to allow having blocks in the \"holes\". Fix dismantling structures when a structure block breaks. Fix structure block bounding boxes.",
     "0.11.3": "Update Checker support"
+  }.
+  "1.8.9": {
+    "0.12.2": "Update checker support backported along with other improvements"
   }
 }
