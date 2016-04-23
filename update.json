@@ -7,6 +7,7 @@
     "1.9-recommended": "0.12.2"
   },
   "1.9": {
+    "0.14.0": "Change the browser gui interaction logic to be more likea chest (AE2-style).",
     "0.13.0": "Removed remaining IInventory uses. Fixed interface/browser scanning directions.",
     "0.12.2": "Fixed interacting with the rift browser in complex situations such as with the Storage Drawers.",
     "0.12.1": "Protect TileEntities from calls to worldObj.getBlockState returning \"air\", during the tick when the block has been broken, but the TE is still being used by something else.",
@@ -14,6 +15,7 @@
     "0.11.3": "Update Checker support"
   },
   "1.8.9": {
+    "0.14.0": "Change the browser gui interaction logic to be more likea chest (AE2-style).",
     "0.13.0": "Removed remaining IInventory uses. Fixed interface/browser scanning directions.",
     "0.12.2": "Update checker support backported along with other improvements"
   }
