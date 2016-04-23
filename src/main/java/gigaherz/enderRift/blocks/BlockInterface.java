@@ -45,22 +45,6 @@ public class BlockInterface
     }
 
     @Override
-    public void onNeighborBlockChange(World worldIn, BlockPos pos, IBlockState state, Block neighborBlock)
-    {
-        TileEntity te = worldIn.getTileEntity(pos);
-        if (te != null)
-            te.markDirty();
-    }
-
-    @Override
-    public void onNeighborChange(IBlockAccess world, BlockPos pos, BlockPos neighbor)
-    {
-        IBlockState state = world.getBlockState(pos);
-        if (neighbor.equals(pos.offset(state.getValue(FACING))))
-            world.getTileEntity(pos).markDirty();
-    }
-
-    @Override
     public boolean hasTileEntity(IBlockState state)
     {
         return true;
