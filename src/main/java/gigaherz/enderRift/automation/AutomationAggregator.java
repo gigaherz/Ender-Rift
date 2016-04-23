@@ -1,6 +1,5 @@
 package gigaherz.enderRift.automation;
 
-import com.google.common.base.Predicate;
 import com.google.common.collect.Lists;
 import net.minecraft.item.ItemStack;
 
@@ -23,12 +22,12 @@ public class AutomationAggregator implements IInventoryAutomation
     }
 
     @Override
-    public int getSizeInventory()
+    public int getSlots()
     {
         int sum = 0;
         for (IInventoryAutomation inv : aggregated)
         {
-            sum += inv.getSizeInventory();
+            sum += inv.getSlots();
         }
         return sum;
     }
@@ -38,7 +37,7 @@ public class AutomationAggregator implements IInventoryAutomation
     {
         for (IInventoryAutomation inv : aggregated)
         {
-            int size = inv.getSizeInventory();
+            int size = inv.getSlots();
             if (index < size)
             {
                 return inv.getStackInSlot(index);
@@ -50,7 +49,7 @@ public class AutomationAggregator implements IInventoryAutomation
     }
 
     @Override
-    public ItemStack pushItems(@Nonnull ItemStack stack)
+    public ItemStack insertItems(@Nonnull ItemStack stack)
     {
         ItemStack remaining = null;
 
@@ -58,25 +57,11 @@ public class AutomationAggregator implements IInventoryAutomation
         for (int i = 0; i < aggregated.size(); i++)
         {
             IInventoryAutomation inv = aggregated.get(i);
-            remaining = inv.pushItems(stack);
+            remaining = inv.insertItems(stack);
             if (remaining == null)
                 return null;
         }
         return remaining;
-    }
-
-    @Override
-    public ItemStack pullItems(int limit, Predicate<ItemStack> filter)
-    {
-        // DO NOT CHANGE BACK TO FOREACH, CAUSES ConcurrentModificationException
-        for (int i = 0; i < aggregated.size(); i++)
-        {
-            IInventoryAutomation inv = aggregated.get(i);
-            ItemStack obtained = inv.pullItems(limit, filter);
-            if (obtained != null)
-                return obtained;
-        }
-        return null;
     }
 
     @Override

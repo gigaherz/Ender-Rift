@@ -9,19 +9,17 @@ import gigaherz.enderRift.network.SetFilterText;
 import gigaherz.enderRift.network.SetScrollPosition;
 import gigaherz.enderRift.network.SetSortMode;
 import gigaherz.enderRift.network.SetSpecialSlot;
-import gigaherz.enderRift.slots.SlotFakeClient;
-import gigaherz.enderRift.slots.SlotFakeServer;
+import gigaherz.enderRift.slots.SlotFake;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.ICrafting;
-import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.play.server.S2FPacketSetSlot;
-import net.minecraft.util.IChatComponent;
+import net.minecraftforge.items.IItemHandlerModifiable;
 
 import java.util.Comparator;
 import java.util.List;
@@ -56,32 +54,27 @@ public class ContainerBrowser
     {
         this.tile = tileEntity;
 
+        IItemHandlerModifiable fake;
         if (isClient)
         {
             fakeInventoryClient = new FakeInventoryClient(FakeSlots);
             fakeInventoryServer = null;
-            for (int y = 0; y < FakeRows; y++)
-            {
-                for (int x = 0; x < FakeColumns; x++)
-                {
-                    addSlotToContainer(new SlotFakeClient(fakeInventoryClient,
-                            x + y * FakeColumns,
-                            Left + x * SlotWidth, Top + y * SlotHeight));
-                }
-            }
+            fake = fakeInventoryClient;
         }
         else
         {
             fakeInventoryClient = null;
             fakeInventoryServer = new FakeInventoryServer();
-            for (int y = 0; y < FakeRows; y++)
+            fake = fakeInventoryServer;
+        }
+
+        for (int y = 0; y < FakeRows; y++)
+        {
+            for (int x = 0; x < FakeColumns; x++)
             {
-                for (int x = 0; x < FakeColumns; x++)
-                {
-                    addSlotToContainer(new SlotFakeServer(fakeInventoryServer,
-                            x + y * FakeColumns,
-                            Left + x * SlotWidth, Top + y * SlotHeight));
-                }
+                addSlotToContainer(new SlotFake(fake,
+                        x + y * FakeColumns,
+                        Left + x * SlotWidth, Top + y * SlotHeight));
             }
         }
 
@@ -155,7 +148,7 @@ public class ContainerBrowser
             if (!(crafter instanceof EntityPlayerMP))
                 continue;
 
-            EntityPlayerMP player = (EntityPlayerMP)crafter;
+            EntityPlayerMP player = (EntityPlayerMP) crafter;
             ItemStack newStack = player.inventory.getItemStack();
 
             if (!ItemStack.areItemStacksEqual(stackInCursor, newStack))
@@ -165,7 +158,6 @@ public class ContainerBrowser
                 player.playerNetServerHandler.sendPacket(new S2FPacketSetSlot(-1, -1, newStack));
             }
         }
-
     }
 
     @Override
@@ -262,7 +254,7 @@ public class ContainerBrowser
                     {
                         ItemStack push = dropping.copy();
                         push.stackSize = amount;
-                        ItemStack remaining = parent.pushItems(push);
+                        ItemStack remaining = parent.insertItems(push);
 
                         dropping.stackSize -= push.stackSize;
 
@@ -287,7 +279,7 @@ public class ContainerBrowser
                 {
                     if (clickedButton == 0)
                     {
-                        ItemStack remaining = parent.pushItems(dropping);
+                        ItemStack remaining = parent.insertItems(dropping);
                         if (remaining != null)
                         {
                             if (dropping.stackSize != remaining.stackSize)
@@ -303,7 +295,7 @@ public class ContainerBrowser
                     {
                         ItemStack push = dropping.copy();
                         push.stackSize = amount;
-                        ItemStack remaining = parent.pushItems(push);
+                        ItemStack remaining = parent.insertItems(push);
 
                         dropping.stackSize -= push.stackSize;
 
@@ -483,7 +475,7 @@ public class ContainerBrowser
             ItemStack stack = slot.getStack();
             ItemStack stackCopy = stack.copy();
 
-            ItemStack remaining = parent.pushItems(stack);
+            ItemStack remaining = parent.insertItems(stack);
             if (remaining != null)
             {
                 if (remaining.stackSize == stackCopy.stackSize)
@@ -507,7 +499,7 @@ public class ContainerBrowser
         }
     }
 
-    public class FakeInventoryServer implements IInventory
+    public class FakeInventoryServer implements IItemHandlerModifiable
     {
         final List<ItemStack> slots = Lists.newArrayList();
 
@@ -527,7 +519,7 @@ public class ContainerBrowser
             if (inv == null)
                 return;
 
-            int invSlots = inv.getSizeInventory();
+            int invSlots = inv.getSlots();
             for (int j = 0; j < invSlots; j++)
             {
                 ItemStack invStack = inv.getStackInSlot(j);
@@ -560,9 +552,9 @@ public class ContainerBrowser
                         itemData.add(Item.itemRegistry.getNameForObject(item).toString());
                         item.addInformation(stack, null, itemData, false);
                         matchesSearch = false;
-                        for(String s : itemData)
+                        for (String s : itemData)
                         {
-                            if(s.contains(filterText))
+                            if (s.contains(filterText))
                             {
                                 matchesSearch = true;
                                 break;
@@ -618,7 +610,7 @@ public class ContainerBrowser
         }
 
         @Override
-        public int getSizeInventory()
+        public int getSlots()
         {
             return slots.size() - scroll;
         }
@@ -632,102 +624,24 @@ public class ContainerBrowser
         }
 
         @Override
-        public ItemStack decrStackSize(int index, int count)
+        public ItemStack insertItem(int slot, ItemStack stack, boolean simulate)
         {
             return null;
         }
 
         @Override
-        public ItemStack removeStackFromSlot(int index)
+        public ItemStack extractItem(int slot, int amount, boolean simulate)
         {
             return null;
         }
 
         @Override
-        public void setInventorySlotContents(int index, ItemStack invStack)
+        public void setStackInSlot(int slot, ItemStack stack)
         {
-        }
-
-        @Override
-        public int getInventoryStackLimit()
-        {
-            return 0;
-        }
-
-        @Override
-        public void markDirty()
-        {
-
-        }
-
-        @Override
-        public boolean isUseableByPlayer(EntityPlayer player)
-        {
-            return false;
-        }
-
-        @Override
-        public void openInventory(EntityPlayer player)
-        {
-
-        }
-
-        @Override
-        public void closeInventory(EntityPlayer player)
-        {
-
-        }
-
-        @Override
-        public boolean isItemValidForSlot(int index, ItemStack stack)
-        {
-            return false;
-        }
-
-        @Override
-        public int getField(int id)
-        {
-            return 0;
-        }
-
-        @Override
-        public void setField(int id, int value)
-        {
-
-        }
-
-        @Override
-        public int getFieldCount()
-        {
-            return 0;
-        }
-
-        @Override
-        public void clear()
-        {
-
-        }
-
-        @Override
-        public String getName()
-        {
-            return null;
-        }
-
-        @Override
-        public boolean hasCustomName()
-        {
-            return false;
-        }
-
-        @Override
-        public IChatComponent getDisplayName()
-        {
-            return null;
         }
     }
 
-    public class FakeInventoryClient implements IInventory
+    public class FakeInventoryClient implements IItemHandlerModifiable
     {
         ItemStack[] totals;
         ItemStack[] singles;
@@ -739,7 +653,7 @@ public class ContainerBrowser
         }
 
         @Override
-        public int getSizeInventory()
+        public int getSlots()
         {
             return totals.length;
         }
@@ -765,19 +679,19 @@ public class ContainerBrowser
         }
 
         @Override
-        public ItemStack decrStackSize(int index, int count)
+        public ItemStack insertItem(int slot, ItemStack stack, boolean simulate)
         {
             return null;
         }
 
         @Override
-        public ItemStack removeStackFromSlot(int index)
+        public ItemStack extractItem(int slot, int amount, boolean simulate)
         {
             return null;
         }
 
         @Override
-        public void setInventorySlotContents(int index, ItemStack stack)
+        public void setStackInSlot(int index, ItemStack stack)
         {
             if (index >= totals.length)
                 return;
@@ -793,84 +707,6 @@ public class ContainerBrowser
             {
                 singles[index] = null;
             }
-        }
-
-        @Override
-        public int getInventoryStackLimit()
-        {
-            return 0;
-        }
-
-        @Override
-        public void markDirty()
-        {
-
-        }
-
-        @Override
-        public boolean isUseableByPlayer(EntityPlayer player)
-        {
-            return false;
-        }
-
-        @Override
-        public void openInventory(EntityPlayer player)
-        {
-
-        }
-
-        @Override
-        public void closeInventory(EntityPlayer player)
-        {
-
-        }
-
-        @Override
-        public boolean isItemValidForSlot(int index, ItemStack stack)
-        {
-            return false;
-        }
-
-        @Override
-        public int getField(int id)
-        {
-            return 0;
-        }
-
-        @Override
-        public void setField(int id, int value)
-        {
-
-        }
-
-        @Override
-        public int getFieldCount()
-        {
-            return 0;
-        }
-
-        @Override
-        public void clear()
-        {
-
-        }
-
-        @Override
-        public String getName()
-        {
-            return null;
-        }
-
-        @Override
-        public boolean hasCustomName()
-        {
-            return false;
-        }
-
-        @Override
-        public IChatComponent getDisplayName()
-        {
-            return null;
         }
     }
 }

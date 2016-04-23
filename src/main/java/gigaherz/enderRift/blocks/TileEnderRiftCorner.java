@@ -3,7 +3,6 @@ package gigaherz.enderRift.blocks;
 import cofh.api.energy.IEnergyReceiver;
 import gigaherz.capabilities.api.energy.CapabilityEnergy;
 import gigaherz.capabilities.api.energy.IEnergyHandler;
-import gigaherz.capabilities.api.energy.compat.RFWrapper;
 import gigaherz.enderRift.EnderRiftMod;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.tileentity.TileEntity;
@@ -20,7 +19,7 @@ public class TileEnderRiftCorner
     @Override
     public boolean hasCapability(Capability<?> capability, EnumFacing facing)
     {
-        if(capability == CapabilityEnergy.ENERGY_HANDLER_CAPABILITY)
+        if (capability == CapabilityEnergy.ENERGY_HANDLER_CAPABILITY)
             return getParent() != null;
         return super.hasCapability(capability, facing);
     }
@@ -29,8 +28,8 @@ public class TileEnderRiftCorner
     @Override
     public <T> T getCapability(Capability<T> capability, EnumFacing facing)
     {
-        if(capability == CapabilityEnergy.ENERGY_HANDLER_CAPABILITY)
-            return (T)getParent();
+        if (capability == CapabilityEnergy.ENERGY_HANDLER_CAPABILITY)
+            return (T) getParent();
         return super.getCapability(capability, facing);
     }
 

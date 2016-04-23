@@ -9,7 +9,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraftforge.client.model.IFlexibleBakedModel;
 import org.lwjgl.opengl.GL11;
 
-public class TESREnderRift extends TileEntitySpecialRenderer<TileEnderRift>
+public class RenderRift extends TileEntitySpecialRenderer<TileEnderRift>
 {
     @Override
     public void renderTileEntityAt(TileEnderRift te, double x, double y, double z, float partialTicks, int destroyStage)
@@ -30,7 +30,6 @@ public class TESREnderRift extends TileEntitySpecialRenderer<TileEnderRift>
 
         bindTexture(TextureMap.locationBlocksTexture);
 
-        long time = te.getWorld().getTotalWorldTime();
 
         GlStateManager.disableLighting();
         GlStateManager.disableAlpha();
@@ -49,6 +48,7 @@ public class TESREnderRift extends TileEntitySpecialRenderer<TileEnderRift>
         int steps = 5;
         int time_loop = step_time * steps;
 
+        long time = te.getWorld().getTotalWorldTime();
         int tm = (int) (time % step_time);
 
         float c0 = 1.0f / steps;

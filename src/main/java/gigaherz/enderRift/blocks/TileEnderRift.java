@@ -1,11 +1,10 @@
 package gigaherz.enderRift.blocks;
 
-import com.google.common.base.Predicate;
 import gigaherz.capabilities.api.energy.EnergyBuffer;
 import gigaherz.capabilities.api.energy.IEnergyHandler;
 import gigaherz.enderRift.ConfigValues;
 import gigaherz.enderRift.EnderRiftMod;
-import gigaherz.enderRift.automation.IAutomationProvider;
+import gigaherz.enderRift.automation.CapabilityAutomation;
 import gigaherz.enderRift.automation.IInventoryAutomation;
 import gigaherz.enderRift.storage.RiftInventory;
 import gigaherz.enderRift.storage.RiftStorageWorldData;
@@ -16,13 +15,13 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.world.World;
+import net.minecraftforge.common.capabilities.Capability;
 
 import javax.annotation.Nonnull;
 import java.util.Random;
 
 public class TileEnderRift
         extends TileEntity
-        implements IAutomationProvider
 {
     public final Random rand = new Random();
 
@@ -60,7 +59,10 @@ public class TileEnderRift
         return inventory;
     }
 
-    public IEnergyHandler getEnergyBuffer() { return energyBuffer; }
+    public IEnergyHandler getEnergyBuffer()
+    {
+        return energyBuffer;
+    }
 
     @Override
     public boolean shouldRefresh(World world, BlockPos pos, IBlockState oldState, IBlockState newSate)
@@ -78,7 +80,7 @@ public class TileEnderRift
     {
         if (getInventory() == null)
             return 0;
-        int sizeInventory = getInventory().getSizeInventory();
+        int sizeInventory = getInventory().getSlots();
         int sizeInventory2 = sizeInventory * sizeInventory;
         return ConfigValues.PowerPerInsertionConstant
                 + (sizeInventory * ConfigValues.PowerPerInsertionLinear)
@@ -89,7 +91,7 @@ public class TileEnderRift
     {
         if (getInventory() == null)
             return 0;
-        int sizeInventory = getInventory().getSizeInventory();
+        int sizeInventory = getInventory().getSlots();
         int sizeInventory2 = sizeInventory * sizeInventory;
         return ConfigValues.PowerPerExtractionConstant
                 + (sizeInventory * ConfigValues.PowerPerExtractionLinear)
@@ -98,7 +100,7 @@ public class TileEnderRift
 
     public int countInventoryStacks()
     {
-        return getInventory().getSizeInventory();
+        return getInventory().getSlots();
     }
 
     private int getEffectivePowerUsageToInsert(int stackSize)
@@ -139,15 +141,26 @@ public class TileEnderRift
     }
 
     @Override
-    public IInventoryAutomation getAutomation(EnumFacing face)
+    public boolean hasCapability(Capability<?> capability, EnumFacing facing)
     {
-        return automation;
+        if (capability == CapabilityAutomation.INSTANCE)
+            return true;
+        return super.hasCapability(capability, facing);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public <T> T getCapability(Capability<T> capability, EnumFacing facing)
+    {
+        if (capability == CapabilityAutomation.INSTANCE)
+            return (T)automation;
+        return super.getCapability(capability, facing);
     }
 
     class AutomationEnergyWrapper implements IInventoryAutomation
     {
         @Override
-        public ItemStack pushItems(@Nonnull ItemStack stack)
+        public ItemStack insertItems(@Nonnull ItemStack stack)
         {
             if (getInventory() == null)
                 return stack;
@@ -169,7 +182,7 @@ public class TileEnderRift
                 temp.stackSize = stackSize;
             }
 
-            ItemStack remaining = getInventory().pushItems(temp);
+            ItemStack remaining = getInventory().insertItems(temp);
             if (remaining != null)
                 stackSize -= remaining.stackSize;
 
@@ -177,31 +190,6 @@ public class TileEnderRift
             energyBuffer.extractEnergy(actualCost, false);
 
             return remaining;
-        }
-
-        @Override
-        public ItemStack pullItems(int limit, Predicate<ItemStack> filter)
-        {
-            if (getInventory() == null)
-                return null;
-
-            int cost = getEffectivePowerUsageToExtract(limit);
-            while (cost > energyBuffer.getEnergy() && limit > 0)
-            {
-                limit--;
-            }
-
-            if (limit <= 0)
-                return null;
-
-            ItemStack extracted = getInventory().pullItems(limit, filter);
-            if (extracted == null)
-                return null;
-
-            int actualCost = getEffectivePowerUsageToExtract(extracted.stackSize);
-            energyBuffer.extractEnergy(actualCost, false);
-
-            return extracted;
         }
 
         @Override
@@ -233,12 +221,12 @@ public class TileEnderRift
         }
 
         @Override
-        public int getSizeInventory()
+        public int getSlots()
         {
             if (getInventory() == null)
                 return 0;
 
-            return getInventory().getSizeInventory();
+            return getInventory().getSlots();
         }
 
         @Override
@@ -256,7 +244,7 @@ public class TileEnderRift
         if (getInventory() == null)
             return null;
 
-        int max = getInventory().getSizeInventory();
+        int max = getInventory().getSlots();
 
         if (max <= 0)
             return null;

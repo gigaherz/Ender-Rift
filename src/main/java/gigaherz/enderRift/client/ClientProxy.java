@@ -27,7 +27,7 @@ public class ClientProxy implements IModProxy
     public void preInit()
     {
         OBJLoader.instance.addDomain(EnderRiftMod.MODID);
-        ClientRegistry.bindTileEntitySpecialRenderer(TileEnderRift.class, new TESREnderRift());
+        ClientRegistry.bindTileEntitySpecialRenderer(TileEnderRift.class, new RenderRift());
         registerItemModel(EnderRiftMod.riftOrb, 0, "item_rift");
         registerBlockModelAsItem(EnderRiftMod.rift, "blockEnderRift");
         registerBlockModelAsItem(EnderRiftMod.riftInterface, "blockInterface");

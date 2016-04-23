@@ -62,7 +62,7 @@ public class RiftStructure
                 null,
                 EnderRiftMod.structure.edgeState(BlockStructure.Type2.VERTICAL, false),
 
-                null,null,null,
+                null, null, null,
 
                 EnderRiftMod.structure.edgeState(BlockStructure.Type2.VERTICAL, false),
                 null,
@@ -167,7 +167,7 @@ public class RiftStructure
                 for (int xx = 0; xx <= 2; xx++)
                 {
                     IBlockState bs = StructureStates[yy * 9 + zz * 3 + xx];
-                    if(bs == null)
+                    if (bs == null)
                         continue;
 
                     BlockPos bp = pos.add(xx - 1, yy - 1, zz - 1);

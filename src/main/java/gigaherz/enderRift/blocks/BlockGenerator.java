@@ -11,10 +11,12 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.InventoryHelper;
+import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.world.World;
+import net.minecraftforge.items.IItemHandler;
 
 public class BlockGenerator
         extends Block
@@ -96,7 +98,7 @@ public class BlockGenerator
 
         if (tileentity instanceof TileGenerator)
         {
-            InventoryHelper.dropInventoryItems(worldIn, pos, (TileGenerator) tileentity);
+            BlockInterface.dropInventoryItems(worldIn, pos, ((TileGenerator) tileentity).inventory());
             worldIn.updateComparatorOutputLevel(pos, this);
         }
 

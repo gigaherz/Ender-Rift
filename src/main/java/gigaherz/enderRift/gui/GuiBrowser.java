@@ -20,27 +20,23 @@ import java.io.IOException;
 
 public class GuiBrowser extends GuiContainer
 {
+    private static final ResourceLocation backgroundTexture = new ResourceLocation(EnderRiftMod.MODID, "textures/gui/browser.png");
+    private static final ResourceLocation tabsTexture = new ResourceLocation("minecraft:textures/gui/container/creative_inventory/tabs.png");
     private static final String textBrowser = "container." + EnderRiftMod.MODID + ".browser";
 
-    protected InventoryPlayer player;
-    protected TileBrowser tile;
-    protected ResourceLocation backgroundTexture;
-    protected ResourceLocation tabsTexture;
+    private InventoryPlayer player;
 
-    boolean isDragging;
-    int scrollY;
+    private boolean isDragging;
+    private int scrollY;
 
     private GuiTextField searchField;
 
     public GuiBrowser(InventoryPlayer playerInventory, TileBrowser tileEntity)
     {
         super(new ContainerBrowser(tileEntity, playerInventory, true));
-        this.player = playerInventory;
-        this.tile = tileEntity;
-        this.xSize = 194;
-        this.ySize = 168;
-        backgroundTexture = new ResourceLocation(EnderRiftMod.MODID, "textures/gui/browser.png");
-        tabsTexture = new ResourceLocation("minecraft:textures/gui/container/creative_inventory/tabs.png");
+        player = playerInventory;
+        xSize = 194;
+        ySize = 168;
     }
 
     @Override
@@ -48,19 +44,16 @@ public class GuiBrowser extends GuiContainer
     {
         super.initGui();
 
-        int x = (width - xSize) / 2;
-        int y = (height - ySize) / 2;
-
-        GuiButton btn = new GuiButton(1, x - 22, y + 12, 20, 20, "");
+        GuiButton btn = new GuiButton(1, guiLeft - 22, guiTop + 12, 20, 20, "");
         buttonList.add(btn);
 
         Keyboard.enableRepeatEvents(true);
-        this.searchField = new GuiTextField(2, this.fontRendererObj, x + 114, y + 6, 71, this.fontRendererObj.FONT_HEIGHT)
+        this.searchField = new GuiTextField(2, this.fontRendererObj, guiLeft + 114, guiTop + 6, 71, this.fontRendererObj.FONT_HEIGHT)
         {
             @Override
             public void mouseClicked(int mouseX, int mouseY, int mouseButton)
             {
-                if(mouseButton == 1 && getText() != null && getText().length() > 0)
+                if (mouseButton == 1 && getText() != null && getText().length() > 0)
                 {
                     setText("");
                     updateSearchFilter();
@@ -68,13 +61,14 @@ public class GuiBrowser extends GuiContainer
                 super.mouseClicked(mouseX, mouseY, mouseButton);
             }
         };
-        this.searchField.setMaxStringLength(15);
-        this.searchField.setEnableBackgroundDrawing(false);
-        this.searchField.setVisible(true);
-        this.searchField.setTextColor(16777215);
-        this.searchField.setCanLoseFocus(false);
-        this.searchField.setFocused(true);
-        this.searchField.setText("");
+
+        searchField.setMaxStringLength(15);
+        searchField.setEnableBackgroundDrawing(false);
+        searchField.setVisible(true);
+        searchField.setTextColor(16777215);
+        searchField.setCanLoseFocus(false);
+        searchField.setFocused(true);
+        searchField.setText("");
 
         changeSorting(btn, SortMode.StackSize);
     }
@@ -82,11 +76,11 @@ public class GuiBrowser extends GuiContainer
     @Override
     protected void keyTyped(char typedChar, int keyCode) throws IOException
     {
-        if (!this.checkHotbarKeys(keyCode))
+        if (!checkHotbarKeys(keyCode))
         {
-            if (this.searchField.textboxKeyTyped(typedChar, keyCode))
+            if (searchField.textboxKeyTyped(typedChar, keyCode))
             {
-                this.updateSearchFilter();
+                updateSearchFilter();
             }
             else
             {
@@ -97,7 +91,7 @@ public class GuiBrowser extends GuiContainer
 
     private void updateSearchFilter()
     {
-        ((ContainerBrowser) inventorySlots).setFilterText(this.searchField.getText());
+        ((ContainerBrowser) inventorySlots).setFilterText(searchField.getText());
     }
 
     @Override
@@ -135,24 +129,21 @@ public class GuiBrowser extends GuiContainer
     @Override
     protected void drawGuiContainerBackgroundLayer(float partialTicks, int xMouse, int yMouse)
     {
-        int x = (width - xSize) / 2;
-        int y = (height - ySize) / 2;
-
         mc.renderEngine.bindTexture(backgroundTexture);
-        GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f);
-        this.drawTexturedModalRect(x, y, 0, 0, xSize, ySize);
-        this.drawTexturedModalRect(x - 27, y + 8, 194, 0, 27, 28);
 
-        // 174, 18, 12, 62
+        GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f);
+        drawTexturedModalRect(guiLeft, guiTop, 0, 0, xSize, ySize);
+        drawTexturedModalRect(guiLeft - 27, guiTop + 8, 194, 0, 27, 28);
+
         mc.renderEngine.bindTexture(tabsTexture);
 
         boolean isEnabled = needsScrollBar();
         if (isEnabled)
-            this.drawTexturedModalRect(x + 174, y + 18 + scrollY, 232, 0, 12, 15);
+            drawTexturedModalRect(guiLeft + 174, guiTop + 18 + scrollY, 232, 0, 12, 15);
         else
-            this.drawTexturedModalRect(x + 174, y + 18, 244, 0, 12, 15);
+            drawTexturedModalRect(guiLeft + 174, guiTop + 18, 244, 0, 12, 15);
 
-        this.searchField.drawTextBox();
+        searchField.drawTextBox();
     }
 
     @Override
@@ -164,22 +155,22 @@ public class GuiBrowser extends GuiContainer
 
         String name = StatCollector.translateToLocal(textBrowser);
         mc.fontRendererObj.drawString(name, 8, 6, 0x404040);
-        mc.fontRendererObj.drawString(StatCollector.translateToLocal(this.player.getName()), 8, ySize - 96 + 2, 0x404040);
+        mc.fontRendererObj.drawString(StatCollector.translateToLocal(player.getName()), 8, ySize - 96 + 2, 0x404040);
     }
 
     private void drawCustomSlotTexts()
     {
         for (int i = 0; i < ContainerBrowser.FakeSlots; ++i)
         {
-            Slot slot = this.inventorySlots.inventorySlots.get(i);
+            Slot slot = inventorySlots.inventorySlots.get(i);
             drawSlotText(slot);
         }
     }
 
     private void drawSlotText(Slot slotIn)
     {
-        this.zLevel = 100.0F;
-        this.itemRender.zLevel = 100.0F;
+        zLevel = 100.0F;
+        itemRender.zLevel = 100.0F;
 
         int xPosition = slotIn.xDisplayPosition;
         int yPosition = slotIn.yDisplayPosition;
@@ -215,8 +206,9 @@ public class GuiBrowser extends GuiContainer
                 GlStateManager.enableDepth();
             }
         }
-        this.itemRender.zLevel = 0.0F;
-        this.zLevel = 0.0F;
+
+        itemRender.zLevel = 0.0F;
+        zLevel = 0.0F;
     }
 
     private boolean needsScrollBar()
@@ -258,14 +250,11 @@ public class GuiBrowser extends GuiContainer
     @Override
     protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException
     {
-        int x = (width - xSize) / 2;
-        int y = (height - ySize) / 2;
-
         {
             final int w = 12;
             final int h = 62;
-            int mx = mouseX - 174 - x;
-            int my = mouseY - 18 - y;
+            int mx = mouseX - 174 - guiLeft;
+            int my = mouseY - 18 - guiTop;
             if (mx >= 0 && mx < w && my >= 0 && my < h)
             {
                 updateScrollPos(my);
@@ -313,8 +302,7 @@ public class GuiBrowser extends GuiContainer
     @Override
     protected void mouseClickMove(int mouseX, int mouseY, int clickedMouseButton, long timeSinceLastClick)
     {
-        int y = (height - ySize) / 2;
-        int my = mouseY - 18 - y;
+        int my = mouseY - 18 - guiTop;
         if (isDragging)
         {
             updateScrollPos(my);
@@ -326,8 +314,7 @@ public class GuiBrowser extends GuiContainer
     @Override
     protected void mouseReleased(int mouseX, int mouseY, int state)
     {
-        int y = (height - ySize) / 2;
-        int my = mouseY - 18 - y;
+        int my = mouseY - 18 - guiTop;
         if (isDragging)
         {
             updateScrollPos(my);

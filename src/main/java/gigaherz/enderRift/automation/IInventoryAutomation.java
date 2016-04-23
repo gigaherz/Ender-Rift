@@ -1,6 +1,5 @@
 package gigaherz.enderRift.automation;
 
-import com.google.common.base.Predicate;
 import net.minecraft.item.ItemStack;
 
 import javax.annotation.Nonnull;
@@ -13,7 +12,7 @@ public interface IInventoryAutomation
      *
      * @return Returns the number of slots.
      */
-    int getSizeInventory();
+    int getSlots();
 
     /**
      * Gets the contents of the slot in the inventory.
@@ -34,15 +33,7 @@ public interface IInventoryAutomation
      * @param stack The items to insert.
      * @return Returns the remaining items it was unable to insert. Can be null.
      */
-    ItemStack pushItems(@Nonnull ItemStack stack);
-
-    /**
-     * Tries to pull from the first available stack from the inventory.
-     *
-     * @param limit The maximum number of items to pull.
-     * @return Returns the items that were extracted. Can be null.
-     */
-    ItemStack pullItems(int limit, Predicate<ItemStack> filter);
+    ItemStack insertItems(@Nonnull ItemStack stack);
 
     /**
      * Tries to extract a specific amount of a certain item, as defined by the provided ItemStack.
@@ -50,7 +41,7 @@ public interface IInventoryAutomation
      *
      * @param stack    The item to extract.
      * @param wanted   The quantity being requested.
-     * @param simulate
+     * @param simulate If true, returns the result of the operation without applying the changes.
      * @return Returns the items that were extracted. Can be null.
      */
     ItemStack extractItems(@Nonnull ItemStack stack, int wanted, boolean simulate);

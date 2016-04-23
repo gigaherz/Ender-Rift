@@ -1,6 +1,5 @@
 package gigaherz.enderRift.storage;
 
-import com.google.common.base.Predicate;
 import com.google.common.collect.Lists;
 import gigaherz.enderRift.automation.IInventoryAutomation;
 import gigaherz.enderRift.blocks.TileEnderRift;
@@ -91,7 +90,7 @@ public class RiftInventory implements IInventoryAutomation
     }
 
     @Override
-    public int getSizeInventory()
+    public int getSlots()
     {
         return inventorySlots.size();
     }
@@ -103,7 +102,7 @@ public class RiftInventory implements IInventoryAutomation
     }
 
     @Override
-    public ItemStack pushItems(@Nonnull ItemStack stack)
+    public ItemStack insertItems(@Nonnull ItemStack stack)
     {
         ItemStack remaining = stack.copy();
 
@@ -130,28 +129,6 @@ public class RiftInventory implements IInventoryAutomation
 
         onContentsChanged();
 
-        return null;
-    }
-
-    @Override
-    public ItemStack pullItems(int limit, Predicate<ItemStack> filter)
-    {
-        for (int i = 0; i < inventorySlots.size(); i++)
-        {
-            ItemStack slot = inventorySlots.get(i);
-            if (slot != null)
-            {
-                int available = Math.min(limit, slot.stackSize);
-                if (filter.apply(slot) && available > 0)
-                {
-                    ItemStack pulled = slot.splitStack(available);
-                    if (slot.stackSize <= 0)
-                        inventorySlots.remove(i);
-                    onContentsChanged();
-                    return pulled;
-                }
-            }
-        }
         return null;
     }
 

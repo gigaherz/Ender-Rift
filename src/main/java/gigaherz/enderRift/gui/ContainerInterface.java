@@ -7,6 +7,7 @@ import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
+import net.minecraftforge.items.SlotItemHandler;
 
 public class ContainerInterface
         extends Container
@@ -23,7 +24,7 @@ public class ContainerInterface
         }
         for (int x = 0; x < 9; x++)
         {
-            addSlotToContainer(new Slot(tileEntity, x, 8 + x * 18, 62));
+            addSlotToContainer(new SlotItemHandler(tileEntity.inventoryOutputs(), x, 8 + x * 18, 62));
         }
 
         bindPlayerInventory(playerInventory);

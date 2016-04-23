@@ -1,6 +1,7 @@
 package gigaherz.enderRift;
 
 import gigaherz.capabilities.api.energy.CapabilityEnergy;
+import gigaherz.enderRift.automation.CapabilityAutomation;
 import gigaherz.enderRift.blocks.*;
 import gigaherz.enderRift.gui.GuiHandler;
 import gigaherz.enderRift.items.ItemEnderRift;
@@ -67,6 +68,7 @@ public class EnderRiftMod
         ConfigValues.readConfig(config);
 
         CapabilityEnergy.enable();
+        CapabilityAutomation.register();
 
         tabEnderRift = new CreativeTabs("tabEnderRift")
         {
