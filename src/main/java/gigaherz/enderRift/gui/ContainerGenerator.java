@@ -11,6 +11,7 @@ import net.minecraft.inventory.ICrafting;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntityFurnace;
+import net.minecraftforge.items.SlotItemHandler;
 
 public class ContainerGenerator
         extends Container
@@ -23,7 +24,7 @@ public class ContainerGenerator
         this.tile = tileEntity;
         prevFields = new int[tile.getFieldCount()];
 
-        addSlotToContainer(new Slot(tileEntity, 0, 80, 53));
+        addSlotToContainer(new SlotItemHandler(tileEntity.inventory(), 0, 80, 53));
 
         bindPlayerInventory(playerInventory);
     }

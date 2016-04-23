@@ -12,26 +12,25 @@ public class GuiInterface extends GuiContainer
 {
     protected InventoryPlayer player;
     protected TileInterface tile;
-    protected ResourceLocation guiTextureLocation;
 
-    static final String textFilters = "text." + EnderRiftMod.MODID + ".interface.filters";
+    private static final ResourceLocation guiTextureLocation = new ResourceLocation(EnderRiftMod.MODID, "textures/gui/interface.png");
+    private static final String textFilters = "text." + EnderRiftMod.MODID + ".interface.filters";
+    private static final String textName = "container." + EnderRiftMod.MODID + ".interface";
 
     public GuiInterface(InventoryPlayer playerInventory, TileInterface tileEntity)
     {
         super(new ContainerInterface(tileEntity, playerInventory));
-        this.player = playerInventory;
-        this.tile = tileEntity;
-        this.ySize = 176;
-        guiTextureLocation = new ResourceLocation(EnderRiftMod.MODID, "textures/gui/interface.png");
+        player = playerInventory;
+        tile = tileEntity;
+        ySize = 176;
     }
 
     @Override
     protected void drawGuiContainerForegroundLayer(int i, int j)
     {
-        String name = I18n.translateToLocal(this.tile.getName());
+        String name = I18n.translateToLocal(textName);
         fontRendererObj.drawString(name, (xSize - fontRendererObj.getStringWidth(name)) / 2, 6, 0x404040);
         fontRendererObj.drawString(I18n.translateToLocal(this.player.getName()), 8, ySize - 96 + 2, 0x404040);
-
         fontRendererObj.drawString(I18n.translateToLocal(textFilters), 8, 20, 0x404040);
     }
 
@@ -40,8 +39,6 @@ public class GuiInterface extends GuiContainer
     {
         mc.renderEngine.bindTexture(guiTextureLocation);
         GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f);
-        int x = (width - xSize) / 2;
-        int y = (height - ySize) / 2;
-        this.drawTexturedModalRect(x, y, 0, 0, xSize, ySize);
+        drawTexturedModalRect(guiLeft, guiTop, 0, 0, xSize, ySize);
     }
 }

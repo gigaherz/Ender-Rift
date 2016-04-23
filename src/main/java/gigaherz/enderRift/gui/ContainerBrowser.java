@@ -148,7 +148,7 @@ public class ContainerBrowser
             if (!(crafter instanceof EntityPlayerMP))
                 continue;
 
-            EntityPlayerMP player = (EntityPlayerMP)crafter;
+            EntityPlayerMP player = (EntityPlayerMP) crafter;
             ItemStack newStack = player.inventory.getItemStack();
 
             if (!ItemStack.areItemStacksEqual(stackInCursor, newStack))
@@ -158,7 +158,6 @@ public class ContainerBrowser
                 player.playerNetServerHandler.sendPacket(new SPacketSetSlot(-1, -1, newStack));
             }
         }
-
     }
 
     @Override

@@ -6,7 +6,6 @@ import gigaherz.capabilities.api.energy.IEnergyHandler;
 import gigaherz.enderRift.EnderRiftMod;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
@@ -15,13 +14,15 @@ import net.minecraft.tileentity.TileEntityFurnace;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.ITextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.Constants;
+import net.minecraftforge.items.CapabilityItemHandler;
+import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.items.ItemStackHandler;
 
 public class TileGenerator extends TileEntity
-        implements IInventory, ITickable
+        implements ITickable
 {
     public static final int SlotCount = 1;
     public static final int PowerLimit = 100000;
@@ -32,7 +33,24 @@ public class TileGenerator extends TileEntity
     public static final int HeatInterval = 20;
     public static final int PowerTransferMax = 800;
 
-    final ItemStack[] inputs = new ItemStack[SlotCount];
+    final ItemStackHandler inputs = new ItemStackHandler(SlotCount)
+    {
+        @Override
+        protected void onContentsChanged(int slot)
+        {
+            super.onContentsChanged(slot);
+            markDirty();
+        }
+
+        @Override
+        public ItemStack insertItem(int slot, ItemStack stack, boolean simulate)
+        {
+            if (TileEntityFurnace.getItemBurnTime(stack) <= 0)
+                return stack;
+
+            return super.insertItem(slot, stack, simulate);
+        }
+    };
 
     int heatLevel;
     int burnTimeRemaining;
@@ -47,6 +65,8 @@ public class TileGenerator extends TileEntity
     {
         if (capability == CapabilityEnergy.ENERGY_HANDLER_CAPABILITY)
             return true;
+        if (capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
+            return true;
         return super.hasCapability(capability, facing);
     }
 
@@ -55,7 +75,9 @@ public class TileGenerator extends TileEntity
     public <T> T getCapability(Capability<T> capability, EnumFacing facing)
     {
         if (capability == CapabilityEnergy.ENERGY_HANDLER_CAPABILITY)
-            return (T) energyCapability;
+            return CapabilityEnergy.ENERGY_HANDLER_CAPABILITY.cast(energyCapability);
+        if (capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
+            return CapabilityItemHandler.ITEM_HANDLER_CAPABILITY.cast(inputs);
         return super.getCapability(capability, facing);
     }
 
@@ -105,13 +127,14 @@ public class TileGenerator extends TileEntity
 
         if (burnTimeRemaining <= 0 && containedEnergy < PowerLimit)
         {
-            if (inputs[0] != null)
+            ItemStack stack = inputs.getStackInSlot(0);
+            if (stack != null)
             {
-                currentItemBurnTime = burnTimeRemaining = TileEntityFurnace.getItemBurnTime(inputs[0]);
+                currentItemBurnTime = burnTimeRemaining = TileEntityFurnace.getItemBurnTime(inputs.getStackInSlot(0));
                 timeInterval = 0;
-                inputs[0].stackSize--;
-                if (inputs[0].stackSize <= 0)
-                    inputs[0] = null;
+                stack.stackSize--;
+                if (stack.stackSize <= 0)
+                    inputs.setStackInSlot(0, null);
                 anyChanged = true;
             }
         }
@@ -167,90 +190,9 @@ public class TileGenerator extends TileEntity
             this.markDirty();
     }
 
-    @Override
-    public int getSizeInventory()
-    {
-        return SlotCount;
-    }
-
-    @Override
-    public ItemStack getStackInSlot(int index)
-    {
-        if (index < 0 || index >= inputs.length)
-            return null;
-        return inputs[index];
-    }
-
-    @Override
-    public ItemStack decrStackSize(int index, int count)
-    {
-        if (index < 0 || index >= inputs.length)
-            return null;
-
-        if (inputs[index] == null)
-            return null;
-
-        if (count > inputs[index].stackSize)
-            count = inputs[index].stackSize;
-
-        ItemStack result = inputs[index].splitStack(count);
-
-        if (inputs[index].stackSize <= 0)
-        {
-            inputs[index] = null;
-        }
-
-        this.markDirty();
-
-        return result;
-    }
-
-    @Override
-    public ItemStack removeStackFromSlot(int index)
-    {
-        if (index < 0 || index >= inputs.length)
-            return null;
-
-        if (inputs[index] == null)
-            return null;
-
-        ItemStack itemstack = inputs[index];
-        inputs[index] = null;
-        return itemstack;
-    }
-
-    @Override
-    public void setInventorySlotContents(int index, ItemStack stack)
-    {
-        if (index < 0 || index >= inputs.length)
-            return;
-
-        inputs[index] = stack;
-
-        if (stack != null && stack.stackSize > this.getInventoryStackLimit())
-        {
-            stack.stackSize = this.getInventoryStackLimit();
-        }
-
-        this.markDirty();
-    }
-
-    @Override
     public String getName()
     {
         return "container." + EnderRiftMod.MODID + ".generator";
-    }
-
-    @Override
-    public boolean hasCustomName()
-    {
-        return false;
-    }
-
-    @Override
-    public ITextComponent getDisplayName()
-    {
-        return null;
     }
 
     @Override
@@ -264,9 +206,9 @@ public class TileGenerator extends TileEntity
             NBTTagCompound nbttagcompound = _outputs.getCompoundTagAt(i);
             int j = nbttagcompound.getByte("Slot") & 255;
 
-            if (j >= 0 && j < inputs.length)
+            if (j >= 0 && j < inputs.getSlots())
             {
-                inputs[j] = ItemStack.loadItemStackFromNBT(nbttagcompound);
+                inputs.setStackInSlot(j, ItemStack.loadItemStackFromNBT(nbttagcompound));
             }
         }
 
@@ -283,13 +225,14 @@ public class TileGenerator extends TileEntity
         super.writeToNBT(compound);
 
         NBTTagList _outputs = new NBTTagList();
-        for (int i = 0; i < inputs.length; ++i)
+        for (int i = 0; i < inputs.getSlots(); ++i)
         {
-            if (inputs[i] != null)
+            ItemStack stack = inputs.getStackInSlot(i);
+            if (stack != null)
             {
                 NBTTagCompound nbttagcompound = new NBTTagCompound();
                 nbttagcompound.setByte("Slot", (byte) i);
-                inputs[i].writeToNBT(nbttagcompound);
+                stack.writeToNBT(nbttagcompound);
                 _outputs.appendTag(nbttagcompound);
             }
         }
@@ -303,36 +246,12 @@ public class TileGenerator extends TileEntity
         compound.setInteger("timeInterval", timeInterval);
     }
 
-    @Override
-    public int getInventoryStackLimit()
-    {
-        return 64;
-    }
-
-    @Override
     public boolean isUseableByPlayer(EntityPlayer player)
     {
         return worldObj.getTileEntity(pos) == this
                 && player.getDistanceSq(pos.getX() + 0.5D, pos.getY() + 0.5D, pos.getZ() + 0.5D) <= 64.0D;
     }
 
-    @Override
-    public void openInventory(EntityPlayer player)
-    {
-    }
-
-    @Override
-    public void closeInventory(EntityPlayer player)
-    {
-    }
-
-    @Override
-    public boolean isItemValidForSlot(int index, ItemStack stack)
-    {
-        return TileEntityFurnace.getItemBurnTime(stack) > 0;
-    }
-
-    @Override
     public int getField(int id)
     {
         switch (id)
@@ -349,7 +268,6 @@ public class TileGenerator extends TileEntity
         return 0;
     }
 
-    @Override
     public void setField(int id, int value)
     {
         switch (id)
@@ -372,19 +290,9 @@ public class TileGenerator extends TileEntity
         this.markDirty();
     }
 
-    @Override
     public int getFieldCount()
     {
         return 4;
-    }
-
-    public void clear()
-    {
-        for (int i = 0; i < inputs.length; ++i)
-        {
-            inputs[i] = null;
-        }
-        markDirty();
     }
 
     public boolean isBurning()
@@ -407,5 +315,10 @@ public class TileGenerator extends TileEntity
     public int getContainedEnergy()
     {
         return containedEnergy;
+    }
+
+    public IItemHandler inventory()
+    {
+        return inputs;
     }
 }

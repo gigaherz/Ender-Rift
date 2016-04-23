@@ -9,7 +9,6 @@ import gigaherz.enderRift.automation.AutomationHelper;
 import gigaherz.enderRift.automation.IInventoryAutomation;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
@@ -17,12 +16,13 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.ITextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.items.CapabilityItemHandler;
-import net.minecraftforge.items.wrapper.InvWrapper;
+import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.items.IItemHandlerModifiable;
+import net.minecraftforge.items.ItemStackHandler;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.lang3.tuple.Triple;
 
@@ -31,14 +31,29 @@ import java.util.Queue;
 import java.util.Set;
 
 public class TileInterface extends TileEntity
-        implements IInventory, ITickable, IBrowserExtension
+        implements ITickable, IBrowserExtension
 {
     static final int FilterCount = 9;
 
-    final ItemStack[] filters = new ItemStack[FilterCount];
-    final ItemStack[] outputs = new ItemStack[FilterCount];
+    FilterInventory filters = new FilterInventory(FilterCount);
+    ItemStackHandler outputs = new ItemStackHandler(FilterCount)
+    {
+        @Override
+        protected void onContentsChanged(int slot)
+        {
+            markDirty();
+        }
+    };
 
-    InvWrapper invHandler = new InvWrapper(this);
+    public IItemHandler inventoryOutputs()
+    {
+        return outputs;
+    }
+
+    public IItemHandler inventoryFilter()
+    {
+        return filters;
+    }
 
     @Override
     public boolean hasCapability(Capability<?> capability, EnumFacing facing)
@@ -48,12 +63,11 @@ public class TileInterface extends TileEntity
         return super.hasCapability(capability, facing);
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public <T> T getCapability(Capability<T> capability, EnumFacing facing)
     {
         if (capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
-            return (T) invHandler;
+            return CapabilityItemHandler.ITEM_HANDLER_CAPABILITY.cast(outputs);
         return super.getCapability(capability, facing);
     }
 
@@ -147,133 +161,52 @@ public class TileInterface extends TileEntity
 
         for (int i = 0; i < FilterCount; i++)
         {
-            if (filters[i] != null)
+            ItemStack inFilter = filters.getStackInSlot(i);
+            ItemStack inSlot = outputs.getStackInSlot(i);
+            if (inFilter != null)
             {
-                if (outputs[i] == null)
+                if (inSlot == null)
                 {
                     int free = 64;
-                    outputs[i] = getAutomation().extractItems(filters[i], free, false);
-                    if (outputs[i] != null)
+                    inSlot = getAutomation().extractItems(inFilter, free, false);
+                    outputs.setStackInSlot(i, inSlot);
+                    if (inSlot != null)
                         anyChanged = true;
                 }
-                else if (outputs[i].isItemEqual(filters[i]))
+                else if (inSlot.isItemEqual(inFilter))
                 {
-                    int free = outputs[i].getMaxStackSize() - outputs[i].stackSize;
+                    int free = inSlot.getMaxStackSize() - inSlot.stackSize;
                     if (free > 0)
                     {
-                        ItemStack extracted = getAutomation().extractItems(filters[i], free, false);
+                        ItemStack extracted = getAutomation().extractItems(inFilter, free, false);
                         if (extracted != null)
                         {
-                            outputs[i].stackSize += extracted.stackSize;
+                            inSlot.stackSize += extracted.stackSize;
                             anyChanged = true;
                         }
                     }
                 }
-                else if (outputs[i] != null)
+                else
                 {
-                    int stackSize = outputs[i].stackSize;
-                    outputs[i] = getAutomation().insertItems(outputs[i]);
-                    if (outputs[i] == null || stackSize != outputs[i].stackSize)
+                    int stackSize = inSlot.stackSize;
+                    inSlot = getAutomation().insertItems(inSlot);
+                    outputs.setStackInSlot(i, inSlot);
+                    if (inSlot == null || stackSize != inSlot.stackSize)
                         anyChanged = true;
                 }
             }
-            else if (outputs[i] != null)
+            else if (inSlot != null)
             {
-                int stackSize = outputs[i].stackSize;
-                outputs[i] = getAutomation().insertItems(outputs[i]);
-                if (outputs[i] == null || stackSize != outputs[i].stackSize)
+                int stackSize = inSlot.stackSize;
+                inSlot = getAutomation().insertItems(inSlot);
+                outputs.setStackInSlot(i, inSlot);
+                if (inSlot == null || stackSize != inSlot.stackSize)
                     anyChanged = true;
             }
         }
 
         if (anyChanged)
             markDirty();
-    }
-
-    @Override
-    public int getSizeInventory()
-    {
-        return FilterCount;
-    }
-
-    @Override
-    public ItemStack getStackInSlot(int index)
-    {
-        if (index < 0 || index >= outputs.length)
-            return null;
-        return outputs[index];
-    }
-
-    @Override
-    public ItemStack decrStackSize(int index, int count)
-    {
-        if (index < 0 || index >= outputs.length)
-            return null;
-
-        if (outputs[index] == null)
-            return null;
-
-        if (count > outputs[index].stackSize)
-            count = outputs[index].stackSize;
-
-        ItemStack result = outputs[index].splitStack(count);
-
-        if (outputs[index].stackSize <= 0)
-        {
-            outputs[index] = null;
-        }
-
-        this.markDirty();
-
-        return result;
-    }
-
-    @Override
-    public ItemStack removeStackFromSlot(int index)
-    {
-        if (index < 0 || index >= outputs.length)
-            return null;
-
-        if (outputs[index] == null)
-            return null;
-
-        ItemStack itemstack = outputs[index];
-        outputs[index] = null;
-        return itemstack;
-    }
-
-    @Override
-    public void setInventorySlotContents(int index, ItemStack stack)
-    {
-        if (index < 0 || index >= outputs.length)
-            return;
-
-        outputs[index] = stack;
-
-        if (stack != null && stack.stackSize > this.getInventoryStackLimit())
-        {
-            stack.stackSize = this.getInventoryStackLimit();
-        }
-
-        this.markDirty();
-    }
-
-    @Override
-    public String getName()
-    {
-        return "container." + EnderRiftMod.MODID + ".interface";
-    }
-
-    @Override
-    public boolean hasCustomName()
-    {
-        return false;
-    }
-
-    @Override
-    public ITextComponent getDisplayName()
-    {
-        return null;
     }
 
     @Override
@@ -287,21 +220,21 @@ public class TileInterface extends TileEntity
             NBTTagCompound nbttagcompound = _filters.getCompoundTagAt(i);
             int j = nbttagcompound.getByte("Slot") & 255;
 
-            if (j >= 0 && j < filters.length)
+            if (j >= 0 && j < filters.getSlots())
             {
-                filters[j] = ItemStack.loadItemStackFromNBT(nbttagcompound);
+                filters.setStackInSlot(j, ItemStack.loadItemStackFromNBT(nbttagcompound));
             }
         }
 
         NBTTagList _outputs = compound.getTagList("Outputs", Constants.NBT.TAG_COMPOUND);
         for (int i = 0; i < _outputs.tagCount(); ++i)
         {
-            NBTTagCompound nbttagcompound = _outputs.getCompoundTagAt(i);
-            int j = nbttagcompound.getByte("Slot") & 255;
+            NBTTagCompound slot = _outputs.getCompoundTagAt(i);
+            int j = slot.getByte("Slot") & 255;
 
-            if (j >= 0 && j < outputs.length)
+            if (j >= 0 && j < outputs.getSlots())
             {
-                outputs[j] = ItemStack.loadItemStackFromNBT(nbttagcompound);
+                outputs.setStackInSlot(j, ItemStack.loadItemStackFromNBT(slot));
             }
         }
     }
@@ -312,13 +245,14 @@ public class TileInterface extends TileEntity
         super.writeToNBT(compound);
 
         NBTTagList _filters = new NBTTagList();
-        for (int i = 0; i < filters.length; ++i)
+        for (int i = 0; i < filters.getSlots(); ++i)
         {
-            if (filters[i] != null)
+            ItemStack stack = filters.getStackInSlot(i);
+            if (stack != null)
             {
                 NBTTagCompound nbttagcompound = new NBTTagCompound();
                 nbttagcompound.setByte("Slot", (byte) i);
-                filters[i].writeToNBT(nbttagcompound);
+                stack.writeToNBT(nbttagcompound);
                 _filters.appendTag(nbttagcompound);
             }
         }
@@ -326,225 +260,95 @@ public class TileInterface extends TileEntity
         compound.setTag("Filters", _filters);
 
         NBTTagList _outputs = new NBTTagList();
-        for (int i = 0; i < outputs.length; ++i)
+        for (int i = 0; i < outputs.getSlots(); ++i)
         {
-            if (outputs[i] != null)
+            ItemStack stack = outputs.getStackInSlot(i);
+            if (stack != null)
             {
-                NBTTagCompound nbttagcompound = new NBTTagCompound();
-                nbttagcompound.setByte("Slot", (byte) i);
-                outputs[i].writeToNBT(nbttagcompound);
-                _outputs.appendTag(nbttagcompound);
+                NBTTagCompound slot = new NBTTagCompound();
+                slot.setByte("Slot", (byte) i);
+                stack.writeToNBT(slot);
+                _outputs.appendTag(slot);
             }
         }
 
         compound.setTag("Outputs", _outputs);
     }
 
-    @Override
-    public int getInventoryStackLimit()
-    {
-        return 64;
-    }
-
-    @Override
     public boolean isUseableByPlayer(EntityPlayer player)
     {
         return worldObj.getTileEntity(pos) == this
                 && player.getDistanceSq(pos.getX() + 0.5D, pos.getY() + 0.5D, pos.getZ() + 0.5D) <= 64.0D;
     }
 
-    @Override
-    public void openInventory(EntityPlayer player)
+    class FilterInventory implements IItemHandlerModifiable
     {
-    }
+        final ItemStack[] filters;
 
-    @Override
-    public void closeInventory(EntityPlayer player)
-    {
-    }
-
-    @Override
-    public boolean isItemValidForSlot(int index, ItemStack stack)
-    {
-        return true;
-    }
-
-    @Override
-    public int getField(int id)
-    {
-        return 0;
-    }
-
-    @Override
-    public void setField(int id, int value)
-    {
-    }
-
-    @Override
-    public int getFieldCount()
-    {
-        return 0;
-    }
-
-    public void clear()
-    {
-        for (int i = 0; i < filters.length; ++i)
+        public FilterInventory(int slotCount)
         {
-            filters[i] = null;
+            filters = new ItemStack[slotCount];
         }
-        for (int i = 0; i < outputs.length; ++i)
+
+        @Override
+        public int getSlots()
         {
-            outputs[i] = null;
+            return FilterCount;
         }
-        markDirty();
-    }
 
-    public IInventory inventoryFilter()
-    {
-        return new IInventory()
+        @Override
+        public ItemStack getStackInSlot(int slot)
         {
-
-            @Override
-            public void markDirty()
-            {
-            }
-
-            @Override
-            public int getSizeInventory()
-            {
-                return FilterCount;
-            }
-
-            @Override
-            public ItemStack getStackInSlot(int index)
-            {
-                if (index < 0 || index >= filters.length)
-                    return null;
-                return filters[index];
-            }
-
-            @Override
-            public ItemStack decrStackSize(int index, int count)
-            {
-                if (index < 0 || index >= filters.length)
-                    return null;
-
-                if (filters[index] == null)
-                    return null;
-
-                if (count > filters[index].stackSize)
-                    count = filters[index].stackSize;
-
-                ItemStack result = filters[index].splitStack(count);
-
-                if (filters[index].stackSize <= 0)
-                {
-                    filters[index] = null;
-                }
-
-                this.markDirty();
-
-                return result;
-            }
-
-            @Override
-            public ItemStack removeStackFromSlot(int index)
-            {
-                if (index < 0 || index >= filters.length)
-                    return null;
-
-                if (filters[index] == null)
-                    return null;
-
-                ItemStack itemstack = filters[index];
-                filters[index] = null;
-                return itemstack;
-            }
-
-            @Override
-            public void setInventorySlotContents(int index, ItemStack stack)
-            {
-                filters[index] = stack;
-
-                if (stack != null && stack.stackSize > this.getInventoryStackLimit())
-                {
-                    stack.stackSize = this.getInventoryStackLimit();
-                }
-
-                this.markDirty();
-            }
-
-            @Override
-            public String getName()
-            {
+            if (slot < 0 || slot >= filters.length)
                 return null;
+            return filters[slot];
+        }
+
+        @Override
+        public ItemStack insertItem(int slot, ItemStack stack, boolean simulate)
+        {
+            if (slot < 0 || slot >= filters.length)
+                return stack;
+
+            if (!simulate)
+            {
+                filters[slot] = stack.copy();
+                filters[slot].stackSize = 1;
             }
 
-            @Override
-            public boolean hasCustomName()
+            return stack;
+        }
+
+        @Override
+        public ItemStack extractItem(int slot, int amount, boolean simulate)
+        {
+            return null;
+        }
+
+        @Override
+        public void setStackInSlot(int index, ItemStack stack)
+        {
+            filters[index] = stack;
+
+            if (stack != null && stack.stackSize > this.getInventoryStackLimit())
             {
-                return false;
+                stack.stackSize = this.getInventoryStackLimit();
             }
 
-            @Override
-            public ITextComponent getDisplayName()
-            {
-                return null;
-            }
+            markDirty();
+        }
 
-            @Override
-            public int getInventoryStackLimit()
-            {
-                return 1;
-            }
+        public int getInventoryStackLimit()
+        {
+            return 1;
+        }
 
-            @Override
-            public boolean isUseableByPlayer(EntityPlayer player)
+        public void clear()
+        {
+            for (int i = 0; i < filters.length; ++i)
             {
-                return true;
+                filters[i] = null;
             }
-
-            @Override
-            public void openInventory(EntityPlayer player)
-            {
-            }
-
-            @Override
-            public void closeInventory(EntityPlayer player)
-            {
-            }
-
-            @Override
-            public boolean isItemValidForSlot(int index, ItemStack stack)
-            {
-                return true;
-            }
-
-            @Override
-            public int getField(int id)
-            {
-                return 0;
-            }
-
-            @Override
-            public void setField(int id, int value)
-            {
-            }
-
-            @Override
-            public int getFieldCount()
-            {
-                return 0;
-            }
-
-            @Override
-            public void clear()
-            {
-                for (int i = 0; i < filters.length; ++i)
-                {
-                    filters[i] = null;
-                }
-            }
-        };
+        }
     }
 }

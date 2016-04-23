@@ -26,9 +26,9 @@ public class GuiGenerator extends GuiContainer
     public GuiGenerator(InventoryPlayer playerInventory, TileGenerator tileEntity)
     {
         super(new ContainerGenerator(tileEntity, playerInventory));
-        this.player = playerInventory;
-        this.tile = tileEntity;
-        this.ySize = 165;
+        player = playerInventory;
+        tile = tileEntity;
+        ySize = 165;
         guiTextureLocation = new ResourceLocation(EnderRiftMod.MODID, "textures/gui/generator.png");
         energyTextureLocation = new ResourceLocation(EnderRiftMod.MODID, "textures/gui/Energy.png");
     }
@@ -36,9 +36,9 @@ public class GuiGenerator extends GuiContainer
     @Override
     protected void drawGuiContainerForegroundLayer(int i, int j)
     {
-        String name = I18n.translateToLocal(this.tile.getName());
+        String name = I18n.translateToLocal(tile.getName());
         mc.fontRendererObj.drawString(name, (xSize - mc.fontRendererObj.getStringWidth(name)) / 2, 6, 0x404040);
-        mc.fontRendererObj.drawString(I18n.translateToLocal(this.player.getName()), 8, ySize - 96 + 2, 0x404040);
+        mc.fontRendererObj.drawString(I18n.translateToLocal(player.getName()), 8, ySize - 96 + 2, 0x404040);
 
         String label;
         if (tile.getGenerationPower() > 0)
@@ -70,10 +70,8 @@ public class GuiGenerator extends GuiContainer
 
     private void drawBarTooltip(int mx, int my, int ox, int oy)
     {
-        int x = (width - xSize) / 2;
-        int y = (height - ySize) / 2;
-        int rx = mx - ox - x;
-        int ry = my - oy - y;
+        int rx = mx - ox - guiLeft;
+        int ry = my - oy - guiTop;
 
         if (rx < 0 || ry < 0 || rx > barWidth || ry > barHeight)
             return;
@@ -82,7 +80,7 @@ public class GuiGenerator extends GuiContainer
         tooltip.add(I18n.translateToLocal("text." + EnderRiftMod.MODID + ".generator.energy.label"));
         tooltip.add(String.format("%d / %d RF", tile.getContainedEnergy(), TileGenerator.PowerLimit));
 
-        drawHoveringText(tooltip, mx - x, my - y);
+        drawHoveringText(tooltip, mx - guiLeft, my - guiTop);
     }
 
     @Override
@@ -90,19 +88,16 @@ public class GuiGenerator extends GuiContainer
     {
         GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f);
 
-        int x = (width - xSize) / 2;
-        int y = (height - ySize) / 2;
-
         mc.renderEngine.bindTexture(guiTextureLocation);
-        this.drawTexturedModalRect(x, y, 0, 0, xSize, ySize);
+        drawTexturedModalRect(guiLeft, guiTop, 0, 0, xSize, ySize);
 
         if (tile.isBurning())
         {
-            int k = this.getBurnLeftScaled(13);
-            this.drawTexturedModalRect(x + 80, y + 36 + 12 - k, 176, 12 - k, 14, k + 1);
+            int k = getBurnLeftScaled(13);
+            drawTexturedModalRect(guiLeft + 80, guiTop + 36 + 12 - k, 176, 12 - k, 14, k + 1);
         }
 
-        drawEnergyBar(x + xSize - 14 - 8, y + 20, tile.getContainedEnergy(), TileGenerator.PowerLimit);
+        drawEnergyBar(guiLeft + xSize - 14 - 8, guiTop + 20, tile.getContainedEnergy(), TileGenerator.PowerLimit);
     }
 
     private void drawEnergyBar(int x, int y, int powerLevel, int powerLimit)
@@ -133,13 +128,13 @@ public class GuiGenerator extends GuiContainer
 
     private int getBurnLeftScaled(int pixels)
     {
-        int i = this.tile.getField(1);
+        int i = tile.getField(1);
 
         if (i == 0)
         {
             i = 200;
         }
 
-        return this.tile.getField(0) * pixels / i;
+        return tile.getField(0) * pixels / i;
     }
 }

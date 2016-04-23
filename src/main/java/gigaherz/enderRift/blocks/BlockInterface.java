@@ -19,7 +19,7 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-import net.minecraftforge.items.ItemHandlerHelper;
+import net.minecraftforge.items.IItemHandler;
 
 public class BlockInterface
         extends BlockRegistered
@@ -115,10 +115,23 @@ public class BlockInterface
 
         if (tileentity instanceof TileInterface)
         {
-            InventoryHelper.dropInventoryItems(worldIn, pos, (TileInterface) tileentity);
+            dropInventoryItems(worldIn, pos, ((TileInterface) tileentity).inventoryOutputs());
             worldIn.updateComparatorOutputLevel(pos, this);
         }
 
         super.breakBlock(worldIn, pos, state);
+    }
+
+    public static void dropInventoryItems(World worldIn, BlockPos pos, IItemHandler inventory)
+    {
+        for (int i = 0; i < inventory.getSlots(); ++i)
+        {
+            ItemStack itemstack = inventory.getStackInSlot(i);
+
+            if (itemstack != null)
+            {
+                InventoryHelper.spawnItemStack(worldIn, (double) pos.getX(), (double) pos.getY(), (double) pos.getZ(), itemstack);
+            }
+        }
     }
 }
