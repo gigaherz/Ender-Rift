@@ -22,6 +22,20 @@ public class TileBrowser extends TileEntity implements IBrowserExtension
 {
     private int changeCount = 1;
 
+    EnumFacing facing = null;
+    public EnumFacing getFacing()
+    {
+        if(facing == null)
+        {
+            IBlockState state = worldObj.getBlockState(pos);
+            if(state.getBlock() == EnderRiftMod.browser)
+            {
+                facing = state.getValue(BlockInterface.FACING).getOpposite();
+            }
+        }
+        return facing;
+    }
+
     public IInventoryAutomation getAutomation()
     {
         AutomationAggregator aggregator = new AutomationAggregator();
@@ -82,6 +96,7 @@ public class TileBrowser extends TileEntity implements IBrowserExtension
     public void markDirty()
     {
         changeCount++;
+        facing = null;
         super.markDirty();
     }
 
@@ -99,6 +114,10 @@ public class TileBrowser extends TileEntity implements IBrowserExtension
     @Override
     public void gatherNeighbours(Queue<Triple<BlockPos, EnumFacing, Integer>> pending, EnumFacing faceFrom, int distance)
     {
-        pending.add(Triple.of(this.pos.offset(faceFrom.getOpposite()), faceFrom, distance));
+        EnumFacing f = getFacing();
+        if (f != null)
+        {
+            pending.add(Triple.of(this.pos.offset(f.getOpposite()), faceFrom, distance));
+        }
     }
 }

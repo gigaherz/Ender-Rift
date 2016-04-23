@@ -45,6 +45,20 @@ public class TileInterface extends TileEntity
         }
     };
 
+    EnumFacing facing = null;
+    public EnumFacing getFacing()
+    {
+        if(facing == null)
+        {
+            IBlockState state = worldObj.getBlockState(pos);
+            if(state.getBlock() == EnderRiftMod.riftInterface)
+            {
+                facing = state.getValue(BlockInterface.FACING).getOpposite();
+            }
+        }
+        return facing;
+    }
+
     public IItemHandler inventoryOutputs()
     {
         return outputs;
@@ -58,16 +72,22 @@ public class TileInterface extends TileEntity
     @Override
     public boolean hasCapability(Capability<?> capability, EnumFacing facing)
     {
-        if (capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
-            return true;
+        if (facing == getFacing())
+        {
+            if (capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
+                return true;
+        }
         return super.hasCapability(capability, facing);
     }
 
     @Override
     public <T> T getCapability(Capability<T> capability, EnumFacing facing)
     {
-        if (capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
-            return CapabilityItemHandler.ITEM_HANDLER_CAPABILITY.cast(outputs);
+        if (facing == getFacing())
+        {
+            if (capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
+                return CapabilityItemHandler.ITEM_HANDLER_CAPABILITY.cast(outputs);
+        }
         return super.getCapability(capability, facing);
     }
 
@@ -131,6 +151,7 @@ public class TileInterface extends TileEntity
     public void markDirty()
     {
         super.markDirty();
+        facing = null;
     }
 
     @Override
@@ -142,7 +163,11 @@ public class TileInterface extends TileEntity
     @Override
     public void gatherNeighbours(Queue<Triple<BlockPos, EnumFacing, Integer>> pending, EnumFacing faceFrom, int distance)
     {
-        pending.add(Triple.of(this.pos.offset(faceFrom.getOpposite()), faceFrom, distance));
+        EnumFacing f = getFacing();
+        if (f != null)
+        {
+            pending.add(Triple.of(this.pos.offset(f.getOpposite()), faceFrom, distance));
+        }
     }
 
     @Override
