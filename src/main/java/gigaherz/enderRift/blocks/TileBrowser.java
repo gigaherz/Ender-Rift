@@ -23,12 +23,13 @@ public class TileBrowser extends TileEntity implements IBrowserExtension
     private int changeCount = 1;
 
     EnumFacing facing = null;
+
     public EnumFacing getFacing()
     {
-        if(facing == null)
+        if (facing == null)
         {
             IBlockState state = worldObj.getBlockState(pos);
-            if(state.getBlock() == EnderRiftMod.browser)
+            if (state.getBlock() == EnderRiftMod.browser)
             {
                 facing = state.getValue(BlockInterface.FACING).getOpposite();
             }

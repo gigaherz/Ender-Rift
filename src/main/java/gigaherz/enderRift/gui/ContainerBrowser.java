@@ -21,6 +21,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.play.server.SPacketSetSlot;
 import net.minecraftforge.items.IItemHandlerModifiable;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
 
@@ -199,7 +200,7 @@ public class ContainerBrowser
 
     public void setFilterText(String text)
     {
-        this.filterText = text;
+        this.filterText = text.toLowerCase();
 
         if (!tile.getWorld().isRemote)
         {
@@ -521,7 +522,7 @@ public class ContainerBrowser
                         matchesSearch = false;
                         for (String s : itemData)
                         {
-                            if (s.contains(filterText))
+                            if (StringUtils.containsIgnoreCase(s, filterText))
                             {
                                 matchesSearch = true;
                                 break;
