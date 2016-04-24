@@ -118,12 +118,12 @@ public class BlockStructure
         IBlockState state = worldIn.getBlockState(pos);
         AxisAlignedBB aabb = getBB(0, 0, 0, state);
         setBlockBounds(
-                (float)aabb.minX,
-                (float)aabb.minY,
-                (float)aabb.minZ,
-                (float)aabb.maxX,
-                (float)aabb.maxY,
-                (float)aabb.maxZ);
+                (float) aabb.minX,
+                (float) aabb.minY,
+                (float) aabb.minZ,
+                (float) aabb.maxX,
+                (float) aabb.maxY,
+                (float) aabb.maxZ);
     }
 
     @Override

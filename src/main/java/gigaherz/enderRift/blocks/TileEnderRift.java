@@ -153,7 +153,7 @@ public class TileEnderRift
     public <T> T getCapability(Capability<T> capability, EnumFacing facing)
     {
         if (capability == CapabilityAutomation.INSTANCE)
-            return (T)automation;
+            return (T) automation;
         return super.getCapability(capability, facing);
     }
 

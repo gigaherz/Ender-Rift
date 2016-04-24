@@ -77,9 +77,9 @@ public class TileGenerator extends TileEntity
     public <T> T getCapability(Capability<T> capability, EnumFacing facing)
     {
         if (capability == CapabilityEnergy.ENERGY_HANDLER_CAPABILITY)
-            return (T)energyCapability;
+            return (T) energyCapability;
         if (capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
-            return (T)inputs;
+            return (T) inputs;
         return super.getCapability(capability, facing);
     }
 

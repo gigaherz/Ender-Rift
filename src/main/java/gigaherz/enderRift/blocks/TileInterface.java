@@ -46,12 +46,13 @@ public class TileInterface extends TileEntity
     };
 
     EnumFacing facing = null;
+
     public EnumFacing getFacing()
     {
-        if(facing == null)
+        if (facing == null)
         {
             IBlockState state = worldObj.getBlockState(pos);
-            if(state.getBlock() == EnderRiftMod.riftInterface)
+            if (state.getBlock() == EnderRiftMod.riftInterface)
             {
                 facing = state.getValue(BlockInterface.FACING).getOpposite();
             }

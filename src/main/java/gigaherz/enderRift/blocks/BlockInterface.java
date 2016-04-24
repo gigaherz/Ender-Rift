@@ -11,13 +11,11 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.inventory.InventoryHelper;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.items.IItemHandler;
 
@@ -136,17 +134,17 @@ public class BlockInterface
             }
 
             stack.stackSize -= i;
-            EntityItem entityitem = new EntityItem(worldIn, x + (double)f, y + (double)f1, z + (double)f2, new ItemStack(stack.getItem(), i, stack.getMetadata()));
+            EntityItem entityitem = new EntityItem(worldIn, x + (double) f, y + (double) f1, z + (double) f2, new ItemStack(stack.getItem(), i, stack.getMetadata()));
 
             if (stack.hasTagCompound())
             {
-                entityitem.getEntityItem().setTagCompound((NBTTagCompound)stack.getTagCompound().copy());
+                entityitem.getEntityItem().setTagCompound((NBTTagCompound) stack.getTagCompound().copy());
             }
 
             float f3 = 0.05F;
-            entityitem.motionX = RANDOM.nextGaussian() * (double)f3;
-            entityitem.motionY = RANDOM.nextGaussian() * (double)f3 + 0.20000000298023224D;
-            entityitem.motionZ = RANDOM.nextGaussian() * (double)f3;
+            entityitem.motionX = RANDOM.nextGaussian() * (double) f3;
+            entityitem.motionY = RANDOM.nextGaussian() * (double) f3 + 0.20000000298023224D;
+            entityitem.motionZ = RANDOM.nextGaussian() * (double) f3;
             worldIn.spawnEntityInWorld(entityitem);
         }
     }
