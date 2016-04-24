@@ -1,6 +1,8 @@
 package gigaherz.enderRift.automation;
 
 import com.google.common.collect.Lists;
+import com.typesafe.config.ConfigValue;
+import gigaherz.enderRift.ConfigValues;
 import net.minecraft.item.ItemStack;
 
 import javax.annotation.Nonnull;
@@ -51,16 +53,40 @@ public class AutomationAggregator implements IInventoryAutomation
     @Override
     public ItemStack insertItems(@Nonnull ItemStack stack)
     {
-        ItemStack remaining = null;
+        ItemStack remaining = stack.copy();
+
+        // New feature: try to push into existing inventories that contain the item, first
+        if  (ConfigValues.PreferContainersWithExistingStacks)
+        {
+            // DO NOT CHANGE BACK TO FOREACH, CAUSES ConcurrentModificationException
+            for (int i = 0; i < aggregated.size(); i++)
+            {
+                IInventoryAutomation inv = aggregated.get(i);
+
+                for (int j = 0; j < inv.getSlots(); j++)
+                {
+                    ItemStack existing = inv.getStackInSlot(j);
+                    if (ItemStack.areItemsEqual(stack, existing) && ItemStack.areItemStackTagsEqual(stack, existing))
+                    {
+                        remaining = inv.insertItems(remaining);
+                        break;
+                    }
+                }
+
+                if (remaining == null)
+                    return null;
+            }
+        }
 
         // DO NOT CHANGE BACK TO FOREACH, CAUSES ConcurrentModificationException
         for (int i = 0; i < aggregated.size(); i++)
         {
             IInventoryAutomation inv = aggregated.get(i);
-            remaining = inv.insertItems(stack);
+            remaining = inv.insertItems(remaining);
             if (remaining == null)
                 return null;
         }
+
         return remaining;
     }
 
