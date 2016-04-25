@@ -32,7 +32,7 @@ public class BlockEnderRift
         super(name, Material.rock);
         setCreativeTab(EnderRiftMod.tabEnderRift);
         setBlockBounds(0.2F, 0.2F, 0.2F, 0.8F, 0.8F, 0.8F);
-        setHardness(0.5F);
+        setHardness(3.0F);
         setStepSound(Block.soundTypeMetal);
         setDefaultState(this.blockState.getBaseState()
                 .withProperty(ASSEMBLED, false));
