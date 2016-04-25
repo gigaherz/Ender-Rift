@@ -5,27 +5,38 @@ import gigaherz.enderRift.gui.GuiHandler;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
+import net.minecraft.block.properties.PropertyBool;
 import net.minecraft.block.properties.PropertyDirection;
 import net.minecraft.block.state.BlockState;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemBlock;
+import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
+import java.util.List;
+
 public class BlockBrowser
         extends Block
 {
     public static final PropertyDirection FACING = PropertyDirection.create("facing");
+    public static final PropertyBool CRAFTING = PropertyBool.create("crafting");
+
+    private static final String unlocStandard = EnderRiftMod.MODID + ".blockBrowser";
+    private static final String unlocCrafting = EnderRiftMod.MODID + ".blockCraftingBrowser";
 
     public BlockBrowser()
     {
         super(Material.iron, MapColor.stoneColor);
         setStepSound(soundTypeMetal);
-        setUnlocalizedName(EnderRiftMod.MODID + ".blockBrowser");
+        setUnlocalizedName(unlocStandard);
         setCreativeTab(EnderRiftMod.tabEnderRift);
         setDefaultState(blockState.getBaseState().withProperty(FACING, EnumFacing.NORTH));
         setBlockBounds(0.0F, 0.0F, 0.0F, 1.0F, 1.0F, 1.0F);
@@ -70,19 +81,22 @@ public class BlockBrowser
     @Override
     protected BlockState createBlockState()
     {
-        return new BlockState(this, FACING);
+        return new BlockState(this, FACING, CRAFTING);
     }
 
     @Override
     public IBlockState getStateFromMeta(int meta)
     {
-        return getDefaultState().withProperty(FACING, EnumFacing.VALUES[meta & 7]);
+        return getDefaultState()
+                .withProperty(FACING, EnumFacing.VALUES[meta & 7])
+                .withProperty(CRAFTING, (meta&8)!=0);
     }
 
     @Override
     public int getMetaFromState(IBlockState state)
     {
-        return state.getValue(FACING).ordinal();
+        return state.getValue(FACING).ordinal()
+                | (state.getValue(CRAFTING) ? 8 : 0);
     }
 
     @Override
@@ -93,7 +107,11 @@ public class BlockBrowser
         if (!(tileEntity instanceof TileBrowser) || playerIn.isSneaking())
             return false;
 
-        playerIn.openGui(EnderRiftMod.instance, GuiHandler.GUI_BROWSER, worldIn, pos.getX(), pos.getY(), pos.getZ());
+        int which = state.getValue(CRAFTING) ?
+                GuiHandler.GUI_BROWSER_CRAFTING :
+                GuiHandler.GUI_BROWSER;
+
+        playerIn.openGui(EnderRiftMod.instance, which, worldIn, pos.getX(), pos.getY(), pos.getZ());
 
         return true;
     }
@@ -101,6 +119,35 @@ public class BlockBrowser
     @Override
     public IBlockState onBlockPlaced(World worldIn, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer)
     {
-        return getDefaultState().withProperty(BlockBrowser.FACING, facing.getOpposite());
+        return getDefaultState().withProperty(BlockBrowser.FACING, facing.getOpposite()).withProperty(CRAFTING, meta != 0);
+    }
+
+    public static class AsItem extends ItemBlock
+    {
+        public AsItem(Block block)
+        {
+            super(block);
+            setHasSubtypes(true);
+        }
+
+        @Override
+        public int getMetadata(int damage)
+        {
+            return damage & 1;
+        }
+
+        @Override
+        public String getUnlocalizedName(ItemStack stack)
+        {
+            return "tile." + ((stack.getMetadata() != 0) ? unlocCrafting : unlocStandard);
+        }
+
+        @Override
+        public void getSubItems(Item itemIn, CreativeTabs tab, List<ItemStack> subItems)
+        {
+            subItems.add(new ItemStack(itemIn, 1, 0));
+            subItems.add(new ItemStack(itemIn, 1, 1));
+        }
+
     }
 }

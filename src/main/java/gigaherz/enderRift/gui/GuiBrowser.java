@@ -9,6 +9,7 @@ import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraft.inventory.Container;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
@@ -24,12 +25,17 @@ public class GuiBrowser extends GuiContainer
     private static final ResourceLocation tabsTexture = new ResourceLocation("minecraft:textures/gui/container/creative_inventory/tabs.png");
     private static final String textBrowser = "container." + EnderRiftMod.MODID + ".browser";
 
-    private InventoryPlayer player;
+    protected InventoryPlayer player;
 
     private boolean isDragging;
     private int scrollY;
 
     private GuiTextField searchField;
+
+    protected GuiBrowser(Container container)
+    {
+        super(container);
+    }
 
     public GuiBrowser(InventoryPlayer playerInventory, TileBrowser tileEntity)
     {
@@ -38,6 +44,8 @@ public class GuiBrowser extends GuiContainer
         xSize = 194;
         ySize = 168;
     }
+
+    protected ResourceLocation getBackgroundTexture() { return backgroundTexture; }
 
     @Override
     public void initGui()
@@ -97,18 +105,21 @@ public class GuiBrowser extends GuiContainer
     @Override
     protected void actionPerformed(GuiButton guibutton)
     {
-        SortMode mode = ((ContainerBrowser) inventorySlots).sortMode;
-        switch (mode)
+        if (guibutton.id == 1)
         {
-            case Alphabetic:
-                mode = SortMode.StackSize;
-                break;
-            case StackSize:
-                mode = SortMode.Alphabetic;
-                break;
-        }
+            SortMode mode = ((ContainerBrowser) inventorySlots).sortMode;
+            switch (mode)
+            {
+                case Alphabetic:
+                    mode = SortMode.StackSize;
+                    break;
+                case StackSize:
+                    mode = SortMode.Alphabetic;
+                    break;
+            }
 
-        changeSorting(guibutton, mode);
+            changeSorting(guibutton, mode);
+        }
     }
 
     private void changeSorting(GuiButton guibutton, SortMode mode)
@@ -129,7 +140,7 @@ public class GuiBrowser extends GuiContainer
     @Override
     protected void drawGuiContainerBackgroundLayer(float partialTicks, int xMouse, int yMouse)
     {
-        mc.renderEngine.bindTexture(backgroundTexture);
+        mc.renderEngine.bindTexture(getBackgroundTexture());
 
         GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f);
         drawTexturedModalRect(guiLeft, guiTop, 0, 0, xSize, ySize);

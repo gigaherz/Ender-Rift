@@ -14,6 +14,7 @@ public class GuiHandler implements IGuiHandler
     public static final int GUI_INTERFACE = 0;
     public static final int GUI_GENERATOR = 1;
     public static final int GUI_BROWSER = 2;
+    public static final int GUI_BROWSER_CRAFTING = 3;
 
     @Override
     public Object getServerGuiElement(int id, EntityPlayer player, World world, int x, int y, int z)
@@ -38,6 +39,12 @@ public class GuiHandler implements IGuiHandler
                 if (tileEntity instanceof TileBrowser)
                 {
                     return new ContainerBrowser((TileBrowser) tileEntity, player.inventory, false);
+                }
+                break;
+            case GUI_BROWSER_CRAFTING:
+                if (tileEntity instanceof TileBrowser)
+                {
+                    return new ContainerCraftingBrowser((TileBrowser) tileEntity, player.inventory, false);
                 }
                 break;
         }
@@ -68,6 +75,12 @@ public class GuiHandler implements IGuiHandler
                 if (tileEntity instanceof TileBrowser)
                 {
                     return new GuiBrowser(player.inventory, (TileBrowser) tileEntity);
+                }
+                break;
+            case GUI_BROWSER_CRAFTING:
+                if (tileEntity instanceof TileBrowser)
+                {
+                    return new GuiCraftingBrowser(player.inventory, (TileBrowser) tileEntity);
                 }
                 break;
         }

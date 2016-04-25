@@ -43,7 +43,7 @@ public class EnderRiftMod
     public static BlockStructure structure;
     public static Block riftInterface;
     public static Block generator;
-    public static Block browser;
+    public static BlockBrowser browser;
     public static Block extension;
     public static Item riftOrb;
 
@@ -92,7 +92,7 @@ public class EnderRiftMod
         GameRegistry.registerBlock(riftInterface, "blockInterface");
 
         browser = new BlockBrowser();
-        GameRegistry.registerBlock(browser, "blockBrowser");
+        GameRegistry.registerBlock(browser, BlockBrowser.AsItem.class, "blockBrowser");
 
         generator = new BlockGenerator();
         GameRegistry.registerBlock(generator, "blockGenerator");
@@ -117,6 +117,7 @@ public class EnderRiftMod
         channel.registerMessage(SetSortMode.Handler.class, SetSortMode.class, messageNumber++, Side.SERVER);
         channel.registerMessage(SetFilterText.Handler.class, SetFilterText.class, messageNumber++, Side.SERVER);
         channel.registerMessage(UpdateField.Handler.class, UpdateField.class, messageNumber++, Side.CLIENT);
+        channel.registerMessage(ClearCraftingGrid.Handler.class, ClearCraftingGrid.class, messageNumber++, Side.SERVER);
         logger.debug("Final message number: " + messageNumber);
 
         proxy.preInit();
@@ -179,6 +180,15 @@ public class EnderRiftMod
                 'w', Items.water_bucket,
                 'r', Items.redstone,
                 'i', Items.iron_ingot);
+
+        GameRegistry.addRecipe(new ItemStack(browser, 1, 1),
+                "gdg",
+                "dbd",
+                "gcg",
+                'g', Items.gold_ingot,
+                'd', Items.diamond,
+                'c', Blocks.crafting_table,
+                'b', new ItemStack(browser, 1, 0));
 
         GameRegistry.addRecipe(new RecipesRiftDuplication());
 

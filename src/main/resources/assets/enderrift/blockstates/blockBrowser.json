@@ -2,12 +2,20 @@
   "forge_marker": 1,
   "defaults": {
     "model": "enderrift:interface.obj",
+    "transform": "forge:default-block",
     "textures": {
       "#Face": "enderrift:blocks/browser"
     }
   },
   "variants": {
-    "inventory": [{ "transform": "forge:default-block" }],
+    "crafting": {
+      "false": {},
+      "true": {
+        "textures": {
+          "#Face": "enderrift:blocks/crafting_browser"
+        }
+      }
+    },
     "facing": {
       "up": {
         "x": 90
