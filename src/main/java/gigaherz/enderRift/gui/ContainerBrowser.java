@@ -224,9 +224,9 @@ public class ContainerBrowser
     }
 
     @Override
-    public ItemStack slotClick(int slotId, int dragType, ClickType clickTypeIn, EntityPlayer player)
+    public ItemStack slotClick(int slotId, int clickedButton, ClickType mode, EntityPlayer playerIn)
     {
-        InventoryPlayer inventoryPlayer = player.inventory;
+        InventoryPlayer inventoryPlayer = playerIn.inventory;
 
         if (slotId >= 0 && slotId < FakeSlots)
         {
@@ -237,13 +237,13 @@ public class ContainerBrowser
             Slot slot = this.inventorySlots.get(slotId);
             ItemStack existing = slot.getStack();
 
-            if (clickTypeIn == ClickType.PICKUP)
+            if (mode == ClickType.PICKUP)
             {
                 ItemStack dropping = inventoryPlayer.getItemStack();
 
                 if (dropping != null)
                 {
-                    if (dragType == 0)
+                    if (clickedButton == 0)
                     {
                         ItemStack remaining = parent.insertItems(dropping);
                         if (remaining != null)
@@ -286,7 +286,7 @@ public class ContainerBrowser
                 }
                 else if (existing != null)
                 {
-                    int amount = dragType == 0
+                    int amount = clickedButton == 0
                             ? existing.getMaxStackSize()
                             : existing.getMaxStackSize() / 2;
 
@@ -299,10 +299,10 @@ public class ContainerBrowser
                 detectAndSendChanges();
                 return slot.getStack();
             }
-            else if (clickTypeIn == ClickType.QUICK_MOVE && existing != null)
+            else if (mode == ClickType.QUICK_MOVE && existing != null)
             {
                 int amount = existing.getMaxStackSize();
-                if (dragType != 0 && amount > 1)
+                if (clickedButton != 0 && amount > 1)
                     amount /= 2;
 
                 if (amount == 0)
@@ -327,11 +327,11 @@ public class ContainerBrowser
                 }
             }
 
-            if (clickTypeIn != ClickType.CLONE)
+            if (mode != ClickType.CLONE)
                 return null;
         }
 
-        return super.slotClick(slotId, dragType, clickTypeIn, player);
+        return super.slotClick(slotId, clickedButton, mode, playerIn);
     }
 
     public ItemStack simulateAddToPlayer(ItemStack stack, int amount)

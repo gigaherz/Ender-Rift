@@ -90,7 +90,7 @@ public class BlockBrowser
     {
         return getDefaultState()
                 .withProperty(FACING, EnumFacing.VALUES[meta & 7])
-                .withProperty(CRAFTING, (meta&8)!=0);
+                .withProperty(CRAFTING, (meta & 8) != 0);
     }
 
     @Override

@@ -10,14 +10,12 @@ import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.inventory.InventoryHelper;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.minecraftforge.items.IItemHandler;
 
 public class BlockGenerator
         extends BlockRegistered
@@ -98,23 +96,10 @@ public class BlockGenerator
 
         if (tileentity instanceof TileGenerator)
         {
-            dropInventoryItems(worldIn, pos, ((TileGenerator) tileentity).inventory());
+            BlockInterface.dropInventoryItems(worldIn, pos, ((TileGenerator) tileentity).inventory());
             worldIn.updateComparatorOutputLevel(pos, this);
         }
 
         super.breakBlock(worldIn, pos, state);
-    }
-
-    public static void dropInventoryItems(World worldIn, BlockPos pos, IItemHandler inventory)
-    {
-        for (int i = 0; i < inventory.getSlots(); ++i)
-        {
-            ItemStack itemstack = inventory.getStackInSlot(i);
-
-            if (itemstack != null)
-            {
-                InventoryHelper.spawnItemStack(worldIn, (double) pos.getX(), (double) pos.getY(), (double) pos.getZ(), itemstack);
-            }
-        }
     }
 }

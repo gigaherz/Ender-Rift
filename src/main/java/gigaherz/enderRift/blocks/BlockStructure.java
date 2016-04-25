@@ -37,6 +37,7 @@ public class BlockStructure
         setDefaultState(this.blockState.getBaseState()
                 .withProperty(TYPE1, Type1.NORMAL).withProperty(TYPE2, Type2.NONE)
                 .withProperty(CORNER, Corner.values[0]).withProperty(BASE, false));
+        setHardness(0.5F);
         setLightOpacity(0);
     }
 

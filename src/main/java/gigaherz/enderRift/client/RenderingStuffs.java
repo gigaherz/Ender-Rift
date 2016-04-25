@@ -44,18 +44,6 @@ public class RenderingStuffs
         }
     }
 
-    public static void renderModel(IBakedModel model)
-    {
-        Tessellator tessellator = Tessellator.getInstance();
-        VertexBuffer buffer = tessellator.getBuffer();
-        buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.ITEM);
-        for (BakedQuad bakedquad : model.getQuads(null, null, 0))
-        {
-            buffer.addVertexData(bakedquad.getVertexData());
-        }
-        tessellator.draw();
-    }
-
     public static void renderModel(IBakedModel model, int color)
     {
         Tessellator tessellator = Tessellator.getInstance();

@@ -56,16 +56,16 @@ public class ContainerInterface
     }
 
     @Override
-    public ItemStack slotClick(int slotId, int dragType, ClickType clickTypeIn, EntityPlayer player)
+    public ItemStack slotClick(int slotId, int clickedButton, ClickType mode, EntityPlayer playerIn)
     {
         if (slotId >= 0 && slotId < 9)
         {
-            if (clickTypeIn == ClickType.PICKUP || clickTypeIn == ClickType.PICKUP_ALL ||
-                    clickTypeIn == ClickType.SWAP) // 1 is shift-click
+            if (mode == ClickType.PICKUP || mode == ClickType.PICKUP_ALL ||
+                    mode == ClickType.SWAP) // 1 is shift-click
             {
                 Slot slot = this.inventorySlots.get(slotId);
 
-                ItemStack dropping = player.inventory.getItemStack();
+                ItemStack dropping = playerIn.inventory.getItemStack();
 
                 if (dropping != null)
                 {
@@ -85,7 +85,7 @@ public class ContainerInterface
             return null;
         }
 
-        return super.slotClick(slotId, dragType, clickTypeIn, player);
+        return super.slotClick(slotId, clickedButton, mode, playerIn);
     }
 
     @Override
