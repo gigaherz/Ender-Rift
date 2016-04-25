@@ -43,7 +43,7 @@ public class EnderRiftMod
     public static BlockStructure structure;
     public static BlockRegistered riftInterface;
     public static BlockRegistered generator;
-    public static BlockRegistered browser;
+    public static BlockBrowser browser;
     public static BlockRegistered extension;
     public static Item riftOrb;
 
@@ -119,6 +119,7 @@ public class EnderRiftMod
         channel.registerMessage(SetSortMode.Handler.class, SetSortMode.class, messageNumber++, Side.SERVER);
         channel.registerMessage(SetFilterText.Handler.class, SetFilterText.class, messageNumber++, Side.SERVER);
         channel.registerMessage(UpdateField.Handler.class, UpdateField.class, messageNumber++, Side.CLIENT);
+        channel.registerMessage(ClearCraftingGrid.Handler.class, ClearCraftingGrid.class, messageNumber++, Side.SERVER);
         logger.debug("Final message number: " + messageNumber);
 
         proxy.preInit();
@@ -181,6 +182,15 @@ public class EnderRiftMod
                 'w', Items.WATER_BUCKET,
                 'r', Items.REDSTONE,
                 'i', Items.IRON_INGOT);
+
+        GameRegistry.addRecipe(new ItemStack(browser, 1, 1),
+                "gdg",
+                "dbd",
+                "gcg",
+                'g', Items.GOLD_INGOT,
+                'd', Items.DIAMOND,
+                'c', Blocks.CRAFTING_TABLE,
+                'b', new ItemStack(browser, 1, 0));
 
         GameRegistry.addRecipe(new RecipesRiftDuplication());
         RecipeSorter.register(MODID + ":rift_duplication", RecipesRiftDuplication.class, RecipeSorter.Category.SHAPELESS, "after:minecraft:shapeless");

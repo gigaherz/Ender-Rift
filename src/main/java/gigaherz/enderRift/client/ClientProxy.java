@@ -32,7 +32,8 @@ public class ClientProxy implements IModProxy
         registerBlockModelAsItem(EnderRiftMod.rift, "blockEnderRift");
         registerBlockModelAsItem(EnderRiftMod.riftInterface, "blockInterface");
         registerBlockModelAsItem(EnderRiftMod.generator, "blockGenerator");
-        registerBlockModelAsItem(EnderRiftMod.browser, "blockBrowser");
+        registerBlockModelAsItem(EnderRiftMod.browser, 0, "blockBrowser", "crafting=false,facing=south");
+        registerBlockModelAsItem(EnderRiftMod.browser, 1, "blockBrowser", "crafting=true,facing=south");
         registerBlockModelAsItem(EnderRiftMod.extension, "blockProxy");
 
         MinecraftForge.EVENT_BUS.register(this);
@@ -47,12 +48,12 @@ public class ClientProxy implements IModProxy
 
     public void registerBlockModelAsItem(final Block block, final String blockName)
     {
-        registerBlockModelAsItem(block, 0, blockName);
+        ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(block), 0, new ModelResourceLocation(EnderRiftMod.MODID + ":" + blockName, "inventory"));
     }
 
-    public void registerBlockModelAsItem(final Block block, int meta, final String blockName)
+    public void registerBlockModelAsItem(final Block block, int meta, final String blockName, final String variant)
     {
-        ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(block), meta, new ModelResourceLocation(EnderRiftMod.MODID + ":" + blockName, "inventory"));
+        ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(block), meta, new ModelResourceLocation(EnderRiftMod.MODID + ":" + blockName, variant));
     }
 
     public void registerItemModel(final Item item, int meta, final String itemName)

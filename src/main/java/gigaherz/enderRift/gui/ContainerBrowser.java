@@ -31,25 +31,25 @@ public class ContainerBrowser
     public final FakeInventoryClient fakeInventoryClient;
     public final FakeInventoryServer fakeInventoryServer;
     protected TileBrowser tile;
-    int prevChangeCount;
-    int actualSlotCount;
+    private int prevChangeCount;
+    public int actualSlotCount;
     public int scroll;
     public SortMode sortMode = SortMode.StackSize;
     private String filterText = "";
     private ItemStack stackInCursor;
 
-    final static int Left = 8;
-    final static int Top = 18;
-    final static int SlotWidth = 18;
-    final static int SlotHeight = 18;
+    protected final static int Left = 8;
+    protected final static int Top = 18;
+    protected final static int SlotWidth = 18;
+    protected final static int SlotHeight = 18;
 
-    final static int FakeRows = 3;
-    final static int FakeColumns = 9;
-    final static int FakeSlots = FakeRows * FakeColumns;
+    protected final static int FakeRows = 3;
+    protected final static int FakeColumns = 9;
+    protected final static int FakeSlots = FakeRows * FakeColumns;
 
-    final static int PlayerRows = 4;
-    final static int PlayerColumns = 9;
-    final static int PlayerSlots = PlayerRows * PlayerColumns;
+    protected final static int PlayerRows = 4;
+    protected final static int PlayerColumns = 9;
+    protected final static int PlayerSlots = PlayerRows * PlayerColumns;
 
     public ContainerBrowser(TileBrowser tileEntity, InventoryPlayer playerInventory, boolean isClient)
     {
@@ -79,6 +79,11 @@ public class ContainerBrowser
             }
         }
 
+        bindPlayerInventory(playerInventory);
+    }
+
+    protected void bindPlayerInventory(InventoryPlayer playerInventory)
+    {
         bindPlayerInventory(playerInventory, Top + FakeRows * SlotHeight + 14);
     }
 
