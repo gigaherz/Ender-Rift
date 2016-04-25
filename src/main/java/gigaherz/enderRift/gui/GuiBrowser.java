@@ -45,7 +45,10 @@ public class GuiBrowser extends GuiContainer
         ySize = 168;
     }
 
-    protected ResourceLocation getBackgroundTexture() { return backgroundTexture; }
+    protected ResourceLocation getBackgroundTexture()
+    {
+        return backgroundTexture;
+    }
 
     @Override
     public void initGui()

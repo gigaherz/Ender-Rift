@@ -14,7 +14,9 @@ public class AutomationAggregator implements IInventoryAutomation
     public void addAll(Iterable<IInventoryAutomation> inventorySet)
     {
         for (IInventoryAutomation value : inventorySet)
-        { add(value); }
+        {
+            add(value);
+        }
     }
 
     public void add(IInventoryAutomation inv)
@@ -55,7 +57,7 @@ public class AutomationAggregator implements IInventoryAutomation
         ItemStack remaining = stack.copy();
 
         // New feature: try to push into existing inventories that contain the item, first
-        if  (ConfigValues.PreferContainersWithExistingStacks)
+        if (ConfigValues.PreferContainersWithExistingStacks)
         {
             // DO NOT CHANGE BACK TO FOREACH, CAUSES ConcurrentModificationException
             for (int i = 0; i < aggregated.size(); i++)

@@ -24,6 +24,6 @@ public class BlockRegistered extends Block
 
     public ItemBlock createItemBlock()
     {
-        return (ItemBlock)new ItemBlock(this).setRegistryName(getRegistryName());
+        return (ItemBlock) new ItemBlock(this).setRegistryName(getRegistryName());
     }
 }

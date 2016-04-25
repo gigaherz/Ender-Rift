@@ -94,12 +94,6 @@ public class BlockEnderRift
     }
 
     @Override
-    public int getRenderType()
-    {
-        return super.getRenderType();
-    }
-
-    @Override
     public boolean removedByPlayer(World world, BlockPos pos, EntityPlayer player, boolean willHarvest)
     {
         //If it will harvest, delay deletion of the block until after getDrops

@@ -4,7 +4,6 @@ import gigaherz.enderRift.EnderRiftMod;
 import gigaherz.enderRift.automation.IInventoryAutomation;
 import gigaherz.enderRift.blocks.TileBrowser;
 import gigaherz.enderRift.network.ClearCraftingGrid;
-import gigaherz.enderRift.network.SetScrollPosition;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.*;
@@ -54,7 +53,7 @@ public class ContainerCraftingBrowser extends ContainerBrowser
     @Override
     public void onCraftMatrixChanged(IInventory inventoryIn)
     {
-        if(inventoryIn == craftMatrix)
+        if (inventoryIn == craftMatrix)
             this.craftResult.setInventorySlotContents(0, CraftingManager.getInstance().findMatchingRecipe(this.craftMatrix, this.worldObj));
         else
             super.onCraftMatrixChanged(inventoryIn);
@@ -148,14 +147,14 @@ public class ContainerCraftingBrowser extends ContainerBrowser
                 if (!isRemote && itemstack != null)
                 {
                     ItemStack remaining = null;
-                    if(parent != null)
+                    if (parent != null)
                         remaining = parent.insertItems(itemstack);
 
                     if (remaining != null)
                     {
                         playerIn.dropPlayerItemWithRandomChoice(remaining, false);
 
-                        if(remaining.stackSize != itemstack.stackSize)
+                        if (remaining.stackSize != itemstack.stackSize)
                             tile.markDirty();
                     }
                     else

@@ -2,15 +2,12 @@ package gigaherz.enderRift.gui;
 
 import gigaherz.enderRift.EnderRiftMod;
 import gigaherz.enderRift.blocks.TileBrowser;
-import gigaherz.enderRift.misc.SortMode;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
-import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.util.ResourceLocation;
-import org.lwjgl.input.Keyboard;
 
 public class GuiCraftingBrowser extends GuiBrowser
 {
@@ -25,7 +22,10 @@ public class GuiCraftingBrowser extends GuiBrowser
     }
 
     @Override
-    protected ResourceLocation getBackgroundTexture() { return backgroundTexture; }
+    protected ResourceLocation getBackgroundTexture()
+    {
+        return backgroundTexture;
+    }
 
     @Override
     public void initGui()

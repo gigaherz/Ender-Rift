@@ -33,12 +33,13 @@ public class BlockStructure
     public BlockStructure(String name)
     {
         super(name, Material.rock);
-        setHardness(0.5F).setStepSound(Block.soundTypeMetal);
+        setStepSound(Block.soundTypeMetal);
         setUnlocalizedName(EnderRiftMod.MODID + ".blockStructure");
-        setBlockBounds(0 / 16.0f, 0 / 16.0f, 0 / 16.0f, 16 / 16.0f, 16 / 16.0f, 16 / 16.0f);
+        setBlockBounds(0, 0, 0, 1, 1, 1);
         setDefaultState(this.blockState.getBaseState()
                 .withProperty(TYPE1, Type1.NORMAL).withProperty(TYPE2, Type2.NONE)
                 .withProperty(CORNER, Corner.values[0]).withProperty(BASE, false));
+        setHardness(0.5F);
         setLightOpacity(0);
     }
 
@@ -116,7 +117,7 @@ public class BlockStructure
     public void setBlockBoundsBasedOnState(IBlockAccess worldIn, BlockPos pos)
     {
         IBlockState state = worldIn.getBlockState(pos);
-        AxisAlignedBB aabb = getBB(0, 0, 0, state);
+        AxisAlignedBB aabb = getBB(state);
         setBlockBounds(
                 (float) aabb.minX,
                 (float) aabb.minY,
@@ -130,19 +131,19 @@ public class BlockStructure
     public AxisAlignedBB getSelectedBoundingBox(World worldIn, BlockPos pos)
     {
         IBlockState state = getActualState(worldIn.getBlockState(pos), worldIn, pos);
-        return getBB(pos.getX(), pos.getY(), pos.getZ(), state);
+        return getBB(state).offset(pos.getX(), pos.getY(), pos.getZ());
     }
 
     @Override
     public AxisAlignedBB getCollisionBoundingBox(World worldIn, BlockPos pos, IBlockState state)
     {
-        return getBB(pos.getX(), pos.getY(), pos.getZ(), state);
+        return getBB(state).offset(pos.getX(), pos.getY(), pos.getZ());
     }
 
     @Override
     public void addCollisionBoxesToList(World worldIn, BlockPos pos, IBlockState state, AxisAlignedBB mask, List<AxisAlignedBB> list, Entity collidingEntity)
     {
-        AxisAlignedBB aabb = getBB(pos.getX(), pos.getY(), pos.getZ(), state);
+        AxisAlignedBB aabb = getBB(state).offset(pos.getX(), pos.getY(), pos.getZ());
 
         if (aabb != null && mask.intersectsWith(aabb))
         {
@@ -150,7 +151,7 @@ public class BlockStructure
         }
     }
 
-    public AxisAlignedBB getBB(int x, int y, int z, IBlockState state)
+    public AxisAlignedBB getBB(IBlockState state)
     {
         if (state.getValue(TYPE1) == Type1.NORMAL)
         {
@@ -159,43 +160,40 @@ public class BlockStructure
             {
                 case NONE: // base center
                     return new AxisAlignedBB(
-                            x + 0 / 16.0f, y + 0 / 16.0f, z + 0 / 16.0f,
-                            x + 16 / 16.0f, y + 4 / 16.0f, z + 16 / 16.0f);
+                            0 / 16.0f, 0 / 16.0f, 0 / 16.0f,
+                            16 / 16.0f, 4 / 16.0f, 16 / 16.0f);
                 case SIDE_EW:
                     if (!state.getValue(BASE))
                         return new AxisAlignedBB(
-                                x + 0 / 16.0f, y + 4 / 16.0f, z + 4 / 16.0f,
-                                x + 16 / 16.0f, y + 12 / 16.0f, z + 12 / 16.0f);
+                                0 / 16.0f, 4 / 16.0f, 4 / 16.0f,
+                                16 / 16.0f, 12 / 16.0f, 12 / 16.0f);
                     else
                         return new AxisAlignedBB(
-                                x + 0 / 16.0f, y + 0 / 16.0f, z + 0 / 16.0f,
-                                x + 16 / 16.0f, y + 12 / 16.0f, z + 16 / 16.0f);
+                                0 / 16.0f, 0 / 16.0f, 0 / 16.0f,
+                                16 / 16.0f, 12 / 16.0f, 16 / 16.0f);
                 case VERTICAL:
                     return new AxisAlignedBB(
-                            x + 4 / 16.0f, y + 0 / 16.0f, z + 4 / 16.0f,
-                            x + 12 / 16.0f, y + 16 / 16.0f, z + 12 / 16.0f);
+                            4 / 16.0f, 0 / 16.0f, 4 / 16.0f,
+                            12 / 16.0f, 16 / 16.0f, 12 / 16.0f);
                 case SIDE_NS:
                     if (!state.getValue(BASE))
                         return new AxisAlignedBB(
-                                x + 4 / 16.0f, y + 4 / 16.0f, z + 0 / 16.0f,
-                                x + 12 / 16.0f, y + 12 / 16.0f, z + 16 / 16.0f);
+                                4 / 16.0f, 4 / 16.0f, 0 / 16.0f,
+                                12 / 16.0f, 12 / 16.0f, 16 / 16.0f);
                     else
                         return new AxisAlignedBB(
-                                x + 0 / 16.0f, y + 0 / 16.0f, z + 0 / 16.0f,
-                                x + 16 / 16.0f, y + 12 / 16.0f, z + 16 / 16.0f);
+                                0 / 16.0f, 0 / 16.0f, 0 / 16.0f,
+                                16 / 16.0f, 12 / 16.0f, 16 / 16.0f);
             }
         }
 
-        return new AxisAlignedBB(
-                x + 0 / 16.0f, y + 0 / 16.0f, z + 0 / 16.0f,
-                x + 16 / 16.0f, y + 16 / 16.0f, z + 16 / 16.0f);
+        return new AxisAlignedBB(0, 0, 0, 1, 1, 1);
     }
 
     @Override
     public void breakBlock(World worldIn, BlockPos pos, IBlockState state)
     {
         super.breakBlock(worldIn, pos, state);
-
         RiftStructure.breakStructure(worldIn, pos);
     }
 
@@ -210,7 +208,6 @@ public class BlockStructure
     @Override
     public ItemStack getPickBlock(MovingObjectPosition target, World world, BlockPos pos, EntityPlayer player)
     {
-
         return new ItemStack(RiftStructure.getOriginalBlock(world, pos));
     }
 
