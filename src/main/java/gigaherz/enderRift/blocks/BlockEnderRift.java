@@ -33,7 +33,7 @@ public class BlockEnderRift
         super(name, Material.ROCK);
         setUnlocalizedName(EnderRiftMod.MODID + ".blockEnderRift");
         setCreativeTab(EnderRiftMod.tabEnderRift);
-        setHardness(0.5F);
+        setHardness(3.0F);
         setSoundType(SoundType.METAL);
         setDefaultState(this.blockState.getBaseState()
                 .withProperty(ASSEMBLED, false));
