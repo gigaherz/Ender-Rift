@@ -3,16 +3,14 @@ package gigaherz.enderRift.client;
 import gigaherz.enderRift.EnderRiftMod;
 import gigaherz.enderRift.IModProxy;
 import gigaherz.enderRift.blocks.TileEnderRift;
-import gigaherz.enderRift.network.SetSpecialSlot;
+import gigaherz.enderRift.gui.ContainerBrowser;
+import gigaherz.enderRift.network.SendSlotChanges;
 import gigaherz.enderRift.network.UpdateField;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.inventory.GuiContainerCreative;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
-import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.client.model.ModelLoader;
@@ -67,56 +65,30 @@ public class ClientProxy implements IModProxy
     }
 
     @Override
-    public void handleSetSpecialSlot(final SetSpecialSlot message)
+    public void handleSendSlotChanges(final SendSlotChanges message)
     {
-        Minecraft.getMinecraft().addScheduledTask(() -> ClientProxy.this.handleSetSpecialSlot2(message));
+        Minecraft.getMinecraft().addScheduledTask(() -> ClientProxy.this.handleSendSlotChanges_internal(message));
     }
 
-    void handleSetSpecialSlot2(SetSpecialSlot message)
+    void handleSendSlotChanges_internal(SendSlotChanges message)
     {
         Minecraft gameController = Minecraft.getMinecraft();
 
         EntityPlayer entityplayer = gameController.thePlayer;
 
-        if (message.windowId == -1)
+        if (message.windowId != -1)
         {
-            entityplayer.inventory.setItemStack(message.stack);
-        }
-        else
-        {
-            boolean flag = false;
-
-            if (gameController.currentScreen instanceof GuiContainerCreative)
-            {
-                GuiContainerCreative guicontainercreative = (GuiContainerCreative) gameController.currentScreen;
-                flag = guicontainercreative.getSelectedTabIndex() != CreativeTabs.INVENTORY.getTabIndex();
-            }
-
-            if (message.windowId == 0 && message.slot >= 36 && message.slot < 45)
-            {
-                ItemStack itemstack = entityplayer.inventoryContainer.getSlot(message.slot).getStack();
-
-                if (message.stack != null && (itemstack == null || itemstack.stackSize < message.stack.stackSize))
-                {
-                    message.stack.animationsToGo = 5;
-                }
-
-                entityplayer.inventoryContainer.putStackInSlot(message.slot, message.stack);
-            }
-            else if (message.windowId == entityplayer.openContainer.windowId && (message.windowId != 0 || !flag))
-            {
-                entityplayer.openContainer.putStackInSlot(message.slot, message.stack);
-            }
+            ((ContainerBrowser) entityplayer.openContainer).slotsChanged(message.slotCount, message.indices, message.stacks);
         }
     }
 
     @Override
     public void handleUpdateField(final UpdateField message)
     {
-        Minecraft.getMinecraft().addScheduledTask(() -> ClientProxy.this.handleUpdateField2(message));
+        Minecraft.getMinecraft().addScheduledTask(() -> ClientProxy.this.handleUpdateField_internal(message));
     }
 
-    void handleUpdateField2(UpdateField message)
+    void handleUpdateField_internal(UpdateField message)
     {
         Minecraft gameController = Minecraft.getMinecraft();
 

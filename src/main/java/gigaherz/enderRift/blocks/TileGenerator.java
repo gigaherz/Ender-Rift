@@ -93,6 +93,17 @@ public class TileGenerator extends TileEntity
         if (worldObj.isRemote)
             return;
 
+        boolean anyChanged;
+
+        anyChanged = updateGeneration();
+        anyChanged |= transferPower();
+
+        if (anyChanged)
+            this.markDirty();
+    }
+
+    private boolean updateGeneration()
+    {
         boolean anyChanged = false;
 
         timeInterval++;
@@ -139,12 +150,20 @@ public class TileGenerator extends TileEntity
             }
         }
 
+        return anyChanged;
+    }
+
+    private boolean transferPower()
+    {
+        boolean anyChanged = false;
+
         int sendPower = Math.min(PowerTransferMax, containedEnergy);
         if (sendPower > 0)
         {
             IEnergyHandler[] handlers = new IEnergyHandler[6];
             int[] wantedSide = new int[6];
             int accepted = 0;
+
             for (EnumFacing neighbor : EnumFacing.VALUES)
             {
                 TileEntity e = worldObj.getTileEntity(pos.offset(neighbor));
@@ -167,6 +186,7 @@ public class TileGenerator extends TileEntity
                     accepted += wanted;
                 }
             }
+
             if (accepted > 0)
             {
                 for (EnumFacing from : EnumFacing.VALUES)
@@ -186,8 +206,7 @@ public class TileGenerator extends TileEntity
             }
         }
 
-        if (anyChanged)
-            this.markDirty();
+        return anyChanged;
     }
 
     public String getName()
