@@ -8,40 +8,45 @@ import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
-public class SetScrollPosition
+public class SetVisibleSlots
         implements IMessage
 {
     public int windowId;
-    public int position;
+    public int[] visible;
 
-    public SetScrollPosition()
+    public SetVisibleSlots()
     {
     }
 
-    public SetScrollPosition(int windowId, int position)
+    public SetVisibleSlots(int windowId, int[] visible)
     {
         this.windowId = windowId;
-        this.position = position;
+        this.visible = visible;
     }
 
     @Override
     public void fromBytes(ByteBuf buf)
     {
         windowId = buf.readInt();
-        position = buf.readInt();
+        int num = buf.readInt();
+        visible = new int[num];
+        for(int i=0;i<num;i++)
+            visible[i] = buf.readInt();
     }
 
     @Override
     public void toBytes(ByteBuf buf)
     {
         buf.writeInt(windowId);
-        buf.writeInt(position);
+        buf.writeInt(visible.length);
+        for(int i=0;i<visible.length;i++)
+            buf.writeInt(visible[i]);
     }
 
-    public static class Handler implements IMessageHandler<SetScrollPosition, IMessage>
+    public static class Handler implements IMessageHandler<SetVisibleSlots, IMessage>
     {
         @Override
-        public IMessage onMessage(final SetScrollPosition message, MessageContext ctx)
+        public IMessage onMessage(final SetVisibleSlots message, MessageContext ctx)
         {
             final EntityPlayerMP player = ctx.getServerHandler().playerEntity;
             final WorldServer world = (WorldServer) player.worldObj;
@@ -55,7 +60,7 @@ public class SetScrollPosition
                             && player.openContainer.windowId == message.windowId
                             && player.openContainer instanceof ContainerBrowser)
                     {
-                        ((ContainerBrowser) player.openContainer).setScrollPosition(message.position);
+                        ((ContainerBrowser) player.openContainer).setVisibleSlots(message.visible);
                     }
                 }
             });

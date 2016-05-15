@@ -227,7 +227,7 @@ public class GuiBrowser extends GuiContainer
 
     private boolean needsScrollBar()
     {
-        int actualSlotCount = ((ContainerBrowser) inventorySlots).actualSlotCount;
+        int actualSlotCount = ((ContainerBrowser) inventorySlots).getActualSlotCount();
 
         return actualSlotCount > ContainerBrowser.FakeSlots;
     }
@@ -241,7 +241,7 @@ public class GuiBrowser extends GuiContainer
         final ContainerBrowser container = ((ContainerBrowser) inventorySlots);
         final int h = 62;
         final int bitHeight = 15;
-        final int actualSlotCount = container.actualSlotCount;
+        final int actualSlotCount = container.getActualSlotCount();
         final int rows = (int) Math.ceil(actualSlotCount / 9.0);
 
         if (i != 0 && rows > ContainerBrowser.FakeRows)
@@ -257,7 +257,7 @@ public class GuiBrowser extends GuiContainer
 
             scrollY = row * (h - bitHeight) / scrollRows;
 
-            container.setScrollPosition(row * 9);
+            container.setScrollPos(row * 9);
         }
     }
 
@@ -296,7 +296,7 @@ public class GuiBrowser extends GuiContainer
     {
         final int h = 62;
         final int bitHeight = 15;
-        final int actualSlotCount = ((ContainerBrowser) inventorySlots).actualSlotCount;
+        final int actualSlotCount = ((ContainerBrowser) inventorySlots).getActualSlotCount();
         final int rows = (int) Math.ceil(actualSlotCount / 9.0);
         final int scrollRows = rows - ContainerBrowser.FakeRows;
 
@@ -309,7 +309,7 @@ public class GuiBrowser extends GuiContainer
             scrollY = row * (h - bitHeight) / scrollRows;
 
             final ContainerBrowser container = ((ContainerBrowser) inventorySlots);
-            container.setScrollPosition(row * 9);
+            container.setScrollPos(row * 9);
         }
     }
 

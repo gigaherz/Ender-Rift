@@ -1,6 +1,6 @@
 package gigaherz.enderRift;
 
-import gigaherz.enderRift.network.SetSpecialSlot;
+import gigaherz.enderRift.network.SendSlotChanges;
 import gigaherz.enderRift.network.UpdateField;
 
 public interface IModProxy
@@ -9,7 +9,7 @@ public interface IModProxy
 
     void init();
 
-    void handleSetSpecialSlot(SetSpecialSlot message);
+    void handleSendSlotChanges(SendSlotChanges message);
 
     void handleUpdateField(UpdateField message);
 }

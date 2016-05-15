@@ -1,7 +1,7 @@
 package gigaherz.enderRift.server;
 
 import gigaherz.enderRift.IModProxy;
-import gigaherz.enderRift.network.SetSpecialSlot;
+import gigaherz.enderRift.network.SendSlotChanges;
 import gigaherz.enderRift.network.UpdateField;
 
 public class ServerProxy implements IModProxy
@@ -17,7 +17,7 @@ public class ServerProxy implements IModProxy
     }
 
     @Override
-    public void handleSetSpecialSlot(SetSpecialSlot message)
+    public void handleSendSlotChanges(SendSlotChanges message)
     {
 
     }
