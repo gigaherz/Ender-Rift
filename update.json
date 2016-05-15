@@ -1,12 +1,13 @@
 {
   "homepage": "https://github.com/gigaherz/Ender-Rift",
   "promos": {
-    "1.9-latest": "0.15.0",
-    "1.9-recommended": "0.15.0",
-    "1.8.9-latest": "0.15.0",
-    "1.8.9-recommended": "0.15.0"
+    "1.9-latest": "0.16.0",
+    "1.9-recommended": "0.16.0",
+    "1.8.9-latest": "0.16.0",
+    "1.8.9-recommended": "0.16.0"
   },
   "1.9": {
+    "0.16.0": "Rework the Browser GUI to perform sorting and searching on the client. This allows the feature to work with dedicated servers.",
 	"0.15.0": "Implemented a crafting browser. It works, but I haven't decided on the final recipe yet. Gave the rift blocks a better hardness value.",
     "0.14.2": "Added logic to first try to fill existing inventories with the blocks they already contain, rather than always using the closest one.",
     "0.14.1": "Make browser search case-insensitive.",
@@ -18,6 +19,7 @@
     "0.11.3": "Update Checker support"
   },
   "1.8.9": {
+    "0.16.0": "Rework the Browser GUI to perform sorting and searching on the client. This allows the feature to work with dedicated servers.",
 	"0.15.0": "Implemented a crafting browser. It works, but I haven't decided on the final recipe yet. Gave the rift blocks a better hardness value.",
     "0.14.2": "Added logic to first try to fill existing inventories with the blocks they already contain, rather than always using the closest one.",
     "0.14.1": "Make browser search case-insensitive.",
