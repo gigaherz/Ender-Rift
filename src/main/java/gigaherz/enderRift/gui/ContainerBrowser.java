@@ -8,6 +8,7 @@ import gigaherz.enderRift.misc.SortMode;
 import gigaherz.enderRift.network.SendSlotChanges;
 import gigaherz.enderRift.network.SetVisibleSlots;
 import gigaherz.enderRift.slots.SlotFake;
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.player.InventoryPlayer;
@@ -644,7 +645,7 @@ public class ContainerBrowser
                     Item item = invStack.getItem();
                     itemData.add(stack.getDisplayName());
                     itemData.add(Item.REGISTRY.getNameForObject(item).toString());
-                    item.addInformation(stack, null, itemData, false);
+                    item.addInformation(stack, Minecraft.getMinecraft().thePlayer, itemData, false);
                     matchesSearch = false;
                     for (String s : itemData)
                     {

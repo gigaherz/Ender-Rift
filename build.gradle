@@ -14,7 +14,7 @@ buildscript {
 
 apply plugin: 'net.minecraftforge.gradle.forge'
 
-version = "0.16.1"
+version = "0.16.2"
 group= "gigaherz.enderRift"
 archivesBaseName = "EnderRift-1.9"
 
