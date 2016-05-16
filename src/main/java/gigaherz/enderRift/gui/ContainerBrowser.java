@@ -8,7 +8,6 @@ import gigaherz.enderRift.misc.SortMode;
 import gigaherz.enderRift.network.SendSlotChanges;
 import gigaherz.enderRift.network.SetVisibleSlots;
 import gigaherz.enderRift.slots.SlotFake;
-import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.player.InventoryPlayer;
@@ -19,7 +18,6 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.play.server.S2FPacketSetSlot;
 import net.minecraftforge.items.IItemHandlerModifiable;
-import net.minecraftforge.items.ItemStackHandler;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Arrays;
@@ -38,6 +36,8 @@ public class ContainerBrowser
     private String filterText = "";
     private ItemStack stackInCursor;
 
+    private EntityPlayer player;
+
     private ItemStack[] currentStacks = new ItemStack[0];
 
     protected final static int Left = 8;
@@ -53,9 +53,10 @@ public class ContainerBrowser
     protected final static int PlayerColumns = 9;
     protected final static int PlayerSlots = PlayerRows * PlayerColumns;
 
-    public ContainerBrowser(TileBrowser tileEntity, InventoryPlayer playerInventory, boolean isClient)
+    public ContainerBrowser(TileBrowser tileEntity, EntityPlayer player, boolean isClient)
     {
         this.tile = tileEntity;
+        this.player = player;
 
         IItemHandlerModifiable fake;
         if (isClient)
@@ -81,7 +82,7 @@ public class ContainerBrowser
             }
         }
 
-        bindPlayerInventory(playerInventory);
+        bindPlayerInventory(player.inventory);
     }
 
     protected void bindPlayerInventory(InventoryPlayer playerInventory)
@@ -643,7 +644,7 @@ public class ContainerBrowser
                     Item item = invStack.getItem();
                     itemData.add(stack.getDisplayName());
                     itemData.add(Item.itemRegistry.getNameForObject(item).toString());
-                    item.addInformation(stack, Minecraft.getMinecraft().thePlayer, itemData, false);
+                    item.addInformation(stack, player, itemData, false);
                     matchesSearch = false;
                     for (String s : itemData)
                     {
@@ -751,7 +752,7 @@ public class ContainerBrowser
 
         public int[] getIndices()
         {
-            return Arrays.copyOfRange(indices, scroll, FakeSlots);
+            return Arrays.copyOfRange(indices, scroll, Math.min(FakeSlots, indices.length));
         }
     }
 }

@@ -38,13 +38,13 @@ public class GuiHandler implements IGuiHandler
             case GUI_BROWSER:
                 if (tileEntity instanceof TileBrowser)
                 {
-                    return new ContainerBrowser((TileBrowser) tileEntity, player.inventory, false);
+                    return new ContainerBrowser((TileBrowser) tileEntity, player, false);
                 }
                 break;
             case GUI_BROWSER_CRAFTING:
                 if (tileEntity instanceof TileBrowser)
                 {
-                    return new ContainerCraftingBrowser((TileBrowser) tileEntity, player.inventory, false);
+                    return new ContainerCraftingBrowser((TileBrowser) tileEntity, player, false);
                 }
                 break;
         }
@@ -74,13 +74,13 @@ public class GuiHandler implements IGuiHandler
             case GUI_BROWSER:
                 if (tileEntity instanceof TileBrowser)
                 {
-                    return new GuiBrowser(player.inventory, (TileBrowser) tileEntity);
+                    return new GuiBrowser(player, (TileBrowser) tileEntity);
                 }
                 break;
             case GUI_BROWSER_CRAFTING:
                 if (tileEntity instanceof TileBrowser)
                 {
-                    return new GuiCraftingBrowser(player.inventory, (TileBrowser) tileEntity);
+                    return new GuiCraftingBrowser(player, (TileBrowser) tileEntity);
                 }
                 break;
         }

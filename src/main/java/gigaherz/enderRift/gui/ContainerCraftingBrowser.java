@@ -20,13 +20,13 @@ public class ContainerCraftingBrowser extends ContainerBrowser
     public IInventory craftResult = new InventoryCraftResult();
     private World worldObj;
 
-    public ContainerCraftingBrowser(TileBrowser tileEntity, InventoryPlayer playerInventory, boolean isClient)
+    public ContainerCraftingBrowser(TileBrowser tileEntity, EntityPlayer player, boolean isClient)
     {
-        super(tileEntity, playerInventory, isClient);
+        super(tileEntity, player, isClient);
 
         this.worldObj = tileEntity.getWorld();
 
-        bindCraftingGrid(playerInventory, CraftingOffset);
+        bindCraftingGrid(player.inventory, CraftingOffset);
     }
 
     protected void bindCraftingGrid(InventoryPlayer playerInventory, int top)

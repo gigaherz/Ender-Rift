@@ -6,6 +6,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.util.ResourceLocation;
 
@@ -13,10 +14,10 @@ public class GuiCraftingBrowser extends GuiBrowser
 {
     private static final ResourceLocation backgroundTexture = new ResourceLocation(EnderRiftMod.MODID, "textures/gui/crafting_browser.png");
 
-    public GuiCraftingBrowser(InventoryPlayer playerInventory, TileBrowser tileEntity)
+    public GuiCraftingBrowser(EntityPlayer player, TileBrowser tileEntity)
     {
-        super(new ContainerCraftingBrowser(tileEntity, playerInventory, true));
-        player = playerInventory;
+        super(new ContainerCraftingBrowser(tileEntity, player, true));
+        this.player = player.inventory;
         xSize = 194;
         ySize = 226;
     }
