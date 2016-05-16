@@ -188,7 +188,7 @@ public class ContainerBrowser
             {
                 stackInCursor = newStack == null ? null : newStack.copy();
 
-                player.playerNetServerHandler.sendPacket(new SPacketSetSlot(-1, -1, newStack));
+                player.connection.sendPacket(new SPacketSetSlot(-1, -1, newStack));
             }
         }
     }

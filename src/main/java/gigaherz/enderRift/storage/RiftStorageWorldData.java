@@ -30,7 +30,7 @@ public class RiftStorageWorldData extends WorldSavedData
     public static RiftStorageWorldData get(World world)
     {
         MapStorage storage = world.getMapStorage();
-        RiftStorageWorldData instance = (RiftStorageWorldData) storage.loadData(RiftStorageWorldData.class, StorageKey);
+        RiftStorageWorldData instance = (RiftStorageWorldData) storage.getOrLoadData(RiftStorageWorldData.class, StorageKey);
         if (instance == null)
         {
             instance = new RiftStorageWorldData();
