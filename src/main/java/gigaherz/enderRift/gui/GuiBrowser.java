@@ -8,6 +8,7 @@ import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.Slot;
@@ -37,10 +38,10 @@ public class GuiBrowser extends GuiContainer
         super(container);
     }
 
-    public GuiBrowser(InventoryPlayer playerInventory, TileBrowser tileEntity)
+    public GuiBrowser(EntityPlayer player, TileBrowser tileEntity)
     {
-        super(new ContainerBrowser(tileEntity, playerInventory, true));
-        player = playerInventory;
+        super(new ContainerBrowser(tileEntity, player, true));
+        this.player = player.inventory;
         xSize = 194;
         ySize = 168;
     }
