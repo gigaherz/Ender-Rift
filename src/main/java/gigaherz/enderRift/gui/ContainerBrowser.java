@@ -747,7 +747,7 @@ public class ContainerBrowser
         {
             if((slot+scroll) >= indices.length)
                 return 0;
-            return stacks[indices[slot]].stackSize;
+            return stacks[indices[slot+scroll]].stackSize;
         }
 
         public int[] getIndices()
