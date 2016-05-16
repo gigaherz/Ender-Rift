@@ -752,7 +752,9 @@ public class ContainerBrowser
 
         public int[] getIndices()
         {
-            return Arrays.copyOfRange(indices, scroll, Math.min(FakeSlots, indices.length));
+            int from = Math.max(0,Math.min(scroll,indices.length-1));
+            int to = Math.min(from + FakeSlots, indices.length);
+            return Arrays.copyOfRange(indices, from, to);
         }
     }
 }
