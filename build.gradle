@@ -19,10 +19,10 @@ group= "gigaherz.enderRift"
 archivesBaseName = "EnderRift-1.9"
 
 minecraft {
-    version = "1.9-12.16.1.1906"
+    version = "1.9-12.16.1.1907"
     runDir = "run"
 
-    mappings = "snapshot_20160516"
+    mappings = "stable_24"
 
     replace "@VERSION@", project.version
     replaceIn "EnderRiftMod.java"
