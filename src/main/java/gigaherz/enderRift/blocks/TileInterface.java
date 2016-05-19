@@ -266,9 +266,9 @@ public class TileInterface extends TileEntity
     }
 
     @Override
-    public void writeToNBT(NBTTagCompound compound)
+    public NBTTagCompound writeToNBT(NBTTagCompound compound)
     {
-        super.writeToNBT(compound);
+        compound = super.writeToNBT(compound);
 
         NBTTagList _filters = new NBTTagList();
         for (int i = 0; i < filters.getSlots(); ++i)
@@ -299,6 +299,8 @@ public class TileInterface extends TileEntity
         }
 
         compound.setTag("Outputs", _outputs);
+
+        return compound;
     }
 
     public boolean isUseableByPlayer(EntityPlayer player)

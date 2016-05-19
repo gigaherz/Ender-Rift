@@ -239,9 +239,9 @@ public class TileGenerator extends TileEntity
     }
 
     @Override
-    public void writeToNBT(NBTTagCompound compound)
+    public NBTTagCompound writeToNBT(NBTTagCompound compound)
     {
-        super.writeToNBT(compound);
+        compound = super.writeToNBT(compound);
 
         NBTTagList _outputs = new NBTTagList();
         for (int i = 0; i < inputs.getSlots(); ++i)
@@ -263,6 +263,8 @@ public class TileGenerator extends TileEntity
         compound.setInteger("currentItemBurnTime", currentItemBurnTime);
         compound.setInteger("powerLevel", containedEnergy);
         compound.setInteger("timeInterval", timeInterval);
+
+        return compound;
     }
 
     public boolean isUseableByPlayer(EntityPlayer player)

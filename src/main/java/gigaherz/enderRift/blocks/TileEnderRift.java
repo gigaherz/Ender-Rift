@@ -133,11 +133,12 @@ public class TileEnderRift
         riftId = nbtTagCompound.getInteger("RiftId");
     }
 
-    public void writeToNBT(NBTTagCompound nbtTagCompound)
+    public NBTTagCompound writeToNBT(NBTTagCompound nbtTagCompound)
     {
-        super.writeToNBT(nbtTagCompound);
+        nbtTagCompound = super.writeToNBT(nbtTagCompound);
         nbtTagCompound.setInteger("Energy", energyBuffer.getEnergy());
         nbtTagCompound.setInteger("RiftId", riftId);
+        return nbtTagCompound;
     }
 
     @Override

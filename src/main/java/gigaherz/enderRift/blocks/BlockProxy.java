@@ -88,7 +88,7 @@ public class BlockProxy extends BlockRegistered
     }
 
     @Override
-    public void onNeighborBlockChange(World worldIn, BlockPos pos, IBlockState state, Block neighborBlock)
+    public void neighborChanged(IBlockState state, World worldIn, BlockPos pos, Block blockIn)
     {
         TileEntity te = worldIn.getTileEntity(pos);
         if (te != null)

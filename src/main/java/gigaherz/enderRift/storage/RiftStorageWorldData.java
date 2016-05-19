@@ -82,7 +82,7 @@ public class RiftStorageWorldData extends WorldSavedData
     }
 
     @Override
-    public void writeToNBT(NBTTagCompound nbtTagCompound)
+    public NBTTagCompound writeToNBT(NBTTagCompound nbtTagCompound)
     {
         NBTTagList nbtTagList = new NBTTagList();
 
@@ -98,5 +98,7 @@ public class RiftStorageWorldData extends WorldSavedData
 
         nbtTagCompound.setTag("Rifts", nbtTagList);
         nbtTagCompound.setInteger("LastRiftId", lastRiftId);
+
+        return nbtTagCompound;
     }
 }

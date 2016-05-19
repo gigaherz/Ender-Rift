@@ -13,7 +13,7 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.ClickType;
 import net.minecraft.inventory.Container;
-import net.minecraft.inventory.ICrafting;
+import net.minecraft.inventory.IContainerListener;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -165,14 +165,14 @@ public class ContainerBrowser
                 inCache = inSlot == null ? null : inSlot.copy();
                 this.inventoryItemStacks.set(i, inCache);
 
-                for (ICrafting crafter : this.listeners)
+                for (IContainerListener crafter : this.listeners)
                 {
                     crafter.sendSlotContents(this, i, inCache);
                 }
             }
         }
 
-        for (ICrafting crafter : this.listeners)
+        for (IContainerListener crafter : this.listeners)
         {
             if (!(crafter instanceof EntityPlayerMP))
                 continue;
