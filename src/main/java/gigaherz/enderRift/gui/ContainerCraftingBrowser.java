@@ -20,6 +20,9 @@ public class ContainerCraftingBrowser extends ContainerBrowser
     public IInventory craftResult = new InventoryCraftResult();
     private World worldObj;
 
+    public static int InventorySlotStart = FakeSlots;
+    public static int CraftingSlotStart = FakeSlots + PlayerSlots + 1;
+
     public ContainerCraftingBrowser(TileBrowser tileEntity, EntityPlayer player, boolean isClient)
     {
         super(tileEntity, player, isClient);

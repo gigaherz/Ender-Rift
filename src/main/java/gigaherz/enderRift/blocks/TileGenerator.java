@@ -145,7 +145,7 @@ public class TileGenerator extends TileEntity
                 timeInterval = 0;
                 stack.stackSize--;
                 if (stack.stackSize <= 0)
-                    inputs.setStackInSlot(0, null);
+                    inputs.setStackInSlot(0, stack.getItem().getContainerItem(stack));
                 anyChanged = true;
             }
         }
