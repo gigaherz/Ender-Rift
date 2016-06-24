@@ -215,10 +215,14 @@ public class TileGenerator extends TileEntity
                 if (e == null)
                     continue;
 
-                IEnergyHandler handler = null;
+                IEnergyHandler handler;
                 if (e.hasCapability(CapabilityEnergy.ENERGY_HANDLER_CAPABILITY, from))
                 {
                     handler = e.getCapability(CapabilityEnergy.ENERGY_HANDLER_CAPABILITY, from);
+                }
+                else
+                {
+                    handler = TeslaControllerBase.CONSUMER.wrapReverse(e, from);
                 }
 
                 if (handler != null)

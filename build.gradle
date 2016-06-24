@@ -23,7 +23,7 @@ repositories {
 
 apply plugin: 'net.minecraftforge.gradle.forge'
 
-version = "1.0.0"
+version = "1.0.1"
 group= "gigaherz.enderRift"
 archivesBaseName = "EnderRift-1.9.4"
 
@@ -40,7 +40,7 @@ minecraft {
 }
 
 dependencies {
-    deobfCompile "mezz.jei:jei_1.9.4:3.6.3.212"
+    deobfCompile "mezz.jei:jei_1.9.4:3.6.7.216"
     deobfCompile "net.darkhax.tesla:Tesla:1.9.4-1.1.0.24"
 }
 

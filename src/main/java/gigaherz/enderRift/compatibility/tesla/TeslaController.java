@@ -4,6 +4,9 @@ import gigaherz.capabilities.api.energy.IEnergyHandler;
 import net.darkhax.tesla.api.ITeslaConsumer;
 import net.darkhax.tesla.api.ITeslaHolder;
 import net.darkhax.tesla.api.ITeslaProducer;
+import net.darkhax.tesla.capability.TeslaCapabilities;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.EnumFacing;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
 
@@ -57,6 +60,14 @@ public class TeslaController
 
         @Override
         public Object createInstance(IEnergyHandler handler) { return new TeslaEnergyReceiver(handler); }
+
+        @Override
+        public IEnergyHandler wrapReverse(TileEntity e, EnumFacing from)
+        {
+            if (e.hasCapability(TeslaCapabilities.CAPABILITY_CONSUMER, from))
+                return new TeslaConsumerWrapper(e.getCapability(TeslaCapabilities.CAPABILITY_CONSUMER, from));
+            return null;
+        }
     }
 
     private static class Holder extends TeslaControllerBase
