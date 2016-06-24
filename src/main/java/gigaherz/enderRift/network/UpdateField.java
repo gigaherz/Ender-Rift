@@ -10,34 +10,34 @@ public class UpdateField
         implements IMessage
 {
     public int windowId;
-    public int field;
-    public int value;
+    public int[] fields;
 
     public UpdateField()
     {
     }
 
-    public UpdateField(int windowId, int field, int value)
+    public UpdateField(int windowId, int[] values)
     {
         this.windowId = windowId;
-        this.field = field;
-        this.value = value;
+        this.fields = values;
     }
 
     @Override
     public void fromBytes(ByteBuf buf)
     {
         windowId = buf.readInt();
-        field = buf.readByte();
-        value = buf.readInt();
+        fields = new int[buf.readByte()];
+        for(int i=0;i<fields.length;i++)
+            fields[i] = buf.readInt();
     }
 
     @Override
     public void toBytes(ByteBuf buf)
     {
         buf.writeInt(windowId);
-        buf.writeByte(field);
-        buf.writeInt(value);
+        buf.writeByte(fields.length);
+        for(int i=0;i<fields.length;i++)
+            buf.writeInt(fields[i]);
     }
 
     public static class Handler implements IMessageHandler<UpdateField, IMessage>

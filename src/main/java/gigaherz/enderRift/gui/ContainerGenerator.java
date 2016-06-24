@@ -23,6 +23,10 @@ public class ContainerGenerator
     {
         this.tile = tileEntity;
         prevFields = new int[tile.getFieldCount()];
+        for (int i = 0; i < prevFields.length; i++)
+        {
+            prevFields[i] = this.tile.getField(i)-1;
+        }
 
         addSlotToContainer(new SlotItemHandler(tileEntity.inventory(), 0, 80, 53));
 
@@ -52,24 +56,26 @@ public class ContainerGenerator
     {
         super.detectAndSendChanges();
 
+        boolean needUpdate = false;
         for (int i = 0; i < prevFields.length; i++)
         {
             int field = this.tile.getField(i);
             if (prevFields[i] != field)
             {
-                for (IContainerListener watcher : this.listeners)
-                {
-                    if (watcher instanceof EntityPlayerMP)
-                    {
-                        EnderRiftMod.channel.sendTo(new UpdateField(this.windowId, i, field), (EntityPlayerMP) watcher);
-                    }
-                }
+                prevFields[i] = this.tile.getField(i);
+                needUpdate = true;
             }
         }
 
-        for (int i = 0; i < prevFields.length; i++)
+        if(needUpdate)
         {
-            prevFields[i] = this.tile.getField(i);
+            for (IContainerListener watcher : this.listeners)
+            {
+                if (watcher instanceof EntityPlayerMP)
+                {
+                    EnderRiftMod.channel.sendTo(new UpdateField(this.windowId, prevFields), (EntityPlayerMP) watcher);
+                }
+            }
         }
     }
 

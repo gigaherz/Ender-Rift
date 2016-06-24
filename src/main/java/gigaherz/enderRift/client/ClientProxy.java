@@ -76,7 +76,7 @@ public class ClientProxy implements IModProxy
 
         EntityPlayer entityplayer = gameController.thePlayer;
 
-        if (message.windowId != -1)
+        if (entityplayer.openContainer != null && entityplayer.openContainer.windowId == message.windowId)
         {
             ((ContainerBrowser) entityplayer.openContainer).slotsChanged(message.slotCount, message.indices, message.stacks);
         }
@@ -94,9 +94,10 @@ public class ClientProxy implements IModProxy
 
         EntityPlayer entityplayer = gameController.thePlayer;
 
-        if (message.windowId >= 0)
+        if (entityplayer.openContainer != null && entityplayer.openContainer.windowId == message.windowId)
         {
-            entityplayer.openContainer.updateProgressBar(message.field, message.value);
+            for(int i=0;i<message.fields.length;i++)
+                entityplayer.openContainer.updateProgressBar(i, message.fields[i]);
         }
     }
 }
