@@ -313,47 +313,18 @@ public class TileGenerator extends TileEntity
                 && player.getDistanceSq(pos.getX() + 0.5D, pos.getY() + 0.5D, pos.getZ() + 0.5D) <= 64.0D;
     }
 
-    public int getField(int id)
+    public int[] getFields()
     {
-        switch (id)
-        {
-            case 0:
-                return burnTimeRemaining;
-            case 1:
-                return currentItemBurnTime;
-            case 2:
-                return energyCapability.getEnergy();
-            case 3:
-                return heatLevel;
-        }
-        return 0;
+        return new int[]{ burnTimeRemaining, currentItemBurnTime, energyCapability.getEnergy(), heatLevel };
     }
 
-    public void setField(int id, int value)
+    public void setFields(int[] values)
     {
-        switch (id)
-        {
-            case 0:
-                burnTimeRemaining = value;
-                break;
-            case 1:
-                currentItemBurnTime = value;
-                break;
-            case 2:
-                energyCapability.setEnergy(value);
-                break;
-            case 3:
-                heatLevel = value;
-                break;
-            default:
-                return;
-        }
+        burnTimeRemaining = values[0];
+        currentItemBurnTime = values[1];
+        energyCapability.setEnergy(values[2]);
+        heatLevel = values[3];
         this.markDirty();
-    }
-
-    public int getFieldCount()
-    {
-        return 4;
     }
 
     public boolean isBurning()
@@ -381,5 +352,15 @@ public class TileGenerator extends TileEntity
     public IItemHandler inventory()
     {
         return fuelSlot;
+    }
+
+    public int getCurrentItemBurnTime()
+    {
+        return currentItemBurnTime;
+    }
+
+    public int getBurnTimeRemaining()
+    {
+        return burnTimeRemaining;
     }
 }

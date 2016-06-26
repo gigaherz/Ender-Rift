@@ -14,7 +14,7 @@ import net.minecraft.inventory.Container;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.translation.I18n;
+import net.minecraft.client.resources.I18n;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 
@@ -168,9 +168,9 @@ public class GuiBrowser extends GuiContainer
         drawCustomSlotTexts();
         RenderHelper.disableStandardItemLighting();
 
-        String name = I18n.translateToLocal(textBrowser);
+        String name = I18n.format(textBrowser);
         mc.fontRendererObj.drawString(name, 8, 6, 0x404040);
-        mc.fontRendererObj.drawString(I18n.translateToLocal(player.getName()), 8, ySize - 96 + 2, 0x404040);
+        mc.fontRendererObj.drawString(I18n.format(player.getName()), 8, ySize - 96 + 2, 0x404040);
     }
 
     private void drawCustomSlotTexts()

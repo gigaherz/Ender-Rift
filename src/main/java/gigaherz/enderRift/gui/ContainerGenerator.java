@@ -22,11 +22,8 @@ public class ContainerGenerator
     public ContainerGenerator(TileGenerator tileEntity, InventoryPlayer playerInventory)
     {
         this.tile = tileEntity;
-        prevFields = new int[tile.getFieldCount()];
-        for (int i = 0; i < prevFields.length; i++)
-        {
-            prevFields[i] = this.tile.getField(i)-1;
-        }
+        prevFields = this.tile.getFields();
+        for(int i=0;i<prevFields.length;i++) prevFields[i]--;
 
         addSlotToContainer(new SlotItemHandler(tileEntity.inventory(), 0, 80, 53));
 
@@ -57,32 +54,27 @@ public class ContainerGenerator
         super.detectAndSendChanges();
 
         boolean needUpdate = false;
+
+        int[] fields = this.tile.getFields();
         for (int i = 0; i < prevFields.length; i++)
         {
-            int field = this.tile.getField(i);
-            if (prevFields[i] != field)
+            if (prevFields[i] != fields[i])
             {
-                prevFields[i] = this.tile.getField(i);
+                prevFields[i] = fields[i];
                 needUpdate = true;
             }
         }
 
         if(needUpdate)
         {
-            for (IContainerListener watcher : this.listeners)
-            {
-                if (watcher instanceof EntityPlayerMP)
-                {
-                    EnderRiftMod.channel.sendTo(new UpdateField(this.windowId, prevFields), (EntityPlayerMP) watcher);
-                }
-            }
+            this.listeners.stream().filter(watcher -> watcher instanceof EntityPlayerMP).forEach(watcher ->
+                    EnderRiftMod.channel.sendTo(new UpdateField(this.windowId, prevFields), (EntityPlayerMP) watcher));
         }
     }
 
-    @Override
-    public void updateProgressBar(int id, int data)
+    public void updateFields(int[] data)
     {
-        this.tile.setField(id, data);
+        this.tile.setFields(data);
     }
 
     @Override

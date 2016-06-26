@@ -53,12 +53,14 @@ public class BlockStructure
         return new TileEnderRiftCorner();
     }
 
+    @Deprecated
     @Override
     public boolean isOpaqueCube(IBlockState state)
     {
         return false;
     }
 
+    @Deprecated
     @Override
     public boolean isFullCube(IBlockState state)
     {
@@ -77,6 +79,7 @@ public class BlockStructure
         return new BlockStateContainer(this, TYPE1, TYPE2, CORNER, BASE);
     }
 
+    @Deprecated
     @Override
     public IBlockState getStateFromMeta(int meta)
     {
@@ -111,6 +114,7 @@ public class BlockStructure
         return (type1i << 3) | (type2 << 1) | base;
     }
 
+    @Deprecated
     @Override
     public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos)
     {
