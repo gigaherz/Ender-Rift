@@ -1,5 +1,6 @@
-package gigaherz.enderRift;
+package gigaherz.enderRift.integration;
 
+import gigaherz.enderRift.EnderRiftMod;
 import gigaherz.enderRift.blocks.BlockStructure;
 import gigaherz.enderRift.blocks.TileEnderRift;
 import gigaherz.enderRift.blocks.TileEnderRiftCorner;
