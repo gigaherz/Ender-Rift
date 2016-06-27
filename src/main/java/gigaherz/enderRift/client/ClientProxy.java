@@ -1,5 +1,6 @@
 package gigaherz.enderRift.client;
 
+import gigaherz.enderRift.ConfigValues;
 import gigaherz.enderRift.EnderRiftMod;
 import gigaherz.enderRift.IModProxy;
 import gigaherz.enderRift.blocks.TileEnderRift;
@@ -30,10 +31,14 @@ public class ClientProxy implements IModProxy
         registerItemModel(EnderRiftMod.riftOrb, 0, "item_rift");
         registerBlockModelAsItem(EnderRiftMod.rift, "blockEnderRift");
         registerBlockModelAsItem(EnderRiftMod.riftInterface, "blockInterface");
-        registerBlockModelAsItem(EnderRiftMod.generator, "blockGenerator");
         registerBlockModelAsItem(EnderRiftMod.browser, 0, "blockBrowser", "crafting=false,facing=south");
         registerBlockModelAsItem(EnderRiftMod.browser, 1, "blockBrowser", "crafting=true,facing=south");
         registerBlockModelAsItem(EnderRiftMod.extension, "blockProxy");
+
+        if (ConfigValues.EnableRudimentaryGenerator)
+        {
+            registerBlockModelAsItem(EnderRiftMod.generator, "blockGenerator");
+        }
 
         MinecraftForge.EVENT_BUS.register(this);
         RenderingStuffs.init();

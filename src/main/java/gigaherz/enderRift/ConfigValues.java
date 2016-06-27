@@ -16,6 +16,8 @@ public class ConfigValues
 
     public static boolean PreferContainersWithExistingStacks;
 
+    public static boolean EnableRudimentaryGenerator;
+
     public static void readConfig(Configuration config)
     {
         config.load();
@@ -30,6 +32,8 @@ public class ConfigValues
         PowerPerExtractionConstant = (float) config.get("PowerUsage", "PowerPerExtractionConstant", 0.97).getDouble();
         PowerPerExtractionLinear = (float) config.get("PowerUsage", "PowerPerExtractionLinear", 0.013).getDouble();
         PowerPerExtractionGeometric = (float) config.get("PowerUsage", "PowerPerExtractionGeometric", 0).getDouble();
+
+        EnableRudimentaryGenerator = config.get("Generator", "Enable", true).getBoolean();
 
         config.save();
     }

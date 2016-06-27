@@ -1,5 +1,6 @@
 package gigaherz.enderRift;
 
+import com.typesafe.config.ConfigValue;
 import gigaherz.capabilities.api.energy.CapabilityEnergy;
 import gigaherz.enderRift.automation.CapabilityAutomation;
 import gigaherz.enderRift.blocks.*;
@@ -101,15 +102,18 @@ public class EnderRiftMod
         GameRegistry.register(browser.createItemBlock());
         GameRegistry.registerTileEntity(TileBrowser.class, "tileBrowser");
 
-        generator = new BlockGenerator("blockGenerator");
-        GameRegistry.register(generator);
-        GameRegistry.register(generator.createItemBlock());
-        GameRegistry.registerTileEntity(TileGenerator.class, "tileGenerator");
-
         extension = new BlockProxy("blockProxy");
         GameRegistry.register(extension);
         GameRegistry.register(extension.createItemBlock());
         GameRegistry.registerTileEntity(TileProxy.class, "tileProxy");
+
+        if (ConfigValues.EnableRudimentaryGenerator)
+        {
+            generator = new BlockGenerator("blockGenerator");
+            GameRegistry.register(generator);
+            GameRegistry.register(generator.createItemBlock());
+            GameRegistry.registerTileEntity(TileGenerator.class, "tileGenerator");
+        }
 
         channel = NetworkRegistry.INSTANCE.newSimpleChannel(CHANNEL);
 
@@ -172,14 +176,17 @@ public class EnderRiftMod
                 'g', Items.GLOWSTONE_DUST,
                 'i', Items.IRON_INGOT);
 
-        GameRegistry.addRecipe(new ItemStack(generator),
-                "iri",
-                "rwr",
-                "ifi",
-                'f', Blocks.FURNACE,
-                'w', Items.WATER_BUCKET,
-                'r', Items.REDSTONE,
-                'i', Items.IRON_INGOT);
+        if (ConfigValues.EnableRudimentaryGenerator)
+        {
+            GameRegistry.addRecipe(new ItemStack(generator),
+                    "iri",
+                    "rwr",
+                    "ifi",
+                    'f', Blocks.FURNACE,
+                    'w', Items.WATER_BUCKET,
+                    'r', Items.REDSTONE,
+                    'i', Items.IRON_INGOT);
+        }
 
         GameRegistry.addRecipe(new ItemStack(browser, 1, 1),
                 "gdg",
