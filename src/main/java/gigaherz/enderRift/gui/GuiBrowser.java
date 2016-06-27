@@ -30,6 +30,7 @@ public class GuiBrowser extends GuiContainer
 
     private boolean isDragging;
     private int scrollY;
+    private float scrollAcc = 0;
 
     private GuiTextField searchField;
 
@@ -237,7 +238,7 @@ public class GuiBrowser extends GuiContainer
     public void handleMouseInput() throws IOException
     {
         super.handleMouseInput();
-        int i = Mouse.getEventDWheel();
+        scrollAcc += Mouse.getEventDWheel();
 
         final ContainerBrowser container = ((ContainerBrowser) inventorySlots);
         final int h = 62;
@@ -245,20 +246,24 @@ public class GuiBrowser extends GuiContainer
         final int actualSlotCount = container.getActualSlotCount();
         final int rows = (int) Math.ceil(actualSlotCount / 9.0);
 
-        if (i != 0 && rows > ContainerBrowser.FakeRows)
+        if (rows > ContainerBrowser.FakeRows)
         {
             int scrollRows = rows - ContainerBrowser.FakeRows;
 
             int row = container.scroll / 9;
 
-            if (i > 0) row -= 1;
-            else if (i < 0) row += 1;
+            while (scrollAcc >= 120) { row -= 1; scrollAcc-=120; }
+            while (scrollAcc <= -120) { row += 1; scrollAcc+=120; }
 
             row = Math.max(0, Math.min(scrollRows, row));
 
             scrollY = row * (h - bitHeight) / scrollRows;
 
             container.setScrollPos(row * 9);
+        }
+        else
+        {
+            scrollAcc = 0;
         }
     }
 
