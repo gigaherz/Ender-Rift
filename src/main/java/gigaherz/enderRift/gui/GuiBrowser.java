@@ -14,7 +14,7 @@ import net.minecraft.inventory.Container;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.translation.I18n;
+import net.minecraft.client.resources.I18n;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 
@@ -30,6 +30,7 @@ public class GuiBrowser extends GuiContainer
 
     private boolean isDragging;
     private int scrollY;
+    private float scrollAcc = 0;
 
     private GuiTextField searchField;
 
@@ -168,9 +169,9 @@ public class GuiBrowser extends GuiContainer
         drawCustomSlotTexts();
         RenderHelper.disableStandardItemLighting();
 
-        String name = I18n.translateToLocal(textBrowser);
+        String name = I18n.format(textBrowser);
         mc.fontRendererObj.drawString(name, 8, 6, 0x404040);
-        mc.fontRendererObj.drawString(I18n.translateToLocal(player.getName()), 8, ySize - 96 + 2, 0x404040);
+        mc.fontRendererObj.drawString(I18n.format(player.getName()), 8, ySize - 96 + 2, 0x404040);
     }
 
     private void drawCustomSlotTexts()
@@ -237,7 +238,7 @@ public class GuiBrowser extends GuiContainer
     public void handleMouseInput() throws IOException
     {
         super.handleMouseInput();
-        int i = Mouse.getEventDWheel();
+        scrollAcc += Mouse.getEventDWheel();
 
         final ContainerBrowser container = ((ContainerBrowser) inventorySlots);
         final int h = 62;
@@ -245,20 +246,24 @@ public class GuiBrowser extends GuiContainer
         final int actualSlotCount = container.getActualSlotCount();
         final int rows = (int) Math.ceil(actualSlotCount / 9.0);
 
-        if (i != 0 && rows > ContainerBrowser.FakeRows)
+        if (rows > ContainerBrowser.FakeRows)
         {
             int scrollRows = rows - ContainerBrowser.FakeRows;
 
             int row = container.scroll / 9;
 
-            if (i > 0) row -= 1;
-            else if (i < 0) row += 1;
+            while (scrollAcc >= 120) { row -= 1; scrollAcc-=120; }
+            while (scrollAcc <= -120) { row += 1; scrollAcc+=120; }
 
             row = Math.max(0, Math.min(scrollRows, row));
 
             scrollY = row * (h - bitHeight) / scrollRows;
 
             container.setScrollPos(row * 9);
+        }
+        else
+        {
+            scrollAcc = 0;
         }
     }
 

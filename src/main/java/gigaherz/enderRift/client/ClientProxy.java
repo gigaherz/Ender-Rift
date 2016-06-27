@@ -4,6 +4,7 @@ import gigaherz.enderRift.EnderRiftMod;
 import gigaherz.enderRift.IModProxy;
 import gigaherz.enderRift.blocks.TileEnderRift;
 import gigaherz.enderRift.gui.ContainerBrowser;
+import gigaherz.enderRift.gui.ContainerGenerator;
 import gigaherz.enderRift.network.SendSlotChanges;
 import gigaherz.enderRift.network.UpdateField;
 import net.minecraft.block.Block;
@@ -46,7 +47,7 @@ public class ClientProxy implements IModProxy
 
     public void registerBlockModelAsItem(final Block block, final String blockName)
     {
-        ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(block), 0, new ModelResourceLocation(EnderRiftMod.MODID + ":" + blockName, "inventory"));
+        registerBlockModelAsItem(block, 0, blockName, "inventory");
     }
 
     public void registerBlockModelAsItem(final Block block, int meta, final String blockName, final String variant)
@@ -76,7 +77,7 @@ public class ClientProxy implements IModProxy
 
         EntityPlayer entityplayer = gameController.thePlayer;
 
-        if (message.windowId != -1)
+        if (entityplayer.openContainer != null && entityplayer.openContainer.windowId == message.windowId)
         {
             ((ContainerBrowser) entityplayer.openContainer).slotsChanged(message.slotCount, message.indices, message.stacks);
         }
@@ -94,9 +95,9 @@ public class ClientProxy implements IModProxy
 
         EntityPlayer entityplayer = gameController.thePlayer;
 
-        if (message.windowId >= 0)
+        if (entityplayer.openContainer != null && entityplayer.openContainer.windowId == message.windowId)
         {
-            entityplayer.openContainer.updateProgressBar(message.field, message.value);
+            ((ContainerGenerator) entityplayer.openContainer).updateFields(message.fields);
         }
     }
 }

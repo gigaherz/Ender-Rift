@@ -45,12 +45,14 @@ public class BlockBrowser
         setResistance(8.0F);
     }
 
+    @Deprecated
     @Override
     public boolean isOpaqueCube(IBlockState state)
     {
         return false;
     }
 
+    @Deprecated
     @Override
     public void neighborChanged(IBlockState state, World worldIn, BlockPos pos, Block blockIn)
     {
@@ -85,6 +87,7 @@ public class BlockBrowser
         return new BlockStateContainer(this, FACING, CRAFTING);
     }
 
+    @Deprecated
     @Override
     public IBlockState getStateFromMeta(int meta)
     {

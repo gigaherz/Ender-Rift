@@ -41,6 +41,7 @@ public class BlockProxy extends BlockRegistered
         setResistance(8.0F);
     }
 
+    @Deprecated
     @Override
     public boolean isOpaqueCube(IBlockState state)
     {
@@ -53,12 +54,14 @@ public class BlockProxy extends BlockRegistered
         return 0;
     }
 
+    @Deprecated
     @Override
     public IBlockState getStateFromMeta(int meta)
     {
         return getDefaultState();
     }
 
+    @Deprecated
     @Override
     public IBlockState getActualState(IBlockState state, IBlockAccess worldIn, BlockPos pos)
     {
@@ -87,6 +90,7 @@ public class BlockProxy extends BlockRegistered
         return new BlockStateContainer(this, NORTH, SOUTH, WEST, EAST, UP, DOWN);
     }
 
+    @Deprecated
     @Override
     public void neighborChanged(IBlockState state, World worldIn, BlockPos pos, Block blockIn)
     {

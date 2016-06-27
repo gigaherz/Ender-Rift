@@ -46,6 +46,7 @@ public class BlockEnderRift
         return new BlockStateContainer(this, ASSEMBLED);
     }
 
+    @Deprecated
     @Override
     public IBlockState getStateFromMeta(int meta)
     {
@@ -58,12 +59,14 @@ public class BlockEnderRift
         return state.getValue(ASSEMBLED) ? 1 : 0;
     }
 
+    @Deprecated
     @Override
     public boolean isOpaqueCube(IBlockState state)
     {
         return false;
     }
 
+    @Deprecated
     @Override
     public int getLightValue(IBlockState state)
     {
@@ -72,6 +75,7 @@ public class BlockEnderRift
         return state.getValue(ASSEMBLED) ? 15 : 0;
     }
 
+    @Deprecated
     @Override
     public int getLightOpacity(IBlockState state)
     {

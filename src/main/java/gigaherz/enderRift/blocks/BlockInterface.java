@@ -35,6 +35,7 @@ public class BlockInterface
         setResistance(8.0F);
     }
 
+    @Deprecated
     @Override
     public boolean isOpaqueCube(IBlockState state)
     {
@@ -59,6 +60,7 @@ public class BlockInterface
         return new BlockStateContainer(this, FACING);
     }
 
+    @Deprecated
     @Override
     public IBlockState getStateFromMeta(int meta)
     {

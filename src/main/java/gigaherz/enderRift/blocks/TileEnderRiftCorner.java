@@ -3,6 +3,7 @@ package gigaherz.enderRift.blocks;
 import gigaherz.capabilities.api.energy.CapabilityEnergy;
 import gigaherz.capabilities.api.energy.IEnergyHandler;
 import gigaherz.enderRift.EnderRiftMod;
+import gigaherz.enderRift.compatibility.tesla.TeslaControllerBase;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
@@ -14,10 +15,26 @@ public class TileEnderRiftCorner
 {
     TileEnderRift energyParent;
 
+    private Capability teslaConsumerCap;
+    private Object teslaConsumerInstance;
+
+    private Capability teslaHolderCap;
+    private Object teslaHolderInstance;
+
+    public TileEnderRiftCorner()
+    {
+        teslaConsumerCap = TeslaControllerBase.CONSUMER.getCapability();
+        teslaHolderCap = TeslaControllerBase.HOLDER.getCapability();
+    }
+
     @Override
     public boolean hasCapability(Capability<?> capability, EnumFacing facing)
     {
         if (capability == CapabilityEnergy.ENERGY_HANDLER_CAPABILITY)
+            return getParent() != null;
+        if (teslaConsumerCap != null && capability == teslaConsumerCap)
+            return getParent() != null;
+        if (teslaHolderCap != null && capability == teslaHolderCap)
             return getParent() != null;
         return super.hasCapability(capability, facing);
     }
@@ -28,6 +45,18 @@ public class TileEnderRiftCorner
     {
         if (capability == CapabilityEnergy.ENERGY_HANDLER_CAPABILITY)
             return (T) getParent();
+        if (teslaConsumerCap != null && capability == teslaConsumerCap)
+        {
+            if (teslaConsumerInstance == null && getParent() != null)
+                teslaConsumerInstance = TeslaControllerBase.CONSUMER.createInstance(getParent());
+            return (T) teslaConsumerInstance;
+        }
+        if (teslaHolderCap != null && capability == teslaHolderCap)
+        {
+            if (teslaHolderInstance == null && getParent() != null)
+                teslaHolderInstance = TeslaControllerBase.HOLDER.createInstance(getParent());
+            return (T) teslaHolderInstance;
+        }
         return super.getCapability(capability, facing);
     }
 

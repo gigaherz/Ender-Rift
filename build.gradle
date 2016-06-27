@@ -16,11 +16,14 @@ repositories {
     maven {
         url "http://dvs1.progwml6.com/files/maven"
     }
+    maven {
+        url 'http://maven.epoxide.xyz'
+    }
 }
 
 apply plugin: 'net.minecraftforge.gradle.forge'
 
-version = "0.16.3"
+version = "1.0.1"
 group= "gigaherz.enderRift"
 archivesBaseName = "EnderRift-1.10"
 
@@ -39,6 +42,7 @@ minecraft {
 dependencies {
     deobfCompile "mezz.jei:jei_1.10:3.7.0.218:api"
     runtime "mezz.jei:jei_1.10:3.7.0.218"
+    deobfCompile "net.darkhax.tesla:Tesla:1.9.4-1.1.0.24"
 }
 
 compileJava {
