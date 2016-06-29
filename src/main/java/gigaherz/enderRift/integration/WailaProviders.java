@@ -1,10 +1,7 @@
 package gigaherz.enderRift.integration;
 
 import gigaherz.enderRift.EnderRiftMod;
-import gigaherz.enderRift.blocks.BlockStructure;
-import gigaherz.enderRift.blocks.TileEnderRift;
-import gigaherz.enderRift.blocks.TileEnderRiftCorner;
-import gigaherz.enderRift.blocks.TileGenerator;
+import gigaherz.enderRift.blocks.*;
 import mcp.mobius.waila.api.IWailaConfigHandler;
 import mcp.mobius.waila.api.IWailaDataAccessor;
 import mcp.mobius.waila.api.IWailaDataProvider;
@@ -22,9 +19,14 @@ import java.util.List;
 
 public class WailaProviders
 {
+    private static final String CONFIG_GENERATOR = EnderRiftMod.MODID + ".generator";
+    private static final String CONFIG_RIFT = EnderRiftMod.MODID + ".rift";
+    private static final String CONFIG_RF = EnderRiftMod.MODID + ".rf";
     public static void callbackRegister(IWailaRegistrar registrar)
     {
-        registrar.addConfig("Ender-Rift", "enderRift.block");
+        registrar.addConfig("Ender-Rift", CONFIG_GENERATOR);
+        registrar.addConfig("Ender-Rift", CONFIG_RIFT);
+        registrar.addConfig("Ender-Rift", CONFIG_RF);
 
         {
             RiftTooltipProvider instance = new RiftTooltipProvider();
@@ -47,7 +49,6 @@ public class WailaProviders
         }
     }
 
-
     @Optional.Interface(modid = "Waila", iface = "mcp.mobius.waila.api.IWailaDataProvider")
     public static class GeneratorTooltipProvider implements IWailaDataProvider
     {
@@ -66,7 +67,7 @@ public class WailaProviders
         @Override
         public List<String> getWailaBody(ItemStack itemStack, List<String> currenttip, IWailaDataAccessor accessor, IWailaConfigHandler config)
         {
-            if (config.getConfig("enderRift.blockGenerator"))
+            if (config.getConfig(CONFIG_GENERATOR))
             {
                 NBTTagCompound tag = accessor.getNBTData();
 
@@ -84,7 +85,9 @@ public class WailaProviders
                 }
 
                 currenttip.add(I18n.format("text." + EnderRiftMod.MODID + ".generator.heat", tag.getInteger("heat")));
-                currenttip.add(I18n.format("text." + EnderRiftMod.MODID + ".generator.energy", tag.getInteger("energy"), TileGenerator.PowerLimit));
+
+                if (config.getConfig(CONFIG_RF))
+                    currenttip.add(I18n.format("text." + EnderRiftMod.MODID + ".generator.energy", tag.getInteger("energy"), TileGenerator.PowerLimit));
             }
 
             return currenttip;
@@ -162,7 +165,7 @@ public class WailaProviders
         @Override
         public List<String> getWailaBody(ItemStack itemStack, List<String> currenttip, IWailaDataAccessor accessor, IWailaConfigHandler config)
         {
-            if (config.getConfig("enderRift.blockEnderRift"))
+            if (config.getConfig(CONFIG_RIFT))
             {
                 NBTTagCompound tag = accessor.getNBTData();
 
@@ -172,7 +175,8 @@ public class WailaProviders
                     if (tag.getBoolean("isFormed"))
                     {
                         currenttip.add(I18n.format("text." + EnderRiftMod.MODID + ".rift.riftId", tag.getInteger("riftId")));
-                        currenttip.add(I18n.format("text." + EnderRiftMod.MODID + ".rift.rf", tag.getInteger("energy"), tag.getInteger("energyTotal")));
+                        if (config.getConfig(CONFIG_RF))
+                            currenttip.add(I18n.format("text." + EnderRiftMod.MODID + ".rift.rf", tag.getInteger("energy"), tag.getInteger("energyTotal")));
                     }
                     currenttip.add(I18n.format("text." + EnderRiftMod.MODID + ".rift.usedSlots", tag.getInteger("usedSlots")));
                     currenttip.add(I18n.format("text." + EnderRiftMod.MODID + ".rift.energyUsageInsert", tag.getInteger("energyInsert")));

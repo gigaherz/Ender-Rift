@@ -32,3 +32,6 @@ text.enderrift.generator.heat=Heat: %d C
 text.enderrift.generator.energy.label=Energy:
 text.enderrift.generator.energy=Energy: %d / %d RF
 
+option.enderrift.generator=Generator
+option.enderrift.rift=Rift
+option.enderrift.rf=Show RF

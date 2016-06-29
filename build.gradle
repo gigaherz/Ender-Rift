@@ -42,8 +42,6 @@ minecraft {
 
     replace "@VERSION@", project.version
     replaceIn "EnderRiftMod.java"
-
-    useDepAts = true
 }
 
 jar {
@@ -69,9 +67,10 @@ artifacts {
 }
 
 dependencies {
-    deobfCompile "mezz.jei:jei_1.9.4:3.6.7.216"
     deobfCompile "net.darkhax.tesla:Tesla:1.9.4-1.1.0.24"
     deobfCompile "gigaherz.graph:GraphLib:1.1.1"
+    deobfCompile "mezz.jei:jei_1.10:3.7.1.219:api"
+    runtime "mezz.jei:jei_1.10:3.7.1.219"
 }
 
 compileJava {
