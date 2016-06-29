@@ -12,6 +12,10 @@ buildscript {
     }
 }
 
+plugins {
+    id 'com.github.johnrengelman.shadow' version '1.2.3'
+}
+
 repositories {
     maven {
         url "http://dvs1.progwml6.com/files/maven"
@@ -19,11 +23,14 @@ repositories {
     maven {
         url 'http://maven.epoxide.xyz'
     }
+    maven {
+        url 'http://dogforce-games.com/maven'
+    }
 }
 
 apply plugin: 'net.minecraftforge.gradle.forge'
 
-version = "1.0.2"
+version = "1.1.0"
 group= "gigaherz.enderRift"
 archivesBaseName = "EnderRift-1.9.4"
 
@@ -39,9 +46,32 @@ minecraft {
     useDepAts = true
 }
 
+jar {
+    classifier = 'slim'
+}
+
+shadowJar {
+    classifier = ''
+    dependencies {
+        include(dependency(':GraphLib:'))
+    }
+}
+
+reobf {
+    shadowJar { mappingType = 'SEARGE' }
+}
+
+tasks.build.dependsOn reobfShadowJar
+
+artifacts {
+    archives shadowJar
+    archives sourceJar
+}
+
 dependencies {
     deobfCompile "mezz.jei:jei_1.9.4:3.6.7.216"
     deobfCompile "net.darkhax.tesla:Tesla:1.9.4-1.1.0.24"
+    deobfCompile "gigaherz.graph:GraphLib:1.1.1"
 }
 
 compileJava {
