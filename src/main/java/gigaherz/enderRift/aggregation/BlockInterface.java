@@ -1,4 +1,4 @@
-package gigaherz.enderRift.blocks;
+package gigaherz.enderRift.aggregation;
 
 import gigaherz.enderRift.EnderRiftMod;
 import gigaherz.enderRift.gui.GuiHandler;
@@ -19,8 +19,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.items.IItemHandler;
 
-public class BlockInterface
-        extends BlockRegistered
+public class BlockInterface extends BlockAggragator<TileInterface>
 {
     public static final PropertyDirection FACING = PropertyDirection.create("facing");
 
@@ -35,13 +34,6 @@ public class BlockInterface
         setResistance(8.0F);
     }
 
-    @Deprecated
-    @Override
-    public boolean isOpaqueCube(IBlockState state)
-    {
-        return false;
-    }
-
     @Override
     public boolean hasTileEntity(IBlockState state)
     {
@@ -49,9 +41,16 @@ public class BlockInterface
     }
 
     @Override
-    public TileEntity createTileEntity(World world, IBlockState state)
+    public TileInterface createTileEntity(World world, IBlockState state)
     {
         return new TileInterface();
+    }
+
+    @Deprecated
+    @Override
+    public boolean isOpaqueCube(IBlockState state)
+    {
+        return false;
     }
 
     @Override

@@ -4,7 +4,7 @@ public interface ITweakable
 {
     /**
      * Requests a configuration UI or mode change.
-     *
+     * <p>
      * The hitX/Y/Z params can be used to detect which area was activated.
      */
     void configure(float hitX, float hitY, float hitZ);

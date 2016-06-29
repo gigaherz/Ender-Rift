@@ -1,4 +1,4 @@
-package gigaherz.enderRift.slots;
+package gigaherz.enderRift.gui.slots;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;

@@ -1,14 +1,19 @@
 package gigaherz.enderRift;
 
-import com.typesafe.config.ConfigValue;
 import gigaherz.capabilities.api.energy.CapabilityEnergy;
+import gigaherz.enderRift.aggregation.*;
 import gigaherz.enderRift.automation.CapabilityAutomation;
-import gigaherz.enderRift.blocks.*;
+import gigaherz.enderRift.blocks.BlockRegistered;
+import gigaherz.enderRift.generator.BlockGenerator;
+import gigaherz.enderRift.generator.TileGenerator;
 import gigaherz.enderRift.gui.GuiHandler;
 import gigaherz.enderRift.items.ItemEnderRift;
-import gigaherz.enderRift.network.*;
+import gigaherz.enderRift.network.ClearCraftingGrid;
+import gigaherz.enderRift.network.SendSlotChanges;
+import gigaherz.enderRift.network.SetVisibleSlots;
+import gigaherz.enderRift.network.UpdateField;
 import gigaherz.enderRift.recipe.RecipesRiftDuplication;
-import gigaherz.enderRift.rift.RiftStructure;
+import gigaherz.enderRift.rift.*;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;

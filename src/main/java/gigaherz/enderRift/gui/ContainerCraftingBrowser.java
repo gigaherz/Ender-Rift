@@ -1,8 +1,8 @@
 package gigaherz.enderRift.gui;
 
 import gigaherz.enderRift.EnderRiftMod;
+import gigaherz.enderRift.aggregation.TileBrowser;
 import gigaherz.enderRift.automation.IInventoryAutomation;
-import gigaherz.enderRift.blocks.TileBrowser;
 import gigaherz.enderRift.network.ClearCraftingGrid;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
@@ -164,7 +164,6 @@ public class ContainerCraftingBrowser extends ContainerBrowser
                     {
                         tile.markDirty();
                     }
-
                 }
             }
         }

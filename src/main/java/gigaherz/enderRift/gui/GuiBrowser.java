@@ -1,20 +1,20 @@
 package gigaherz.enderRift.gui;
 
 import gigaherz.enderRift.EnderRiftMod;
-import gigaherz.enderRift.blocks.TileBrowser;
+import gigaherz.enderRift.aggregation.TileBrowser;
 import gigaherz.enderRift.misc.SortMode;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.client.resources.I18n;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 
@@ -252,8 +252,16 @@ public class GuiBrowser extends GuiContainer
 
             int row = container.scroll / 9;
 
-            while (scrollAcc >= 120) { row -= 1; scrollAcc-=120; }
-            while (scrollAcc <= -120) { row += 1; scrollAcc+=120; }
+            while (scrollAcc >= 120)
+            {
+                row -= 1;
+                scrollAcc -= 120;
+            }
+            while (scrollAcc <= -120)
+            {
+                row += 1;
+                scrollAcc += 120;
+            }
 
             row = Math.max(0, Math.min(scrollRows, row));
 

@@ -1,4 +1,4 @@
-package gigaherz.enderRift.blocks;
+package gigaherz.enderRift.aggregation;
 
 import gigaherz.enderRift.EnderRiftMod;
 import gigaherz.enderRift.automation.AutomationHelper;
@@ -15,7 +15,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
-public class BlockProxy extends BlockRegistered
+public class BlockProxy extends BlockAggragator<TileProxy>
 {
     public static final PropertyBool NORTH = PropertyBool.create("north");
     public static final PropertyBool SOUTH = PropertyBool.create("south");
@@ -39,6 +39,18 @@ public class BlockProxy extends BlockRegistered
                 .withProperty(DOWN, false));
         setHardness(3.0F);
         setResistance(8.0F);
+    }
+
+    @Override
+    public boolean hasTileEntity(IBlockState state)
+    {
+        return true;
+    }
+
+    @Override
+    public TileProxy createTileEntity(World world, IBlockState state)
+    {
+        return new TileProxy();
     }
 
     @Deprecated
@@ -78,7 +90,7 @@ public class BlockProxy extends BlockRegistered
     {
         TileEntity te = worldIn.getTileEntity(pos.offset(facing));
 
-        if (te instanceof IBrowserExtension)
+        if (te instanceof TileAggregator)
             return true;
 
         return AutomationHelper.isAutomatable(te, facing.getOpposite());
@@ -94,9 +106,18 @@ public class BlockProxy extends BlockRegistered
     @Override
     public void neighborChanged(IBlockState state, World worldIn, BlockPos pos, Block blockIn)
     {
+        super.neighborChanged(state, worldIn, pos, blockIn);
         TileEntity te = worldIn.getTileEntity(pos);
         if (te != null)
             te.markDirty();
+    }
+
+    @Override
+    public void onNeighborChange(IBlockAccess world, BlockPos pos, BlockPos neighbor)
+    {
+        super.onNeighborChange(world, pos, neighbor);
+        if (isUpdateSource(world, pos, fromNeighbour(pos, neighbor)))
+            ((TileProxy) world.getTileEntity(pos)).broadcastDirty();
     }
 
     private boolean isUpdateSource(IBlockAccess worldIn, BlockPos pos, EnumFacing facing)
@@ -105,28 +126,9 @@ public class BlockProxy extends BlockRegistered
         return AutomationHelper.isAutomatable(te, facing.getOpposite());
     }
 
-    @Override
-    public void onNeighborChange(IBlockAccess world, BlockPos pos, BlockPos neighbor)
-    {
-        if (isUpdateSource(world, pos, fromNeighbour(pos, neighbor)))
-            ((TileProxy) world.getTileEntity(pos)).broadcastDirty();
-    }
-
-    EnumFacing fromNeighbour(BlockPos a, BlockPos b)
+    private EnumFacing fromNeighbour(BlockPos a, BlockPos b)
     {
         BlockPos diff = b.subtract(a);
         return EnumFacing.getFacingFromVector(diff.getX(), diff.getY(), diff.getZ());
-    }
-
-    @Override
-    public boolean hasTileEntity(IBlockState state)
-    {
-        return true;
-    }
-
-    @Override
-    public TileEntity createTileEntity(World world, IBlockState state)
-    {
-        return new TileProxy();
     }
 }

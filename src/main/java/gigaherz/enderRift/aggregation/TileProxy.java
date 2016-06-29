@@ -1,4 +1,4 @@
-package gigaherz.enderRift.blocks;
+package gigaherz.enderRift.aggregation;
 
 import com.google.common.collect.Queues;
 import com.google.common.collect.Sets;
@@ -11,7 +11,7 @@ import org.apache.commons.lang3.tuple.Triple;
 import java.util.Queue;
 import java.util.Set;
 
-public class TileProxy extends TileEntity implements IBrowserExtension
+public class TileProxy extends TileAggregator
 {
     public static final int MAX_SCAN_DISTANCE = 32;
 
@@ -49,9 +49,9 @@ public class TileProxy extends TileEntity implements IBrowserExtension
             }
 
             TileEntity te = worldObj.getTileEntity(pos2);
-            if (te instanceof IBrowserExtension)
+            if (te instanceof TileAggregator)
             {
-                ((IBrowserExtension) te).markDirty(scanned, distance + 1, pending);
+                ((TileAggregator) te).markDirty(scanned, distance + 1, pending);
             }
         }
     }

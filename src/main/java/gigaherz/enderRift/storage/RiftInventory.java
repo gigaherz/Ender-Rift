@@ -2,7 +2,7 @@ package gigaherz.enderRift.storage;
 
 import com.google.common.collect.Lists;
 import gigaherz.enderRift.automation.IInventoryAutomation;
-import gigaherz.enderRift.blocks.TileEnderRift;
+import gigaherz.enderRift.rift.TileEnderRift;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;

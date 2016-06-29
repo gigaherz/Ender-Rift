@@ -1,9 +1,9 @@
-package gigaherz.enderRift.blocks;
+package gigaherz.enderRift.rift;
 
 import com.google.common.collect.Lists;
 import gigaherz.enderRift.EnderRiftMod;
 import gigaherz.enderRift.automation.CapabilityAutomation;
-import gigaherz.enderRift.rift.RiftStructure;
+import gigaherz.enderRift.blocks.BlockRegistered;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.PropertyBool;

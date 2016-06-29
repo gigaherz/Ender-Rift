@@ -1,13 +1,12 @@
 package gigaherz.enderRift.gui;
 
 import gigaherz.enderRift.EnderRiftMod;
-import gigaherz.enderRift.blocks.TileGenerator;
+import gigaherz.enderRift.generator.TileGenerator;
 import gigaherz.enderRift.network.UpdateField;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
-import net.minecraft.inventory.IContainerListener;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntityFurnace;
@@ -23,7 +22,7 @@ public class ContainerGenerator
     {
         this.tile = tileEntity;
         prevFields = this.tile.getFields();
-        for(int i=0;i<prevFields.length;i++) prevFields[i]--;
+        for (int i = 0; i < prevFields.length; i++) { prevFields[i]--; }
 
         addSlotToContainer(new SlotItemHandler(tileEntity.inventory(), 0, 80, 53));
 
@@ -65,7 +64,7 @@ public class ContainerGenerator
             }
         }
 
-        if(needUpdate)
+        if (needUpdate)
         {
             this.listeners.stream().filter(watcher -> watcher instanceof EntityPlayerMP).forEach(watcher ->
                     EnderRiftMod.channel.sendTo(new UpdateField(this.windowId, prevFields), (EntityPlayerMP) watcher));

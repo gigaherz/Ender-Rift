@@ -1,17 +1,20 @@
 package gigaherz.enderRift.integration;
 
 import gigaherz.enderRift.EnderRiftMod;
-import gigaherz.enderRift.blocks.*;
+import gigaherz.enderRift.generator.TileGenerator;
+import gigaherz.enderRift.rift.BlockStructure;
+import gigaherz.enderRift.rift.TileEnderRift;
+import gigaherz.enderRift.rift.TileEnderRiftCorner;
 import mcp.mobius.waila.api.IWailaConfigHandler;
 import mcp.mobius.waila.api.IWailaDataAccessor;
 import mcp.mobius.waila.api.IWailaDataProvider;
 import mcp.mobius.waila.api.IWailaRegistrar;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.client.resources.I18n;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.Optional;
 
@@ -22,6 +25,7 @@ public class WailaProviders
     private static final String CONFIG_GENERATOR = EnderRiftMod.MODID + ".generator";
     private static final String CONFIG_RIFT = EnderRiftMod.MODID + ".rift";
     private static final String CONFIG_RF = EnderRiftMod.MODID + ".rf";
+
     public static void callbackRegister(IWailaRegistrar registrar)
     {
         registrar.addConfig("Ender-Rift", CONFIG_GENERATOR);

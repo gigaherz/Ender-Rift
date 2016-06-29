@@ -30,8 +30,8 @@ public class SetVisibleSlots
         windowId = buf.readInt();
         int num = buf.readInt();
         visible = new int[num];
-        for(int i=0;i<num;i++)
-            visible[i] = buf.readInt();
+        for (int i = 0; i < num; i++)
+        { visible[i] = buf.readInt(); }
     }
 
     @Override
@@ -39,8 +39,8 @@ public class SetVisibleSlots
     {
         buf.writeInt(windowId);
         buf.writeInt(visible.length);
-        for(int i=0;i<visible.length;i++)
-            buf.writeInt(visible[i]);
+        for (int i = 0; i < visible.length; i++)
+        { buf.writeInt(visible[i]); }
     }
 
     public static class Handler implements IMessageHandler<SetVisibleSlots, IMessage>

@@ -1,8 +1,8 @@
 package gigaherz.enderRift.gui;
 
-import gigaherz.enderRift.blocks.TileBrowser;
-import gigaherz.enderRift.blocks.TileGenerator;
-import gigaherz.enderRift.blocks.TileInterface;
+import gigaherz.enderRift.aggregation.TileBrowser;
+import gigaherz.enderRift.aggregation.TileInterface;
+import gigaherz.enderRift.generator.TileGenerator;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;

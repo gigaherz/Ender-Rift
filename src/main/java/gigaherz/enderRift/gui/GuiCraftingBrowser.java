@@ -1,13 +1,12 @@
 package gigaherz.enderRift.gui;
 
 import gigaherz.enderRift.EnderRiftMod;
-import gigaherz.enderRift.blocks.TileBrowser;
+import gigaherz.enderRift.aggregation.TileBrowser;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.util.ResourceLocation;
 
 public class GuiCraftingBrowser extends GuiBrowser
