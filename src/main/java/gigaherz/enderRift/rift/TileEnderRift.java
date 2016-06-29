@@ -189,6 +189,8 @@ public class TileEnderRift
             int actualCost = getEffectivePowerUsageToInsert(stackSize);
             energyBuffer.extractEnergy(actualCost, false);
 
+            markDirty();
+
             return remaining;
         }
 
@@ -216,6 +218,8 @@ public class TileEnderRift
                 int actualCost = getEffectivePowerUsageToExtract(extracted.stackSize);
                 energyBuffer.extractEnergy(actualCost, false);
             }
+
+            markDirty();
 
             return extracted;
         }

@@ -4,10 +4,17 @@ import net.minecraft.util.EnumFacing;
 
 public class TileProxy extends TileAggregator
 {
+    boolean broadcasting = false;
+
     @Override
     public void markDirty()
     {
-        broadcastDirty();
+        if (!broadcasting)
+        {
+            broadcasting = true;
+            broadcastDirty();
+            broadcasting = false;
+        }
         super.markDirty();
     }
 

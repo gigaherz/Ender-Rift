@@ -187,11 +187,16 @@ public class ContainerBrowser
 
             if (!ItemStack.areItemStacksEqual(stackInCursor, newStack))
             {
-                stackInCursor = newStack == null ? null : newStack.copy();
-
-                player.connection.sendPacket(new SPacketSetSlot(-1, -1, newStack));
+                sendStackInCursor(player, newStack);
             }
         }
+    }
+
+    private void sendStackInCursor(EntityPlayerMP player, ItemStack newStack)
+    {
+        stackInCursor = newStack == null ? null : newStack.copy();
+
+        player.connection.sendPacket(new SPacketSetSlot(-1, -1, newStack));
     }
 
     public void slotsChanged(int slotCount, List<Integer> indices, List<ItemStack> stacks)
@@ -292,6 +297,14 @@ public class ContainerBrowser
                         {
                             if (dropping.stackSize != remaining.stackSize)
                                 tile.markDirty();
+
+                            for (IContainerListener crafter : this.listeners)
+                            {
+                                if (!(crafter instanceof EntityPlayerMP))
+                                    continue;
+
+                                sendStackInCursor((EntityPlayerMP) crafter, remaining);
+                            }
                         }
                         else
                         {
@@ -314,6 +327,14 @@ public class ContainerBrowser
                             if (push.stackSize != remaining.stackSize)
                                 tile.markDirty();
                             dropping.stackSize += remaining.stackSize;
+
+                            for (IContainerListener crafter : this.listeners)
+                            {
+                                if (!(crafter instanceof EntityPlayerMP))
+                                    continue;
+
+                                sendStackInCursor((EntityPlayerMP) crafter, remaining);
+                            }
                         }
                         else
                         {
@@ -334,7 +355,20 @@ public class ContainerBrowser
 
                     ItemStack extracted = parent.extractItems(existing, amount, false);
                     if (extracted != null)
+                    {
                         tile.markDirty();
+                    }
+                    else
+                    {
+
+                        for (IContainerListener crafter : this.listeners)
+                        {
+                            if (!(crafter instanceof EntityPlayerMP))
+                                continue;
+
+                            sendStackInCursor((EntityPlayerMP) crafter, extracted);
+                        }
+                    }
                     inventoryPlayer.setItemStack(extracted);
                 }
 
