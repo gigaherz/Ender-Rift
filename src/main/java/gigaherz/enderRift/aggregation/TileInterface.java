@@ -8,19 +8,12 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.ItemStackHandler;
-import org.apache.commons.lang3.tuple.Pair;
-import org.apache.commons.lang3.tuple.Triple;
-
-import java.util.Queue;
-import java.util.Set;
 
 public class TileInterface extends TileAggregator
 {
@@ -96,24 +89,16 @@ public class TileInterface extends TileAggregator
     }
 
     @Override
-    public void markDirty(Set<BlockPos> scanned, int distance, Queue<Pair<BlockPos, Integer>> pending)
+    protected boolean canConnectSide(EnumFacing side)
     {
-        // Do nothing here
-    }
-
-    @Override
-    public void gatherNeighbours(Queue<Triple<BlockPos, EnumFacing, Integer>> pending, EnumFacing faceFrom, int distance)
-    {
-        EnumFacing f = getFacing();
-        if (f != null)
-        {
-            pending.add(Triple.of(this.pos.offset(f.getOpposite()), faceFrom, distance));
-        }
+        return side == getFacing().getOpposite();
     }
 
     @Override
     public void update()
     {
+        super.update();
+
         if (getAutomation() == null)
             return;
 

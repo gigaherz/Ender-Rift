@@ -1,8 +1,6 @@
 package gigaherz.enderRift.aggregation;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Queues;
-import com.google.common.collect.Sets;
 import gigaherz.enderRift.automation.AutomationAggregator;
 import gigaherz.enderRift.automation.AutomationHelper;
 import gigaherz.enderRift.automation.IInventoryAutomation;
@@ -15,17 +13,14 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import org.apache.commons.lang3.tuple.Pair;
-import org.apache.commons.lang3.tuple.Triple;
 
 import java.util.List;
-import java.util.Queue;
-import java.util.Set;
 
 public abstract class TileAggregator extends TileEntity implements ITickable, GraphObject
 {
     private Graph graph;
     private boolean firstUpdate = true;
+    private final List<IInventoryAutomation> connectedInventories = Lists.newArrayList();
 
     @Override
     public Graph getGraph()
@@ -67,6 +62,7 @@ public abstract class TileAggregator extends TileEntity implements ITickable, Gr
     private void init()
     {
         Graph.integrate(this, getNeighbours());
+        updateConnectedInventories();
     }
 
     @Override
@@ -101,65 +97,74 @@ public abstract class TileAggregator extends TileEntity implements ITickable, Gr
         {
             graph.addNeighours(this, getNeighbours());
         }
+
+        updateConnectedInventories();
     }
+
+    private void updateConnectedInventories()
+    {
+        connectedInventories.clear();
+        for (EnumFacing f : EnumFacing.VALUES)
+        {
+            if (!canConnectSide(f))
+                continue;
+
+            TileEntity teOther = worldObj.getTileEntity(pos.offset(f));
+            if (teOther instanceof TileAggregator)
+                continue;
+
+            if (AutomationHelper.isAutomatable(teOther, f.getOpposite()))
+            {
+                IInventoryAutomation auto = AutomationHelper.get(teOther, f.getOpposite());
+                if (auto != null)
+                    connectedInventories.add(auto);
+            }
+        }
+    }
+
+    protected abstract boolean canConnectSide(EnumFacing side);
 
     protected IInventoryAutomation getAutomation(Block selfBlock)
     {
         AutomationAggregator aggregator = new AutomationAggregator();
 
-        List<IInventoryAutomation> seen = Lists.newArrayList();
-        Set<BlockPos> scanned = Sets.newHashSet();
-        Queue<Triple<BlockPos, EnumFacing, Integer>> pending = Queues.newArrayDeque();
-
         IBlockState state = worldObj.getBlockState(getPos());
         if (state.getBlock() != selfBlock)
             return aggregator;
 
-        EnumFacing facing = state.getValue(BlockInterface.FACING);
-        pending.add(Triple.of(this.pos, facing, 0));
+        if (getGraph() == null)
+            return aggregator;
 
-        while (pending.size() > 0)
+        for (GraphObject object : getGraph().getObjects())
         {
-            Triple<BlockPos, EnumFacing, Integer> pair = pending.remove();
-            BlockPos pos2 = pair.getLeft();
-
-            if (scanned.contains(pos2))
-            {
+            if (!(object instanceof TileAggregator))
                 continue;
-            }
+            TileAggregator proxy = (TileAggregator) object;
 
-            scanned.add(pos2);
-
-            int distance = pair.getRight();
-
-            if (distance >= TileProxy.MAX_SCAN_DISTANCE)
-            {
-                continue;
-            }
-
-            facing = pair.getMiddle();
-
-            TileEntity te = worldObj.getTileEntity(pos2);
-            if (te != null)
-            {
-                if (te instanceof TileAggregator)
-                {
-                    ((TileAggregator) te).gatherNeighbours(pending, facing.getOpposite(), distance + 1);
-                }
-                else
-                {
-                    IInventoryAutomation automated = AutomationHelper.get(te, facing.getOpposite());
-                    if (automated != null) seen.add(automated);
-                }
-            }
+            aggregator.addAll(proxy.getConnectedInventories());
         }
-
-        aggregator.addAll(seen);
 
         return aggregator;
     }
 
-    public abstract void markDirty(Set<BlockPos> scanned, int distance, Queue<Pair<BlockPos, Integer>> pending);
+    public Iterable<IInventoryAutomation> getConnectedInventories()
+    {
+        return connectedInventories;
+    }
 
-    public abstract void gatherNeighbours(Queue<Triple<BlockPos, EnumFacing, Integer>> pending, EnumFacing faceFrom, int distance);
+    public void broadcastDirty()
+    {
+        if (getGraph() == null)
+            return;
+
+        for (GraphObject object : getGraph().getObjects())
+        {
+            if (!(object instanceof TileAggregator))
+                continue;
+            TileAggregator proxy = (TileAggregator) object;
+
+            if (!proxy.isInvalid())
+                proxy.markDirty();
+        }
+    }
 }
