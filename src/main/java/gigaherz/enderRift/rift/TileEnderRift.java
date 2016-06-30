@@ -1,4 +1,4 @@
-package gigaherz.enderRift.blocks;
+package gigaherz.enderRift.rift;
 
 import gigaherz.capabilities.api.energy.EnergyBuffer;
 import gigaherz.capabilities.api.energy.IEnergyHandler;
@@ -189,6 +189,8 @@ public class TileEnderRift
             int actualCost = getEffectivePowerUsageToInsert(stackSize);
             energyBuffer.extractEnergy(actualCost, false);
 
+            markDirty();
+
             return remaining;
         }
 
@@ -216,6 +218,8 @@ public class TileEnderRift
                 int actualCost = getEffectivePowerUsageToExtract(extracted.stackSize);
                 energyBuffer.extractEnergy(actualCost, false);
             }
+
+            markDirty();
 
             return extracted;
         }

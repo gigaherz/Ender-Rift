@@ -2,12 +2,12 @@ package gigaherz.enderRift.gui;
 
 import com.google.common.collect.Lists;
 import gigaherz.enderRift.EnderRiftMod;
+import gigaherz.enderRift.aggregation.TileBrowser;
 import gigaherz.enderRift.automation.IInventoryAutomation;
-import gigaherz.enderRift.blocks.TileBrowser;
+import gigaherz.enderRift.gui.slots.SlotFake;
 import gigaherz.enderRift.misc.SortMode;
 import gigaherz.enderRift.network.SendSlotChanges;
 import gigaherz.enderRift.network.SetVisibleSlots;
-import gigaherz.enderRift.slots.SlotFake;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.player.InventoryPlayer;
@@ -177,7 +177,7 @@ public class ContainerBrowser
             if (!(crafter instanceof EntityPlayerMP))
                 continue;
 
-            if(newLength != oldLength || indicesChanged.size() > 0)
+            if (newLength != oldLength || indicesChanged.size() > 0)
             {
                 EnderRiftMod.channel.sendTo(new SendSlotChanges(windowId, newLength, indicesChanged, stacksChanged), (EntityPlayerMP) crafter);
             }
@@ -187,21 +187,26 @@ public class ContainerBrowser
 
             if (!ItemStack.areItemStacksEqual(stackInCursor, newStack))
             {
-                stackInCursor = newStack == null ? null : newStack.copy();
-
-                player.connection.sendPacket(new SPacketSetSlot(-1, -1, newStack));
+                sendStackInCursor(player, newStack);
             }
         }
     }
 
+    private void sendStackInCursor(EntityPlayerMP player, ItemStack newStack)
+    {
+        stackInCursor = newStack == null ? null : newStack.copy();
+
+        player.connection.sendPacket(new SPacketSetSlot(-1, -1, newStack));
+    }
+
     public void slotsChanged(int slotCount, List<Integer> indices, List<ItemStack> stacks)
     {
-        if(slotCount != currentStacks.length)
+        if (slotCount != currentStacks.length)
         {
             currentStacks = Arrays.copyOf(currentStacks, slotCount);
         }
 
-        for(int i=0;i<indices.size();i++)
+        for (int i = 0; i < indices.size(); i++)
         {
             int slot = indices.get(i);
             ItemStack stack = stacks.get(i);
@@ -292,6 +297,14 @@ public class ContainerBrowser
                         {
                             if (dropping.stackSize != remaining.stackSize)
                                 tile.markDirty();
+
+                            for (IContainerListener crafter : this.listeners)
+                            {
+                                if (!(crafter instanceof EntityPlayerMP))
+                                    continue;
+
+                                sendStackInCursor((EntityPlayerMP) crafter, remaining);
+                            }
                         }
                         else
                         {
@@ -314,6 +327,14 @@ public class ContainerBrowser
                             if (push.stackSize != remaining.stackSize)
                                 tile.markDirty();
                             dropping.stackSize += remaining.stackSize;
+
+                            for (IContainerListener crafter : this.listeners)
+                            {
+                                if (!(crafter instanceof EntityPlayerMP))
+                                    continue;
+
+                                sendStackInCursor((EntityPlayerMP) crafter, remaining);
+                            }
                         }
                         else
                         {
@@ -334,7 +355,20 @@ public class ContainerBrowser
 
                     ItemStack extracted = parent.extractItems(existing, amount, false);
                     if (extracted != null)
+                    {
                         tile.markDirty();
+                    }
+                    else
+                    {
+
+                        for (IContainerListener crafter : this.listeners)
+                        {
+                            if (!(crafter instanceof EntityPlayerMP))
+                                continue;
+
+                            sendStackInCursor((EntityPlayerMP) crafter, extracted);
+                        }
+                    }
                     inventoryPlayer.setItemStack(extracted);
                 }
 
@@ -634,7 +668,7 @@ public class ContainerBrowser
             final List<String> itemData = Lists.newArrayList();
 
             int indexx = 0;
-            for(ItemStack invStack : stacks)
+            for (ItemStack invStack : stacks)
             {
                 ItemStack stack = invStack.copy();
 
@@ -689,7 +723,7 @@ public class ContainerBrowser
             }
 
             this.indices = new int[indices.size()];
-            for(int i=0;i<this.indices.length;i++)
+            for (int i = 0; i < this.indices.length; i++)
             {
                 this.indices[i] = indices.get(i);
             }
@@ -704,10 +738,10 @@ public class ContainerBrowser
         @Override
         public ItemStack getStackInSlot(int slot)
         {
-            if((slot+scroll) >= indices.length)
+            if ((slot + scroll) >= indices.length)
                 return null;
             ItemStack stack = stacks[indices[slot + scroll]];
-            if(stack != null)
+            if (stack != null)
             {
                 stack = stack.copy();
                 stack.stackSize = 1;
@@ -730,20 +764,20 @@ public class ContainerBrowser
         @Override
         public void setStackInSlot(int slot, ItemStack stack)
         {
-            if((slot+scroll) < indices.length)
+            if ((slot + scroll) < indices.length)
                 stacks[indices[slot + scroll]] = stack;
         }
 
         public int getStackSizeForSlot(int slot)
         {
-            if((slot+scroll) >= indices.length)
+            if ((slot + scroll) >= indices.length)
                 return 0;
-            return stacks[indices[slot+scroll]].stackSize;
+            return stacks[indices[slot + scroll]].stackSize;
         }
 
         public int[] getIndices()
         {
-            int from = Math.max(0,Math.min(scroll,indices.length-1));
+            int from = Math.max(0, Math.min(scroll, indices.length - 1));
             int to = Math.min(from + FakeSlots, indices.length);
             return Arrays.copyOfRange(indices, from, to);
         }

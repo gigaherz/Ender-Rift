@@ -11,7 +11,6 @@ import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
-import java.io.IOException;
 import java.util.List;
 
 public class SendSlotChanges
@@ -56,7 +55,7 @@ public class SendSlotChanges
         buf.writeInt(windowId);
         buf.writeInt(slotCount);
         buf.writeInt(indices.size());
-        for(int i=0;i<indices.size();i++)
+        for (int i = 0; i < indices.size(); i++)
         {
             buf.writeInt(indices.get(i));
             writeItemStackToBuffer(buf, stacks.get(i));
@@ -97,7 +96,7 @@ public class SendSlotChanges
                 nbttagcompound = stack.getTagCompound();
             }
 
-            ByteBufUtils.writeTag(buf,nbttagcompound);
+            ByteBufUtils.writeTag(buf, nbttagcompound);
         }
     }
 

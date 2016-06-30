@@ -2,6 +2,7 @@ tile.enderrift.blockEnderRift.name=Ender-Rift Core
 tile.enderrift.blockStructure.name=Ender-Rift Structure
 tile.enderrift.blockInterface.name=Rift Interface
 tile.enderrift.blockBrowser.name=Rift Browser
+tile.enderrift.blockCraftingBrowser.name=Crafting Browser
 tile.enderrift.blockGenerator.name=Rudimentary Generator
 tile.enderrift.blockProxy.name=Automation Proxy
 
@@ -32,3 +33,6 @@ text.enderrift.generator.heat=Heat: %d C
 text.enderrift.generator.energy.label=Energy:
 text.enderrift.generator.energy=Energy: %d / %d RF
 
+option.enderrift.generator=Generator
+option.enderrift.rift=Rift
+option.enderrift.rf=Show RF

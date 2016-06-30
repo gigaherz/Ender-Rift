@@ -2,12 +2,12 @@ package gigaherz.enderRift.gui;
 
 import com.google.common.collect.Lists;
 import gigaherz.enderRift.EnderRiftMod;
-import gigaherz.enderRift.blocks.TileGenerator;
+import gigaherz.enderRift.generator.TileGenerator;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.client.resources.I18n;
 
 import java.util.List;
 

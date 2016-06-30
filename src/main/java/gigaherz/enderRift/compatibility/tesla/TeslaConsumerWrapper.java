@@ -33,6 +33,6 @@ public class TeslaConsumerWrapper implements IEnergyHandler
     @Override
     public int insertEnergy(int maxReceive, boolean simulate)
     {
-        return (int)consumer.givePower(maxReceive, simulate);
+        return (int) consumer.givePower(maxReceive, simulate);
     }
 }

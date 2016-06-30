@@ -1,4 +1,4 @@
-package gigaherz.enderRift.blocks;
+package gigaherz.enderRift.rift;
 
 import gigaherz.capabilities.api.energy.CapabilityEnergy;
 import gigaherz.capabilities.api.energy.IEnergyHandler;

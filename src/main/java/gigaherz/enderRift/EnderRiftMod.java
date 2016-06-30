@@ -1,13 +1,19 @@
 package gigaherz.enderRift;
 
 import gigaherz.capabilities.api.energy.CapabilityEnergy;
+import gigaherz.enderRift.aggregation.*;
 import gigaherz.enderRift.automation.CapabilityAutomation;
-import gigaherz.enderRift.blocks.*;
+import gigaherz.enderRift.blocks.BlockRegistered;
+import gigaherz.enderRift.generator.BlockGenerator;
+import gigaherz.enderRift.generator.TileGenerator;
 import gigaherz.enderRift.gui.GuiHandler;
 import gigaherz.enderRift.items.ItemEnderRift;
-import gigaherz.enderRift.network.*;
+import gigaherz.enderRift.network.ClearCraftingGrid;
+import gigaherz.enderRift.network.SendSlotChanges;
+import gigaherz.enderRift.network.SetVisibleSlots;
+import gigaherz.enderRift.network.UpdateField;
 import gigaherz.enderRift.recipe.RecipesRiftDuplication;
-import gigaherz.enderRift.rift.RiftStructure;
+import gigaherz.enderRift.rift.*;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
@@ -101,15 +107,18 @@ public class EnderRiftMod
         GameRegistry.register(browser.createItemBlock());
         GameRegistry.registerTileEntity(TileBrowser.class, "tileBrowser");
 
-        generator = new BlockGenerator("blockGenerator");
-        GameRegistry.register(generator);
-        GameRegistry.register(generator.createItemBlock());
-        GameRegistry.registerTileEntity(TileGenerator.class, "tileGenerator");
-
         extension = new BlockProxy("blockProxy");
         GameRegistry.register(extension);
         GameRegistry.register(extension.createItemBlock());
         GameRegistry.registerTileEntity(TileProxy.class, "tileProxy");
+
+        if (ConfigValues.EnableRudimentaryGenerator)
+        {
+            generator = new BlockGenerator("blockGenerator");
+            GameRegistry.register(generator);
+            GameRegistry.register(generator.createItemBlock());
+            GameRegistry.registerTileEntity(TileGenerator.class, "tileGenerator");
+        }
 
         channel = NetworkRegistry.INSTANCE.newSimpleChannel(CHANNEL);
 
@@ -172,14 +181,17 @@ public class EnderRiftMod
                 'g', Items.GLOWSTONE_DUST,
                 'i', Items.IRON_INGOT);
 
-        GameRegistry.addRecipe(new ItemStack(generator),
-                "iri",
-                "rwr",
-                "ifi",
-                'f', Blocks.FURNACE,
-                'w', Items.WATER_BUCKET,
-                'r', Items.REDSTONE,
-                'i', Items.IRON_INGOT);
+        if (ConfigValues.EnableRudimentaryGenerator)
+        {
+            GameRegistry.addRecipe(new ItemStack(generator),
+                    "iri",
+                    "rwr",
+                    "ifi",
+                    'f', Blocks.FURNACE,
+                    'w', Items.WATER_BUCKET,
+                    'r', Items.REDSTONE,
+                    'i', Items.IRON_INGOT);
+        }
 
         GameRegistry.addRecipe(new ItemStack(browser, 1, 1),
                 "gdg",

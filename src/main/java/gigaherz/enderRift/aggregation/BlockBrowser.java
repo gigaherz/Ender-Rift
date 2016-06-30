@@ -1,4 +1,4 @@
-package gigaherz.enderRift.blocks;
+package gigaherz.enderRift.aggregation;
 
 import gigaherz.enderRift.EnderRiftMod;
 import gigaherz.enderRift.gui.GuiHandler;
@@ -25,8 +25,7 @@ import net.minecraft.world.World;
 
 import java.util.List;
 
-public class BlockBrowser
-        extends BlockRegistered
+public class BlockBrowser extends BlockAggragator<TileBrowser>
 {
     public static final PropertyDirection FACING = PropertyDirection.create("facing");
     public static final PropertyBool CRAFTING = PropertyBool.create("crafting");
@@ -45,6 +44,18 @@ public class BlockBrowser
         setResistance(8.0F);
     }
 
+    @Override
+    public boolean hasTileEntity(IBlockState state)
+    {
+        return true;
+    }
+
+    @Override
+    public TileBrowser createTileEntity(World world, IBlockState state)
+    {
+        return new TileBrowser();
+    }
+
     @Deprecated
     @Override
     public boolean isOpaqueCube(IBlockState state)
@@ -56,6 +67,7 @@ public class BlockBrowser
     @Override
     public void neighborChanged(IBlockState state, World worldIn, BlockPos pos, Block blockIn)
     {
+        super.neighborChanged(state, worldIn, pos, blockIn);
         TileEntity te = worldIn.getTileEntity(pos);
         if (te != null)
             te.markDirty();
@@ -64,21 +76,10 @@ public class BlockBrowser
     @Override
     public void onNeighborChange(IBlockAccess world, BlockPos pos, BlockPos neighbor)
     {
+        super.onNeighborChange(world, pos, neighbor);
         IBlockState state = world.getBlockState(pos);
         if (neighbor.equals(pos.offset(state.getValue(FACING))))
             world.getTileEntity(pos).markDirty();
-    }
-
-    @Override
-    public boolean hasTileEntity(IBlockState state)
-    {
-        return true;
-    }
-
-    @Override
-    public TileEntity createTileEntity(World world, IBlockState state)
-    {
-        return new TileBrowser();
     }
 
     @Override
@@ -159,6 +160,5 @@ public class BlockBrowser
             subItems.add(new ItemStack(itemIn, 1, 0));
             subItems.add(new ItemStack(itemIn, 1, 1));
         }
-
     }
 }

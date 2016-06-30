@@ -1,4 +1,4 @@
-package gigaherz.enderRift.blocks;
+package gigaherz.enderRift.generator;
 
 import gigaherz.capabilities.api.energy.CapabilityEnergy;
 import gigaherz.capabilities.api.energy.EnergyBuffer;
@@ -98,9 +98,9 @@ public class TileGenerator extends TileEntity
         if (capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
             return CapabilityItemHandler.ITEM_HANDLER_CAPABILITY.cast(fuelSlot);
         if (teslaProducerCap != null && capability == teslaProducerCap)
-            return (T)teslaProducerInstance;
+            return (T) teslaProducerInstance;
         if (teslaHolderCap != null && capability == teslaHolderCap)
-            return (T)teslaHolderInstance;
+            return (T) teslaHolderInstance;
         return super.getCapability(capability, facing);
     }
 
@@ -315,7 +315,7 @@ public class TileGenerator extends TileEntity
 
     public int[] getFields()
     {
-        return new int[]{ burnTimeRemaining, currentItemBurnTime, energyCapability.getEnergy(), heatLevel };
+        return new int[]{burnTimeRemaining, currentItemBurnTime, energyCapability.getEnergy(), heatLevel};
     }
 
     public void setFields(int[] values)

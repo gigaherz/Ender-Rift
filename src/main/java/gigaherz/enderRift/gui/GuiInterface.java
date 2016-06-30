@@ -1,12 +1,12 @@
 package gigaherz.enderRift.gui;
 
 import gigaherz.enderRift.EnderRiftMod;
-import gigaherz.enderRift.blocks.TileInterface;
+import gigaherz.enderRift.aggregation.TileInterface;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.client.resources.I18n;
 
 public class GuiInterface extends GuiContainer
 {

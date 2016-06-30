@@ -1,7 +1,7 @@
 package gigaherz.enderRift.gui;
 
-import gigaherz.enderRift.blocks.TileInterface;
-import gigaherz.enderRift.slots.SlotFilter;
+import gigaherz.enderRift.aggregation.TileInterface;
+import gigaherz.enderRift.gui.slots.SlotFilter;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.ClickType;

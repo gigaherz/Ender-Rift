@@ -15,6 +15,6 @@ public class TeslaEnergyReceiver implements ITeslaConsumer
     @Override
     public long givePower(long power, boolean simulated)
     {
-        return handler.insertEnergy(power > Integer.MAX_VALUE ? Integer.MAX_VALUE : (int)power, simulated);
+        return handler.insertEnergy(power > Integer.MAX_VALUE ? Integer.MAX_VALUE : (int) power, simulated);
     }
 }

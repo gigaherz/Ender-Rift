@@ -1,6 +1,6 @@
 package gigaherz.enderRift.client;
 
-import gigaherz.enderRift.blocks.TileEnderRift;
+import gigaherz.enderRift.rift.TileEnderRift;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.block.model.IBakedModel;

@@ -40,10 +40,16 @@ public class TeslaController
         }
 
         @Override
-        public Capability getCapability() {return tesla; }
+        public Capability getCapability()
+        {
+            return tesla;
+        }
 
         @Override
-        public Object createInstance(IEnergyHandler handler) { return new TeslaEnergyProducer(handler); }
+        public Object createInstance(IEnergyHandler handler)
+        {
+            return new TeslaEnergyProducer(handler);
+        }
     }
 
     private static class Consumer extends TeslaControllerBase
@@ -56,10 +62,16 @@ public class TeslaController
         }
 
         @Override
-        public Capability getCapability() {return tesla; }
+        public Capability getCapability()
+        {
+            return tesla;
+        }
 
         @Override
-        public Object createInstance(IEnergyHandler handler) { return new TeslaEnergyReceiver(handler); }
+        public Object createInstance(IEnergyHandler handler)
+        {
+            return new TeslaEnergyReceiver(handler);
+        }
 
         @Override
         public IEnergyHandler wrapReverse(TileEntity e, EnumFacing from)
@@ -80,9 +92,15 @@ public class TeslaController
         }
 
         @Override
-        public Capability getCapability() {return tesla; }
+        public Capability getCapability()
+        {
+            return tesla;
+        }
 
         @Override
-        public Object createInstance(IEnergyHandler handler) { return new TeslaEnergyHolder(handler); }
+        public Object createInstance(IEnergyHandler handler)
+        {
+            return new TeslaEnergyHolder(handler);
+        }
     }
 }
