@@ -1,10 +1,32 @@
 {
   "homepage": "https://github.com/gigaherz/Ender-Rift",
   "promos": {
+    "1.10.2-latest": "1.1.1",
+    "1.10.2-recommended": "1.1.1",
+    "1.10-latest": "1.1.1",
+    "1.10-recommended": "1.1.1",
+    "1.9.4-latest": "1.1.1",
+    "1.9.4-recommended": "1.1.1",
     "1.9-latest": "0.16.3",
     "1.9-recommended": "0.16.3",
     "1.8.9-latest": "0.16.3",
     "1.8.9-recommended": "0.16.3"
+  },
+  "1.10.2": {
+    "1.1.1": "EXPERIMENTAL: New GraphLib-based interface/browser network."
+  },
+  "1.10": {
+    "1.0.0": "Tesla API compatibility. Fix generators consuming buckets.",
+    "1.0.1": "Support pushing energy to Tesla receivers.",
+    "1.0.2": "Config option"
+    "1.1.1": "EXPERIMENTAL: New GraphLib-based interface/browser network."
+  },
+  "1.9.4": {
+    "0.16.3": "Fix crashes.",
+    "1.0.0": "Tesla API compatibility. Fix generators consuming buckets.",
+    "1.0.1": "Support pushing energy to Tesla receivers.",
+    "1.0.2": "Config option"
+    "1.1.1": "EXPERIMENTAL: New GraphLib-based interface/browser network."
   },
   "1.9": {
     "0.11.3": "Update Checker support",
