@@ -1,8 +1,7 @@
-package gigaherz.enderRift.generator;
+package gigaherz.enderRift.automation.iface;
 
 import gigaherz.enderRift.EnderRiftMod;
-import gigaherz.enderRift.automation.iface.BlockInterface;
-import gigaherz.enderRift.common.BlockRegistered;
+import gigaherz.enderRift.automation.BlockAggragator;
 import gigaherz.enderRift.common.GuiHandler;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.MapColor;
@@ -12,35 +11,28 @@ import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.inventory.InventoryHelper;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraftforge.items.IItemHandler;
 
-public class BlockGenerator
-        extends BlockRegistered
+public class BlockInterface extends BlockAggragator<TileInterface>
 {
-    // MAYBE? public static final PropertyBool POWERED
-    public static final PropertyDirection FACING = PropertyDirection.create("facing", EnumFacing.Plane.HORIZONTAL);
+    public static final PropertyDirection FACING = PropertyDirection.create("facing");
 
-    public BlockGenerator(String name)
+    public BlockInterface(String name)
     {
         super(name, Material.IRON, MapColor.STONE);
         setSoundType(SoundType.METAL);
-        setUnlocalizedName(EnderRiftMod.MODID + ".blockGenerator");
+        setUnlocalizedName(EnderRiftMod.MODID + ".blockInterface");
         setCreativeTab(EnderRiftMod.tabEnderRift);
         setDefaultState(blockState.getBaseState().withProperty(FACING, EnumFacing.NORTH));
         setHardness(3.0F);
         setResistance(8.0F);
-    }
-
-    @Deprecated
-    @Override
-    public boolean isOpaqueCube(IBlockState state)
-    {
-        return false;
     }
 
     @Override
@@ -50,9 +42,16 @@ public class BlockGenerator
     }
 
     @Override
-    public TileEntity createTileEntity(World world, IBlockState state)
+    public TileInterface createTileEntity(World world, IBlockState state)
     {
-        return new TileGenerator();
+        return new TileInterface();
+    }
+
+    @Deprecated
+    @Override
+    public boolean isOpaqueCube(IBlockState state)
+    {
+        return false;
     }
 
     @Override
@@ -65,7 +64,7 @@ public class BlockGenerator
     @Override
     public IBlockState getStateFromMeta(int meta)
     {
-        return getDefaultState().withProperty(FACING, EnumFacing.HORIZONTALS[meta & 3]);
+        return getDefaultState().withProperty(FACING, EnumFacing.VALUES[meta & 7]);
     }
 
     @Override
@@ -79,10 +78,10 @@ public class BlockGenerator
     {
         TileEntity tileEntity = worldIn.getTileEntity(pos);
 
-        if (!(tileEntity instanceof TileGenerator) || playerIn.isSneaking())
+        if (!(tileEntity instanceof TileInterface) || playerIn.isSneaking())
             return false;
 
-        playerIn.openGui(EnderRiftMod.instance, GuiHandler.GUI_GENERATOR, worldIn, pos.getX(), pos.getY(), pos.getZ());
+        playerIn.openGui(EnderRiftMod.instance, GuiHandler.GUI_INTERFACE, worldIn, pos.getX(), pos.getY(), pos.getZ());
 
         return true;
     }
@@ -90,7 +89,7 @@ public class BlockGenerator
     @Override
     public IBlockState onBlockPlaced(World worldIn, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer)
     {
-        return getDefaultState().withProperty(FACING, placer.getHorizontalFacing().getOpposite());
+        return getDefaultState().withProperty(BlockInterface.FACING, facing.getOpposite());
     }
 
     @Override
@@ -98,12 +97,25 @@ public class BlockGenerator
     {
         TileEntity tileentity = worldIn.getTileEntity(pos);
 
-        if (tileentity instanceof TileGenerator)
+        if (tileentity instanceof TileInterface)
         {
-            BlockInterface.dropInventoryItems(worldIn, pos, ((TileGenerator) tileentity).inventory());
+            dropInventoryItems(worldIn, pos, ((TileInterface) tileentity).inventoryOutputs());
             worldIn.updateComparatorOutputLevel(pos, this);
         }
 
         super.breakBlock(worldIn, pos, state);
+    }
+
+    public static void dropInventoryItems(World worldIn, BlockPos pos, IItemHandler inventory)
+    {
+        for (int i = 0; i < inventory.getSlots(); ++i)
+        {
+            ItemStack itemstack = inventory.getStackInSlot(i);
+
+            if (itemstack != null)
+            {
+                InventoryHelper.spawnItemStack(worldIn, (double) pos.getX(), (double) pos.getY(), (double) pos.getZ(), itemstack);
+            }
+        }
     }
 }

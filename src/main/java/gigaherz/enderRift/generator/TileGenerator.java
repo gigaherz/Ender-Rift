@@ -4,7 +4,7 @@ import gigaherz.capabilities.api.energy.CapabilityEnergy;
 import gigaherz.capabilities.api.energy.EnergyBuffer;
 import gigaherz.capabilities.api.energy.IEnergyHandler;
 import gigaherz.enderRift.EnderRiftMod;
-import gigaherz.enderRift.compatibility.tesla.TeslaControllerBase;
+import gigaherz.enderRift.plugins.tesla.TeslaControllerBase;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;

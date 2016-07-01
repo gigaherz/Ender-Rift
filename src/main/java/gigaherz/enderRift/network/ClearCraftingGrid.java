@@ -1,6 +1,6 @@
 package gigaherz.enderRift.network;
 
-import gigaherz.enderRift.gui.ContainerCraftingBrowser;
+import gigaherz.enderRift.automation.browser.ContainerCraftingBrowser;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.world.WorldServer;
