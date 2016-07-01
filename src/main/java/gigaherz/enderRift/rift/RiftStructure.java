@@ -1,7 +1,7 @@
 package gigaherz.enderRift.rift;
 
 import gigaherz.enderRift.EnderRiftMod;
-import gigaherz.enderRift.storage.RiftStorageWorldData;
+import gigaherz.enderRift.rift.storage.RiftStorageWorldData;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;

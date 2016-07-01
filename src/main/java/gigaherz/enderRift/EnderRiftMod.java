@@ -1,18 +1,22 @@
 package gigaherz.enderRift;
 
 import gigaherz.capabilities.api.energy.CapabilityEnergy;
-import gigaherz.enderRift.aggregation.*;
-import gigaherz.enderRift.automation.CapabilityAutomation;
-import gigaherz.enderRift.blocks.BlockRegistered;
+import gigaherz.enderRift.automation.browser.BlockBrowser;
+import gigaherz.enderRift.automation.browser.TileBrowser;
+import gigaherz.enderRift.automation.iface.BlockInterface;
+import gigaherz.enderRift.automation.iface.TileInterface;
+import gigaherz.enderRift.automation.proxy.BlockProxy;
+import gigaherz.enderRift.automation.proxy.TileProxy;
+import gigaherz.enderRift.automation.capability.CapabilityAutomation;
+import gigaherz.enderRift.common.BlockRegistered;
+import gigaherz.enderRift.common.GuiHandler;
 import gigaherz.enderRift.generator.BlockGenerator;
 import gigaherz.enderRift.generator.TileGenerator;
-import gigaherz.enderRift.gui.GuiHandler;
-import gigaherz.enderRift.items.ItemEnderRift;
 import gigaherz.enderRift.network.ClearCraftingGrid;
 import gigaherz.enderRift.network.SendSlotChanges;
 import gigaherz.enderRift.network.SetVisibleSlots;
 import gigaherz.enderRift.network.UpdateField;
-import gigaherz.enderRift.recipe.RecipesRiftDuplication;
+import gigaherz.enderRift.rift.RecipeRiftDuplication;
 import gigaherz.enderRift.rift.*;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.init.Blocks;
@@ -202,8 +206,8 @@ public class EnderRiftMod
                 'c', Blocks.CRAFTING_TABLE,
                 'b', new ItemStack(browser, 1, 0));
 
-        GameRegistry.addRecipe(new RecipesRiftDuplication());
-        RecipeSorter.register(MODID + ":rift_duplication", RecipesRiftDuplication.class, RecipeSorter.Category.SHAPELESS, "after:minecraft:shapeless");
+        GameRegistry.addRecipe(new RecipeRiftDuplication());
+        RecipeSorter.register(MODID + ":rift_duplication", RecipeRiftDuplication.class, RecipeSorter.Category.SHAPELESS, "after:minecraft:shapeless");
 
         NetworkRegistry.INSTANCE.registerGuiHandler(this, guiHandler);
 
