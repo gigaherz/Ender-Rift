@@ -3,7 +3,6 @@ package gigaherz.enderRift.automation;
 import com.google.common.collect.Lists;
 import gigaherz.enderRift.automation.capability.AutomationAggregator;
 import gigaherz.enderRift.automation.capability.AutomationHelper;
-import gigaherz.enderRift.automation.capability.IInventoryAutomation;
 import gigaherz.graph.api.Graph;
 import gigaherz.graph.api.GraphObject;
 import net.minecraft.block.Block;
@@ -13,6 +12,8 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraftforge.items.CapabilityItemHandler;
+import net.minecraftforge.items.IItemHandler;
 
 import java.util.List;
 
@@ -20,7 +21,7 @@ public abstract class TileAggregator extends TileEntity implements ITickable, Gr
 {
     private Graph graph;
     private boolean firstUpdate = true;
-    private final List<IInventoryAutomation> connectedInventories = Lists.newArrayList();
+    private final List<IItemHandler> connectedInventories = Lists.newArrayList();
 
     @Override
     public Graph getGraph()
@@ -115,7 +116,7 @@ public abstract class TileAggregator extends TileEntity implements ITickable, Gr
 
             if (AutomationHelper.isAutomatable(teOther, f.getOpposite()))
             {
-                IInventoryAutomation auto = AutomationHelper.get(teOther, f.getOpposite());
+                IItemHandler auto = teOther.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, f.getOpposite());
                 if (auto != null)
                     connectedInventories.add(auto);
             }
@@ -124,7 +125,7 @@ public abstract class TileAggregator extends TileEntity implements ITickable, Gr
 
     protected abstract boolean canConnectSide(EnumFacing side);
 
-    protected IInventoryAutomation getAutomation(Block selfBlock)
+    protected IItemHandler getAutomation(Block selfBlock)
     {
         AutomationAggregator aggregator = new AutomationAggregator();
 
@@ -147,7 +148,7 @@ public abstract class TileAggregator extends TileEntity implements ITickable, Gr
         return aggregator;
     }
 
-    public Iterable<IInventoryAutomation> getConnectedInventories()
+    public Iterable<IItemHandler> getConnectedInventories()
     {
         return connectedInventories;
     }

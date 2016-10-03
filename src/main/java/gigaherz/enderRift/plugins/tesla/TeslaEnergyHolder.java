@@ -1,13 +1,13 @@
 package gigaherz.enderRift.plugins.tesla;
 
-import gigaherz.capabilities.api.energy.IEnergyHandler;
 import net.darkhax.tesla.api.ITeslaHolder;
+import net.minecraftforge.energy.IEnergyStorage;
 
 public class TeslaEnergyHolder implements ITeslaHolder
 {
-    final IEnergyHandler handler;
+    final IEnergyStorage handler;
 
-    public TeslaEnergyHolder(IEnergyHandler handler)
+    public TeslaEnergyHolder(IEnergyStorage handler)
     {
         this.handler = handler;
     }
@@ -15,12 +15,12 @@ public class TeslaEnergyHolder implements ITeslaHolder
     @Override
     public long getStoredPower()
     {
-        return handler.getEnergy();
+        return handler.getEnergyStored();
     }
 
     @Override
     public long getCapacity()
     {
-        return handler.getCapacity();
+        return handler.getMaxEnergyStored();
     }
 }

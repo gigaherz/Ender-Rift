@@ -1,8 +1,5 @@
 package gigaherz.enderRift.generator;
 
-import gigaherz.capabilities.api.energy.CapabilityEnergy;
-import gigaherz.capabilities.api.energy.EnergyBuffer;
-import gigaherz.capabilities.api.energy.IEnergyHandler;
 import gigaherz.enderRift.EnderRiftMod;
 import gigaherz.enderRift.plugins.tesla.TeslaControllerBase;
 import net.minecraft.block.state.IBlockState;
@@ -19,9 +16,14 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.Constants;
+import net.minecraftforge.energy.CapabilityEnergy;
+import net.minecraftforge.energy.EnergyStorage;
+import net.minecraftforge.energy.IEnergyStorage;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
+
+import javax.annotation.Nonnull;
 
 public class TileGenerator extends TileEntity
         implements ITickable
@@ -59,6 +61,19 @@ public class TileGenerator extends TileEntity
     int currentItemBurnTime;
     int timeInterval;
 
+    class EnergyBuffer extends EnergyStorage
+    {
+        public EnergyBuffer(int capacity)
+        {
+            super(capacity);
+        }
+
+        public void setEnergy(int energy)
+        {
+            this.energy = energy;
+        }
+    }
+
     EnergyBuffer energyCapability = new EnergyBuffer(PowerLimit);
 
     private Capability teslaProducerCap;
@@ -78,7 +93,7 @@ public class TileGenerator extends TileEntity
     @Override
     public boolean hasCapability(Capability<?> capability, EnumFacing facing)
     {
-        if (capability == CapabilityEnergy.ENERGY_HANDLER_CAPABILITY)
+        if (capability == CapabilityEnergy.ENERGY)
             return true;
         if (capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
             return true;
@@ -93,10 +108,10 @@ public class TileGenerator extends TileEntity
     @Override
     public <T> T getCapability(Capability<T> capability, EnumFacing facing)
     {
-        if (capability == CapabilityEnergy.ENERGY_HANDLER_CAPABILITY)
-            return CapabilityEnergy.ENERGY_HANDLER_CAPABILITY.cast(energyCapability);
+        if (capability == CapabilityEnergy.ENERGY)
+            return (T)energyCapability;
         if (capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
-            return CapabilityItemHandler.ITEM_HANDLER_CAPABILITY.cast(fuelSlot);
+            return (T)fuelSlot;
         if (teslaProducerCap != null && capability == teslaProducerCap)
             return (T) teslaProducerInstance;
         if (teslaHolderCap != null && capability == teslaHolderCap)
@@ -172,14 +187,14 @@ public class TileGenerator extends TileEntity
             }
         }
 
-        if (heatLevel >= MinHeat && energyCapability.getEnergy() < PowerLimit)
+        if (heatLevel >= MinHeat && energyCapability.getEnergyStored() < PowerLimit)
         {
             int powerGen = getGenerationPower();
-            energyCapability.setEnergy(Math.min(energyCapability.getEnergy() + powerGen, PowerLimit));
+            energyCapability.setEnergy(Math.min(energyCapability.getEnergyStored() + powerGen, PowerLimit));
             anyChanged = true;
         }
 
-        if (burnTimeRemaining <= 0 && energyCapability.getEnergy() < PowerLimit)
+        if (burnTimeRemaining <= 0 && energyCapability.getEnergyStored() < PowerLimit)
         {
             ItemStack stack = fuelSlot.getStackInSlot(0);
             if (stack != null)
@@ -200,10 +215,10 @@ public class TileGenerator extends TileEntity
     {
         boolean anyChanged = false;
 
-        int sendPower = Math.min(PowerTransferMax, energyCapability.getEnergy());
+        int sendPower = Math.min(PowerTransferMax, energyCapability.getEnergyStored());
         if (sendPower > 0)
         {
-            IEnergyHandler[] handlers = new IEnergyHandler[6];
+            IEnergyStorage[] handlers = new IEnergyStorage[6];
             int[] wantedSide = new int[6];
             int accepted = 0;
 
@@ -215,12 +230,15 @@ public class TileGenerator extends TileEntity
                 if (e == null)
                     continue;
 
-                IEnergyHandler handler;
-                if (e.hasCapability(CapabilityEnergy.ENERGY_HANDLER_CAPABILITY, from))
+                IEnergyStorage handler = null;
+                if (e.hasCapability(CapabilityEnergy.ENERGY, from))
                 {
-                    handler = e.getCapability(CapabilityEnergy.ENERGY_HANDLER_CAPABILITY, from);
+                    handler = e.getCapability(CapabilityEnergy.ENERGY, from);
+                    if (!handler.canReceive())
+                        handler = null;
                 }
-                else
+
+                if (handler == null)
                 {
                     handler = TeslaControllerBase.CONSUMER.wrapReverse(e, from);
                 }
@@ -228,7 +246,7 @@ public class TileGenerator extends TileEntity
                 if (handler != null)
                 {
                     handlers[from.ordinal()] = handler;
-                    int wanted = handler.insertEnergy(sendPower, true);
+                    int wanted = handler.receiveEnergy(sendPower, true);
                     wantedSide[from.ordinal()] = wanted;
                     accepted += wanted;
                 }
@@ -238,15 +256,15 @@ public class TileGenerator extends TileEntity
             {
                 for (EnumFacing from : EnumFacing.VALUES)
                 {
-                    IEnergyHandler handler = handlers[from.ordinal()];
+                    IEnergyStorage handler = handlers[from.ordinal()];
                     int wanted = wantedSide[from.ordinal()];
                     if (handler == null || wanted == 0)
                         continue;
 
-                    int given = Math.min(Math.min(energyCapability.getEnergy(), wanted), wanted * accepted / sendPower);
-                    int received = Math.min(given, handler.insertEnergy(given, false));
-                    energyCapability.setEnergy(energyCapability.getEnergy() - received);
-                    if (energyCapability.getEnergy() <= 0)
+                    int given = Math.min(Math.min(energyCapability.getEnergyStored(), wanted), wanted * accepted / sendPower);
+                    int received = Math.min(given, handler.receiveEnergy(given, false));
+                    energyCapability.setEnergy(energyCapability.getEnergyStored() - received);
+                    if (energyCapability.getEnergyStored() <= 0)
                         break;
                 }
                 anyChanged = true;
@@ -270,11 +288,11 @@ public class TileGenerator extends TileEntity
         burnTimeRemaining = compound.getInteger("burnTimeRemaining");
         currentItemBurnTime = compound.getInteger("currentItemBurnTime");
         timeInterval = compound.getInteger("timeInterval");
-        CapabilityEnergy.ENERGY_HANDLER_CAPABILITY.readNBT(energyCapability, null, compound.getCompoundTag("storedEnergy"));
+        CapabilityEnergy.ENERGY.readNBT(energyCapability, null, compound.getCompoundTag("storedEnergy"));
         CapabilityItemHandler.ITEM_HANDLER_CAPABILITY.readNBT(fuelSlot, null, compound.getTagList("fuelSlot", Constants.NBT.TAG_COMPOUND));
 
         if (compound.hasKey("powerLevel", Constants.NBT.TAG_INT))
-            energyCapability.insertEnergy(compound.getInteger("powerLevel"), false);
+            energyCapability.receiveEnergy(compound.getInteger("powerLevel"), false);
 
         if (compound.hasKey("Items", Constants.NBT.TAG_LIST))
         {
@@ -301,7 +319,7 @@ public class TileGenerator extends TileEntity
         compound.setInteger("burnTimeRemaining", burnTimeRemaining);
         compound.setInteger("currentItemBurnTime", currentItemBurnTime);
         compound.setInteger("timeInterval", timeInterval);
-        compound.setTag("storedEnergy", CapabilityEnergy.ENERGY_HANDLER_CAPABILITY.writeNBT(energyCapability, null));
+        compound.setTag("storedEnergy", CapabilityEnergy.ENERGY.writeNBT(energyCapability, null));
         compound.setTag("fuelSlot", CapabilityItemHandler.ITEM_HANDLER_CAPABILITY.writeNBT(fuelSlot, null));
 
         return compound;
@@ -315,7 +333,7 @@ public class TileGenerator extends TileEntity
 
     public int[] getFields()
     {
-        return new int[]{burnTimeRemaining, currentItemBurnTime, energyCapability.getEnergy(), heatLevel};
+        return new int[]{burnTimeRemaining, currentItemBurnTime, energyCapability.getEnergyStored(), heatLevel};
     }
 
     public void setFields(int[] values)
@@ -346,7 +364,7 @@ public class TileGenerator extends TileEntity
 
     public int getContainedEnergy()
     {
-        return energyCapability.getEnergy();
+        return energyCapability.getEnergyStored();
     }
 
     public IItemHandler inventory()

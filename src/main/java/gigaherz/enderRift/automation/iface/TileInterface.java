@@ -2,7 +2,7 @@ package gigaherz.enderRift.automation.iface;
 
 import gigaherz.enderRift.EnderRiftMod;
 import gigaherz.enderRift.automation.TileAggregator;
-import gigaherz.enderRift.automation.capability.IInventoryAutomation;
+import gigaherz.enderRift.automation.capability.AutomationHelper;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -77,7 +77,7 @@ public class TileInterface extends TileAggregator
         return super.getCapability(capability, facing);
     }
 
-    public IInventoryAutomation getAutomation()
+    public IItemHandler getAutomation()
     {
         return super.getAutomation(EnderRiftMod.riftInterface);
     }
@@ -114,7 +114,7 @@ public class TileInterface extends TileAggregator
                 if (inSlot == null)
                 {
                     int free = 64;
-                    inSlot = getAutomation().extractItems(inFilter, free, false);
+                    inSlot = AutomationHelper.extractItems(getAutomation(), inFilter, free, false);
                     outputs.setStackInSlot(i, inSlot);
                     if (inSlot != null)
                         anyChanged = true;
@@ -124,7 +124,7 @@ public class TileInterface extends TileAggregator
                     int free = inSlot.getMaxStackSize() - inSlot.stackSize;
                     if (free > 0)
                     {
-                        ItemStack extracted = getAutomation().extractItems(inFilter, free, false);
+                        ItemStack extracted = AutomationHelper.extractItems(getAutomation(), inFilter, free, false);
                         if (extracted != null)
                         {
                             inSlot.stackSize += extracted.stackSize;
@@ -135,7 +135,7 @@ public class TileInterface extends TileAggregator
                 else
                 {
                     int stackSize = inSlot.stackSize;
-                    inSlot = getAutomation().insertItems(inSlot);
+                    inSlot = AutomationHelper.insertItems(getAutomation(), inSlot);
                     outputs.setStackInSlot(i, inSlot);
                     if (inSlot == null || stackSize != inSlot.stackSize)
                         anyChanged = true;
@@ -144,7 +144,7 @@ public class TileInterface extends TileAggregator
             else if (inSlot != null)
             {
                 int stackSize = inSlot.stackSize;
-                inSlot = getAutomation().insertItems(inSlot);
+                inSlot = AutomationHelper.insertItems(getAutomation(), inSlot);
                 outputs.setStackInSlot(i, inSlot);
                 if (inSlot == null || stackSize != inSlot.stackSize)
                     anyChanged = true;

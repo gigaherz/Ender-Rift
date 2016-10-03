@@ -1,13 +1,13 @@
 package gigaherz.enderRift.plugins.tesla;
 
-import gigaherz.capabilities.api.energy.IEnergyHandler;
 import net.darkhax.tesla.api.ITeslaConsumer;
+import net.minecraftforge.energy.IEnergyStorage;
 
 public class TeslaEnergyReceiver implements ITeslaConsumer
 {
-    final IEnergyHandler handler;
+    final IEnergyStorage handler;
 
-    public TeslaEnergyReceiver(IEnergyHandler handler)
+    public TeslaEnergyReceiver(IEnergyStorage handler)
     {
         this.handler = handler;
     }
@@ -15,6 +15,6 @@ public class TeslaEnergyReceiver implements ITeslaConsumer
     @Override
     public long givePower(long power, boolean simulated)
     {
-        return handler.insertEnergy(power > Integer.MAX_VALUE ? Integer.MAX_VALUE : (int) power, simulated);
+        return handler.receiveEnergy(power > Integer.MAX_VALUE ? Integer.MAX_VALUE : (int) power, simulated);
     }
 }

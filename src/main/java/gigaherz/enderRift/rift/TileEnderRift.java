@@ -1,11 +1,7 @@
 package gigaherz.enderRift.rift;
 
-import gigaherz.capabilities.api.energy.EnergyBuffer;
-import gigaherz.capabilities.api.energy.IEnergyHandler;
 import gigaherz.enderRift.ConfigValues;
 import gigaherz.enderRift.EnderRiftMod;
-import gigaherz.enderRift.automation.capability.CapabilityAutomation;
-import gigaherz.enderRift.automation.capability.IInventoryAutomation;
 import gigaherz.enderRift.rift.storage.RiftInventory;
 import gigaherz.enderRift.rift.storage.RiftStorageWorldData;
 import net.minecraft.block.state.IBlockState;
@@ -16,14 +12,30 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.energy.EnergyStorage;
+import net.minecraftforge.energy.IEnergyStorage;
+import net.minecraftforge.items.CapabilityItemHandler;
+import net.minecraftforge.items.IItemHandler;
 
-import javax.annotation.Nonnull;
 import java.util.Random;
 
 public class TileEnderRift
         extends TileEntity
 {
     public final Random rand = new Random();
+
+    class EnergyBuffer extends EnergyStorage
+    {
+        public EnergyBuffer(int capacity)
+        {
+            super(capacity);
+        }
+
+        public void setEnergy(int energy)
+        {
+            this.energy = energy;
+        }
+    }
 
     private EnergyBuffer energyBuffer = new EnergyBuffer(10000000);
 
@@ -59,7 +71,7 @@ public class TileEnderRift
         return inventory;
     }
 
-    public IEnergyHandler getEnergyBuffer()
+    public IEnergyStorage getEnergyBuffer()
     {
         return energyBuffer;
     }
@@ -136,7 +148,7 @@ public class TileEnderRift
     public NBTTagCompound writeToNBT(NBTTagCompound nbtTagCompound)
     {
         nbtTagCompound = super.writeToNBT(nbtTagCompound);
-        nbtTagCompound.setInteger("Energy", energyBuffer.getEnergy());
+        nbtTagCompound.setInteger("Energy", energyBuffer.getEnergyStored());
         nbtTagCompound.setInteger("RiftId", riftId);
         return nbtTagCompound;
     }
@@ -144,30 +156,44 @@ public class TileEnderRift
     @Override
     public boolean hasCapability(Capability<?> capability, EnumFacing facing)
     {
-        if (capability == CapabilityAutomation.INSTANCE)
+        if (capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
             return true;
         return super.hasCapability(capability, facing);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public <T> T getCapability(Capability<T> capability, EnumFacing facing)
     {
-        if (capability == CapabilityAutomation.INSTANCE)
-            return CapabilityAutomation.INSTANCE.cast(automation);
+        if (capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
+            return (T)automation;
         return super.getCapability(capability, facing);
     }
 
-    class AutomationEnergyWrapper implements IInventoryAutomation
+    class AutomationEnergyWrapper implements IItemHandler
     {
+
         @Override
-        public ItemStack insertItems(@Nonnull ItemStack stack)
+        public int getSlots()
+        {
+            return getInventory().getSlots();
+        }
+
+        @Override
+        public ItemStack getStackInSlot(int slot)
+        {
+            return getInventory().getStackInSlot(slot);
+        }
+
+        @Override
+        public ItemStack insertItem(int slot, ItemStack stack, boolean simulate)
         {
             if (getInventory() == null)
                 return stack;
 
             int stackSize = stack.stackSize;
             int cost = getEffectivePowerUsageToInsert(stackSize);
-            while (cost > energyBuffer.getEnergy() && stackSize > 0)
+            while (cost > energyBuffer.getEnergyStored() && stackSize > 0)
             {
                 stackSize--;
             }
@@ -175,33 +201,33 @@ public class TileEnderRift
             if (stackSize <= 0)
                 return stack;
 
-            ItemStack temp = stack;
-            if (stackSize != stack.stackSize)
+            ItemStack temp = stack.copy();
+            temp.stackSize = stackSize;
+
+            ItemStack remaining = getInventory().insertItem(slot, temp, simulate);
+
+            if (!simulate)
             {
-                temp = stack.copy();
-                temp.stackSize = stackSize;
+                if (remaining != null)
+                    stackSize -= remaining.stackSize;
+
+                int actualCost = getEffectivePowerUsageToInsert(stackSize);
+                energyBuffer.extractEnergy(actualCost, false);
+
+                markDirty();
             }
-
-            ItemStack remaining = getInventory().insertItems(temp);
-            if (remaining != null)
-                stackSize -= remaining.stackSize;
-
-            int actualCost = getEffectivePowerUsageToInsert(stackSize);
-            energyBuffer.extractEnergy(actualCost, false);
-
-            markDirty();
 
             return remaining;
         }
 
         @Override
-        public ItemStack extractItems(@Nonnull ItemStack stack, int wanted, boolean simulate)
+        public ItemStack extractItem(int slot, int wanted, boolean simulate)
         {
             if (getInventory() == null)
                 return null;
 
             int cost = getEffectivePowerUsageToExtract(wanted);
-            while (cost > energyBuffer.getEnergy() && wanted > 0)
+            while (cost > energyBuffer.getEnergyStored() && wanted > 0)
             {
                 wanted--;
             }
@@ -209,7 +235,7 @@ public class TileEnderRift
             if (wanted <= 0)
                 return null;
 
-            ItemStack extracted = getInventory().extractItems(stack, wanted, simulate);
+            ItemStack extracted = getInventory().extractItem(slot, wanted, simulate);
             if (extracted == null)
                 return null;
 
@@ -217,29 +243,11 @@ public class TileEnderRift
             {
                 int actualCost = getEffectivePowerUsageToExtract(extracted.stackSize);
                 energyBuffer.extractEnergy(actualCost, false);
+
+                markDirty();
             }
 
-            markDirty();
-
             return extracted;
-        }
-
-        @Override
-        public int getSlots()
-        {
-            if (getInventory() == null)
-                return 0;
-
-            return getInventory().getSlots();
-        }
-
-        @Override
-        public ItemStack getStackInSlot(int index)
-        {
-            if (getInventory() == null)
-                return null;
-
-            return getInventory().getStackInSlot(index);
         }
     }
 

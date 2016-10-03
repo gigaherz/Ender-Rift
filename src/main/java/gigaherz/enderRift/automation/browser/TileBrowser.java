@@ -3,9 +3,9 @@ package gigaherz.enderRift.automation.browser;
 import gigaherz.enderRift.EnderRiftMod;
 import gigaherz.enderRift.automation.TileAggregator;
 import gigaherz.enderRift.automation.iface.BlockInterface;
-import gigaherz.enderRift.automation.capability.IInventoryAutomation;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.EnumFacing;
+import net.minecraftforge.items.IItemHandler;
 
 public class TileBrowser extends TileAggregator
 {
@@ -26,7 +26,7 @@ public class TileBrowser extends TileAggregator
         return facing;
     }
 
-    public IInventoryAutomation getAutomation()
+    public IItemHandler getAutomation()
     {
         return super.getAutomation(EnderRiftMod.browser);
     }

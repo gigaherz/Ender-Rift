@@ -1,21 +1,22 @@
 package gigaherz.enderRift.rift.storage;
 
 import com.google.common.collect.Lists;
-import gigaherz.enderRift.automation.capability.IInventoryAutomation;
 import gigaherz.enderRift.rift.TileEnderRift;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraftforge.common.util.Constants;
+import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.items.ItemHandlerHelper;
 
-import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.lang.ref.Reference;
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;
 import java.util.Iterator;
 import java.util.List;
 
-public class RiftInventory implements IInventoryAutomation
+public class RiftInventory implements IItemHandler
 {
     private final RiftStorageWorldData manager;
 
@@ -92,76 +93,74 @@ public class RiftInventory implements IInventoryAutomation
     @Override
     public int getSlots()
     {
-        return inventorySlots.size();
+        return inventorySlots.size() + 1;
     }
 
     @Override
+    @Nullable
     public ItemStack getStackInSlot(int index)
     {
+        if (index >= inventorySlots.size())
+            return null;
         return inventorySlots.get(index);
     }
 
     @Override
-    public ItemStack insertItems(@Nonnull ItemStack stack)
+    @Nullable
+    public ItemStack insertItem(int index, ItemStack stack, boolean simulate)
     {
-        ItemStack remaining = stack.copy();
-
-        // Try to fill existing slots first
-        for (ItemStack slot : inventorySlots)
+        if (index >= inventorySlots.size())
         {
-            if (slot != null)
+            inventorySlots.add(stack.copy());
+            return null;
+        }
+
+        ItemStack remaining = stack.copy();
+        ItemStack slot = inventorySlots.get(index);
+        if (slot != null)
+        {
+            int max = Math.min(remaining.getMaxStackSize(), 64);
+            int transfer = Math.min(remaining.stackSize, max - slot.stackSize);
+            if (transfer > 0 && ItemHandlerHelper.canItemStacksStack(remaining, slot))
             {
-                int max = Math.min(remaining.getMaxStackSize(), 64);
-                int transfer = Math.min(remaining.stackSize, max - slot.stackSize);
-                if (transfer > 0 && ItemStack.areItemsEqual(slot, remaining) && ItemStack.areItemStackTagsEqual(slot, remaining))
-                {
-                    slot.stackSize += transfer;
-                    remaining.stackSize -= transfer;
-                    if (remaining.stackSize <= 0)
-                        break;
-                }
+                slot.stackSize += transfer;
+                remaining.stackSize -= transfer;
+                if (remaining.stackSize <= 0)
+                    remaining = null;
             }
         }
 
-        // Then place any remaining items in the first available empty slot
-        if (remaining.stackSize > 0)
-            inventorySlots.add(remaining);
-
         onContentsChanged();
 
-        return null;
+        return remaining;
     }
 
     @Override
-    public ItemStack extractItems(@Nonnull ItemStack stack, int wanted, boolean simulate)
+    @Nullable
+    public ItemStack extractItem(int index, int wanted, boolean simulate)
     {
-        ItemStack extracted = stack.copy();
-        extracted.stackSize = 0;
+        if (index >= inventorySlots.size())
+        {
+            return null;
+        }
 
-        if (stack.stackSize <= 0)
+        ItemStack slot = inventorySlots.get(index);
+        if (slot == null)
             return null;
 
-        for (int i = 0; i < inventorySlots.size(); i++)
+        ItemStack extracted = slot.copy();
+        extracted.stackSize = 0;
+
+        int available = Math.min(wanted, slot.stackSize);
+        if (available > 0)
         {
-            ItemStack slot = inventorySlots.get(i);
-            if (slot != null)
+            extracted.stackSize += available;
+
+            if (!simulate)
             {
-                int available = Math.min(wanted, slot.stackSize);
-                if (available > 0 && ItemStack.areItemsEqual(slot, stack) && ItemStack.areItemStackTagsEqual(slot, stack))
-                {
-                    extracted.stackSize += available;
-
-                    if (!simulate)
-                    {
-                        slot.stackSize -= available;
-                        if (slot.stackSize <= 0)
-                            inventorySlots.remove(i);
-                    }
-
-                    wanted -= available;
-                    if (wanted <= 0)
-                        break;
-                }
+                slot.stackSize -= available;
+                if (slot.stackSize <= 0)
+                    inventorySlots.remove(index);
             }
         }
 

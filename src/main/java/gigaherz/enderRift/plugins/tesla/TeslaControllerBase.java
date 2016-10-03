@@ -1,9 +1,9 @@
 package gigaherz.enderRift.plugins.tesla;
 
-import gigaherz.capabilities.api.energy.IEnergyHandler;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.energy.IEnergyStorage;
 
 public class TeslaControllerBase
 {
@@ -16,12 +16,12 @@ public class TeslaControllerBase
         return null;
     }
 
-    public Object createInstance(IEnergyHandler handler)
+    public Object createInstance(IEnergyStorage handler)
     {
         return null;
     }
 
-    public IEnergyHandler wrapReverse(TileEntity e, EnumFacing from)
+    public IEnergyStorage wrapReverse(TileEntity e, EnumFacing from)
     {
         return null;
     }

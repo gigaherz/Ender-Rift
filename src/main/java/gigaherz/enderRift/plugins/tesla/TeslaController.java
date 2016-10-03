@@ -1,6 +1,5 @@
 package gigaherz.enderRift.plugins.tesla;
 
-import gigaherz.capabilities.api.energy.IEnergyHandler;
 import net.darkhax.tesla.api.ITeslaConsumer;
 import net.darkhax.tesla.api.ITeslaHolder;
 import net.darkhax.tesla.api.ITeslaProducer;
@@ -9,6 +8,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
+import net.minecraftforge.energy.IEnergyStorage;
 
 public class TeslaController
 {
@@ -46,7 +46,7 @@ public class TeslaController
         }
 
         @Override
-        public Object createInstance(IEnergyHandler handler)
+        public Object createInstance(IEnergyStorage handler)
         {
             return new TeslaEnergyProducer(handler);
         }
@@ -68,13 +68,13 @@ public class TeslaController
         }
 
         @Override
-        public Object createInstance(IEnergyHandler handler)
+        public Object createInstance(IEnergyStorage handler)
         {
             return new TeslaEnergyReceiver(handler);
         }
 
         @Override
-        public IEnergyHandler wrapReverse(TileEntity e, EnumFacing from)
+        public IEnergyStorage wrapReverse(TileEntity e, EnumFacing from)
         {
             if (e.hasCapability(TeslaCapabilities.CAPABILITY_CONSUMER, from))
                 return new TeslaConsumerWrapper(e.getCapability(TeslaCapabilities.CAPABILITY_CONSUMER, from));
@@ -98,7 +98,7 @@ public class TeslaController
         }
 
         @Override
-        public Object createInstance(IEnergyHandler handler)
+        public Object createInstance(IEnergyStorage handler)
         {
             return new TeslaEnergyHolder(handler);
         }

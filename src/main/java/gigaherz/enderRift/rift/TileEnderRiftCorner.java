@@ -1,7 +1,5 @@
 package gigaherz.enderRift.rift;
 
-import gigaherz.capabilities.api.energy.CapabilityEnergy;
-import gigaherz.capabilities.api.energy.IEnergyHandler;
 import gigaherz.enderRift.EnderRiftMod;
 import gigaherz.enderRift.plugins.tesla.TeslaControllerBase;
 import net.minecraft.block.state.IBlockState;
@@ -9,6 +7,8 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.energy.CapabilityEnergy;
+import net.minecraftforge.energy.IEnergyStorage;
 
 public class TileEnderRiftCorner
         extends TileEntity
@@ -30,7 +30,7 @@ public class TileEnderRiftCorner
     @Override
     public boolean hasCapability(Capability<?> capability, EnumFacing facing)
     {
-        if (capability == CapabilityEnergy.ENERGY_HANDLER_CAPABILITY)
+        if (capability == CapabilityEnergy.ENERGY)
             return getParent() != null;
         if (teslaConsumerCap != null && capability == teslaConsumerCap)
             return getParent() != null;
@@ -43,7 +43,7 @@ public class TileEnderRiftCorner
     @Override
     public <T> T getCapability(Capability<T> capability, EnumFacing facing)
     {
-        if (capability == CapabilityEnergy.ENERGY_HANDLER_CAPABILITY)
+        if (capability == CapabilityEnergy.ENERGY)
             return (T) getParent();
         if (teslaConsumerCap != null && capability == teslaConsumerCap)
         {
@@ -60,7 +60,7 @@ public class TileEnderRiftCorner
         return super.getCapability(capability, facing);
     }
 
-    public IEnergyHandler getParent()
+    public IEnergyStorage getParent()
     {
         if (energyParent == null)
         {

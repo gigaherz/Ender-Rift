@@ -1,7 +1,7 @@
 package gigaherz.enderRift.automation.browser;
 
 import gigaherz.enderRift.EnderRiftMod;
-import gigaherz.enderRift.automation.capability.IInventoryAutomation;
+import gigaherz.enderRift.automation.capability.AutomationHelper;
 import gigaherz.enderRift.network.ClearCraftingGrid;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
@@ -9,6 +9,7 @@ import net.minecraft.inventory.*;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.CraftingManager;
 import net.minecraft.world.World;
+import net.minecraftforge.items.IItemHandler;
 
 public class ContainerCraftingBrowser extends ContainerBrowser
 {
@@ -140,7 +141,7 @@ public class ContainerCraftingBrowser extends ContainerBrowser
 
         if (!this.worldObj.isRemote)
         {
-            IInventoryAutomation parent = tile.getAutomation();
+            IItemHandler parent = tile.getAutomation();
 
             for (int i = 0; i < 9; ++i)
             {
@@ -150,7 +151,7 @@ public class ContainerCraftingBrowser extends ContainerBrowser
                 {
                     ItemStack remaining = null;
                     if (parent != null)
-                        remaining = parent.insertItems(itemstack);
+                        remaining = AutomationHelper.insertItems(parent, itemstack);
 
                     if (remaining != null)
                     {

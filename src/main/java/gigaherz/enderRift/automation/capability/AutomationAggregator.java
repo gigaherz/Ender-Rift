@@ -2,24 +2,26 @@ package gigaherz.enderRift.automation.capability;
 
 import com.google.common.collect.Lists;
 import gigaherz.enderRift.ConfigValues;
+import gigaherz.enderRift.EnderRiftMod;
 import net.minecraft.item.ItemStack;
+import net.minecraftforge.items.IItemHandler;
 
 import javax.annotation.Nonnull;
 import java.util.List;
 
-public class AutomationAggregator implements IInventoryAutomation
+public class AutomationAggregator implements IItemHandler
 {
-    final List<IInventoryAutomation> aggregated = Lists.newArrayList();
+    final List<IItemHandler> aggregated = Lists.newArrayList();
 
-    public void addAll(Iterable<IInventoryAutomation> inventorySet)
+    public void addAll(Iterable<IItemHandler> inventorySet)
     {
-        for (IInventoryAutomation value : inventorySet)
+        for (IItemHandler value : inventorySet)
         {
             add(value);
         }
     }
 
-    public void add(IInventoryAutomation inv)
+    public void add(IItemHandler inv)
     {
         aggregated.add(inv);
     }
@@ -28,7 +30,7 @@ public class AutomationAggregator implements IInventoryAutomation
     public int getSlots()
     {
         int sum = 0;
-        for (IInventoryAutomation inv : aggregated)
+        for (IItemHandler inv : aggregated)
         {
             sum += inv.getSlots();
         }
@@ -38,7 +40,7 @@ public class AutomationAggregator implements IInventoryAutomation
     @Override
     public ItemStack getStackInSlot(int index)
     {
-        for (IInventoryAutomation inv : aggregated)
+        for (IItemHandler inv : aggregated)
         {
             int size = inv.getSlots();
             if (index < size)
@@ -52,72 +54,39 @@ public class AutomationAggregator implements IInventoryAutomation
     }
 
     @Override
-    public ItemStack insertItems(@Nonnull ItemStack stack)
+    public ItemStack insertItem(int index, ItemStack stack, boolean simulate)
     {
-        ItemStack remaining = stack.copy();
-
-        // New feature: try to push into existing inventories that contain the item, first
-        if (ConfigValues.PreferContainersWithExistingStacks)
-        {
-            // DO NOT CHANGE BACK TO FOREACH, CAUSES ConcurrentModificationException
-            for (int i = 0; i < aggregated.size(); i++)
-            {
-                IInventoryAutomation inv = aggregated.get(i);
-
-                for (int j = 0; j < inv.getSlots(); j++)
-                {
-                    ItemStack existing = inv.getStackInSlot(j);
-                    if (ItemStack.areItemsEqual(stack, existing) && ItemStack.areItemStackTagsEqual(stack, existing))
-                    {
-                        remaining = inv.insertItems(remaining);
-                        break;
-                    }
-                }
-
-                if (remaining == null)
-                    return null;
-            }
-        }
-
-        // DO NOT CHANGE BACK TO FOREACH, CAUSES ConcurrentModificationException
+        // KEEP indexed!
         for (int i = 0; i < aggregated.size(); i++)
         {
-            IInventoryAutomation inv = aggregated.get(i);
-            remaining = inv.insertItems(remaining);
-            if (remaining == null)
-                return null;
-        }
+            IItemHandler inv = aggregated.get(i);
+            int size = inv.getSlots();
+            if (index < size)
+            {
+                return inv.insertItem(index, stack, simulate);
+            }
 
-        return remaining;
+            index -= size;
+        }
+        return null;
     }
 
     @Override
-    public ItemStack extractItems(@Nonnull ItemStack stack, int wanted, boolean simulate)
+    public ItemStack extractItem(int index, int amount, boolean simulate)
     {
-        wanted = Math.min(wanted, stack.getMaxStackSize());
-
-        ItemStack extracted = null;
-
-        // DO NOT CHANGE BACK TO FOREACH, CAUSES ConcurrentModificationException
+        // KEEP indexed!
         for (int i = 0; i < aggregated.size(); i++)
         {
-            IInventoryAutomation inv = aggregated.get(i);
-            ItemStack obtained = inv.extractItems(stack, wanted, simulate);
-            if (obtained != null)
+            IItemHandler inv = aggregated.get(i);
+            int size = inv.getSlots();
+            if (index < size)
             {
-                if (extracted == null)
-                {
-                    extracted = obtained.copy();
-                }
-                else
-                {
-                    extracted.stackSize += obtained.stackSize;
-                }
-                wanted -= obtained.stackSize;
-                if (wanted <= 0)
-                    break;
+                return inv.extractItem(index, amount, simulate);
             }
+
+            index -= size;
         }
-        return extracted;
+        return null;
     }
+
 }

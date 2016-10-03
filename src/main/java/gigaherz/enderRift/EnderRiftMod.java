@@ -1,13 +1,11 @@
 package gigaherz.enderRift;
 
-import gigaherz.capabilities.api.energy.CapabilityEnergy;
 import gigaherz.enderRift.automation.browser.BlockBrowser;
 import gigaherz.enderRift.automation.browser.TileBrowser;
 import gigaherz.enderRift.automation.iface.BlockInterface;
 import gigaherz.enderRift.automation.iface.TileInterface;
 import gigaherz.enderRift.automation.proxy.BlockProxy;
 import gigaherz.enderRift.automation.proxy.TileProxy;
-import gigaherz.enderRift.automation.capability.CapabilityAutomation;
 import gigaherz.enderRift.common.BlockRegistered;
 import gigaherz.enderRift.common.GuiHandler;
 import gigaherz.enderRift.generator.BlockGenerator;
@@ -76,9 +74,6 @@ public class EnderRiftMod
     {
         Configuration config = new Configuration(event.getSuggestedConfigurationFile());
         ConfigValues.readConfig(config);
-
-        CapabilityEnergy.enable();
-        CapabilityAutomation.register();
 
         tabEnderRift = new CreativeTabs("tabEnderRift")
         {

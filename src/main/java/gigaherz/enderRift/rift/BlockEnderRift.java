@@ -2,7 +2,7 @@ package gigaherz.enderRift.rift;
 
 import com.google.common.collect.Lists;
 import gigaherz.enderRift.EnderRiftMod;
-import gigaherz.enderRift.automation.capability.CapabilityAutomation;
+import gigaherz.enderRift.automation.capability.AutomationHelper;
 import gigaherz.enderRift.common.BlockRegistered;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
@@ -19,6 +19,7 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraftforge.items.CapabilityItemHandler;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -158,7 +159,7 @@ public class BlockEnderRift
 
         int count = stack.stackSize;
         ItemStack stackToPush = stack.splitStack(count);
-        ItemStack remaining = rift.getCapability(CapabilityAutomation.INSTANCE, null).insertItems(stackToPush);
+        ItemStack remaining = AutomationHelper.insertItems(rift.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null), stackToPush);
         if (remaining != null)
         {
             stack.stackSize += remaining.stackSize;
@@ -204,7 +205,7 @@ public class BlockEnderRift
 
         int numberToExtract = playerIn.isSneaking() ? 1 : stack.getMaxStackSize();
 
-        ItemStack extracted = rift.getCapability(CapabilityAutomation.INSTANCE, null).extractItems(stack.copy(), numberToExtract, false);
+        ItemStack extracted = AutomationHelper.extractItems(rift.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null), stack.copy(), numberToExtract, false);
 
         if (extracted != null && extracted.stackSize > 0)
         {
@@ -234,7 +235,7 @@ public class BlockEnderRift
         EntityItem item = (EntityItem) entityIn;
         ItemStack stack = item.getEntityItem().copy();
 
-        ItemStack remaining = rift.getCapability(CapabilityAutomation.INSTANCE, null).insertItems(stack);
+        ItemStack remaining = AutomationHelper.insertItems(rift.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null), stack);
 
         if (remaining == null)
         {

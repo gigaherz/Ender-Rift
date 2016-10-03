@@ -1,9 +1,9 @@
 package gigaherz.enderRift.plugins.tesla;
 
-import gigaherz.capabilities.api.energy.IEnergyHandler;
 import net.darkhax.tesla.api.ITeslaConsumer;
+import net.minecraftforge.energy.IEnergyStorage;
 
-public class TeslaConsumerWrapper implements IEnergyHandler
+public class TeslaConsumerWrapper implements IEnergyStorage
 {
     private final ITeslaConsumer consumer;
 
@@ -13,15 +13,9 @@ public class TeslaConsumerWrapper implements IEnergyHandler
     }
 
     @Override
-    public int getCapacity()
+    public int receiveEnergy(int maxReceive, boolean simulate)
     {
-        return 0;
-    }
-
-    @Override
-    public int getEnergy()
-    {
-        return 0;
+        return (int) consumer.givePower(maxReceive, simulate);
     }
 
     @Override
@@ -31,8 +25,26 @@ public class TeslaConsumerWrapper implements IEnergyHandler
     }
 
     @Override
-    public int insertEnergy(int maxReceive, boolean simulate)
+    public int getEnergyStored()
     {
-        return (int) consumer.givePower(maxReceive, simulate);
+        return 0;
+    }
+
+    @Override
+    public int getMaxEnergyStored()
+    {
+        return 0;
+    }
+
+    @Override
+    public boolean canExtract()
+    {
+        return false;
+    }
+
+    @Override
+    public boolean canReceive()
+    {
+        return true;
     }
 }

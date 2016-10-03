@@ -2,7 +2,7 @@ package gigaherz.enderRift.automation.browser;
 
 import com.google.common.collect.Lists;
 import gigaherz.enderRift.EnderRiftMod;
-import gigaherz.enderRift.automation.capability.IInventoryAutomation;
+import gigaherz.enderRift.automation.capability.AutomationHelper;
 import gigaherz.enderRift.common.slots.SlotFake;
 import gigaherz.enderRift.network.SendSlotChanges;
 import gigaherz.enderRift.network.SetVisibleSlots;
@@ -16,6 +16,7 @@ import net.minecraft.inventory.Slot;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.play.server.SPacketSetSlot;
+import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import org.apache.commons.lang3.StringUtils;
 
@@ -275,7 +276,7 @@ public class ContainerBrowser
 
         if (slotId >= 0 && slotId < FakeSlots)
         {
-            IInventoryAutomation parent = tile.getAutomation();
+            IItemHandler parent = tile.getAutomation();
             if (parent == null)
                 return null;
 
@@ -290,7 +291,7 @@ public class ContainerBrowser
                 {
                     if (clickedButton == 0)
                     {
-                        ItemStack remaining = parent.insertItems(dropping);
+                        ItemStack remaining = AutomationHelper.insertItems(parent, dropping);
                         if (remaining != null)
                         {
                             if (dropping.stackSize != remaining.stackSize)
@@ -316,7 +317,7 @@ public class ContainerBrowser
 
                         ItemStack push = dropping.copy();
                         push.stackSize = amount;
-                        ItemStack remaining = parent.insertItems(push);
+                        ItemStack remaining = AutomationHelper.insertItems(parent, push);
 
                         dropping.stackSize -= push.stackSize;
 
@@ -351,7 +352,7 @@ public class ContainerBrowser
                             ? existing.getMaxStackSize()
                             : existing.getMaxStackSize() / 2;
 
-                    ItemStack extracted = parent.extractItems(existing, amount, false);
+                    ItemStack extracted = AutomationHelper.extractItems(parent, existing, amount, false);
                     if (extracted != null)
                     {
                         tile.markDirty();
@@ -389,7 +390,7 @@ public class ContainerBrowser
 
                 if (amount > 0)
                 {
-                    ItemStack finalExtract = parent.extractItems(existing, amount, false);
+                    ItemStack finalExtract = AutomationHelper.extractItems(parent, existing, amount, false);
 
                     if (finalExtract != null)
                     {
@@ -515,14 +516,14 @@ public class ContainerBrowser
         }
         else
         {
-            IInventoryAutomation parent = tile.getAutomation();
+            IItemHandler parent = tile.getAutomation();
             if (parent == null)
                 return null;
 
             ItemStack stack = slot.getStack();
             ItemStack stackCopy = stack.copy();
 
-            ItemStack remaining = parent.insertItems(stack);
+            ItemStack remaining = AutomationHelper.insertItems(parent, stack);
             if (remaining != null)
             {
                 if (remaining.stackSize == stackCopy.stackSize)
@@ -567,7 +568,7 @@ public class ContainerBrowser
 
         public void refresh()
         {
-            IInventoryAutomation inv = tile.getAutomation();
+            IItemHandler inv = tile.getAutomation();
 
             final List<ItemStack> slotsSeen = Lists.newArrayList();
 

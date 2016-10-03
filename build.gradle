@@ -30,15 +30,15 @@ repositories {
 
 apply plugin: 'net.minecraftforge.gradle.forge'
 
-version = "1.1.0"
+version = "1.5.0"
 group= "gigaherz.enderRift"
-archivesBaseName = "EnderRift-1.10"
+archivesBaseName = "EnderRift-1.10.2"
 
 minecraft {
-    version = "1.10-12.18.0.1983-1.10.0"
+    version = "1.10.2-12.18.1.2095"
     runDir = "run"
 
-    mappings = "snapshot_20160623"
+    mappings = "snapshot_20161002"
 
     replace "@VERSION@", project.version
     replaceIn "EnderRiftMod.java"
@@ -67,10 +67,10 @@ artifacts {
 }
 
 dependencies {
-    deobfCompile "net.darkhax.tesla:Tesla:1.9.4-1.1.0.24"
+    deobfCompile "net.darkhax.tesla:Tesla:1.10.2-1.2.1.49"
     deobfCompile "gigaherz.graph:GraphLib:1.1.1"
-    deobfCompile "mezz.jei:jei_1.10:3.7.1.219:api"
-    runtime "mezz.jei:jei_1.10:3.7.1.219"
+    deobfCompile "mezz.jei:jei_1.10.2:3.12.3.293:api"
+    runtime "mezz.jei:jei_1.10.2:3.12.3.293"
 }
 
 compileJava {
