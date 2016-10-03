@@ -1,7 +1,7 @@
 {
   "homepage": "https://github.com/gigaherz/Ender-Rift",
   "promos": {
-    "1.10.2-latest": "1.1.0",
+    "1.10.2-latest": "1.5.0",
     "1.10.2-recommended": "1.1.0",
     "1.10-latest": "1.1.0",
     "1.10-recommended": "1.1.0",
@@ -13,19 +13,20 @@
     "1.8.9-recommended": "0.16.3"
   },
   "1.10.2": {
-    "1.1.0": "EXPERIMENTAL: New GraphLib-based interface/browser network."
+    "1.1.0": "EXPERIMENTAL: New GraphLib-based interface/browser network.",
+    "1.5.0": "SHINY NEW: A whole lot of refactorings and new features. See the website for more information."
   },
   "1.10": {
     "1.0.0": "Tesla API compatibility. Fix generators consuming buckets.",
     "1.0.1": "Support pushing energy to Tesla receivers.",
-    "1.0.2": "Config option"
+    "1.0.2": "Config option",
     "1.1.0": "EXPERIMENTAL: New GraphLib-based interface/browser network."
   },
   "1.9.4": {
     "0.16.3": "Fix crashes.",
     "1.0.0": "Tesla API compatibility. Fix generators consuming buckets.",
     "1.0.1": "Support pushing energy to Tesla receivers.",
-    "1.0.2": "Config option"
+    "1.0.2": "Config option",
     "1.1.0": "EXPERIMENTAL: New GraphLib-based interface/browser network."
   },
   "1.9": {
@@ -43,7 +44,7 @@
     "0.16.3": "Fix crashes."
   },
   "1.8.9": {
-    "0.12.2": "Update checker support backported along with other improvements"
+    "0.12.2": "Update checker support backported along with other improvements",
     "0.13.0": "Removed remaining IInventory uses. Fixed interface/browser scanning directions.",
     "0.14.0": "Change the browser gui interaction logic to be more like a chest (AE2-style).",
     "0.14.1": "Make browser search case-insensitive.",

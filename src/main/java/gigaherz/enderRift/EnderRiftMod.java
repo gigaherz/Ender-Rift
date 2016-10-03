@@ -156,46 +156,6 @@ public class EnderRiftMod
         proxy.preInit();
     }
 
-    Map<String, Class<? extends TileEntity >> nameToClassMap = ReflectionHelper.getPrivateValue(TileEntity.class, null, "field_145855_i", "nameToClassMap");
-    private void addAlternativeName(Class<? extends TileEntity> clazz, String altName)
-    {
-        nameToClassMap.put(altName, clazz);
-    }
-
-    private Map<ResourceLocation, Item> upgradeItemNames = Maps.newHashMap();
-    private void addAlternativeName(Item item, String altName)
-    {
-        upgradeItemNames.put(new ResourceLocation(MODID, altName), item);
-    }
-
-    private Map<ResourceLocation, Block> upgradeBlockNames = Maps.newHashMap();
-    private void addAlternativeName(Block block, String altName)
-    {
-        upgradeBlockNames.put(new ResourceLocation(MODID, altName), block);
-        Item item = Item.getItemFromBlock(block);
-        if (item != null)
-            addAlternativeName(item, altName);
-    }
-
-    @Mod.EventHandler
-    public void onMissingMapping(FMLMissingMappingsEvent ev)
-    {
-        for (FMLMissingMappingsEvent.MissingMapping missing : ev.get())
-        {
-            if (missing.type == GameRegistry.Type.ITEM
-                    && upgradeItemNames.containsKey(missing.resourceLocation))
-            {
-                missing.remap(upgradeItemNames.get(missing.resourceLocation));
-            }
-
-            if (missing.type == GameRegistry.Type.BLOCK
-                    && upgradeBlockNames.containsKey(missing.resourceLocation))
-            {
-                missing.remap(upgradeBlockNames.get(missing.resourceLocation));
-            }
-        }
-    }
-
     @Mod.EventHandler
     public void init(FMLInitializationEvent event)
     {
@@ -272,6 +232,46 @@ public class EnderRiftMod
         NetworkRegistry.INSTANCE.registerGuiHandler(this, guiHandler);
 
         FMLInterModComms.sendMessage("Waila", "register", "gigaherz.enderRift.integration.WailaProviders.callbackRegister");
+    }
+
+    Map<String, Class<? extends TileEntity >> nameToClassMap = ReflectionHelper.getPrivateValue(TileEntity.class, null, "field_145855_i", "nameToClassMap");
+    private void addAlternativeName(Class<? extends TileEntity> clazz, String altName)
+    {
+        nameToClassMap.put(altName, clazz);
+    }
+
+    private Map<ResourceLocation, Item> upgradeItemNames = Maps.newHashMap();
+    private void addAlternativeName(Item item, String altName)
+    {
+        upgradeItemNames.put(new ResourceLocation(MODID, altName), item);
+    }
+
+    private Map<ResourceLocation, Block> upgradeBlockNames = Maps.newHashMap();
+    private void addAlternativeName(Block block, String altName)
+    {
+        upgradeBlockNames.put(new ResourceLocation(MODID, altName), block);
+        Item item = Item.getItemFromBlock(block);
+        if (item != null)
+            addAlternativeName(item, altName);
+    }
+
+    @Mod.EventHandler
+    public void onMissingMapping(FMLMissingMappingsEvent ev)
+    {
+        for (FMLMissingMappingsEvent.MissingMapping missing : ev.get())
+        {
+            if (missing.type == GameRegistry.Type.ITEM
+                    && upgradeItemNames.containsKey(missing.resourceLocation))
+            {
+                missing.remap(upgradeItemNames.get(missing.resourceLocation));
+            }
+
+            if (missing.type == GameRegistry.Type.BLOCK
+                    && upgradeBlockNames.containsKey(missing.resourceLocation))
+            {
+                missing.remap(upgradeBlockNames.get(missing.resourceLocation));
+            }
+        }
     }
 
     public static ResourceLocation location(String path)
