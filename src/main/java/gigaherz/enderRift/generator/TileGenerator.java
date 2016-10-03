@@ -288,11 +288,8 @@ public class TileGenerator extends TileEntity
         burnTimeRemaining = compound.getInteger("burnTimeRemaining");
         currentItemBurnTime = compound.getInteger("currentItemBurnTime");
         timeInterval = compound.getInteger("timeInterval");
-        CapabilityEnergy.ENERGY.readNBT(energyCapability, null, compound.getCompoundTag("storedEnergy"));
+        CapabilityEnergy.ENERGY.readNBT(energyCapability, null, compound.getTag("storedEnergy"));
         CapabilityItemHandler.ITEM_HANDLER_CAPABILITY.readNBT(fuelSlot, null, compound.getTagList("fuelSlot", Constants.NBT.TAG_COMPOUND));
-
-        if (compound.hasKey("powerLevel", Constants.NBT.TAG_INT))
-            energyCapability.receiveEnergy(compound.getInteger("powerLevel"), false);
 
         if (compound.hasKey("Items", Constants.NBT.TAG_LIST))
         {

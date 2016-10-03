@@ -1,5 +1,6 @@
 package gigaherz.enderRift;
 
+import com.google.common.collect.Maps;
 import gigaherz.enderRift.automation.browser.BlockBrowser;
 import gigaherz.enderRift.automation.browser.TileBrowser;
 import gigaherz.enderRift.automation.iface.BlockInterface;
@@ -16,24 +17,35 @@ import gigaherz.enderRift.network.SetVisibleSlots;
 import gigaherz.enderRift.network.UpdateField;
 import gigaherz.enderRift.rift.RecipeRiftDuplication;
 import gigaherz.enderRift.rift.*;
+import net.minecraft.block.Block;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLInterModComms;
+import net.minecraftforge.fml.common.event.FMLMissingMappingsEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
+import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import net.minecraftforge.fml.common.registry.GameRegistry;
+import net.minecraftforge.fml.relauncher.ReflectionHelper;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.oredict.RecipeSorter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import java.lang.reflect.Field;
+import java.util.Map;
 
 @Mod(name = EnderRiftMod.NAME,
         modid = EnderRiftMod.MODID,
@@ -84,39 +96,52 @@ public class EnderRiftMod
             }
         };
 
-        riftOrb = new ItemEnderRift("itemEnderRift");
+        riftOrb = new ItemEnderRift("rift_orb");
         GameRegistry.register(riftOrb);
+        addAlternativeName(riftOrb, "itemEnderRift");
 
-        rift = new BlockEnderRift("blockEnderRift");
+        rift = new BlockEnderRift("rift");
         GameRegistry.register(rift);
         GameRegistry.register(rift.createItemBlock());
-        GameRegistry.registerTileEntity(TileEnderRift.class, "tileEnderRift");
+        GameRegistry.registerTileEntity(TileEnderRift.class, rift.getRegistryName().toString());
+        addAlternativeName(rift, "blockEnderRift");
+        addAlternativeName(TileEnderRift.class, "tileEnderRift");
 
-        structure = new BlockStructure("blockStructure");
+        structure = new BlockStructure("rift_structure");
         GameRegistry.register(structure);
-        GameRegistry.registerTileEntity(TileEnderRiftCorner.class, "tileStructureCorner");
+        GameRegistry.registerTileEntity(TileEnderRiftCorner.class, location("rift_structure_corner").toString());
+        addAlternativeName(structure, "blockStructure");
+        addAlternativeName(TileEnderRiftCorner.class, "tileStructureCorner");
 
-        riftInterface = new BlockInterface("blockInterface");
+        riftInterface = new BlockInterface("interface");
         GameRegistry.register(riftInterface);
         GameRegistry.register(riftInterface.createItemBlock());
-        GameRegistry.registerTileEntity(TileInterface.class, "tileInterface");
+        GameRegistry.registerTileEntity(TileInterface.class, riftInterface.getRegistryName().toString());
+        addAlternativeName(riftInterface, "blockInterface");
+        addAlternativeName(TileInterface.class, "tileInterface");
 
-        browser = new BlockBrowser("blockBrowser");
+        browser = new BlockBrowser("browser");
         GameRegistry.register(browser);
         GameRegistry.register(browser.createItemBlock());
-        GameRegistry.registerTileEntity(TileBrowser.class, "tileBrowser");
+        GameRegistry.registerTileEntity(TileBrowser.class, browser.getRegistryName().toString());
+        addAlternativeName(browser, "blockBrowser");
+        addAlternativeName(TileBrowser.class, "tileBrowser");
 
-        extension = new BlockProxy("blockProxy");
+        extension = new BlockProxy("proxy");
         GameRegistry.register(extension);
         GameRegistry.register(extension.createItemBlock());
-        GameRegistry.registerTileEntity(TileProxy.class, "tileProxy");
+        GameRegistry.registerTileEntity(TileProxy.class, extension.getRegistryName().toString());
+        addAlternativeName(extension, "blockProxy");
+        addAlternativeName(TileProxy.class, "tileProxy");
 
         if (ConfigValues.EnableRudimentaryGenerator)
         {
-            generator = new BlockGenerator("blockGenerator");
+            generator = new BlockGenerator("generator");
             GameRegistry.register(generator);
             GameRegistry.register(generator.createItemBlock());
-            GameRegistry.registerTileEntity(TileGenerator.class, "tileGenerator");
+            GameRegistry.registerTileEntity(TileGenerator.class, generator.getRegistryName().toString());
+            addAlternativeName(generator, "blockGenerator");
+            addAlternativeName(TileGenerator.class, "tileGenerator");
         }
 
         channel = NetworkRegistry.INSTANCE.newSimpleChannel(CHANNEL);
@@ -129,6 +154,46 @@ public class EnderRiftMod
         logger.debug("Final message number: " + messageNumber);
 
         proxy.preInit();
+    }
+
+    Map<String, Class<? extends TileEntity >> nameToClassMap = ReflectionHelper.getPrivateValue(TileEntity.class, null, "field_145855_i", "nameToClassMap");
+    private void addAlternativeName(Class<? extends TileEntity> clazz, String altName)
+    {
+        nameToClassMap.put(altName, clazz);
+    }
+
+    private Map<ResourceLocation, Item> upgradeItemNames = Maps.newHashMap();
+    private void addAlternativeName(Item item, String altName)
+    {
+        upgradeItemNames.put(new ResourceLocation(MODID, altName), item);
+    }
+
+    private Map<ResourceLocation, Block> upgradeBlockNames = Maps.newHashMap();
+    private void addAlternativeName(Block block, String altName)
+    {
+        upgradeBlockNames.put(new ResourceLocation(MODID, altName), block);
+        Item item = Item.getItemFromBlock(block);
+        if (item != null)
+            addAlternativeName(item, altName);
+    }
+
+    @Mod.EventHandler
+    public void onMissingMapping(FMLMissingMappingsEvent ev)
+    {
+        for (FMLMissingMappingsEvent.MissingMapping missing : ev.get())
+        {
+            if (missing.type == GameRegistry.Type.ITEM
+                    && upgradeItemNames.containsKey(missing.resourceLocation))
+            {
+                missing.remap(upgradeItemNames.get(missing.resourceLocation));
+            }
+
+            if (missing.type == GameRegistry.Type.BLOCK
+                    && upgradeBlockNames.containsKey(missing.resourceLocation))
+            {
+                missing.remap(upgradeBlockNames.get(missing.resourceLocation));
+            }
+        }
     }
 
     @Mod.EventHandler
@@ -207,5 +272,10 @@ public class EnderRiftMod
         NetworkRegistry.INSTANCE.registerGuiHandler(this, guiHandler);
 
         FMLInterModComms.sendMessage("Waila", "register", "gigaherz.enderRift.integration.WailaProviders.callbackRegister");
+    }
+
+    public static ResourceLocation location(String path)
+    {
+        return new ResourceLocation(MODID, path);
     }
 }

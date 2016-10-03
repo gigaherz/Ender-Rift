@@ -28,16 +28,16 @@ public class ClientProxy implements IModProxy
     {
         OBJLoader.INSTANCE.addDomain(EnderRiftMod.MODID);
         ClientRegistry.bindTileEntitySpecialRenderer(TileEnderRift.class, new RenderRift());
-        registerItemModel(EnderRiftMod.riftOrb, 0, "item_rift");
-        registerBlockModelAsItem(EnderRiftMod.rift, "blockEnderRift");
-        registerBlockModelAsItem(EnderRiftMod.riftInterface, "blockInterface");
-        registerBlockModelAsItem(EnderRiftMod.browser, 0, "blockBrowser", "crafting=false,facing=south");
-        registerBlockModelAsItem(EnderRiftMod.browser, 1, "blockBrowser", "crafting=true,facing=south");
-        registerBlockModelAsItem(EnderRiftMod.extension, "blockProxy");
+        registerItemModel(EnderRiftMod.riftOrb);
+        registerBlockModelAsItem(EnderRiftMod.rift);
+        registerBlockModelAsItem(EnderRiftMod.riftInterface);
+        registerBlockModelAsItem(EnderRiftMod.browser, 0, "crafting=false,facing=south");
+        registerBlockModelAsItem(EnderRiftMod.browser, 1, "crafting=true,facing=south");
+        registerBlockModelAsItem(EnderRiftMod.extension);
 
         if (ConfigValues.EnableRudimentaryGenerator)
         {
-            registerBlockModelAsItem(EnderRiftMod.generator, "blockGenerator");
+            registerBlockModelAsItem(EnderRiftMod.generator);
         }
 
         MinecraftForge.EVENT_BUS.register(this);
@@ -50,19 +50,26 @@ public class ClientProxy implements IModProxy
         event.getMap().registerSprite(new ResourceLocation(EnderRiftMod.MODID + ":blocks/rift_aura"));
     }
 
-    public void registerBlockModelAsItem(final Block block, final String blockName)
+    public void registerBlockModelAsItem(final Block block)
     {
-        registerBlockModelAsItem(block, 0, blockName, "inventory");
+        registerBlockModelAsItem(block, 0, "inventory");
     }
 
-    public void registerBlockModelAsItem(final Block block, int meta, final String blockName, final String variant)
+    public void registerBlockModelAsItem(final Block block, int meta, final String variant)
     {
-        ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(block), meta, new ModelResourceLocation(EnderRiftMod.MODID + ":" + blockName, variant));
+        Item item = Item.getItemFromBlock(block);
+        assert item != null;
+        registerItemModel(item, meta, variant);
     }
 
-    public void registerItemModel(final Item item, int meta, final String itemName)
+    public void registerItemModel(final Item item)
     {
-        ModelLoader.setCustomModelResourceLocation(item, meta, new ModelResourceLocation(EnderRiftMod.MODID + ":" + itemName, "inventory"));
+        registerItemModel(item, 0, "inventory");
+    }
+
+    public void registerItemModel(final Item item, int meta, final String variant)
+    {
+        ModelLoader.setCustomModelResourceLocation(item, meta, new ModelResourceLocation(item.getRegistryName(), variant));
     }
 
     @Override

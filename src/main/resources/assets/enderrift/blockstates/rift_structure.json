@@ -8,17 +8,6 @@
       "model": "enderrift:hedron.obj",
       "transform": "forge:default-block"
     }],
-    "type1": {
-      "normal": {},
-      "corner": { "model": "enderrift:hedron.obj" }
-    },
-    "type2": {
-      "none": {
-      },
-      "vertical": { "model": "enderrift:straight.obj", "x": 90 },
-      "side_ns": { "model": "enderrift:straight.obj"},
-      "side_ew": { "model": "enderrift:straight.obj", "y": 90 }
-    },
     "base": {
       "false": {
       },
@@ -34,6 +23,17 @@
       "nw": {},
       "se": {},
       "sw": {}
+    },
+    "type1": {
+      "normal": {},
+      "corner": { "model": "enderrift:hedron.obj" }
+    },
+    "type2": {
+      "none": {
+      },
+      "vertical": { "model": "enderrift:straight.obj", "x": 90 },
+      "side_ns": { "model": "enderrift:straight.obj"},
+      "side_ew": { "model": "enderrift:straight.obj", "y": 90 }
     }
   }
 }
