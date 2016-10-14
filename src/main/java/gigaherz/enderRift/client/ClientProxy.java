@@ -1,5 +1,6 @@
 package gigaherz.enderRift.client;
 
+import gigaherz.common.client.ModelHandle;
 import gigaherz.enderRift.ConfigValues;
 import gigaherz.enderRift.EnderRiftMod;
 import gigaherz.enderRift.IModProxy;
@@ -41,7 +42,7 @@ public class ClientProxy implements IModProxy
         }
 
         MinecraftForge.EVENT_BUS.register(this);
-        RenderingStuffs.init();
+        ModelHandle.init();
     }
 
     @SubscribeEvent

@@ -1,8 +1,8 @@
 package gigaherz.enderRift.generator;
 
+import gigaherz.common.BlockRegistered;
 import gigaherz.enderRift.EnderRiftMod;
 import gigaherz.enderRift.automation.iface.BlockInterface;
-import gigaherz.enderRift.common.BlockRegistered;
 import gigaherz.enderRift.common.GuiHandler;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.MapColor;

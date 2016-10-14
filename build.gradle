@@ -52,7 +52,9 @@ shadowJar {
     classifier = ''
     dependencies {
         include(dependency(':GraphLib:'))
+        include(dependency(':Commons:'))
     }
+    relocate 'gigaherz.common', 'gigaherz.enderRift.shadow.common'
 }
 
 reobf {
@@ -67,8 +69,10 @@ artifacts {
 }
 
 dependencies {
-    deobfCompile "net.darkhax.tesla:Tesla:1.10.2-1.2.1.49"
+    deobfCompile "gigaherz.commons:Commons:1.10.2-0.2"
     deobfCompile "gigaherz.graph:GraphLib:1.1.1"
+
+    deobfCompile "net.darkhax.tesla:Tesla:1.10.2-1.2.1.49"
     deobfCompile "mezz.jei:jei_1.10.2:3.12.3.293:api"
     runtime "mezz.jei:jei_1.10.2:3.12.3.293"
 }

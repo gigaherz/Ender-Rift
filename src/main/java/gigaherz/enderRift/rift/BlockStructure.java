@@ -1,8 +1,8 @@
 package gigaherz.enderRift.rift;
 
 import com.google.common.collect.Lists;
+import gigaherz.common.BlockRegistered;
 import gigaherz.enderRift.EnderRiftMod;
-import gigaherz.enderRift.common.BlockRegistered;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.PropertyBool;

@@ -1,9 +1,10 @@
 package gigaherz.enderRift.client;
 
+import gigaherz.common.client.ModelHandle;
+import gigaherz.enderRift.EnderRiftMod;
 import gigaherz.enderRift.rift.TileEnderRift;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.entity.player.EntityPlayer;
@@ -11,6 +12,8 @@ import org.lwjgl.opengl.GL11;
 
 public class RenderRift extends TileEntitySpecialRenderer<TileEnderRift>
 {
+    private ModelHandle modelHandle = ModelHandle.of(EnderRiftMod.location("block/sphere.obj"));
+
     @Override
     public void renderTileEntityAt(TileEnderRift te, double x, double y, double z, float partialTicks, int destroyStage)
     {
@@ -26,10 +29,7 @@ public class RenderRift extends TileEntitySpecialRenderer<TileEnderRift>
         float xz = (float) Math.sqrt(tx * tx + tz * tz);
         float pitch = (float) Math.atan2(ty, xz);
 
-        IBakedModel model = RenderingStuffs.loadModel("enderrift:block/sphere.obj");
-
         bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
-
 
         GlStateManager.disableLighting();
         GlStateManager.disableAlpha();
@@ -72,7 +72,7 @@ public class RenderRift extends TileEntitySpecialRenderer<TileEnderRift>
             int r = Math.round(Math.min(255, Math.max(0, progress1 * 255)));
             int color = (a << 24) | (b << 16) | (g << 8) | (r);
 
-            RenderingStuffs.renderModel(model, color);
+            modelHandle.render(color);
 
             GlStateManager.popMatrix();
         }

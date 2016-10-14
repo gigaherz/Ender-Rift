@@ -1,13 +1,13 @@
 package gigaherz.enderRift;
 
 import com.google.common.collect.Maps;
+import gigaherz.common.BlockRegistered;
 import gigaherz.enderRift.automation.browser.BlockBrowser;
 import gigaherz.enderRift.automation.browser.TileBrowser;
 import gigaherz.enderRift.automation.iface.BlockInterface;
 import gigaherz.enderRift.automation.iface.TileInterface;
 import gigaherz.enderRift.automation.proxy.BlockProxy;
 import gigaherz.enderRift.automation.proxy.TileProxy;
-import gigaherz.enderRift.common.BlockRegistered;
 import gigaherz.enderRift.common.GuiHandler;
 import gigaherz.enderRift.generator.BlockGenerator;
 import gigaherz.enderRift.generator.TileGenerator;
