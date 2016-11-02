@@ -9,68 +9,49 @@ import gigaherz.enderRift.generator.ContainerGenerator;
 import gigaherz.enderRift.network.SendSlotChanges;
 import gigaherz.enderRift.network.UpdateField;
 import gigaherz.enderRift.rift.TileEnderRift;
-import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.Item;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.event.TextureStitchEvent;
-import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.client.model.obj.OBJLoader;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
+import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
+import static gigaherz.common.client.ModelHelpers.registerBlockModelAsItem;
+import static gigaherz.common.client.ModelHelpers.registerItemModel;
+
+@Mod.EventBusSubscriber
 public class ClientProxy implements IModProxy
 {
-    @Override
-    public void preInit()
+    @SubscribeEvent
+    public static void registerModels(ModelRegistryEvent event)
     {
         OBJLoader.INSTANCE.addDomain(EnderRiftMod.MODID);
-        ClientRegistry.bindTileEntitySpecialRenderer(TileEnderRift.class, new RenderRift());
+
         registerItemModel(EnderRiftMod.riftOrb);
         registerBlockModelAsItem(EnderRiftMod.rift);
         registerBlockModelAsItem(EnderRiftMod.riftInterface);
         registerBlockModelAsItem(EnderRiftMod.browser, 0, "crafting=false,facing=south");
         registerBlockModelAsItem(EnderRiftMod.browser, 1, "crafting=true,facing=south");
         registerBlockModelAsItem(EnderRiftMod.extension);
+        registerBlockModelAsItem(EnderRiftMod.generator);
 
-        if (ConfigValues.EnableRudimentaryGenerator)
-        {
-            registerBlockModelAsItem(EnderRiftMod.generator);
-        }
-
-        MinecraftForge.EVENT_BUS.register(this);
-        ModelHandle.init();
+        ClientRegistry.bindTileEntitySpecialRenderer(TileEnderRift.class, new RenderRift());
     }
 
     @SubscribeEvent
-    public void onTextureStitchEvent(TextureStitchEvent.Pre event)
+    public static void onTextureStitchEvent(TextureStitchEvent.Pre event)
     {
         event.getMap().registerSprite(new ResourceLocation(EnderRiftMod.MODID + ":blocks/rift_aura"));
     }
 
-    public void registerBlockModelAsItem(final Block block)
+    @Override
+    public void preInit()
     {
-        registerBlockModelAsItem(block, 0, "inventory");
-    }
-
-    public void registerBlockModelAsItem(final Block block, int meta, final String variant)
-    {
-        Item item = Item.getItemFromBlock(block);
-        assert item != null;
-        registerItemModel(item, meta, variant);
-    }
-
-    public void registerItemModel(final Item item)
-    {
-        registerItemModel(item, 0, "inventory");
-    }
-
-    public void registerItemModel(final Item item, int meta, final String variant)
-    {
-        ModelLoader.setCustomModelResourceLocation(item, meta, new ModelResourceLocation(item.getRegistryName(), variant));
+        ModelHandle.init();
     }
 
     @Override
@@ -81,36 +62,32 @@ public class ClientProxy implements IModProxy
     @Override
     public void handleSendSlotChanges(final SendSlotChanges message)
     {
-        Minecraft.getMinecraft().addScheduledTask(() -> ClientProxy.this.handleSendSlotChanges_internal(message));
-    }
-
-    void handleSendSlotChanges_internal(SendSlotChanges message)
-    {
-        Minecraft gameController = Minecraft.getMinecraft();
-
-        EntityPlayer entityplayer = gameController.thePlayer;
-
-        if (entityplayer.openContainer != null && entityplayer.openContainer.windowId == message.windowId)
+        Minecraft.getMinecraft().addScheduledTask(() ->
         {
-            ((ContainerBrowser) entityplayer.openContainer).slotsChanged(message.slotCount, message.indices, message.stacks);
-        }
+            Minecraft gameController = Minecraft.getMinecraft();
+
+            EntityPlayer entityplayer = gameController.thePlayer;
+
+            if (entityplayer.openContainer != null && entityplayer.openContainer.windowId == message.windowId)
+            {
+                ((ContainerBrowser) entityplayer.openContainer).slotsChanged(message.slotCount, message.indices, message.stacks);
+            }
+        });
     }
 
     @Override
     public void handleUpdateField(final UpdateField message)
     {
-        Minecraft.getMinecraft().addScheduledTask(() -> ClientProxy.this.handleUpdateField_internal(message));
-    }
-
-    void handleUpdateField_internal(UpdateField message)
-    {
-        Minecraft gameController = Minecraft.getMinecraft();
-
-        EntityPlayer entityplayer = gameController.thePlayer;
-
-        if (entityplayer.openContainer != null && entityplayer.openContainer.windowId == message.windowId)
+        Minecraft.getMinecraft().addScheduledTask(() ->
         {
-            ((ContainerGenerator) entityplayer.openContainer).updateFields(message.fields);
-        }
+            Minecraft gameController = Minecraft.getMinecraft();
+
+            EntityPlayer entityplayer = gameController.thePlayer;
+
+            if (entityplayer.openContainer != null && entityplayer.openContainer.windowId == message.windowId)
+            {
+                ((ContainerGenerator) entityplayer.openContainer).updateFields(message.fields);
+            }
+        });
     }
 }

@@ -123,7 +123,7 @@ public class RiftInventory implements IItemHandler
             int transfer = Math.min(remaining.stackSize, max - slot.stackSize);
             if (transfer > 0 && ItemHandlerHelper.canItemStacksStack(remaining, slot))
             {
-                slot.stackSize += transfer;
+                if (!simulate) slot.stackSize += transfer;
                 remaining.stackSize -= transfer;
                 if (remaining.stackSize <= 0)
                     remaining = null;

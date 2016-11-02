@@ -35,10 +35,10 @@ group= "gigaherz.enderRift"
 archivesBaseName = "EnderRift-1.10.2"
 
 minecraft {
-    version = "1.10.2-12.18.1.2095"
+    version = "1.10.2-12.18.2.2114"
     runDir = "run"
 
-    mappings = "snapshot_20161002"
+    mappings = "snapshot_20161029"
 
     replace "@VERSION@", project.version
     replaceIn "EnderRiftMod.java"
@@ -69,7 +69,7 @@ artifacts {
 }
 
 dependencies {
-    deobfCompile "gigaherz.commons:Commons:1.10.2-0.2"
+    deobfCompile "gigaherz.commons:Commons:1.10.2-0.4.2"
     deobfCompile "gigaherz.graph:GraphLib:1.1.1"
 
     deobfCompile "net.darkhax.tesla:Tesla:1.10.2-1.2.1.49"
