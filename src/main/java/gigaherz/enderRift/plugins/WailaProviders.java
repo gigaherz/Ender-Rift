@@ -222,7 +222,7 @@ public class WailaProviders
         @Override
         public ItemStack getWailaStack(IWailaDataAccessor accessor, IWailaConfigHandler config)
         {
-            return new ItemStack(EnderRiftMod.rift);
+            return new ItemStack(EnderRiftMod.structure);
         }
 
         @Override
@@ -256,7 +256,7 @@ public class WailaProviders
         @Override
         public ItemStack getWailaStack(IWailaDataAccessor accessor, IWailaConfigHandler config)
         {
-            return new ItemStack(EnderRiftMod.structure);
+            return new ItemStack(EnderRiftMod.rift);
         }
 
         @Override
@@ -304,9 +304,13 @@ public class WailaProviders
             TileEnderRift rift;
 
             if (te instanceof TileEnderRiftCorner)
-                rift = (TileEnderRift) ((TileEnderRiftCorner) te).getParent();
+            {
+                rift = ((TileEnderRiftCorner) te).getParent();
+            }
             else
+            {
                 rift = (TileEnderRift) te;
+            }
 
             tag.setInteger("usedSlots", rift.countInventoryStacks());
             tag.setBoolean("isFormed", rift.getBlockMetadata() != 0);

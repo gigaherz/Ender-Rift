@@ -33,6 +33,7 @@ public class ClientProxy implements IModProxy
 
         registerItemModel(EnderRiftMod.riftOrb);
         registerBlockModelAsItem(EnderRiftMod.rift);
+        registerBlockModelAsItem(EnderRiftMod.structure);
         registerBlockModelAsItem(EnderRiftMod.riftInterface);
         registerBlockModelAsItem(EnderRiftMod.browser, 0, "crafting=false,facing=south");
         registerBlockModelAsItem(EnderRiftMod.browser, 1, "crafting=true,facing=south");

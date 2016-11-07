@@ -12,13 +12,11 @@ import net.minecraftforge.items.IItemHandler;
 
 import javax.annotation.Nullable;
 
-public class TileBrowser extends TileAggregator implements IPoweredAutomation
+public class TileBrowser extends TileAggregator
 {
     private int changeCount = 1;
 
     EnumFacing facing = null;
-
-    AutomationEnergyWrapper wrapper = new AutomationEnergyWrapper(this);
 
     public EnumFacing getFacing()
     {
@@ -33,36 +31,18 @@ public class TileBrowser extends TileAggregator implements IPoweredAutomation
         return facing;
     }
 
-    public IItemHandler getAutomation()
-    {
-        return wrapper;
-    }
-
-    @Nullable
-    @Override
-    public IItemHandler getInventory()
-    {
-        return super.getAutomation(EnderRiftMod.browser);
-    }
-
-    @Override
-    public IEnergyStorage getEnergyBuffer()
-    {
-        return getCombinedPowerBuffer();
-    }
-
     @Override
     public void markDirty()
-    {
-        markDirty(true);
-    }
-
-    @Override
-    protected void markDirty(boolean sendBroadcast)
     {
         changeCount++;
         facing = null;
         super.markDirty();
+    }
+
+    @Override
+    protected void lazyDirty()
+    {
+        changeCount++;
     }
 
     public int getChangeCount()

@@ -30,12 +30,13 @@ public class TileEnderRiftCorner
     @Override
     public boolean hasCapability(Capability<?> capability, EnumFacing facing)
     {
+        IEnergyStorage buffer = getEnergyBuffer();
         if (capability == CapabilityEnergy.ENERGY)
-            return getParent() != null;
+            return buffer != null;
         if (teslaConsumerCap != null && capability == teslaConsumerCap)
-            return getParent() != null;
+            return buffer != null;
         if (teslaHolderCap != null && capability == teslaHolderCap)
-            return getParent() != null;
+            return buffer != null;
         return super.hasCapability(capability, facing);
     }
 
@@ -43,24 +44,25 @@ public class TileEnderRiftCorner
     @Override
     public <T> T getCapability(Capability<T> capability, EnumFacing facing)
     {
+        IEnergyStorage buffer = getEnergyBuffer();
         if (capability == CapabilityEnergy.ENERGY)
-            return (T) getParent();
+            return (T) buffer;
         if (teslaConsumerCap != null && capability == teslaConsumerCap)
         {
-            if (teslaConsumerInstance == null && getParent() != null)
-                teslaConsumerInstance = TeslaControllerBase.CONSUMER.createInstance(getParent());
+            if (teslaConsumerInstance == null && buffer != null)
+                teslaConsumerInstance = TeslaControllerBase.CONSUMER.createInstance(getEnergyBuffer());
             return (T) teslaConsumerInstance;
         }
         if (teslaHolderCap != null && capability == teslaHolderCap)
         {
-            if (teslaHolderInstance == null && getParent() != null)
-                teslaHolderInstance = TeslaControllerBase.HOLDER.createInstance(getParent());
+            if (teslaHolderInstance == null && buffer != null)
+                teslaHolderInstance = TeslaControllerBase.HOLDER.createInstance(getEnergyBuffer());
             return (T) teslaHolderInstance;
         }
         return super.getCapability(capability, facing);
     }
 
-    public IEnergyStorage getParent()
+    public TileEnderRift getParent()
     {
         if (energyParent == null)
         {
@@ -78,7 +80,12 @@ public class TileEnderRiftCorner
                 return null;
             }
         }
-        return energyParent.getEnergyBuffer();
+        return energyParent;
+    }
+
+    public IEnergyStorage getEnergyBuffer()
+    {
+        return getParent().getEnergyBuffer();
     }
 
     private static BlockPos getRiftFromCorner(IBlockState state, BlockPos pos)

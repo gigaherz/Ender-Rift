@@ -1,4 +1,4 @@
-package gigaherz.enderRift.automation.capability;
+package gigaherz.enderRift.automation;
 
 import com.google.common.collect.Lists;
 import gigaherz.enderRift.ConfigValues;
@@ -9,7 +9,7 @@ import net.minecraftforge.items.IItemHandler;
 import javax.annotation.Nonnull;
 import java.util.List;
 
-public class AutomationAggregator implements IItemHandler
+public class InventoryAggregator implements IItemHandler
 {
     final List<IItemHandler> aggregated = Lists.newArrayList();
 

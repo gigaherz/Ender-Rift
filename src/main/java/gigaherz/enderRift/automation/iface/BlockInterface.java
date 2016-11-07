@@ -36,9 +36,9 @@ public class BlockInterface extends BlockAggregator<TileInterface>
     }
 
     @Override
-    public boolean hasTileEntity(IBlockState state)
+    protected BlockStateContainer createBlockState()
     {
-        return true;
+        return new BlockStateContainer(this, FACING);
     }
 
     @Override
@@ -47,30 +47,10 @@ public class BlockInterface extends BlockAggregator<TileInterface>
         return new TileInterface();
     }
 
-    @Deprecated
-    @Override
-    public boolean isOpaqueCube(IBlockState state)
-    {
-        return false;
-    }
-
-    @Deprecated
-    @Override
-    public boolean isFullCube(IBlockState state)
-    {
-        return false;
-    }
-
     @Override
     public boolean isSideSolid(IBlockState base_state, IBlockAccess world, BlockPos pos, EnumFacing side)
     {
         return base_state.getValue(FACING) == side.getOpposite();
-    }
-
-    @Override
-    protected BlockStateContainer createBlockState()
-    {
-        return new BlockStateContainer(this, FACING);
     }
 
     @Deprecated
@@ -87,6 +67,12 @@ public class BlockInterface extends BlockAggregator<TileInterface>
     }
 
     @Override
+    public IBlockState getStateForPlacement(World world, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer, ItemStack stack)
+    {
+        return getDefaultState().withProperty(BlockInterface.FACING, facing.getOpposite());
+    }
+
+    @Override
     public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ)
     {
         TileEntity tileEntity = worldIn.getTileEntity(pos);
@@ -97,12 +83,6 @@ public class BlockInterface extends BlockAggregator<TileInterface>
         playerIn.openGui(EnderRiftMod.instance, GuiHandler.GUI_INTERFACE, worldIn, pos.getX(), pos.getY(), pos.getZ());
 
         return true;
-    }
-
-    @Override
-    public IBlockState getStateForPlacement(World world, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer, ItemStack stack)
-    {
-        return getDefaultState().withProperty(BlockInterface.FACING, facing.getOpposite());
     }
 
     @Override

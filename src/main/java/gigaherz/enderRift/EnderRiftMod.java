@@ -111,6 +111,7 @@ public class EnderRiftMod
     {
         event.getRegistry().registerAll(
                 rift.createItemBlock(),
+                structure.createItemBlock(),
                 riftInterface.createItemBlock(),
                 browser.createItemBlock(),
                 extension.createItemBlock(),

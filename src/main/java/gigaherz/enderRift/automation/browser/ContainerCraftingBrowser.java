@@ -1,7 +1,7 @@
 package gigaherz.enderRift.automation.browser;
 
 import gigaherz.enderRift.EnderRiftMod;
-import gigaherz.enderRift.automation.capability.AutomationHelper;
+import gigaherz.enderRift.automation.AutomationHelper;
 import gigaherz.enderRift.network.ClearCraftingGrid;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
@@ -141,7 +141,7 @@ public class ContainerCraftingBrowser extends ContainerBrowser
 
         if (!this.worldObj.isRemote)
         {
-            IItemHandler parent = tile.getAutomation();
+            IItemHandler parent = tile.getCombinedInventory();
 
             for (int i = 0; i < 9; ++i)
             {

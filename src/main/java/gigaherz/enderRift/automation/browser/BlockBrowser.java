@@ -47,9 +47,9 @@ public class BlockBrowser extends BlockAggregator<TileBrowser>
     }
 
     @Override
-    public boolean hasTileEntity(IBlockState state)
+    protected BlockStateContainer createBlockState()
     {
-        return true;
+        return new BlockStateContainer(this, FACING, CRAFTING);
     }
 
     @Override
@@ -58,49 +58,10 @@ public class BlockBrowser extends BlockAggregator<TileBrowser>
         return new TileBrowser();
     }
 
-    @Deprecated
-    @Override
-    public boolean isOpaqueCube(IBlockState state)
-    {
-        return false;
-    }
-
-    @Deprecated
-    @Override
-    public boolean isFullCube(IBlockState state)
-    {
-        return false;
-    }
-
     @Override
     public boolean isSideSolid(IBlockState base_state, IBlockAccess world, BlockPos pos, EnumFacing side)
     {
         return base_state.getValue(FACING) == side.getOpposite();
-    }
-
-    @Deprecated
-    @Override
-    public void neighborChanged(IBlockState state, World worldIn, BlockPos pos, Block blockIn)
-    {
-        super.neighborChanged(state, worldIn, pos, blockIn);
-        TileEntity te = worldIn.getTileEntity(pos);
-        if (te != null)
-            te.markDirty();
-    }
-
-    @Override
-    public void onNeighborChange(IBlockAccess world, BlockPos pos, BlockPos neighbor)
-    {
-        super.onNeighborChange(world, pos, neighbor);
-        IBlockState state = world.getBlockState(pos);
-        if (neighbor.equals(pos.offset(state.getValue(FACING))))
-            world.getTileEntity(pos).markDirty();
-    }
-
-    @Override
-    protected BlockStateContainer createBlockState()
-    {
-        return new BlockStateContainer(this, FACING, CRAFTING);
     }
 
     @Deprecated
@@ -120,6 +81,12 @@ public class BlockBrowser extends BlockAggregator<TileBrowser>
     }
 
     @Override
+    public IBlockState getStateForPlacement(World world, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer, ItemStack stack)
+    {
+        return getDefaultState().withProperty(BlockBrowser.FACING, facing.getOpposite()).withProperty(CRAFTING, meta != 0);
+    }
+
+    @Override
     public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, @Nullable ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ)
     {
         TileEntity tileEntity = worldIn.getTileEntity(pos);
@@ -134,12 +101,6 @@ public class BlockBrowser extends BlockAggregator<TileBrowser>
         playerIn.openGui(EnderRiftMod.instance, which, worldIn, pos.getX(), pos.getY(), pos.getZ());
 
         return true;
-    }
-
-    @Override
-    public IBlockState getStateForPlacement(World world, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer, ItemStack stack)
-    {
-        return getDefaultState().withProperty(BlockBrowser.FACING, facing.getOpposite()).withProperty(CRAFTING, meta != 0);
     }
 
     @Override

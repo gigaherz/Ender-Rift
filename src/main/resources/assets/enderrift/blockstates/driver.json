@@ -6,17 +6,9 @@
   "variants": {
     "inventory": [{ "transform": "forge:default-block" }],
     "up": {
-      "none": {
+      "false": {
       },
-      "inventory": {
-        "submodel": {
-          "up": {
-            "model": "enderrift:proxy_connection.obj",
-            "x": 90
-          }
-        }
-      },
-      "power": {
+      "true": {
         "submodel": {
           "up": {
             "model": "enderrift:proxy_connection.obj",
@@ -27,17 +19,9 @@
       }
     },
     "down": {
-      "none": {
+      "false": {
       },
-      "inventory": {
-        "submodel": {
-          "down": {
-            "model": "enderrift:proxy_connection.obj",
-            "x": 270
-          }
-        }
-      },
-      "power": {
+      "true": {
         "submodel": {
           "down": {
             "model": "enderrift:proxy_connection.obj",
@@ -48,17 +32,9 @@
       }
     },
     "east": {
-      "none": {
+      "false": {
       },
-      "inventory": {
-        "submodel": {
-          "east": {
-            "model": "enderrift:proxy_connection.obj",
-            "y": 270
-          }
-        }
-      },
-      "power": {
+      "true": {
         "submodel": {
           "east": {
             "model": "enderrift:proxy_connection.obj",
@@ -69,17 +45,9 @@
       }
     },
     "west": {
-      "none": {
+      "false": {
       },
-      "inventory": {
-        "submodel": {
-          "west": {
-            "model": "enderrift:proxy_connection.obj",
-            "y": 90
-          }
-        }
-      },
-      "power": {
+      "true": {
         "submodel": {
           "west": {
             "model": "enderrift:proxy_connection.obj",
@@ -90,17 +58,9 @@
       }
     },
     "north": {
-      "none": {
+      "false": {
       },
-      "inventory": {
-        "submodel": {
-          "north": {
-            "model": "enderrift:proxy_connection.obj",
-            "y": 180
-          }
-        }
-      },
-      "power": {
+      "true": {
         "submodel": {
           "north": {
             "model": "enderrift:proxy_connection.obj",
@@ -111,16 +71,9 @@
       }
     },
     "south": {
-      "none": {
+      "false": {
       },
-      "inventory": {
-        "submodel": {
-          "south": {
-            "model": "enderrift:proxy_connection.obj"
-          }
-        }
-      },
-      "power": {
+      "true": {
         "submodel": {
           "south": {
             "model": "enderrift:proxy_connection.obj",

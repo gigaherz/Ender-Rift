@@ -1,4 +1,4 @@
-package gigaherz.enderRift.automation.capability;
+package gigaherz.enderRift.automation;
 
 import gigaherz.enderRift.EnderRiftMod;
 import gigaherz.enderRift.plugins.tesla.TeslaControllerBase;

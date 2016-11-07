@@ -2,7 +2,7 @@ package gigaherz.enderRift.automation.iface;
 
 import gigaherz.enderRift.EnderRiftMod;
 import gigaherz.enderRift.automation.TileAggregator;
-import gigaherz.enderRift.automation.capability.AutomationHelper;
+import gigaherz.enderRift.automation.AutomationHelper;
 import gigaherz.enderRift.common.AutomationEnergyWrapper;
 import gigaherz.enderRift.common.IPoweredAutomation;
 import net.minecraft.block.state.IBlockState;
@@ -23,10 +23,10 @@ import javax.annotation.Nullable;
 
 public class TileInterface extends TileAggregator implements IPoweredAutomation
 {
-    static final int FilterCount = 9;
+    private static final int FilterCount = 9;
 
-    FilterInventory filters = new FilterInventory(FilterCount);
-    ItemStackHandler outputs = new ItemStackHandler(FilterCount)
+    private FilterInventory filters = new FilterInventory(FilterCount);
+    private ItemStackHandler outputs = new ItemStackHandler(FilterCount)
     {
         @Override
         protected void onContentsChanged(int slot)
@@ -35,9 +35,7 @@ public class TileInterface extends TileAggregator implements IPoweredAutomation
         }
     };
 
-    AutomationEnergyWrapper wrapper = new AutomationEnergyWrapper(this);
-
-    EnumFacing facing = null;
+    private EnumFacing facing = null;
 
     public EnumFacing getFacing()
     {
@@ -85,35 +83,17 @@ public class TileInterface extends TileAggregator implements IPoweredAutomation
         return super.getCapability(capability, facing);
     }
 
-    public IItemHandler getAutomation()
-    {
-        return wrapper;
-    }
-
-    @Nullable
-    @Override
-    public IItemHandler getInventory()
-    {
-        return super.getAutomation(EnderRiftMod.riftInterface);
-    }
-
     @Override
     public IEnergyStorage getEnergyBuffer()
     {
-        return getCombinedPowerBuffer();
+        return super.getEnergyBuffer();
     }
 
     @Override
     public void markDirty()
     {
-        markDirty(true);
-    }
-
-    @Override
-    protected void markDirty(boolean sendBroadcast)
-    {
-        super.markDirty();
         facing = null;
+        super.markDirty();
     }
 
     @Override
@@ -127,7 +107,7 @@ public class TileInterface extends TileAggregator implements IPoweredAutomation
     {
         super.update();
 
-        if (getAutomation() == null)
+        if (getCombinedInventory() == null)
             return;
 
         boolean anyChanged = false;
@@ -141,7 +121,7 @@ public class TileInterface extends TileAggregator implements IPoweredAutomation
                 if (inSlot == null)
                 {
                     int free = 64;
-                    inSlot = AutomationHelper.extractItems(getAutomation(), inFilter, free, false);
+                    inSlot = AutomationHelper.extractItems(getCombinedInventory(), inFilter, free, false);
                     outputs.setStackInSlot(i, inSlot);
                     if (inSlot != null)
                         anyChanged = true;
@@ -151,7 +131,7 @@ public class TileInterface extends TileAggregator implements IPoweredAutomation
                     int free = inSlot.getMaxStackSize() - inSlot.stackSize;
                     if (free > 0)
                     {
-                        ItemStack extracted = AutomationHelper.extractItems(getAutomation(), inFilter, free, false);
+                        ItemStack extracted = AutomationHelper.extractItems(getCombinedInventory(), inFilter, free, false);
                         if (extracted != null)
                         {
                             inSlot.stackSize += extracted.stackSize;
@@ -162,7 +142,7 @@ public class TileInterface extends TileAggregator implements IPoweredAutomation
                 else
                 {
                     int stackSize = inSlot.stackSize;
-                    inSlot = AutomationHelper.insertItems(getAutomation(), inSlot);
+                    inSlot = AutomationHelper.insertItems(getCombinedInventory(), inSlot);
                     outputs.setStackInSlot(i, inSlot);
                     if (inSlot == null || stackSize != inSlot.stackSize)
                         anyChanged = true;
@@ -171,7 +151,7 @@ public class TileInterface extends TileAggregator implements IPoweredAutomation
             else if (inSlot != null)
             {
                 int stackSize = inSlot.stackSize;
-                inSlot = AutomationHelper.insertItems(getAutomation(), inSlot);
+                inSlot = AutomationHelper.insertItems(getCombinedInventory(), inSlot);
                 outputs.setStackInSlot(i, inSlot);
                 if (inSlot == null || stackSize != inSlot.stackSize)
                     anyChanged = true;
@@ -180,6 +160,12 @@ public class TileInterface extends TileAggregator implements IPoweredAutomation
 
         if (anyChanged)
             markDirty();
+    }
+
+    @Override
+    protected void lazyDirty()
+    {
+        // Nothing to do here
     }
 
     @Override

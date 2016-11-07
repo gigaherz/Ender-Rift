@@ -1,5 +1,5 @@
 tile.enderrift.rift.name=Ender-Rift Core
-tile.enderrift.structure.name=Ender-Rift Structure
+tile.enderrift.rift_structure.name=Ender-Rift Structure
 tile.enderrift.interface.name=Rift Interface
 tile.enderrift.browser.name=Rift Browser
 tile.enderrift.crafting_browser.name=Crafting Browser

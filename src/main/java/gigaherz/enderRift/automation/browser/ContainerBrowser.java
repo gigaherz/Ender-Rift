@@ -2,7 +2,7 @@ package gigaherz.enderRift.automation.browser;
 
 import com.google.common.collect.Lists;
 import gigaherz.enderRift.EnderRiftMod;
-import gigaherz.enderRift.automation.capability.AutomationHelper;
+import gigaherz.enderRift.automation.AutomationHelper;
 import gigaherz.enderRift.common.slots.SlotFake;
 import gigaherz.enderRift.network.SendSlotChanges;
 import gigaherz.enderRift.network.SetVisibleSlots;
@@ -190,6 +190,11 @@ public class ContainerBrowser
                 sendStackInCursor(player, newStack);
             }
         }
+
+        if (newLength != oldLength || indicesChanged.size() > 0)
+        {
+            fakeInventoryServer.resetVisible();
+        }
     }
 
     private void sendStackInCursor(EntityPlayerMP player, @Nullable ItemStack newStack)
@@ -277,9 +282,7 @@ public class ContainerBrowser
 
         if (slotId >= 0 && slotId < FakeSlots)
         {
-            IItemHandler parent = tile.getAutomation();
-            if (parent == null)
-                return null;
+            IItemHandler parent = tile.getCombinedInventory();
 
             Slot slot = this.inventorySlots.get(slotId);
             ItemStack existing = slot.getStack();
@@ -536,7 +539,7 @@ public class ContainerBrowser
         }
         else
         {
-            IItemHandler parent = tile.getAutomation();
+            IItemHandler parent = tile.getCombinedInventory();
             if (parent == null)
                 return null;
 
@@ -586,14 +589,18 @@ public class ContainerBrowser
             this.visible = visible;
         }
 
+        public void resetVisible()
+        {
+            visible = new int[0];
+        }
+
         public void refresh()
         {
-            IItemHandler inv = tile.getAutomation();
+            IItemHandler inv = tile.getCombinedInventory();
 
             final List<ItemStack> slotsSeen = Lists.newArrayList();
 
             slots.clear();
-            visible = new int[0];
 
             if (inv == null)
                 return;

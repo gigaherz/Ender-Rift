@@ -63,19 +63,9 @@ public class TileDriver extends TileAggregator
     }
 
     @Override
-    public void markDirty()
+    protected void lazyDirty()
     {
-        markDirty(true);
-    }
-
-    @Override
-    protected void markDirty(boolean sendBroadcast)
-    {
-        if (sendBroadcast)
-        {
-            broadcastDirty();
-        }
-        super.markDirty();
+        // Nothing to do here
     }
 
     @Override
