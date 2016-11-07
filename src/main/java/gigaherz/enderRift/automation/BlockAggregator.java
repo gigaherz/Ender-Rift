@@ -9,14 +9,14 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
-public abstract class BlockAggragator<T extends TileAggregator> extends BlockRegistered
+public abstract class BlockAggregator<T extends TileAggregator> extends BlockRegistered
 {
-    public BlockAggragator(String name, Material blockMaterialIn, MapColor blockMapColorIn)
+    public BlockAggregator(String name, Material blockMaterialIn, MapColor blockMapColorIn)
     {
         super(name, blockMaterialIn, blockMapColorIn);
     }
 
-    public BlockAggragator(String name, Material materialIn)
+    public BlockAggregator(String name, Material materialIn)
     {
         super(name, materialIn);
     }

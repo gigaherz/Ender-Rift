@@ -1,10 +1,15 @@
 package gigaherz.enderRift.plugins;
 
 import gigaherz.enderRift.EnderRiftMod;
+import gigaherz.enderRift.automation.TileAggregator;
+import gigaherz.enderRift.automation.driver.BlockDriver;
+import gigaherz.enderRift.automation.driver.TileDriver;
 import gigaherz.enderRift.generator.TileGenerator;
 import gigaherz.enderRift.rift.BlockStructure;
 import gigaherz.enderRift.rift.TileEnderRift;
 import gigaherz.enderRift.rift.TileEnderRiftCorner;
+import gigaherz.graph.api.Graph;
+import gigaherz.graph.api.GraphObject;
 import mcp.mobius.waila.api.IWailaConfigHandler;
 import mcp.mobius.waila.api.IWailaDataAccessor;
 import mcp.mobius.waila.api.IWailaDataProvider;
@@ -44,6 +49,17 @@ public class WailaProviders
         {
             StructureTooltipProvider instance = new StructureTooltipProvider();
             registrar.registerStackProvider(instance, BlockStructure.class);
+        }
+
+        {
+            NetworkTooltipProvider instance = new NetworkTooltipProvider();
+            registrar.registerBodyProvider(instance, TileAggregator.class);
+        }
+
+        {
+            DriverTooltipProvider instance = new DriverTooltipProvider();
+            registrar.registerBodyProvider(instance, TileDriver.class);
+            registrar.registerNBTProvider(instance, TileDriver.class);
         }
 
         {
@@ -118,6 +134,89 @@ public class WailaProviders
     }
 
     @Optional.Interface(modid = "Waila", iface = "mcp.mobius.waila.api.IWailaDataProvider")
+    public static class DriverTooltipProvider implements IWailaDataProvider
+    {
+        @Override
+        public ItemStack getWailaStack(IWailaDataAccessor accessor, IWailaConfigHandler config)
+        {
+            return null;
+        }
+
+        @Override
+        public List<String> getWailaHead(ItemStack itemStack, List<String> currenttip, IWailaDataAccessor accessor, IWailaConfigHandler config)
+        {
+            return currenttip;
+        }
+
+        @Override
+        public List<String> getWailaBody(ItemStack itemStack, List<String> currenttip, IWailaDataAccessor accessor, IWailaConfigHandler config)
+        {
+            if (config.getConfig(CONFIG_GENERATOR))
+            {
+                NBTTagCompound tag = accessor.getNBTData();
+
+                if (config.getConfig(CONFIG_RF))
+                    currenttip.add(I18n.format("text." + EnderRiftMod.MODID + ".generator.energy", tag.getInteger("energy"), TileDriver.PowerLimit));
+            }
+
+            return currenttip;
+        }
+
+        @Override
+        public List<String> getWailaTail(ItemStack itemStack, List<String> currenttip, IWailaDataAccessor accessor, IWailaConfigHandler config)
+        {
+            return currenttip;
+        }
+
+        @Override
+        public NBTTagCompound getNBTData(EntityPlayerMP player, TileEntity te, NBTTagCompound tag, World world, BlockPos pos)
+        {
+            TileDriver rift = (TileDriver) te;
+
+            tag.setInteger("energy", rift.getEnergyBuffer().getEnergyStored());
+
+            return tag;
+        }
+    }
+
+    @Optional.Interface(modid = "Waila", iface = "mcp.mobius.waila.api.IWailaDataProvider")
+    public static class NetworkTooltipProvider implements IWailaDataProvider
+    {
+        @Override
+        public ItemStack getWailaStack(IWailaDataAccessor accessor, IWailaConfigHandler config)
+        {
+            return null;
+        }
+
+        @Override
+        public List<String> getWailaHead(ItemStack itemStack, List<String> currenttip, IWailaDataAccessor accessor, IWailaConfigHandler config)
+        {
+            return currenttip;
+        }
+
+        @Override
+        public List<String> getWailaBody(ItemStack itemStack, List<String> currenttip, IWailaDataAccessor accessor, IWailaConfigHandler config)
+        {
+            Graph network = ((GraphObject) accessor.getTileEntity()).getGraph();
+            currenttip.add(String.format("Network size: %d", network.getObjects().size()));
+
+            return currenttip;
+        }
+
+        @Override
+        public List<String> getWailaTail(ItemStack itemStack, List<String> currenttip, IWailaDataAccessor accessor, IWailaConfigHandler config)
+        {
+            return currenttip;
+        }
+
+        @Override
+        public NBTTagCompound getNBTData(EntityPlayerMP player, TileEntity te, NBTTagCompound tag, World world, BlockPos pos)
+        {
+            return tag;
+        }
+    }
+
+    @Optional.Interface(modid = "Waila", iface = "mcp.mobius.waila.api.IWailaDataProvider")
     public static class StructureTooltipProvider implements IWailaDataProvider
     {
         @Override
@@ -183,8 +282,6 @@ public class WailaProviders
                             currenttip.add(I18n.format("text." + EnderRiftMod.MODID + ".rift.rf", tag.getInteger("energy"), tag.getInteger("energyTotal")));
                     }
                     currenttip.add(I18n.format("text." + EnderRiftMod.MODID + ".rift.usedSlots", tag.getInteger("usedSlots")));
-                    currenttip.add(I18n.format("text." + EnderRiftMod.MODID + ".rift.energyUsageInsert", tag.getInteger("energyInsert")));
-                    currenttip.add(I18n.format("text." + EnderRiftMod.MODID + ".rift.energyUsageExtract", tag.getInteger("energyExtract")));
                 }
                 else
                 {
@@ -212,8 +309,6 @@ public class WailaProviders
                 rift = (TileEnderRift) te;
 
             tag.setInteger("usedSlots", rift.countInventoryStacks());
-            tag.setInteger("energyInsert", (int) Math.ceil(rift.getEnergyInsert()));
-            tag.setInteger("energyExtract", (int) Math.ceil(rift.getEnergyExtract()));
             tag.setBoolean("isFormed", rift.getBlockMetadata() != 0);
             tag.setInteger("riftId", rift.getRiftId());
             tag.setInteger("energy", rift.getEnergyBuffer().getEnergyStored());

@@ -1,6 +1,7 @@
 package gigaherz.enderRift.generator;
 
 import gigaherz.enderRift.EnderRiftMod;
+import gigaherz.enderRift.common.EnergyBuffer;
 import gigaherz.enderRift.plugins.tesla.TeslaControllerBase;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
@@ -17,13 +18,10 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.energy.CapabilityEnergy;
-import net.minecraftforge.energy.EnergyStorage;
 import net.minecraftforge.energy.IEnergyStorage;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
-
-import javax.annotation.Nonnull;
 
 public class TileGenerator extends TileEntity
         implements ITickable
@@ -60,19 +58,6 @@ public class TileGenerator extends TileEntity
     int burnTimeRemaining;
     int currentItemBurnTime;
     int timeInterval;
-
-    class EnergyBuffer extends EnergyStorage
-    {
-        public EnergyBuffer(int capacity)
-        {
-            super(capacity);
-        }
-
-        public void setEnergy(int energy)
-        {
-            this.energy = energy;
-        }
-    }
 
     EnergyBuffer energyCapability = new EnergyBuffer(PowerLimit);
 
@@ -120,9 +105,9 @@ public class TileGenerator extends TileEntity
     }
 
     @Override
-    public boolean shouldRefresh(World world, BlockPos pos, IBlockState oldState, IBlockState newSate)
+    public boolean shouldRefresh(World world, BlockPos pos, IBlockState oldState, IBlockState newState)
     {
-        return oldState.getBlock() != newSate.getBlock();
+        return oldState.getBlock() != newState.getBlock();
     }
 
     @Override
@@ -308,6 +293,12 @@ public class TileGenerator extends TileEntity
     }
 
     @Override
+    public void handleUpdateTag(NBTTagCompound tag)
+    {
+        super.readFromNBT(tag);
+    }
+
+    @Override
     public NBTTagCompound writeToNBT(NBTTagCompound compound)
     {
         compound = super.writeToNBT(compound);
@@ -339,7 +330,7 @@ public class TileGenerator extends TileEntity
         currentItemBurnTime = values[1];
         energyCapability.setEnergy(values[2]);
         heatLevel = values[3];
-        this.markDirty();
+        //this.markDirty();
     }
 
     public boolean isBurning()

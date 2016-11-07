@@ -1,9 +1,12 @@
 package gigaherz.enderRift.automation.capability;
 
 import gigaherz.enderRift.EnderRiftMod;
+import gigaherz.enderRift.plugins.tesla.TeslaControllerBase;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
+import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
+import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 
@@ -14,6 +17,18 @@ import javax.annotation.Nonnull;
  */
 public abstract class AutomationHelper
 {
+    public static boolean isPowerSource(Object object, EnumFacing facing)
+    {
+        if (!(object instanceof ICapabilityProvider))
+            return false;
+
+        ICapabilityProvider cap = (ICapabilityProvider) object;
+
+        Capability teslaCap = TeslaControllerBase.PRODUCER.getCapability();
+        return cap.hasCapability(CapabilityEnergy.ENERGY, facing)
+                || (teslaCap != null && cap.hasCapability(teslaCap, facing));
+    }
+
     public static boolean isAutomatable(Object object, EnumFacing facing)
     {
         if (!(object instanceof ICapabilityProvider))

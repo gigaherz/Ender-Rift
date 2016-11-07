@@ -33,7 +33,6 @@ public class BlockStructure
     {
         super(name, Material.ROCK);
         setSoundType(SoundType.METAL);
-        setUnlocalizedName(EnderRiftMod.MODID + ".blockStructure");
         setDefaultState(this.blockState.getBaseState()
                 .withProperty(TYPE1, Type1.NORMAL).withProperty(TYPE2, Type2.NONE)
                 .withProperty(CORNER, Corner.values[0]).withProperty(BASE, false));

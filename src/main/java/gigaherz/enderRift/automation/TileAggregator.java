@@ -1,8 +1,10 @@
 package gigaherz.enderRift.automation;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import gigaherz.enderRift.automation.capability.AutomationAggregator;
 import gigaherz.enderRift.automation.capability.AutomationHelper;
+import gigaherz.enderRift.automation.driver.TileDriver;
 import gigaherz.graph.api.Graph;
 import gigaherz.graph.api.GraphObject;
 import net.minecraft.block.Block;
@@ -12,10 +14,13 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraftforge.energy.IEnergyStorage;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 
+import javax.annotation.Nullable;
 import java.util.List;
+import java.util.Set;
 
 public abstract class TileAggregator extends TileEntity implements ITickable, GraphObject
 {
@@ -23,6 +28,10 @@ public abstract class TileAggregator extends TileEntity implements ITickable, Gr
     private boolean firstUpdate = true;
     private final List<IItemHandler> connectedInventories = Lists.newArrayList();
 
+    // =============================================================================================
+    // Graph API bindings
+
+    @Nullable
     @Override
     public Graph getGraph()
     {
@@ -33,12 +42,6 @@ public abstract class TileAggregator extends TileEntity implements ITickable, Gr
     public void setGraph(Graph graph)
     {
         this.graph = graph;
-    }
-
-    @Override
-    public boolean shouldRefresh(World world, BlockPos pos, IBlockState oldState, IBlockState newSate)
-    {
-        return oldState.getBlock() != newSate.getBlock();
     }
 
     @Override
@@ -76,6 +79,17 @@ public abstract class TileAggregator extends TileEntity implements ITickable, Gr
             graph.remove(this);
     }
 
+    void updateNeighbours()
+    {
+        Graph graph = this.getGraph();
+        if (graph != null)
+        {
+            graph.addNeighours(this, getNeighbours());
+        }
+
+        updateConnectedInventories();
+    }
+
     private List<GraphObject> getNeighbours()
     {
         List<GraphObject> neighbours = Lists.newArrayList();
@@ -91,18 +105,37 @@ public abstract class TileAggregator extends TileEntity implements ITickable, Gr
         return neighbours;
     }
 
-    public void updateNeighbours()
-    {
-        Graph graph = this.getGraph();
-        if (graph != null)
-        {
-            graph.addNeighours(this, getNeighbours());
-        }
+    // ==================================================================================================
 
-        updateConnectedInventories();
+    public void broadcastDirty()
+    {
+        if (getGraph() == null)
+            return;
+
+        for (GraphObject object : getGraph().getObjects())
+        {
+            if (object == this)
+                continue;
+
+            if (!(object instanceof TileAggregator))
+                continue;
+
+            TileAggregator other = (TileAggregator) object;
+
+            if (!other.isInvalid())
+                other.markDirty(false);
+        }
     }
 
-    private void updateConnectedInventories()
+    protected abstract void markDirty(boolean sendBroadcast);
+
+    @Override
+    public boolean shouldRefresh(World world, BlockPos pos, IBlockState oldState, IBlockState newState)
+    {
+        return oldState.getBlock() != newState.getBlock();
+    }
+
+    void updateConnectedInventories()
     {
         connectedInventories.clear();
         for (EnumFacing f : EnumFacing.VALUES)
@@ -111,14 +144,18 @@ public abstract class TileAggregator extends TileEntity implements ITickable, Gr
                 continue;
 
             TileEntity teOther = worldObj.getTileEntity(pos.offset(f));
+            if (teOther == null)
+                continue;
+
             if (teOther instanceof TileAggregator)
                 continue;
 
             if (AutomationHelper.isAutomatable(teOther, f.getOpposite()))
             {
-                IItemHandler auto = teOther.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, f.getOpposite());
-                if (auto != null)
-                    connectedInventories.add(auto);
+                if (teOther.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, f.getOpposite()))
+                {
+                    connectedInventories.add(teOther.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, f.getOpposite()));
+                }
             }
         }
     }
@@ -136,36 +173,38 @@ public abstract class TileAggregator extends TileEntity implements ITickable, Gr
         if (getGraph() == null)
             return aggregator;
 
+        Set<IItemHandler> inventories = Sets.newHashSet();
         for (GraphObject object : getGraph().getObjects())
         {
             if (!(object instanceof TileAggregator))
                 continue;
             TileAggregator proxy = (TileAggregator) object;
 
-            aggregator.addAll(proxy.getConnectedInventories());
+            inventories.addAll(proxy.connectedInventories);
         }
+
+        aggregator.addAll(inventories);
 
         return aggregator;
     }
 
-    public Iterable<IItemHandler> getConnectedInventories()
+    protected IEnergyStorage getCombinedPowerBuffer()
     {
-        return connectedInventories;
-    }
+        EnergyAggregator energy = new EnergyAggregator();
 
-    public void broadcastDirty()
-    {
         if (getGraph() == null)
-            return;
+            return energy;
 
         for (GraphObject object : getGraph().getObjects())
         {
-            if (!(object instanceof TileAggregator))
+            if (!(object instanceof TileDriver))
                 continue;
-            TileAggregator proxy = (TileAggregator) object;
+            TileDriver proxy = (TileDriver) object;
 
-            if (!proxy.isInvalid())
-                proxy.markDirty();
+            energy.add(proxy.getEnergyBuffer());
         }
+
+        return energy;
     }
+
 }

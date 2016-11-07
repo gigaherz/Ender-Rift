@@ -3,15 +3,22 @@ package gigaherz.enderRift.automation.browser;
 import gigaherz.enderRift.EnderRiftMod;
 import gigaherz.enderRift.automation.TileAggregator;
 import gigaherz.enderRift.automation.iface.BlockInterface;
+import gigaherz.enderRift.common.AutomationEnergyWrapper;
+import gigaherz.enderRift.common.IPoweredAutomation;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.EnumFacing;
+import net.minecraftforge.energy.IEnergyStorage;
 import net.minecraftforge.items.IItemHandler;
 
-public class TileBrowser extends TileAggregator
+import javax.annotation.Nullable;
+
+public class TileBrowser extends TileAggregator implements IPoweredAutomation
 {
     private int changeCount = 1;
 
     EnumFacing facing = null;
+
+    AutomationEnergyWrapper wrapper = new AutomationEnergyWrapper(this);
 
     public EnumFacing getFacing()
     {
@@ -28,11 +35,30 @@ public class TileBrowser extends TileAggregator
 
     public IItemHandler getAutomation()
     {
+        return wrapper;
+    }
+
+    @Nullable
+    @Override
+    public IItemHandler getInventory()
+    {
         return super.getAutomation(EnderRiftMod.browser);
     }
 
     @Override
+    public IEnergyStorage getEnergyBuffer()
+    {
+        return getCombinedPowerBuffer();
+    }
+
+    @Override
     public void markDirty()
+    {
+        markDirty(true);
+    }
+
+    @Override
+    protected void markDirty(boolean sendBroadcast)
     {
         changeCount++;
         facing = null;

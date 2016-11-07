@@ -20,6 +20,7 @@ import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import org.apache.commons.lang3.StringUtils;
 
+import javax.annotation.Nullable;
 import java.util.Arrays;
 import java.util.List;
 
@@ -191,7 +192,7 @@ public class ContainerBrowser
         }
     }
 
-    private void sendStackInCursor(EntityPlayerMP player, ItemStack newStack)
+    private void sendStackInCursor(EntityPlayerMP player, @Nullable ItemStack newStack)
     {
         stackInCursor = newStack == null ? null : newStack.copy();
 
@@ -291,7 +292,7 @@ public class ContainerBrowser
                 {
                     if (clickedButton == 0)
                     {
-                        ItemStack remaining = AutomationHelper.insertItems(parent, dropping);
+                        ItemStack remaining = insertItemsSided(parent, dropping);
                         if (remaining != null)
                         {
                             if (dropping.stackSize != remaining.stackSize)
@@ -317,7 +318,7 @@ public class ContainerBrowser
 
                         ItemStack push = dropping.copy();
                         push.stackSize = amount;
-                        ItemStack remaining = AutomationHelper.insertItems(parent, push);
+                        ItemStack remaining = insertItemsSided(parent, push);
 
                         dropping.stackSize -= push.stackSize;
 
@@ -352,7 +353,7 @@ public class ContainerBrowser
                             ? existing.getMaxStackSize()
                             : existing.getMaxStackSize() / 2;
 
-                    ItemStack extracted = AutomationHelper.extractItems(parent, existing, amount, false);
+                    ItemStack extracted = extractItemsSided(parent, existing, amount, false);
                     if (extracted != null)
                     {
                         tile.markDirty();
@@ -390,7 +391,7 @@ public class ContainerBrowser
 
                 if (amount > 0)
                 {
-                    ItemStack finalExtract = AutomationHelper.extractItems(parent, existing, amount, false);
+                    ItemStack finalExtract = extractItemsSided(parent, existing, amount, false);
 
                     if (finalExtract != null)
                     {
@@ -409,7 +410,26 @@ public class ContainerBrowser
         return super.slotClick(slotId, clickedButton, mode, playerIn);
     }
 
-    public ItemStack simulateAddToPlayer(ItemStack stack, int amount)
+    @Nullable
+    private ItemStack extractItemsSided(IItemHandler parent, ItemStack existing, int amount, boolean simulate)
+    {
+        if (fakeInventoryClient != null)
+        {
+            return existing.copy();
+        }
+        return AutomationHelper.extractItems(parent, existing, amount, simulate);
+    }
+
+    @Nullable
+    private ItemStack insertItemsSided(IItemHandler parent, ItemStack dropping)
+    {
+        if (fakeInventoryClient != null)
+            return null;
+        return AutomationHelper.insertItems(parent,dropping);
+    }
+
+    @Nullable
+    private ItemStack simulateAddToPlayer(ItemStack stack, int amount)
     {
         int startIndex = FakeSlots;
         int endIndex = startIndex + PlayerSlots;

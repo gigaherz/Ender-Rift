@@ -20,6 +20,10 @@ public class RenderRift extends TileEntitySpecialRenderer<TileEnderRift>
         if (te.getBlockMetadata() == 0)
             return;
 
+        float lastPoweringState = te.getLastPoweringState();
+        float nextPoweringState = te.getPoweringState();
+        float poweringState = lerp(lastPoweringState, nextPoweringState, partialTicks);
+
         EntityPlayer player = Minecraft.getMinecraft().thePlayer;
 
         double ty = y + 0.5 - player.getEyeHeight();
@@ -59,7 +63,7 @@ public class RenderRift extends TileEntitySpecialRenderer<TileEnderRift>
             float progress0 = ((tm + i * step_time) % time_loop + partialTicks) / time_loop;
             float progress1 = (progress0 - c0) * c1;
 
-            float scale = 2.0f + 1.6f * progress0;
+            float scale = (1.0f + poweringState) + (0.6f + poweringState) * progress0;
 
             GlStateManager.pushMatrix();
             GlStateManager.translate(0.5, 0.5, 0.5);
@@ -78,5 +82,10 @@ public class RenderRift extends TileEntitySpecialRenderer<TileEnderRift>
         }
 
         GlStateManager.popMatrix();
+    }
+
+    private float lerp(float a, float b, float p)
+    {
+        return a + p * (b - a);
     }
 }

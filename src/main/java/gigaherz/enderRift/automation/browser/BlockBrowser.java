@@ -1,7 +1,7 @@
 package gigaherz.enderRift.automation.browser;
 
 import gigaherz.enderRift.EnderRiftMod;
-import gigaherz.enderRift.automation.BlockAggragator;
+import gigaherz.enderRift.automation.BlockAggregator;
 import gigaherz.enderRift.common.GuiHandler;
 import net.minecraft.block.Block;
 import net.minecraft.block.SoundType;
@@ -27,13 +27,13 @@ import net.minecraft.world.World;
 import javax.annotation.Nullable;
 import java.util.List;
 
-public class BlockBrowser extends BlockAggragator<TileBrowser>
+public class BlockBrowser extends BlockAggregator<TileBrowser>
 {
     public static final PropertyDirection FACING = PropertyDirection.create("facing");
     public static final PropertyBool CRAFTING = PropertyBool.create("crafting");
 
-    private static final String unlocStandard = EnderRiftMod.MODID + ".blockBrowser";
-    private static final String unlocCrafting = EnderRiftMod.MODID + ".blockCraftingBrowser";
+    private static final String unlocStandard = EnderRiftMod.MODID + ".browser";
+    private static final String unlocCrafting = EnderRiftMod.MODID + ".crafting_browser";
 
     public BlockBrowser(String name)
     {
@@ -63,6 +63,19 @@ public class BlockBrowser extends BlockAggragator<TileBrowser>
     public boolean isOpaqueCube(IBlockState state)
     {
         return false;
+    }
+
+    @Deprecated
+    @Override
+    public boolean isFullCube(IBlockState state)
+    {
+        return false;
+    }
+
+    @Override
+    public boolean isSideSolid(IBlockState base_state, IBlockAccess world, BlockPos pos, EnumFacing side)
+    {
+        return base_state.getValue(FACING) == side.getOpposite();
     }
 
     @Deprecated
@@ -124,7 +137,7 @@ public class BlockBrowser extends BlockAggragator<TileBrowser>
     }
 
     @Override
-    public IBlockState onBlockPlaced(World worldIn, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer)
+    public IBlockState getStateForPlacement(World world, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer, ItemStack stack)
     {
         return getDefaultState().withProperty(BlockBrowser.FACING, facing.getOpposite()).withProperty(CRAFTING, meta != 0);
     }

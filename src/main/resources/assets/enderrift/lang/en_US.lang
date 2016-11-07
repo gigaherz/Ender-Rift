@@ -1,13 +1,14 @@
-tile.enderrift.blockEnderRift.name=Ender-Rift Core
-tile.enderrift.blockStructure.name=Ender-Rift Structure
-tile.enderrift.blockInterface.name=Rift Interface
-tile.enderrift.blockBrowser.name=Rift Browser
-tile.enderrift.blockCraftingBrowser.name=Crafting Browser
-tile.enderrift.blockGenerator.name=Rudimentary Generator
-tile.enderrift.blockProxy.name=Automation Proxy
+tile.enderrift.rift.name=Ender-Rift Core
+tile.enderrift.structure.name=Ender-Rift Structure
+tile.enderrift.interface.name=Rift Interface
+tile.enderrift.browser.name=Rift Browser
+tile.enderrift.crafting_browser.name=Crafting Browser
+tile.enderrift.generator.name=Rudimentary Generator
+tile.enderrift.proxy.name=Automation Proxy
+tile.enderrift.driver.name=Automation Driver
 
-item.enderrift.itemEnderRift.empty.name=Ender-Rift Orb (Unbound)
-item.enderrift.itemEnderRift.bound.name=Ender-Rift Orb (Bound)
+item.enderrift.rift_orb.empty.name=Ender-Rift Orb (Unbound)
+item.enderrift.rift_orb.bound.name=Ender-Rift Orb (Bound)
 
 container.enderrift.interface=Rift Interface
 container.enderrift.generator=Rudimentary Generator

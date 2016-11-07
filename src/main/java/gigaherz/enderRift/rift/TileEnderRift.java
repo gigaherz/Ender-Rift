@@ -1,48 +1,117 @@
 package gigaherz.enderRift.rift;
 
-import gigaherz.enderRift.ConfigValues;
 import gigaherz.enderRift.EnderRiftMod;
+import gigaherz.enderRift.common.EnergyBuffer;
 import gigaherz.enderRift.rift.storage.RiftInventory;
 import gigaherz.enderRift.rift.storage.RiftStorageWorldData;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.network.NetworkManager;
+import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumParticleTypes;
+import net.minecraft.util.ITickable;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.energy.EnergyStorage;
-import net.minecraftforge.energy.IEnergyStorage;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 
+import javax.annotation.Nullable;
 import java.util.Random;
 
 public class TileEnderRift
-        extends TileEntity
+        extends TileEntity implements ITickable
 {
-    public final Random rand = new Random();
+    private static final int STARTUP_POWER =  10000;
+    private static final int BUFFER_POWER = 1000000;
+    private final Random rand = new Random();
 
-    class EnergyBuffer extends EnergyStorage
-    {
-        public EnergyBuffer(int capacity)
-        {
-            super(capacity);
-        }
+    private EnergyBuffer energyBuffer = new EnergyBuffer(BUFFER_POWER);
 
-        public void setEnergy(int energy)
-        {
-            this.energy = energy;
-        }
-    }
-
-    private EnergyBuffer energyBuffer = new EnergyBuffer(10000000);
-
+    private boolean powered;
     private int riftId;
     private RiftInventory inventory;
 
-    private AutomationEnergyWrapper automation = new AutomationEnergyWrapper();
+    // Client-side, for rendering
+    private float lastPoweringState;
+    private float poweringState;
+    private boolean poweringStartParticlesSpawned = false;
+    // End of Client-side fields
+
+    public PoweredInventory poweredInventory = new PoweredInventory();
+
+    public EnergyBuffer getEnergyBuffer()
+    {
+        return energyBuffer;
+    }
+
+    @Override
+    public void update()
+    {
+        if (worldObj.isRemote)
+        {
+            lastPoweringState = poweringState;
+            if (powered)
+            {
+                if (!poweringStartParticlesSpawned)
+                {
+                    poweringStartParticlesSpawned = true;
+
+                    for (int i = 0; i < 32; ++i)
+                    {
+                        this.worldObj.spawnParticle(EnumParticleTypes.CRIT_MAGIC, this.pos.getX() + 0.5, this.pos.getY() + 0.5, this.pos.getZ() + 0.5, this.rand.nextGaussian(), this.rand.nextGaussian(), this.rand.nextGaussian());
+                        this.worldObj.spawnParticle(EnumParticleTypes.PORTAL, this.pos.getX() + 0.5, this.pos.getY() + 0.5, this.pos.getZ() + 0.5, this.rand.nextGaussian(), this.rand.nextGaussian(), this.rand.nextGaussian());
+                    }
+                }
+                if (poweringState < 1)
+                    poweringState += 0.1f;
+                else
+                    poweringState = 1;
+            }
+            else
+            {
+                poweringStartParticlesSpawned = false;
+                if (poweringState > 0)
+                    poweringState -= 0.02f;
+                else
+                    poweringState = 0;
+            }
+            return;
+        }
+
+        int energyUsage = getEnergyUsage();
+        int energyStored = energyBuffer.getEnergyStored();
+        if (energyStored > energyBuffer.getMaxEnergyStored())
+        {
+            energyStored = energyBuffer.getMaxEnergyStored();
+            energyBuffer.setEnergy(energyStored);
+        }
+        if (energyStored > energyUsage && !worldObj.isBlockPowered(pos))
+        {
+            if (powered)
+            {
+                energyBuffer.setEnergy(energyStored - energyUsage);
+            }
+            else if (energyStored >= STARTUP_POWER)
+            {
+                powered = true;
+                energyBuffer.setEnergy(energyStored - STARTUP_POWER);
+                IBlockState state = worldObj.getBlockState(pos);
+                worldObj.notifyBlockUpdate(pos, state, state, 3);
+            }
+        }
+        else
+        {
+            energyBuffer.setEnergy(0);
+            powered = false;
+            IBlockState state = worldObj.getBlockState(pos);
+            worldObj.notifyBlockUpdate(pos, state, state, 3);
+        }
+    }
 
     public void assemble(int id)
     {
@@ -58,7 +127,8 @@ public class TileEnderRift
         markDirty();
     }
 
-    public RiftInventory getInventory()
+    @Nullable
+    public IItemHandler getInventory()
     {
         if (riftId < 0)
             return null;
@@ -69,11 +139,6 @@ public class TileEnderRift
             inventory.addWeakListener(this);
         }
         return inventory;
-    }
-
-    public IEnergyStorage getEnergyBuffer()
-    {
-        return energyBuffer;
     }
 
     @Override
@@ -88,41 +153,9 @@ public class TileEnderRift
         return pass == 1;
     }
 
-    public double getEnergyInsert()
-    {
-        if (getInventory() == null)
-            return 0;
-        int sizeInventory = getInventory().getSlots();
-        int sizeInventory2 = sizeInventory * sizeInventory;
-        return ConfigValues.PowerPerInsertionConstant
-                + (sizeInventory * ConfigValues.PowerPerInsertionLinear)
-                + (sizeInventory2 * ConfigValues.PowerPerInsertionGeometric);
-    }
-
-    public double getEnergyExtract()
-    {
-        if (getInventory() == null)
-            return 0;
-        int sizeInventory = getInventory().getSlots();
-        int sizeInventory2 = sizeInventory * sizeInventory;
-        return ConfigValues.PowerPerExtractionConstant
-                + (sizeInventory * ConfigValues.PowerPerExtractionLinear)
-                + (sizeInventory2 * ConfigValues.PowerPerExtractionGeometric);
-    }
-
     public int countInventoryStacks()
     {
         return getInventory().getSlots();
-    }
-
-    private int getEffectivePowerUsageToInsert(int stackSize)
-    {
-        return worldObj.isRemote ? 0 : (int) Math.ceil(getEnergyInsert() * stackSize);
-    }
-
-    private int getEffectivePowerUsageToExtract(int limit)
-    {
-        return worldObj.isRemote ? 0 : (int) Math.ceil(getEnergyExtract() * limit);
     }
 
     public ItemStack getRiftItem()
@@ -138,19 +171,48 @@ public class TileEnderRift
         return stack;
     }
 
-    public void readFromNBT(NBTTagCompound nbtTagCompound)
+    public void readFromNBT(NBTTagCompound compound)
     {
-        super.readFromNBT(nbtTagCompound);
-        energyBuffer.setEnergy(nbtTagCompound.getInteger("Energy"));
-        riftId = nbtTagCompound.getInteger("RiftId");
+        super.readFromNBT(compound);
+        energyBuffer.setEnergy(compound.getInteger("Energy"));
+        powered = compound.getBoolean("Powered");
+        riftId = compound.getInteger("RiftId");
     }
 
-    public NBTTagCompound writeToNBT(NBTTagCompound nbtTagCompound)
+    public NBTTagCompound writeToNBT(NBTTagCompound compound)
     {
-        nbtTagCompound = super.writeToNBT(nbtTagCompound);
-        nbtTagCompound.setInteger("Energy", energyBuffer.getEnergyStored());
-        nbtTagCompound.setInteger("RiftId", riftId);
-        return nbtTagCompound;
+        compound = super.writeToNBT(compound);
+        compound.setInteger("Energy", energyBuffer.getEnergyStored());
+        compound.setBoolean("Powered", powered);
+        compound.setInteger("RiftId", riftId);
+        return compound;
+    }
+
+    @Override
+    public NBTTagCompound getUpdateTag()
+    {
+        NBTTagCompound tag = super.getUpdateTag();
+        tag.setBoolean("Powered", powered);
+        return tag;
+    }
+
+    @Override
+    public void handleUpdateTag(NBTTagCompound tag)
+    {
+        powered = tag.getBoolean("Powered");
+    }
+
+    @Nullable
+    @Override
+    public SPacketUpdateTileEntity getUpdatePacket()
+    {
+        return new SPacketUpdateTileEntity(pos, getBlockMetadata(), getUpdateTag());
+    }
+
+    @Override
+    public void onDataPacket(NetworkManager net, SPacketUpdateTileEntity pkt)
+    {
+        readFromNBT(pkt.getNbtCompound());
     }
 
     @Override
@@ -166,91 +228,11 @@ public class TileEnderRift
     public <T> T getCapability(Capability<T> capability, EnumFacing facing)
     {
         if (capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
-            return (T)automation;
+            return (T)poweredInventory;
         return super.getCapability(capability, facing);
     }
 
-    class AutomationEnergyWrapper implements IItemHandler
-    {
-
-        @Override
-        public int getSlots()
-        {
-            return getInventory().getSlots();
-        }
-
-        @Override
-        public ItemStack getStackInSlot(int slot)
-        {
-            return getInventory().getStackInSlot(slot);
-        }
-
-        @Override
-        public ItemStack insertItem(int slot, ItemStack stack, boolean simulate)
-        {
-            if (getInventory() == null)
-                return stack;
-
-            int stackSize = stack.stackSize;
-            int cost = getEffectivePowerUsageToInsert(stackSize);
-            while (cost > energyBuffer.getEnergyStored() && stackSize > 0)
-            {
-                stackSize--;
-            }
-
-            if (stackSize <= 0)
-                return stack;
-
-            ItemStack temp = stack.copy();
-            temp.stackSize = stackSize;
-
-            ItemStack remaining = getInventory().insertItem(slot, temp, simulate);
-
-            if (!simulate)
-            {
-                if (remaining != null)
-                    stackSize -= remaining.stackSize;
-
-                int actualCost = getEffectivePowerUsageToInsert(stackSize);
-                energyBuffer.extractEnergy(actualCost, false);
-
-                markDirty();
-            }
-
-            return remaining;
-        }
-
-        @Override
-        public ItemStack extractItem(int slot, int wanted, boolean simulate)
-        {
-            if (getInventory() == null)
-                return null;
-
-            int cost = getEffectivePowerUsageToExtract(wanted);
-            while (cost > energyBuffer.getEnergyStored() && wanted > 0)
-            {
-                wanted--;
-            }
-
-            if (wanted <= 0)
-                return null;
-
-            ItemStack extracted = getInventory().extractItem(slot, wanted, simulate);
-            if (extracted == null)
-                return null;
-
-            if (!simulate)
-            {
-                int actualCost = getEffectivePowerUsageToExtract(extracted.stackSize);
-                energyBuffer.extractEnergy(actualCost, false);
-
-                markDirty();
-            }
-
-            return extracted;
-        }
-    }
-
+    @Nullable
     public ItemStack chooseRandomStack()
     {
         if (getInventory() == null)
@@ -263,11 +245,82 @@ public class TileEnderRift
 
         int slot = rand.nextInt(max);
 
-        return automation.getStackInSlot(slot);
+        return poweredInventory.getStackInSlot(slot);
     }
 
     public int getRiftId()
     {
         return riftId;
+    }
+
+    public int getEnergyUsage()
+    {
+        IItemHandler handler = getInventory();
+        if (handler == null)
+            return 0;
+        return MathHelper.ceiling_double_int(Math.pow(handler.getSlots(), 0.8));
+    }
+
+    public boolean isPowered()
+    {
+        return powered;
+    }
+
+    public float getPoweringState()
+    {
+        return poweringState;
+    }
+
+    public float getLastPoweringState()
+    {
+        return lastPoweringState;
+    }
+
+    public class PoweredInventory implements IItemHandler
+    {
+        @Override
+        public int getSlots()
+        {
+            IItemHandler handler = getInventory();
+            if (handler == null)
+                return 0;
+            return handler.getSlots();
+        }
+
+        @Nullable
+        @Override
+        public ItemStack getStackInSlot(int slot)
+        {
+            if (!powered)
+                return null;
+            IItemHandler handler = getInventory();
+            if (handler == null)
+                return null;
+            return handler.getStackInSlot(slot);
+        }
+
+        @Nullable
+        @Override
+        public ItemStack insertItem(int slot, ItemStack stack, boolean simulate)
+        {
+            if (!powered)
+                return stack;
+            IItemHandler handler = getInventory();
+            if (handler == null)
+                return stack;
+            return handler.insertItem(slot, stack, simulate);
+        }
+
+        @Nullable
+        @Override
+        public ItemStack extractItem(int slot, int amount, boolean simulate)
+        {
+            if (!powered)
+                return null;
+            IItemHandler handler = getInventory();
+            if (handler == null)
+                return null;
+            return handler.extractItem(slot, amount, simulate);
+        }
     }
 }

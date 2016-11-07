@@ -34,7 +34,6 @@ public class BlockGenerator
     {
         super(name, Material.IRON, MapColor.STONE);
         setSoundType(SoundType.METAL);
-        setUnlocalizedName(EnderRiftMod.MODID + ".blockGenerator");
         setCreativeTab(EnderRiftMod.tabEnderRift);
         setDefaultState(blockState.getBaseState().withProperty(FACING, EnumFacing.NORTH));
         setHardness(3.0F);
@@ -102,7 +101,7 @@ public class BlockGenerator
     }
 
     @Override
-    public IBlockState onBlockPlaced(World worldIn, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer)
+    public IBlockState getStateForPlacement(World world, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer, ItemStack stack)
     {
         return getDefaultState().withProperty(FACING, placer.getHorizontalFacing().getOpposite());
     }

@@ -73,8 +73,8 @@ dependencies {
     deobfCompile "gigaherz.graph:GraphLib:1.1.1"
 
     deobfCompile "net.darkhax.tesla:Tesla:1.10.2-1.2.1.49"
-    deobfCompile "mezz.jei:jei_1.10.2:3.12.3.293:api"
-    runtime "mezz.jei:jei_1.10.2:3.12.3.293"
+    deobfCompile "mezz.jei:jei_1.10.2:3.13.2.351:api"
+    runtime "mezz.jei:jei_1.10.2:3.13.2.351"
 }
 
 compileJava {

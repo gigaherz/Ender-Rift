@@ -7,6 +7,7 @@ import net.minecraft.inventory.ClickType;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
+import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.SlotItemHandler;
 
 public class ContainerInterface
@@ -18,13 +19,16 @@ public class ContainerInterface
     {
         this.tile = tileEntity;
 
+        IItemHandler filters = tileEntity.inventoryFilter();
         for (int x = 0; x < 9; x++)
         {
-            addSlotToContainer(new SlotFilter(tileEntity.inventoryFilter(), x, 8 + x * 18, 33));
+            addSlotToContainer(new SlotFilter(filters, x, 8 + x * 18, 33));
         }
+
+        IItemHandler outputs = tileEntity.inventoryOutputs();
         for (int x = 0; x < 9; x++)
         {
-            addSlotToContainer(new SlotItemHandler(tileEntity.inventoryOutputs(), x, 8 + x * 18, 62));
+            addSlotToContainer(new SlotItemHandler(outputs, x, 8 + x * 18, 62));
         }
 
         bindPlayerInventory(playerInventory);

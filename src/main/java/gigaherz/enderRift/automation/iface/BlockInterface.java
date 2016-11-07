@@ -1,7 +1,7 @@
 package gigaherz.enderRift.automation.iface;
 
 import gigaherz.enderRift.EnderRiftMod;
-import gigaherz.enderRift.automation.BlockAggragator;
+import gigaherz.enderRift.automation.BlockAggregator;
 import gigaherz.enderRift.common.GuiHandler;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.MapColor;
@@ -17,10 +17,11 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.items.IItemHandler;
 
-public class BlockInterface extends BlockAggragator<TileInterface>
+public class BlockInterface extends BlockAggregator<TileInterface>
 {
     public static final PropertyDirection FACING = PropertyDirection.create("facing");
 
@@ -28,7 +29,6 @@ public class BlockInterface extends BlockAggragator<TileInterface>
     {
         super(name, Material.IRON, MapColor.STONE);
         setSoundType(SoundType.METAL);
-        setUnlocalizedName(EnderRiftMod.MODID + ".blockInterface");
         setCreativeTab(EnderRiftMod.tabEnderRift);
         setDefaultState(blockState.getBaseState().withProperty(FACING, EnumFacing.NORTH));
         setHardness(3.0F);
@@ -52,6 +52,19 @@ public class BlockInterface extends BlockAggragator<TileInterface>
     public boolean isOpaqueCube(IBlockState state)
     {
         return false;
+    }
+
+    @Deprecated
+    @Override
+    public boolean isFullCube(IBlockState state)
+    {
+        return false;
+    }
+
+    @Override
+    public boolean isSideSolid(IBlockState base_state, IBlockAccess world, BlockPos pos, EnumFacing side)
+    {
+        return base_state.getValue(FACING) == side.getOpposite();
     }
 
     @Override
@@ -87,7 +100,7 @@ public class BlockInterface extends BlockAggragator<TileInterface>
     }
 
     @Override
-    public IBlockState onBlockPlaced(World worldIn, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer)
+    public IBlockState getStateForPlacement(World world, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer, ItemStack stack)
     {
         return getDefaultState().withProperty(BlockInterface.FACING, facing.getOpposite());
     }

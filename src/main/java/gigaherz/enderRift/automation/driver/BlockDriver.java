@@ -1,4 +1,4 @@
-package gigaherz.enderRift.automation.proxy;
+package gigaherz.enderRift.automation.driver;
 
 import gigaherz.enderRift.EnderRiftMod;
 import gigaherz.enderRift.automation.BlockAggregator;
@@ -8,28 +8,27 @@ import net.minecraft.block.Block;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
-import net.minecraft.block.properties.PropertyBool;
+import net.minecraft.block.properties.PropertyEnum;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.IStringSerializable;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
-import javax.annotation.Nullable;
-
-public class BlockProxy extends BlockAggregator<TileProxy>
+public class BlockDriver extends BlockAggregator<TileDriver>
 {
-    public static final PropertyBool NORTH = PropertyBool.create("north");
-    public static final PropertyBool SOUTH = PropertyBool.create("south");
-    public static final PropertyBool WEST = PropertyBool.create("west");
-    public static final PropertyBool EAST = PropertyBool.create("east");
-    public static final PropertyBool UP = PropertyBool.create("up");
-    public static final PropertyBool DOWN = PropertyBool.create("down");
+    public static final PropertyEnum<ConnectionType> NORTH = PropertyEnum.create("north", ConnectionType.class);
+    public static final PropertyEnum<ConnectionType> SOUTH = PropertyEnum.create("south", ConnectionType.class);
+    public static final PropertyEnum<ConnectionType> WEST = PropertyEnum.create("west", ConnectionType.class);
+    public static final PropertyEnum<ConnectionType> EAST = PropertyEnum.create("east", ConnectionType.class);
+    public static final PropertyEnum<ConnectionType> UP = PropertyEnum.create("up", ConnectionType.class);
+    public static final PropertyEnum<ConnectionType> DOWN = PropertyEnum.create("down", ConnectionType.class);
 
-    public static final AxisAlignedBB BOUNDS = new AxisAlignedBB(4/16f,4/16f,4/16f,12/16f,12/16f,12/16f);
+    public static final AxisAlignedBB BOUNDS = new AxisAlignedBB(3.5f/16,3.5f/16,3.5f/16,12.5f/16,12.5f/16,12.5f/16);
     public static final AxisAlignedBB BOUNDS_NORTH = new AxisAlignedBB(6/16f,6/16f,0/16f,10/16f,10/16f,10/16f);
     public static final AxisAlignedBB BOUNDS_SOUTH = new AxisAlignedBB(6/16f,6/16f,6/16f,10/16f,10/16f,16/16f);
     public static final AxisAlignedBB BOUNDS_EAST = new AxisAlignedBB(6/16f,6/16f,6/16f,16/16f,10/16f,10/16f);
@@ -37,18 +36,18 @@ public class BlockProxy extends BlockAggregator<TileProxy>
     public static final AxisAlignedBB BOUNDS_UP = new AxisAlignedBB(6/16f,6/16f,6/16f,10/16f,16/16f,10/16f);
     public static final AxisAlignedBB BOUNDS_DOWN = new AxisAlignedBB(6/16f,0/16f,6/16f,10/16f,10/16f,10/16f);
 
-    public BlockProxy(String name)
+    public BlockDriver(String name)
     {
         super(name, Material.IRON, MapColor.GRAY);
         setSoundType(SoundType.METAL);
         setCreativeTab(EnderRiftMod.tabEnderRift);
         setDefaultState(blockState.getBaseState()
-                .withProperty(NORTH, false)
-                .withProperty(SOUTH, false)
-                .withProperty(WEST, false)
-                .withProperty(EAST, false)
-                .withProperty(UP, false)
-                .withProperty(DOWN, false));
+                .withProperty(NORTH, ConnectionType.NONE)
+                .withProperty(SOUTH, ConnectionType.NONE)
+                .withProperty(WEST, ConnectionType.NONE)
+                .withProperty(EAST, ConnectionType.NONE)
+                .withProperty(UP, ConnectionType.NONE)
+                .withProperty(DOWN, ConnectionType.NONE));
         setHardness(3.0F);
         setResistance(8.0F);
     }
@@ -60,9 +59,9 @@ public class BlockProxy extends BlockAggregator<TileProxy>
     }
 
     @Override
-    public TileProxy createTileEntity(World world, IBlockState state)
+    public TileDriver createTileEntity(World world, IBlockState state)
     {
-        return new TileProxy();
+        return new TileDriver();
     }
 
     @Deprecated
@@ -86,12 +85,12 @@ public class BlockProxy extends BlockAggregator<TileProxy>
         state = state.getActualState(source, pos);
 
         AxisAlignedBB bb = BOUNDS;
-        if (state.getValue(NORTH)) bb=bb.union(BOUNDS_NORTH);
-        if (state.getValue(SOUTH)) bb=bb.union(BOUNDS_SOUTH);
-        if (state.getValue(EAST)) bb=bb.union(BOUNDS_EAST);
-        if (state.getValue(WEST)) bb=bb.union(BOUNDS_WEST);
-        if (state.getValue(UP)) bb=bb.union(BOUNDS_UP);
-        if (state.getValue(DOWN)) bb=bb.union(BOUNDS_DOWN);
+        if (state.getValue(NORTH) != ConnectionType.NONE) bb=bb.union(BOUNDS_NORTH);
+        if (state.getValue(SOUTH) != ConnectionType.NONE) bb=bb.union(BOUNDS_SOUTH);
+        if (state.getValue(EAST) != ConnectionType.NONE) bb=bb.union(BOUNDS_EAST);
+        if (state.getValue(WEST) != ConnectionType.NONE) bb=bb.union(BOUNDS_WEST);
+        if (state.getValue(UP) != ConnectionType.NONE) bb=bb.union(BOUNDS_UP);
+        if (state.getValue(DOWN) != ConnectionType.NONE) bb=bb.union(BOUNDS_DOWN);
         return bb;
     }
 
@@ -113,22 +112,25 @@ public class BlockProxy extends BlockAggregator<TileProxy>
     public IBlockState getActualState(IBlockState state, IBlockAccess worldIn, BlockPos pos)
     {
         return state
-                .withProperty(NORTH, isConnectable(worldIn, pos, EnumFacing.NORTH))
-                .withProperty(SOUTH, isConnectable(worldIn, pos, EnumFacing.SOUTH))
-                .withProperty(WEST, isConnectable(worldIn, pos, EnumFacing.WEST))
-                .withProperty(EAST, isConnectable(worldIn, pos, EnumFacing.EAST))
-                .withProperty(UP, isConnectable(worldIn, pos, EnumFacing.UP))
-                .withProperty(DOWN, isConnectable(worldIn, pos, EnumFacing.DOWN));
+                .withProperty(NORTH, getConnectionType(worldIn, pos, EnumFacing.NORTH))
+                .withProperty(SOUTH, getConnectionType(worldIn, pos, EnumFacing.SOUTH))
+                .withProperty(WEST, getConnectionType(worldIn, pos, EnumFacing.WEST))
+                .withProperty(EAST, getConnectionType(worldIn, pos, EnumFacing.EAST))
+                .withProperty(UP, getConnectionType(worldIn, pos, EnumFacing.UP))
+                .withProperty(DOWN, getConnectionType(worldIn, pos, EnumFacing.DOWN));
     }
 
-    private boolean isConnectable(IBlockAccess worldIn, BlockPos pos, EnumFacing facing)
+    private ConnectionType getConnectionType(IBlockAccess worldIn, BlockPos pos, EnumFacing facing)
     {
         TileEntity te = worldIn.getTileEntity(pos.offset(facing));
 
         if (te instanceof TileAggregator)
-            return true;
+            return ConnectionType.INVENTORY;
 
-        return AutomationHelper.isAutomatable(te, facing.getOpposite());
+        if (AutomationHelper.isPowerSource(te, facing.getOpposite()))
+            return ConnectionType.POWER;
+
+        return ConnectionType.NONE;
     }
 
     @Override
@@ -152,7 +154,7 @@ public class BlockProxy extends BlockAggregator<TileProxy>
     {
         super.onNeighborChange(world, pos, neighbor);
         if (isUpdateSource(world, pos, fromNeighbour(pos, neighbor)))
-            ((TileProxy) world.getTileEntity(pos)).broadcastDirty();
+            ((TileDriver) world.getTileEntity(pos)).broadcastDirty();
     }
 
     private boolean isUpdateSource(IBlockAccess worldIn, BlockPos pos, EnumFacing facing)
@@ -165,5 +167,25 @@ public class BlockProxy extends BlockAggregator<TileProxy>
     {
         BlockPos diff = b.subtract(a);
         return EnumFacing.getFacingFromVector(diff.getX(), diff.getY(), diff.getZ());
+    }
+
+    public enum ConnectionType implements IStringSerializable
+    {
+        NONE("none"),
+        INVENTORY("inventory"),
+        POWER("power");
+
+        private final String name;
+
+        ConnectionType(String name)
+        {
+            this.name = name;
+        }
+
+        @Override
+        public String getName()
+        {
+            return name;
+        }
     }
 }

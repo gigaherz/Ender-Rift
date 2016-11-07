@@ -4,6 +4,8 @@ import gigaherz.common.BlockRegistered;
 import gigaherz.common.RenamingHelper;
 import gigaherz.enderRift.automation.browser.BlockBrowser;
 import gigaherz.enderRift.automation.browser.TileBrowser;
+import gigaherz.enderRift.automation.driver.BlockDriver;
+import gigaherz.enderRift.automation.driver.TileDriver;
 import gigaherz.enderRift.automation.iface.BlockInterface;
 import gigaherz.enderRift.automation.iface.TileInterface;
 import gigaherz.enderRift.automation.proxy.BlockProxy;
@@ -18,6 +20,7 @@ import gigaherz.enderRift.network.UpdateField;
 import gigaherz.enderRift.rift.RecipeRiftDuplication;
 import gigaherz.enderRift.rift.*;
 import net.minecraft.block.Block;
+import net.minecraft.client.Minecraft;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
@@ -56,8 +59,9 @@ public class EnderRiftMod
     public static BlockStructure structure;
     public static BlockRegistered riftInterface;
     public static BlockRegistered generator;
-    public static BlockBrowser browser;
+    public static BlockRegistered browser;
     public static BlockRegistered extension;
+    public static BlockRegistered driver;
     public static Item riftOrb;
 
     public static CreativeTabs tabEnderRift = new CreativeTabs("tabEnderRift")
@@ -97,6 +101,7 @@ public class EnderRiftMod
                 riftInterface = new BlockInterface("interface"),
                 browser = new BlockBrowser("browser"),
                 extension = new BlockProxy("proxy"),
+                driver = new BlockDriver("driver"),
                 generator = new BlockGenerator("generator")
         );
     }
@@ -109,6 +114,7 @@ public class EnderRiftMod
                 riftInterface.createItemBlock(),
                 browser.createItemBlock(),
                 extension.createItemBlock(),
+                driver.createItemBlock(),
                 generator.createItemBlock(),
 
                 riftOrb = new ItemEnderRift("rift_orb")
@@ -123,6 +129,7 @@ public class EnderRiftMod
         GameRegistry.registerTileEntity(TileBrowser.class, browser.getRegistryName().toString());
         GameRegistry.registerTileEntity(TileProxy.class, extension.getRegistryName().toString());
         GameRegistry.registerTileEntity(TileGenerator.class, generator.getRegistryName().toString());
+        GameRegistry.registerTileEntity(TileDriver.class, driver.getRegistryName().toString());
     }
 
     @Mod.EventHandler
@@ -235,7 +242,9 @@ public class EnderRiftMod
 
         NetworkRegistry.INSTANCE.registerGuiHandler(this, guiHandler);
 
-        FMLInterModComms.sendMessage("Waila", "register", "gigaherz.enderRift.integration.WailaProviders.callbackRegister");
+        FMLInterModComms.sendMessage("Waila", "register", "gigaherz.enderRift.plugins.WailaProviders.callbackRegister");
+
+
     }
 
     public static ResourceLocation location(String path)

@@ -32,7 +32,6 @@ public class BlockEnderRift
     public BlockEnderRift(String name)
     {
         super(name, Material.ROCK);
-        setUnlocalizedName(EnderRiftMod.MODID + ".blockEnderRift");
         setCreativeTab(EnderRiftMod.tabEnderRift);
         setHardness(3.0F);
         setSoundType(SoundType.METAL);

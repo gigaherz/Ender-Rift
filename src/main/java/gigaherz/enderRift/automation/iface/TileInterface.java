@@ -3,6 +3,8 @@ package gigaherz.enderRift.automation.iface;
 import gigaherz.enderRift.EnderRiftMod;
 import gigaherz.enderRift.automation.TileAggregator;
 import gigaherz.enderRift.automation.capability.AutomationHelper;
+import gigaherz.enderRift.common.AutomationEnergyWrapper;
+import gigaherz.enderRift.common.IPoweredAutomation;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -11,12 +13,15 @@ import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.EnumFacing;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.Constants;
+import net.minecraftforge.energy.IEnergyStorage;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.ItemStackHandler;
 
-public class TileInterface extends TileAggregator
+import javax.annotation.Nullable;
+
+public class TileInterface extends TileAggregator implements IPoweredAutomation
 {
     static final int FilterCount = 9;
 
@@ -29,6 +34,8 @@ public class TileInterface extends TileAggregator
             markDirty();
         }
     };
+
+    AutomationEnergyWrapper wrapper = new AutomationEnergyWrapper(this);
 
     EnumFacing facing = null;
 
@@ -66,24 +73,44 @@ public class TileInterface extends TileAggregator
         return super.hasCapability(capability, facing);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public <T> T getCapability(Capability<T> capability, EnumFacing facing)
     {
         if (facing == getFacing())
         {
             if (capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
-                return CapabilityItemHandler.ITEM_HANDLER_CAPABILITY.cast(outputs);
+                return (T)outputs;
         }
         return super.getCapability(capability, facing);
     }
 
     public IItemHandler getAutomation()
     {
+        return wrapper;
+    }
+
+    @Nullable
+    @Override
+    public IItemHandler getInventory()
+    {
         return super.getAutomation(EnderRiftMod.riftInterface);
     }
 
     @Override
+    public IEnergyStorage getEnergyBuffer()
+    {
+        return getCombinedPowerBuffer();
+    }
+
+    @Override
     public void markDirty()
+    {
+        markDirty(true);
+    }
+
+    @Override
+    protected void markDirty(boolean sendBroadcast)
     {
         super.markDirty();
         facing = null;

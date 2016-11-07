@@ -1,0 +1,133 @@
+{
+  "forge_marker": 1,
+  "defaults": {
+    "model": "enderrift:driver_main.obj"
+  },
+  "variants": {
+    "inventory": [{ "transform": "forge:default-block" }],
+    "up": {
+      "none": {
+      },
+      "inventory": {
+        "submodel": {
+          "up": {
+            "model": "enderrift:proxy_connection.obj",
+            "x": 90
+          }
+        }
+      },
+      "power": {
+        "submodel": {
+          "up": {
+            "model": "enderrift:proxy_connection.obj",
+            "textures": { "#Front": "enderrift:blocks/items_front" },
+            "x": 90
+          }
+        }
+      }
+    },
+    "down": {
+      "none": {
+      },
+      "inventory": {
+        "submodel": {
+          "down": {
+            "model": "enderrift:proxy_connection.obj",
+            "x": 270
+          }
+        }
+      },
+      "power": {
+        "submodel": {
+          "down": {
+            "model": "enderrift:proxy_connection.obj",
+            "textures": { "#Front": "enderrift:blocks/items_front" },
+            "x": 270
+          }
+        }
+      }
+    },
+    "east": {
+      "none": {
+      },
+      "inventory": {
+        "submodel": {
+          "east": {
+            "model": "enderrift:proxy_connection.obj",
+            "y": 270
+          }
+        }
+      },
+      "power": {
+        "submodel": {
+          "east": {
+            "model": "enderrift:proxy_connection.obj",
+            "textures": { "#Front": "enderrift:blocks/items_front" },
+            "y": 270
+          }
+        }
+      }
+    },
+    "west": {
+      "none": {
+      },
+      "inventory": {
+        "submodel": {
+          "west": {
+            "model": "enderrift:proxy_connection.obj",
+            "y": 90
+          }
+        }
+      },
+      "power": {
+        "submodel": {
+          "west": {
+            "model": "enderrift:proxy_connection.obj",
+            "textures": { "#Front": "enderrift:blocks/items_front" },
+            "y": 90
+          }
+        }
+      }
+    },
+    "north": {
+      "none": {
+      },
+      "inventory": {
+        "submodel": {
+          "north": {
+            "model": "enderrift:proxy_connection.obj",
+            "y": 180
+          }
+        }
+      },
+      "power": {
+        "submodel": {
+          "north": {
+            "model": "enderrift:proxy_connection.obj",
+            "textures": { "#Front": "enderrift:blocks/items_front" },
+            "y": 180
+          }
+        }
+      }
+    },
+    "south": {
+      "none": {
+      },
+      "inventory": {
+        "submodel": {
+          "south": {
+            "model": "enderrift:proxy_connection.obj"
+          }
+        }
+      },
+      "power": {
+        "submodel": {
+          "south": {
+            "model": "enderrift:proxy_connection.obj",
+            "textures": { "#Front": "enderrift:blocks/items_front" }
+          }
+        }
+      }
+    }
+  }
+}
