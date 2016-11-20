@@ -37,6 +37,7 @@ public class TileInterface extends TileAggregator implements IPoweredAutomation
 
     private EnumFacing facing = null;
 
+    @Nullable
     public EnumFacing getFacing()
     {
         if (facing == null && world != null)
@@ -61,7 +62,7 @@ public class TileInterface extends TileAggregator implements IPoweredAutomation
     }
 
     @Override
-    public boolean hasCapability(Capability<?> capability, EnumFacing facing)
+    public boolean hasCapability(Capability<?> capability, @Nullable EnumFacing facing)
     {
         if (facing == getFacing())
         {
@@ -73,7 +74,7 @@ public class TileInterface extends TileAggregator implements IPoweredAutomation
 
     @SuppressWarnings("unchecked")
     @Override
-    public <T> T getCapability(Capability<T> capability, EnumFacing facing)
+    public <T> T getCapability(Capability<T> capability, @Nullable EnumFacing facing)
     {
         if (facing == getFacing())
         {
@@ -110,44 +111,44 @@ public class TileInterface extends TileAggregator implements IPoweredAutomation
         {
             ItemStack inFilter = filters.getStackInSlot(i);
             ItemStack inSlot = outputs.getStackInSlot(i);
-            if (inFilter != null)
+            if (inFilter.getCount() > 0)
             {
-                if (inSlot == null)
+                if (inSlot.getCount() > 0)
                 {
                     int free = 64;
                     inSlot = AutomationHelper.extractItems(getCombinedInventory(), inFilter, free, false);
                     outputs.setStackInSlot(i, inSlot);
-                    if (inSlot != null)
+                    if (inSlot.getCount() > 0)
                         anyChanged = true;
                 }
                 else if (inSlot.isItemEqual(inFilter))
                 {
-                    int free = inSlot.getMaxStackSize() - inSlot.stackSize;
+                    int free = inSlot.getMaxStackSize() - inSlot.getCount();
                     if (free > 0)
                     {
                         ItemStack extracted = AutomationHelper.extractItems(getCombinedInventory(), inFilter, free, false);
-                        if (extracted != null)
+                        if (extracted.getCount() > 0)
                         {
-                            inSlot.stackSize += extracted.stackSize;
+                            inSlot.grow(extracted.getCount());
                             anyChanged = true;
                         }
                     }
                 }
                 else
                 {
-                    int stackSize = inSlot.stackSize;
+                    int stackSize = inSlot.getCount();
                     inSlot = AutomationHelper.insertItems(getCombinedInventory(), inSlot);
                     outputs.setStackInSlot(i, inSlot);
-                    if (inSlot == null || stackSize != inSlot.stackSize)
+                    if (stackSize != inSlot.getCount())
                         anyChanged = true;
                 }
             }
-            else if (inSlot != null)
+            else if (inSlot.getCount() > 0)
             {
-                int stackSize = inSlot.stackSize;
+                int stackSize = inSlot.getCount();
                 inSlot = AutomationHelper.insertItems(getCombinedInventory(), inSlot);
                 outputs.setStackInSlot(i, inSlot);
-                if (inSlot == null || stackSize != inSlot.stackSize)
+                if (stackSize != inSlot.getCount())
                     anyChanged = true;
             }
         }
@@ -175,7 +176,7 @@ public class TileInterface extends TileAggregator implements IPoweredAutomation
 
             if (j >= 0 && j < filters.getSlots())
             {
-                filters.setStackInSlot(j, ItemStack.loadItemStackFromNBT(nbttagcompound));
+                filters.setStackInSlot(j, new ItemStack(nbttagcompound));
             }
         }
 
@@ -187,7 +188,7 @@ public class TileInterface extends TileAggregator implements IPoweredAutomation
 
             if (j >= 0 && j < outputs.getSlots())
             {
-                outputs.setStackInSlot(j, ItemStack.loadItemStackFromNBT(slot));
+                outputs.setStackInSlot(j, new ItemStack(slot));
             }
         }
     }
@@ -201,7 +202,7 @@ public class TileInterface extends TileAggregator implements IPoweredAutomation
         for (int i = 0; i < filters.getSlots(); ++i)
         {
             ItemStack stack = filters.getStackInSlot(i);
-            if (stack != null)
+            if (stack.getCount() > 0)
             {
                 NBTTagCompound nbttagcompound = new NBTTagCompound();
                 nbttagcompound.setByte("Slot", (byte) i);
@@ -216,7 +217,7 @@ public class TileInterface extends TileAggregator implements IPoweredAutomation
         for (int i = 0; i < outputs.getSlots(); ++i)
         {
             ItemStack stack = outputs.getStackInSlot(i);
-            if (stack != null)
+            if (stack.getCount() > 0)
             {
                 NBTTagCompound slot = new NBTTagCompound();
                 slot.setByte("Slot", (byte) i);
@@ -236,7 +237,7 @@ public class TileInterface extends TileAggregator implements IPoweredAutomation
                 && player.getDistanceSq(pos.getX() + 0.5D, pos.getY() + 0.5D, pos.getZ() + 0.5D) <= 64.0D;
     }
 
-    class FilterInventory implements IItemHandlerModifiable
+    private class FilterInventory implements IItemHandlerModifiable
     {
         final ItemStack[] filters;
 
@@ -255,7 +256,7 @@ public class TileInterface extends TileAggregator implements IPoweredAutomation
         public ItemStack getStackInSlot(int slot)
         {
             if (slot < 0 || slot >= filters.length)
-                return null;
+                return ItemStack.EMPTY;
             return filters[slot];
         }
 
@@ -268,7 +269,7 @@ public class TileInterface extends TileAggregator implements IPoweredAutomation
             if (!simulate)
             {
                 filters[slot] = stack.copy();
-                filters[slot].stackSize = 1;
+                filters[slot].setCount(1);
             }
 
             return stack;
@@ -277,7 +278,7 @@ public class TileInterface extends TileAggregator implements IPoweredAutomation
         @Override
         public ItemStack extractItem(int slot, int amount, boolean simulate)
         {
-            return null;
+            return ItemStack.EMPTY;
         }
 
         @Override
@@ -285,9 +286,9 @@ public class TileInterface extends TileAggregator implements IPoweredAutomation
         {
             filters[index] = stack;
 
-            if (stack != null && stack.stackSize > this.getInventoryStackLimit())
+            if (stack.getCount() > this.getInventoryStackLimit())
             {
-                stack.stackSize = this.getInventoryStackLimit();
+                stack.setCount(this.getInventoryStackLimit());
             }
 
             markDirty();

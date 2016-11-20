@@ -18,6 +18,7 @@ public class TileBrowser extends TileAggregator
 
     EnumFacing facing = null;
 
+    @Nullable
     public EnumFacing getFacing()
     {
         if (facing == null && world != null)

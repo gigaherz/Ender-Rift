@@ -133,7 +133,6 @@ public abstract class TileAggregator extends TileEntity implements ITickable, Gr
         return getCombinedInventoryInternal();
     }
 
-    @Nullable
     @Override
     public IEnergyStorage getEnergyBuffer()
     {

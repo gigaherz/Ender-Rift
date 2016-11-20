@@ -7,6 +7,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.NonNullList;
 import net.minecraft.world.World;
 
 public class RecipeRiftDuplication implements IRecipe
@@ -20,7 +21,7 @@ public class RecipeRiftDuplication implements IRecipe
             return false;
 
         ItemStack stack = crafting.getStackInSlot(4);
-        if (stack == null)
+        if (stack.getCount() <= 0)
             return false;
 
         if (stack.getItem() != EnderRiftMod.riftOrb)
@@ -60,7 +61,7 @@ public class RecipeRiftDuplication implements IRecipe
     private boolean slotHasItem(InventoryCrafting crafting, int slot, Item item)
     {
         ItemStack stack = crafting.getStackInSlot(slot);
-        return stack != null && stack.getItem() == item;
+        return stack.getItem() == item;
     }
 
     /**
@@ -69,7 +70,7 @@ public class RecipeRiftDuplication implements IRecipe
     public ItemStack getCraftingResult(InventoryCrafting crafting)
     {
         ItemStack stack = crafting.getStackInSlot(4).copy();
-        stack.stackSize = 2;
+        stack.setCount(2);
         return stack;
     }
 
@@ -83,12 +84,12 @@ public class RecipeRiftDuplication implements IRecipe
 
     public ItemStack getRecipeOutput()
     {
-        return null;
+        return ItemStack.EMPTY;
     }
 
     @Override
-    public ItemStack[] getRemainingItems(InventoryCrafting inv)
+    public NonNullList<ItemStack> getRemainingItems(InventoryCrafting inv)
     {
-        return new ItemStack[0];
+        return NonNullList.withSize(inv.getSizeInventory(), ItemStack.EMPTY);
     }
 }

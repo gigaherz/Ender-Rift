@@ -50,7 +50,7 @@ public class InventoryAggregator implements IItemHandler
 
             index -= size;
         }
-        return null;
+        return ItemStack.EMPTY;
     }
 
     @Override
@@ -68,7 +68,7 @@ public class InventoryAggregator implements IItemHandler
 
             index -= size;
         }
-        return null;
+        return ItemStack.EMPTY;
     }
 
     @Override
@@ -86,7 +86,7 @@ public class InventoryAggregator implements IItemHandler
 
             index -= size;
         }
-        return null;
+        return ItemStack.EMPTY;
     }
 
 }

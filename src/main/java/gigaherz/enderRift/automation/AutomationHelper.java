@@ -10,8 +10,6 @@ import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 
-import javax.annotation.Nonnull;
-
 /**
  * Provides a basic implementation for automatable inventory.
  */
@@ -39,56 +37,56 @@ public abstract class AutomationHelper
         return cap.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, facing);
     }
 
-    public static ItemStack insertItems( @Nonnull IItemHandler parent, @Nonnull ItemStack stack)
+    public static ItemStack insertItems(IItemHandler parent, ItemStack stack)
     {
         ItemStack remaining = stack.copy();
 
         for (int i = 0; i < parent.getSlots(); i++)
         {
             remaining = parent.insertItem(i, remaining, false);
-            if (remaining == null || remaining.stackSize <= 0)
+            if (remaining.getCount() <= 0)
                 break;
         }
 
-        if (remaining != null && remaining.stackSize > 0)
+        if (remaining.getCount() > 0)
             return remaining;
 
-        return null;
+        return ItemStack.EMPTY;
     }
 
-    public static ItemStack extractItems( @Nonnull IItemHandler parent, @Nonnull ItemStack stack, int wanted, boolean simulate)
+    public static ItemStack extractItems(IItemHandler parent, ItemStack stack, int wanted, boolean simulate)
     {
-        if (stack.stackSize <= 0 || wanted <= 0)
-            return null;
+        if (stack.getCount() <= 0 || wanted <= 0)
+            return ItemStack.EMPTY;
 
-        ItemStack extracted = stack.copy();
-        extracted.stackSize = 0;
+        ItemStack _extracted = stack.copy();
+        int extractCount = 0;
 
         for (int i = 0; i < parent.getSlots(); i++)
         {
             ItemStack slot = parent.getStackInSlot(i);
-            if (slot != null)
+            if (slot.getCount() > 0)
             {
-                int requested = Math.min(wanted, slot.stackSize);
+                int requested = Math.min(wanted, slot.getCount());
                 if (requested > 0 && ItemStack.areItemsEqual(slot, stack) && ItemStack.areItemStackTagsEqual(slot, stack))
                 {
                     ItemStack obtained = parent.extractItem(i, requested, simulate);
 
-                    if (obtained != null && !simulate)
+                    if (obtained.getCount() > 0 && !simulate)
                     {
-                        int remaining = slot.stackSize - obtained.stackSize;
+                        int remaining = slot.getCount() - obtained.getCount();
                         int found = 0;
                         slot = parent.getStackInSlot(i);
-                        if (slot != null)
-                            found = slot.stackSize;
+                        if (slot.getCount() > 0)
+                            found = slot.getCount();
 
                         if (found != remaining)
                             EnderRiftMod.logger.warn("DAFUQ, Found an incorrect number of items in the slot " + i + " after extraction! Found: " + found + " expected " + remaining);
                     }
 
-                    int returned = (obtained != null) ? obtained.stackSize : 0;
+                    int returned = obtained.getCount();
 
-                    extracted.stackSize += returned;
+                    extractCount += returned;
                     wanted -= returned;
                     if (wanted <= 0)
                         break;
@@ -96,9 +94,10 @@ public abstract class AutomationHelper
             }
         }
 
-        if (extracted.stackSize <= 0)
-            return null;
+        if (extractCount <= 0)
+            return ItemStack.EMPTY;
 
-        return extracted;
+        _extracted.setCount(extractCount);
+        return _extracted;
     }
 }

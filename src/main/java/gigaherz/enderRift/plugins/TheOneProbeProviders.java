@@ -1,5 +1,5 @@
 package gigaherz.enderRift.plugins;
-
+/*
 import gigaherz.enderRift.EnderRiftMod;
 import mcjty.theoneprobe.api.*;
 import net.minecraft.block.state.IBlockState;
@@ -26,3 +26,4 @@ public class TheOneProbeProviders
         });
     }
 }
+*/

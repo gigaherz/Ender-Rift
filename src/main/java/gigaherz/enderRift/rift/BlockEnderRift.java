@@ -24,6 +24,7 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.items.CapabilityItemHandler;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -131,7 +132,7 @@ public class BlockEnderRift
     }
 
     @Override
-    public void harvestBlock(World worldIn, EntityPlayer player, BlockPos pos, IBlockState state, TileEntity te, ItemStack stack)
+    public void harvestBlock(World worldIn, EntityPlayer player, BlockPos pos, IBlockState state, @Nullable TileEntity te, ItemStack stack)
     {
         super.harvestBlock(worldIn, player, pos, state, te, stack);
         worldIn.setBlockToAir(pos);
@@ -145,7 +146,7 @@ public class BlockEnderRift
     }
 
     @Override
-    public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ)
+    public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ)
     {
         if (playerIn.isSneaking())
             return false;
@@ -153,7 +154,7 @@ public class BlockEnderRift
         int slot = playerIn.inventory.currentItem;
         ItemStack stack = playerIn.inventory.getStackInSlot(slot);
 
-        if (stack == null || stack.getItem() == EnderRiftMod.riftOrb)
+        if (stack.getItem() == EnderRiftMod.riftOrb)
             return false;
 
         if (worldIn.isRemote)
@@ -168,16 +169,13 @@ public class BlockEnderRift
 
         TileEnderRift rift = (TileEnderRift) te;
 
-        int count = stack.stackSize;
+        int count = stack.getCount();
         ItemStack stackToPush = stack.splitStack(count);
         ItemStack remaining = AutomationHelper.insertItems(rift.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null), stackToPush);
-        if (remaining != null)
-        {
-            stack.stackSize += remaining.stackSize;
-        }
+        stack.grow(remaining.getCount());
 
-        if (stack.stackSize <= 0)
-            stack = null;
+        if (stack.getCount() <= 0)
+            stack = ItemStack.EMPTY;
 
         playerIn.inventory.setInventorySlotContents(slot, stack);
 
@@ -202,7 +200,7 @@ public class BlockEnderRift
         TileEnderRift rift = (TileEnderRift) te;
 
         ItemStack stack = playerIn.getHeldItem(EnumHand.MAIN_HAND);
-        if (stack != null)
+        if (stack.getCount() <= 0)
         {
             if (stack.getItem() == EnderRiftMod.riftOrb)
                 return;
@@ -210,7 +208,7 @@ public class BlockEnderRift
         else
         {
             stack = rift.chooseRandomStack();
-            if (stack == null)
+            if (stack.getCount() <= 0)
                 return;
         }
 
@@ -218,10 +216,10 @@ public class BlockEnderRift
 
         ItemStack extracted = AutomationHelper.extractItems(rift.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null), stack.copy(), numberToExtract, false);
 
-        if (extracted != null && extracted.stackSize > 0)
+        if (extracted.getCount() > 0)
         {
             EntityItem entityItem = new EntityItem(worldIn, playerIn.posX, playerIn.posY + playerIn.getEyeHeight() / 2, playerIn.posZ, extracted);
-            worldIn.spawnEntityInWorld(entityItem);
+            worldIn.spawnEntity(entityItem);
         }
     }
 
@@ -248,7 +246,7 @@ public class BlockEnderRift
 
         ItemStack remaining = AutomationHelper.insertItems(rift.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null), stack);
 
-        if (remaining == null)
+        if (remaining.getCount() <= 0)
         {
             entityIn.setDead();
         }

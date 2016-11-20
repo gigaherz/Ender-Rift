@@ -73,7 +73,7 @@ public class ContainerCraftingBrowser extends ContainerBrowser
             {
                 ItemStack itemstack = this.craftMatrix.removeStackFromSlot(i);
 
-                if (itemstack != null)
+                if (itemstack.getCount() > 0)
                 {
                     playerIn.dropItem(itemstack, false);
                 }
@@ -93,7 +93,7 @@ public class ContainerCraftingBrowser extends ContainerBrowser
 
         if (slot == null || !slot.getHasStack())
         {
-            return null;
+            return ItemStack.EMPTY;
         }
 
         ItemStack stack = slot.getStack();
@@ -104,27 +104,27 @@ public class ContainerCraftingBrowser extends ContainerBrowser
 
         if (!this.mergeItemStack(stack, firstSlot, lastSlot, false))
         {
-            return null;
+            return ItemStack.EMPTY;
         }
 
         if (slotIndex == 0)
             slot.onSlotChange(stack, stackCopy);
 
-        if (stack.stackSize == 0)
+        if (stack.getCount() == 0)
         {
-            slot.putStack(null);
+            slot.putStack(ItemStack.EMPTY);
         }
         else
         {
             slot.onSlotChanged();
         }
 
-        if (stack.stackSize == stackCopy.stackSize)
+        if (stack.getCount() == stackCopy.getCount())
         {
-            return null;
+            return ItemStack.EMPTY;
         }
 
-        slot.onPickupFromSlot(player, stack);
+        slot.onTake(player, stack);
 
         return stackCopy;
     }
@@ -147,17 +147,17 @@ public class ContainerCraftingBrowser extends ContainerBrowser
             {
                 ItemStack itemstack = this.craftMatrix.removeStackFromSlot(i);
 
-                if (!isRemote && itemstack != null)
+                if (!isRemote && itemstack.getCount() > 0)
                 {
-                    ItemStack remaining = null;
+                    ItemStack remaining = ItemStack.EMPTY;
                     if (parent != null)
                         remaining = AutomationHelper.insertItems(parent, itemstack);
 
-                    if (remaining != null)
+                    if (remaining.getCount() > 0)
                     {
                         playerIn.dropItem(remaining, false);
 
-                        if (remaining.stackSize != itemstack.stackSize)
+                        if (remaining.getCount() != itemstack.getCount())
                             tile.markDirty();
                     }
                     else

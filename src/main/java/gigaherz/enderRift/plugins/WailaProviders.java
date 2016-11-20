@@ -76,7 +76,7 @@ public class WailaProviders
         @Override
         public ItemStack getWailaStack(IWailaDataAccessor accessor, IWailaConfigHandler config)
         {
-            return null;
+            return ItemStack.EMPTY;
         }
 
         @Override
@@ -140,7 +140,7 @@ public class WailaProviders
         @Override
         public ItemStack getWailaStack(IWailaDataAccessor accessor, IWailaConfigHandler config)
         {
-            return null;
+            return ItemStack.EMPTY;
         }
 
         @Override
@@ -186,7 +186,7 @@ public class WailaProviders
         @Override
         public ItemStack getWailaStack(IWailaDataAccessor accessor, IWailaConfigHandler config)
         {
-            return null;
+            return ItemStack.EMPTY;
         }
 
         @Override

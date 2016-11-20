@@ -87,7 +87,7 @@ public class ContainerGenerator
         Slot slot = this.inventorySlots.get(slotIndex);
         if (slot == null || !slot.getHasStack())
         {
-            return null;
+            return ItemStack.EMPTY;
         }
 
         ItemStack stack = slot.getStack();
@@ -104,7 +104,7 @@ public class ContainerGenerator
         else
         {
             if (TileEntityFurnace.getItemBurnTime(slot.getStack()) <= 0)
-                return null;
+                return ItemStack.EMPTY;
 
             startIndex = 0;
             endIndex = 1;
@@ -112,24 +112,24 @@ public class ContainerGenerator
 
         if (!this.mergeItemStack(stack, startIndex, endIndex, false))
         {
-            return null;
+            return ItemStack.EMPTY;
         }
 
-        if (stack.stackSize == 0)
+        if (stack.getCount() == 0)
         {
-            slot.putStack(null);
+            slot.putStack(ItemStack.EMPTY);
         }
         else
         {
             slot.onSlotChanged();
         }
 
-        if (stack.stackSize == stackCopy.stackSize)
+        if (stack.getCount() == stackCopy.getCount())
         {
-            return null;
+            return ItemStack.EMPTY;
         }
 
-        slot.onPickupFromSlot(player, stack);
+        slot.onTake(player, stack);
         return stackCopy;
     }
 }

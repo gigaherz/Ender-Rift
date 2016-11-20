@@ -11,6 +11,8 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.IEnergyStorage;
 
+import javax.annotation.Nullable;
+
 public class TileDriver extends TileAggregator
 {
     public static final int POWER_LIMIT = 100000;
@@ -32,7 +34,7 @@ public class TileDriver extends TileAggregator
     }
 
     @Override
-    public boolean hasCapability(Capability<?> capability, EnumFacing facing)
+    public boolean hasCapability(Capability<?> capability, @Nullable EnumFacing facing)
     {
         if (capability == CapabilityEnergy.ENERGY)
             return true;
@@ -45,7 +47,7 @@ public class TileDriver extends TileAggregator
 
     @SuppressWarnings("unchecked")
     @Override
-    public <T> T getCapability(Capability<T> capability, EnumFacing facing)
+    public <T> T getCapability(Capability<T> capability, @Nullable EnumFacing facing)
     {
         if (capability == CapabilityEnergy.ENERGY)
             return (T) energyBuffer;

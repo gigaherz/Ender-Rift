@@ -1,5 +1,5 @@
 package gigaherz.enderRift.plugins.tesla;
-;
+/*
 import net.darkhax.tesla.api.ITeslaProducer;
 import net.minecraftforge.energy.IEnergyStorage;
 
@@ -18,3 +18,4 @@ public class TeslaEnergyProducer implements ITeslaProducer
         return handler.extractEnergy(power > Integer.MAX_VALUE ? Integer.MAX_VALUE : (int) power, simulated);
     }
 }
+*/

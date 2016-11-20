@@ -48,9 +48,9 @@ public abstract class BlockAggregator<T extends TileAggregator> extends BlockReg
 
     @Deprecated
     @Override
-    public void neighborChanged(IBlockState state, World worldIn, BlockPos pos, Block blockIn)
+    public void neighborChanged(IBlockState state, World worldIn, BlockPos pos, Block otherBlock, BlockPos otherPos)
     {
-        super.neighborChanged(state, worldIn, pos, blockIn);
+        super.neighborChanged(state, worldIn, pos, otherBlock, otherPos);
         TileEntity teSelf = worldIn.getTileEntity(pos);
         if (!(teSelf instanceof TileAggregator))
             return;
@@ -88,12 +88,18 @@ public abstract class BlockAggregator<T extends TileAggregator> extends BlockReg
     {
         TileEntity te = worldIn.getTileEntity(pos.offset(facing));
 
+        if (te == null)
+            return false;
+
         return AutomationHelper.isAutomatable(te, facing.getOpposite());
     }
 
     protected boolean isConnectableAutomation(IBlockAccess worldIn, BlockPos pos, EnumFacing facing)
     {
         TileEntity te = worldIn.getTileEntity(pos.offset(facing));
+
+        if (te == null)
+            return false;
 
         if (te instanceof TileAggregator)
             return true;

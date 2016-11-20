@@ -54,26 +54,24 @@ public class AutomationEnergyWrapper implements IItemHandler
         return inventory != null ? inventory.getSlots() : 0;
     }
 
-    @Nullable
     @Override
     public ItemStack getStackInSlot(int slot)
     {
         IItemHandler inventory = owner.getInventory();
-        return inventory != null ? inventory.getStackInSlot(slot) : null;
+        return inventory != null ? inventory.getStackInSlot(slot) : ItemStack.EMPTY;
     }
 
-    @Nullable
     @Override
     public ItemStack insertItem(int slot, ItemStack stack, boolean simulate)
     {
-        int stackSize = stack.stackSize;
+        int stackSize = stack.getCount();
         int cost = getEffectivePowerUsageToInsert(stackSize);
 
         IEnergyStorage energyBuffer = owner.getEnergyBuffer();
         IItemHandler inventory = owner.getInventory();
 
         if (inventory == null)
-            return null;
+            return ItemStack.EMPTY;
 
         while (cost > energyBuffer.getEnergyStored() && stackSize > 0)
         {
@@ -84,14 +82,13 @@ public class AutomationEnergyWrapper implements IItemHandler
             return stack;
 
         ItemStack temp = stack.copy();
-        temp.stackSize = stackSize;
+        temp.setCount(stackSize);
 
         ItemStack remaining = inventory.insertItem(slot, temp, simulate);
 
         if (!simulate)
         {
-            if (remaining != null)
-                stackSize -= remaining.stackSize;
+            stackSize -= remaining.getCount();
 
             int actualCost = getEffectivePowerUsageToInsert(stackSize);
             energyBuffer.extractEnergy(actualCost, false);
@@ -102,7 +99,6 @@ public class AutomationEnergyWrapper implements IItemHandler
         return remaining;
     }
 
-    @Nullable
     @Override
     public ItemStack extractItem(int slot, int wanted, boolean simulate)
     {
@@ -112,7 +108,7 @@ public class AutomationEnergyWrapper implements IItemHandler
         IItemHandler inventory = owner.getInventory();
 
         if (inventory == null)
-            return null;
+            return ItemStack.EMPTY;
 
         while (cost > energyBuffer.getEnergyStored() && wanted > 0)
         {
@@ -120,15 +116,15 @@ public class AutomationEnergyWrapper implements IItemHandler
         }
 
         if (wanted <= 0)
-            return null;
+            return ItemStack.EMPTY;
 
         ItemStack extracted = inventory.extractItem(slot, wanted, simulate);
-        if (extracted == null)
-            return null;
+        if (extracted.getCount() <= 0)
+            return ItemStack.EMPTY;
 
         if (!simulate)
         {
-            int actualCost = getEffectivePowerUsageToExtract(extracted.stackSize);
+            int actualCost = getEffectivePowerUsageToExtract(extracted.getCount());
             energyBuffer.extractEnergy(actualCost, false);
 
             owner.setDirty();

@@ -1,5 +1,5 @@
 package gigaherz.enderRift.plugins.tesla;
-
+/*
 import net.darkhax.tesla.api.ITeslaConsumer;
 import net.minecraftforge.energy.IEnergyStorage;
 
@@ -48,3 +48,4 @@ public class TeslaConsumerWrapper implements IEnergyStorage
         return true;
     }
 }
+*/

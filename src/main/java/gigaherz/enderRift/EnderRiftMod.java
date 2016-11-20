@@ -68,9 +68,9 @@ public class EnderRiftMod
     public static CreativeTabs tabEnderRift = new CreativeTabs("tabEnderRift")
     {
         @Override
-        public Item getTabIconItem()
+        public ItemStack getTabIconItem()
         {
-            return riftOrb;
+            return new ItemStack(riftOrb);
         }
     };
 
@@ -85,16 +85,9 @@ public class EnderRiftMod
 
     public static final Logger logger = LogManager.getLogger(MODID);
     public static final GuiHandler guiHandler = new GuiHandler();
-    public static final RenamingHelper helper = new RenamingHelper();
 
     @GameRegistry.ItemStackHolder(value="gbook:guidebook", nbt="{Book:\""+MODID+":xml/book.xml\"}")
     public static ItemStack book;
-
-    @Mod.EventHandler
-    public void onMissingMapping(FMLMissingMappingsEvent ev)
-    {
-        helper.process(ev);
-    }
 
     @SubscribeEvent
     public static void registerBlocks(RegistryEvent.Register<Block> event)
@@ -128,12 +121,12 @@ public class EnderRiftMod
 
     private static void registerTileEntities()
     {
-        GameRegistry.registerTileEntity(TileEnderRift.class, rift.getRegistryName().toString());
-        GameRegistry.registerTileEntity(TileEnderRiftCorner.class, location("rift_structure_corner").toString());
-        GameRegistry.registerTileEntity(TileInterface.class, riftInterface.getRegistryName().toString());
-        GameRegistry.registerTileEntity(TileBrowser.class, browser.getRegistryName().toString());
-        GameRegistry.registerTileEntity(TileProxy.class, extension.getRegistryName().toString());
-        GameRegistry.registerTileEntity(TileGenerator.class, generator.getRegistryName().toString());
+        GameRegistry.registerTileEntityWithAlternatives(TileEnderRift.class, rift.getRegistryName().toString(), "tileEnderRift");
+        GameRegistry.registerTileEntityWithAlternatives(TileEnderRiftCorner.class, location("rift_structure_corner").toString(), "tileStructureCorner");
+        GameRegistry.registerTileEntityWithAlternatives(TileInterface.class, riftInterface.getRegistryName().toString(), "tileInterface");
+        GameRegistry.registerTileEntityWithAlternatives(TileBrowser.class, browser.getRegistryName().toString(), "tileBrowser");
+        GameRegistry.registerTileEntityWithAlternatives(TileProxy.class, extension.getRegistryName().toString(), "tileProxy");
+        GameRegistry.registerTileEntityWithAlternatives(TileGenerator.class, generator.getRegistryName().toString(), "tileGenerator");
         GameRegistry.registerTileEntity(TileDriver.class, driver.getRegistryName().toString());
     }
 
@@ -145,20 +138,13 @@ public class EnderRiftMod
 
         registerTileEntities();
 
-        helper.addAlternativeName(riftOrb, location("itemEnderRift"));
-        helper.addAlternativeName(rift, location("blockEnderRift"));
-        helper.addAlternativeName(structure, location("blockStructure"));
-        helper.addAlternativeName(riftInterface, location("blockInterface"));
-        helper.addAlternativeName(browser, location("blockBrowser"));
-        helper.addAlternativeName(extension, location("blockProxy"));
-        helper.addAlternativeName(generator, location("blockGenerator"));
-
-        helper.addAlternativeName(TileEnderRift.class, "tileEnderRift");
-        helper.addAlternativeName(TileEnderRiftCorner.class, "tileStructureCorner");
-        helper.addAlternativeName(TileInterface.class, "tileInterface");
-        helper.addAlternativeName(TileBrowser.class, "tileBrowser");
-        helper.addAlternativeName(TileProxy.class, "tileProxy");
-        helper.addAlternativeName(TileGenerator.class, "tileGenerator");
+        //helper.addAlternativeName(riftOrb, location("itemEnderRift"));
+        //helper.addAlternativeName(rift, location("blockEnderRift"));
+        //helper.addAlternativeName(structure, location("blockStructure"));
+        //helper.addAlternativeName(riftInterface, location("blockInterface"));
+        //helper.addAlternativeName(browser, location("blockBrowser"));
+        //helper.addAlternativeName(extension, location("blockProxy"));
+        //helper.addAlternativeName(generator, location("blockGenerator"));
 
         channel = NetworkRegistry.INSTANCE.newSimpleChannel(CHANNEL);
 

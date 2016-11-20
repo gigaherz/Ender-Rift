@@ -70,10 +70,10 @@ public class ContainerInterface
 
                 ItemStack dropping = playerIn.inventory.getItemStack();
 
-                if (dropping != null)
+                if (dropping.getCount() > 0)
                 {
                     ItemStack copy = dropping.copy();
-                    copy.stackSize = 1;
+                    copy.setCount(1);
                     slot.putStack(copy);
                 }
                 else if (slot.getStack() != null)
@@ -81,11 +81,10 @@ public class ContainerInterface
                     slot.putStack(null);
                 }
 
-                if (slot.getStack() != null)
-                    return slot.getStack().copy();
+                return slot.getStack().copy();
             }
 
-            return null;
+            return ItemStack.EMPTY;
         }
 
         return super.slotClick(slotId, clickedButton, mode, playerIn);
@@ -96,13 +95,13 @@ public class ContainerInterface
     {
         if (slotIndex < 8)
         {
-            return null;
+            return ItemStack.EMPTY;
         }
 
         Slot slot = this.inventorySlots.get(slotIndex);
         if (slot == null || !slot.getHasStack())
         {
-            return null;
+            return ItemStack.EMPTY;
         }
 
         ItemStack stack = slot.getStack();
@@ -113,7 +112,7 @@ public class ContainerInterface
 
         if (slotIndex < 9)
         {
-            return null;
+            return ItemStack.EMPTY;
         }
         else if (slotIndex < 18)
         {
@@ -128,24 +127,24 @@ public class ContainerInterface
 
         if (!this.mergeItemStack(stack, startIndex, endIndex, false))
         {
-            return null;
+            return ItemStack.EMPTY;
         }
 
-        if (stack.stackSize == 0)
+        if (stack.getCount() == 0)
         {
-            slot.putStack(null);
+            slot.putStack(ItemStack.EMPTY);
         }
         else
         {
             slot.onSlotChanged();
         }
 
-        if (stack.stackSize == stackCopy.stackSize)
+        if (stack.getCount() == stackCopy.getCount())
         {
-            return null;
+            return ItemStack.EMPTY;
         }
 
-        slot.onPickupFromSlot(player, stack);
+        slot.onTake(player, stack);
         return stackCopy;
     }
 }

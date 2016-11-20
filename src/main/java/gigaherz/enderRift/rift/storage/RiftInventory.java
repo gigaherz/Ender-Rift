@@ -69,7 +69,7 @@ public class RiftInventory implements IItemHandler
         for (int i = 0; i < itemList.tagCount(); ++i)
         {
             NBTTagCompound slot = itemList.getCompoundTagAt(i);
-            inventorySlots.add(ItemStack.loadItemStackFromNBT(slot));
+            inventorySlots.add(new ItemStack(slot));
         }
     }
 
@@ -97,22 +97,20 @@ public class RiftInventory implements IItemHandler
     }
 
     @Override
-    @Nullable
     public ItemStack getStackInSlot(int index)
     {
         if (index >= inventorySlots.size())
-            return null;
+            return ItemStack.EMPTY;
         return inventorySlots.get(index);
     }
 
     @Override
-    @Nullable
     public ItemStack insertItem(int index, ItemStack stack, boolean simulate)
     {
         if (index >= inventorySlots.size())
         {
             inventorySlots.add(stack.copy());
-            return null;
+            return ItemStack.EMPTY;
         }
 
         ItemStack remaining = stack.copy();
@@ -120,13 +118,13 @@ public class RiftInventory implements IItemHandler
         if (slot != null)
         {
             int max = Math.min(remaining.getMaxStackSize(), 64);
-            int transfer = Math.min(remaining.stackSize, max - slot.stackSize);
+            int transfer = Math.min(remaining.getCount(), max - slot.getCount());
             if (transfer > 0 && ItemHandlerHelper.canItemStacksStack(remaining, slot))
             {
-                if (!simulate) slot.stackSize += transfer;
-                remaining.stackSize -= transfer;
-                if (remaining.stackSize <= 0)
-                    remaining = null;
+                if (!simulate) slot.grow(transfer);
+                remaining.shrink(transfer);
+                if (remaining.getCount() <= 0)
+                    remaining = ItemStack.EMPTY;
             }
         }
 
@@ -136,38 +134,39 @@ public class RiftInventory implements IItemHandler
     }
 
     @Override
-    @Nullable
     public ItemStack extractItem(int index, int wanted, boolean simulate)
     {
         if (index >= inventorySlots.size())
         {
-            return null;
+            return ItemStack.EMPTY;
         }
 
         ItemStack slot = inventorySlots.get(index);
         if (slot == null)
-            return null;
+            return ItemStack.EMPTY;
 
-        ItemStack extracted = slot.copy();
-        extracted.stackSize = 0;
+        ItemStack _extracted = slot.copy();
+        int extractedCount = 0;
 
-        int available = Math.min(wanted, slot.stackSize);
+        int available = Math.min(wanted, slot.getCount());
         if (available > 0)
         {
-            extracted.stackSize += available;
+            extractedCount += available;
 
             if (!simulate)
             {
-                slot.stackSize -= available;
-                if (slot.stackSize <= 0)
+                slot.shrink(available);
+                if (slot.getCount() <= 0)
                     inventorySlots.remove(index);
             }
         }
 
-        if (extracted.stackSize <= 0)
-            return null;
+        if (extractedCount <= 0)
+            return ItemStack.EMPTY;
 
         onContentsChanged();
-        return extracted;
+
+        _extracted.setCount(extractedCount);
+        return _extracted;
     }
 }

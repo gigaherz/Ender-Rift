@@ -64,7 +64,7 @@ public class SendSlotChanges
 
     private ItemStack readItemStackFromBuffer(ByteBuf buf)
     {
-        ItemStack itemstack = null;
+        ItemStack itemstack = ItemStack.EMPTY;
         int i = buf.readShort();
 
         if (i >= 0)
@@ -80,14 +80,14 @@ public class SendSlotChanges
 
     private void writeItemStackToBuffer(ByteBuf buf, ItemStack stack)
     {
-        if (stack == null)
+        if (stack.getCount() <= 0)
         {
             buf.writeShort(-1);
         }
         else
         {
             buf.writeShort(Item.getIdFromItem(stack.getItem()));
-            buf.writeInt(stack.stackSize);
+            buf.writeInt(stack.getCount());
             buf.writeShort(stack.getMetadata());
             NBTTagCompound nbttagcompound = null;
 

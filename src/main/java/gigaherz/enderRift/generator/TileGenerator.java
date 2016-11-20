@@ -23,6 +23,8 @@ import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
 
+import javax.annotation.Nullable;
+
 public class TileGenerator extends TileEntity
         implements ITickable
 {
@@ -76,7 +78,7 @@ public class TileGenerator extends TileEntity
     }
 
     @Override
-    public boolean hasCapability(Capability<?> capability, EnumFacing facing)
+    public boolean hasCapability(Capability<?> capability, @Nullable EnumFacing facing)
     {
         if (capability == CapabilityEnergy.ENERGY)
             return true;
@@ -91,7 +93,7 @@ public class TileGenerator extends TileEntity
 
     @SuppressWarnings("unchecked")
     @Override
-    public <T> T getCapability(Capability<T> capability, EnumFacing facing)
+    public <T> T getCapability(Capability<T> capability, @Nullable EnumFacing facing)
     {
         if (capability == CapabilityEnergy.ENERGY)
             return (T)energyCapability;
@@ -182,12 +184,12 @@ public class TileGenerator extends TileEntity
         if (burnTimeRemaining <= 0 && energyCapability.getEnergyStored() < POWER_LIMIT)
         {
             ItemStack stack = fuelSlot.getStackInSlot(0);
-            if (stack != null)
+            if (stack.getCount() > 0)
             {
                 currentItemBurnTime = burnTimeRemaining = TileEntityFurnace.getItemBurnTime(fuelSlot.getStackInSlot(0));
                 timeInterval = 0;
-                stack.stackSize--;
-                if (stack.stackSize <= 0)
+                stack.shrink(1);
+                if (stack.getCount() <= 0)
                     fuelSlot.setStackInSlot(0, stack.getItem().getContainerItem(stack));
                 anyChanged = true;
             }
@@ -286,7 +288,7 @@ public class TileGenerator extends TileEntity
 
                 if (j >= 0 && j < fuelSlot.getSlots())
                 {
-                    fuelSlot.setStackInSlot(j, ItemStack.loadItemStackFromNBT(nbttagcompound));
+                    fuelSlot.setStackInSlot(j, new ItemStack(nbttagcompound));
                 }
             }
         }

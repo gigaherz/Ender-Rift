@@ -218,7 +218,7 @@ public class TileEnderRift
     }
 
     @Override
-    public boolean hasCapability(Capability<?> capability, EnumFacing facing)
+    public boolean hasCapability(Capability<?> capability, @Nullable EnumFacing facing)
     {
         if (capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
             return true;
@@ -227,23 +227,22 @@ public class TileEnderRift
 
     @SuppressWarnings("unchecked")
     @Override
-    public <T> T getCapability(Capability<T> capability, EnumFacing facing)
+    public <T> T getCapability(Capability<T> capability, @Nullable EnumFacing facing)
     {
         if (capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
             return (T)poweredInventory;
         return super.getCapability(capability, facing);
     }
 
-    @Nullable
     public ItemStack chooseRandomStack()
     {
         if (getInventory() == null)
-            return null;
+            return ItemStack.EMPTY;
 
         int max = getInventory().getSlots();
 
         if (max <= 0)
-            return null;
+            return ItemStack.EMPTY;
 
         int slot = rand.nextInt(max);
 
@@ -289,19 +288,17 @@ public class TileEnderRift
             return handler.getSlots();
         }
 
-        @Nullable
         @Override
         public ItemStack getStackInSlot(int slot)
         {
             if (!powered)
-                return null;
+                return ItemStack.EMPTY;
             IItemHandler handler = getInventory();
             if (handler == null)
-                return null;
+                return ItemStack.EMPTY;
             return handler.getStackInSlot(slot);
         }
 
-        @Nullable
         @Override
         public ItemStack insertItem(int slot, ItemStack stack, boolean simulate)
         {
@@ -313,15 +310,14 @@ public class TileEnderRift
             return handler.insertItem(slot, stack, simulate);
         }
 
-        @Nullable
         @Override
         public ItemStack extractItem(int slot, int amount, boolean simulate)
         {
             if (!powered)
-                return null;
+                return ItemStack.EMPTY;
             IItemHandler handler = getInventory();
             if (handler == null)
-                return null;
+                return ItemStack.EMPTY;
             return handler.extractItem(slot, amount, simulate);
         }
     }

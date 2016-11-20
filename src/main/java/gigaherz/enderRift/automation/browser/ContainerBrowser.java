@@ -16,6 +16,7 @@ import net.minecraft.inventory.Slot;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.play.server.SPacketSetSlot;
+import net.minecraft.util.NonNullList;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import org.apache.commons.lang3.StringUtils;
@@ -34,11 +35,11 @@ public class ContainerBrowser
     public int scroll;
     public SortMode sortMode = SortMode.StackSize;
     private String filterText = "";
-    private ItemStack stackInCursor;
+    private ItemStack stackInCursor = ItemStack.EMPTY;
 
     private EntityPlayer player;
 
-    private ItemStack[] currentStacks = new ItemStack[0];
+    private NonNullList<ItemStack> currentStacks = NonNullList.create();
 
     protected final static int Left = 8;
     protected final static int Top = 18;
@@ -127,7 +128,7 @@ public class ContainerBrowser
             prevChangeCount = tile.getChangeCount();
         }
 
-        int oldLength = currentStacks.length;
+        int oldLength = currentStacks.size();
         int newLength;
         List<Integer> indicesChanged = Lists.newArrayList();
         List<ItemStack> stacksChanged = Lists.newArrayList();
@@ -137,18 +138,18 @@ public class ContainerBrowser
         newLength = serverInv.getRealSizeInventory();
         if (newLength != oldLength)
         {
-            currentStacks = Arrays.copyOf(currentStacks, newLength);
+            changeSize(oldLength, newLength);
         }
 
         for (int i = 0; i < newLength; ++i)
         {
             ItemStack newStack = serverInv.getStack(i);
-            ItemStack current = currentStacks[i];
+            ItemStack current = currentStacks.get(i);
 
             if (!ItemStack.areItemStacksEqual(current, newStack))
             {
-                current = newStack == null ? null : newStack.copy();
-                currentStacks[i] = current;
+                current = newStack.copy();
+                currentStacks.set(i, current);
 
                 indicesChanged.add(i);
                 stacksChanged.add(current);
@@ -162,7 +163,7 @@ public class ContainerBrowser
 
             if (!ItemStack.areItemStacksEqual(inCache, inSlot))
             {
-                inCache = inSlot == null ? null : inSlot.copy();
+                inCache = inSlot.copy();
                 this.inventoryItemStacks.set(i, inCache);
 
                 for (IContainerListener crafter : this.listeners)
@@ -197,18 +198,26 @@ public class ContainerBrowser
         }
     }
 
-    private void sendStackInCursor(EntityPlayerMP player, @Nullable ItemStack newStack)
+    private void changeSize(int oldLength, int newLength)
     {
-        stackInCursor = newStack == null ? null : newStack.copy();
+        NonNullList<ItemStack> oldStacks = currentStacks;
+        currentStacks = NonNullList.withSize(newLength, ItemStack.EMPTY);
+        for(int i=0;i<Math.min(newLength,oldLength);i++)
+            currentStacks.set(i, oldStacks.get(i));
+    }
+
+    private void sendStackInCursor(EntityPlayerMP player, ItemStack newStack)
+    {
+        stackInCursor = newStack.copy();
 
         player.connection.sendPacket(new SPacketSetSlot(-1, -1, newStack));
     }
 
     public void slotsChanged(int slotCount, List<Integer> indices, List<ItemStack> stacks)
     {
-        if (slotCount != currentStacks.length)
+        if (slotCount != currentStacks.size())
         {
-            currentStacks = Arrays.copyOf(currentStacks, slotCount);
+            changeSize(currentStacks.size(), slotCount);
         }
 
         for (int i = 0; i < indices.size(); i++)
@@ -216,7 +225,7 @@ public class ContainerBrowser
             int slot = indices.get(i);
             ItemStack stack = stacks.get(i);
 
-            currentStacks[slot] = stack;
+            currentStacks.set(slot, stack);
         }
 
         fakeInventoryClient.setArray(currentStacks);
@@ -225,7 +234,7 @@ public class ContainerBrowser
     }
 
     @Override
-    public void putStacksInSlots(ItemStack[] p_75131_1_)
+    public void setAll(List<ItemStack> p_75131_1_)
     {
         // Left blank intentionally
     }
@@ -291,14 +300,14 @@ public class ContainerBrowser
             {
                 ItemStack dropping = inventoryPlayer.getItemStack();
 
-                if (dropping != null)
+                if (dropping.getCount() > 0)
                 {
                     if (clickedButton == 0)
                     {
                         ItemStack remaining = insertItemsSided(parent, dropping);
-                        if (remaining != null)
+                        if (remaining.getCount() > 0)
                         {
-                            if (dropping.stackSize != remaining.stackSize)
+                            if (dropping.getCount() != remaining.getCount())
                                 tile.markDirty();
 
                             for (IContainerListener crafter : this.listeners)
@@ -320,16 +329,16 @@ public class ContainerBrowser
                         int amount = 1;
 
                         ItemStack push = dropping.copy();
-                        push.stackSize = amount;
+                        push.setCount(amount);
                         ItemStack remaining = insertItemsSided(parent, push);
 
-                        dropping.stackSize -= push.stackSize;
+                        dropping.shrink(push.getCount());
 
                         if (remaining != null)
                         {
-                            if (push.stackSize != remaining.stackSize)
+                            if (push.getCount() != remaining.getCount())
                                 tile.markDirty();
-                            dropping.stackSize += remaining.stackSize;
+                            dropping.grow(remaining.getCount());
 
                             for (IContainerListener crafter : this.listeners)
                             {
@@ -344,20 +353,20 @@ public class ContainerBrowser
                             tile.markDirty();
                         }
 
-                        if (dropping.stackSize <= 0)
-                            dropping = null;
+                        if (dropping.getCount() <= 0)
+                            dropping = ItemStack.EMPTY;
 
                         inventoryPlayer.setItemStack(dropping);
                     }
                 }
-                else if (existing != null)
+                else if (existing.getCount() > 0)
                 {
                     int amount = clickedButton == 0
                             ? existing.getMaxStackSize()
                             : existing.getMaxStackSize() / 2;
 
                     ItemStack extracted = extractItemsSided(parent, existing, amount, false);
-                    if (extracted != null)
+                    if (extracted.getCount() > 0)
                     {
                         tile.markDirty();
                     }
@@ -378,25 +387,25 @@ public class ContainerBrowser
                 detectAndSendChanges();
                 return slot.getStack();
             }
-            else if (mode == ClickType.QUICK_MOVE && existing != null)
+            else if (mode == ClickType.QUICK_MOVE && existing.getCount() > 0)
             {
                 int amount = existing.getMaxStackSize();
                 if (clickedButton != 0 && amount > 1)
                     amount /= 2;
 
                 if (amount == 0)
-                    return null;
+                    return ItemStack.EMPTY;
 
                 ItemStack remaining = simulateAddToPlayer(existing, amount);
 
                 if (remaining != null)
-                    amount -= remaining.stackSize;
+                    amount -= remaining.getCount();
 
                 if (amount > 0)
                 {
                     ItemStack finalExtract = extractItemsSided(parent, existing, amount, false);
 
-                    if (finalExtract != null)
+                    if (finalExtract.getCount() > 0)
                     {
                         addToPlayer(finalExtract);
 
@@ -407,13 +416,12 @@ public class ContainerBrowser
             }
 
             if (mode != ClickType.CLONE)
-                return null;
+                return ItemStack.EMPTY;
         }
 
         return super.slotClick(slotId, clickedButton, mode, playerIn);
     }
 
-    @Nullable
     private ItemStack extractItemsSided(IItemHandler parent, ItemStack existing, int amount, boolean simulate)
     {
         if (fakeInventoryClient != null)
@@ -423,29 +431,27 @@ public class ContainerBrowser
         return AutomationHelper.extractItems(parent, existing, amount, simulate);
     }
 
-    @Nullable
     private ItemStack insertItemsSided(IItemHandler parent, ItemStack dropping)
     {
         if (fakeInventoryClient != null)
-            return null;
+            return ItemStack.EMPTY;
         return AutomationHelper.insertItems(parent,dropping);
     }
 
-    @Nullable
     private ItemStack simulateAddToPlayer(ItemStack stack, int amount)
     {
         int startIndex = FakeSlots;
         int endIndex = startIndex + PlayerSlots;
 
         ItemStack stackCopy = stack.copy();
-        stackCopy.stackSize = amount;
+        stackCopy.setCount(amount);
 
         if (!this.simulateInsertStack(stackCopy, startIndex, endIndex))
         {
             return stackCopy;
         }
 
-        if (stackCopy.stackSize <= 0)
+        if (stackCopy.getCount() <= 0)
         {
             return null;
         }
@@ -459,40 +465,41 @@ public class ContainerBrowser
 
         if (stack.isStackable())
         {
-            for (int i = startIndex; stack.stackSize > 0 && i < endIndex; i++)
+            for (int i = startIndex; stack.getCount() > 0 && i < endIndex; i++)
             {
                 Slot slot = this.inventorySlots.get(i);
                 ItemStack stackInSlot = slot.getStack();
 
-                if (stackInSlot != null && stackInSlot.stackSize < stackInSlot.getMaxStackSize() &&
-                        ItemStack.areItemsEqual(stackInSlot, stack) && ItemStack.areItemStackTagsEqual(stack, stackInSlot))
+                if (stackInSlot.getCount() < stackInSlot.getMaxStackSize()
+                        && ItemStack.areItemsEqual(stackInSlot, stack)
+                        && ItemStack.areItemStackTagsEqual(stack, stackInSlot))
                 {
-                    int j = stackInSlot.stackSize + stack.stackSize;
+                    int j = stackInSlot.getCount() + stack.getCount();
 
                     if (j <= stack.getMaxStackSize())
                     {
-                        stack.stackSize = 0;
+                        stack.setCount(0);
                         canInsert = true;
                     }
                     else
                     {
-                        stack.stackSize -= stack.getMaxStackSize() - stackInSlot.stackSize;
+                        stack.shrink(stack.getMaxStackSize() - stackInSlot.getCount());
                         canInsert = true;
                     }
                 }
             }
         }
 
-        if (stack.stackSize > 0)
+        if (stack.getCount() > 0)
         {
             for (int i = startIndex; i < endIndex; i++)
             {
                 Slot slot = this.inventorySlots.get(i);
                 ItemStack stackInSlot = slot.getStack();
 
-                if (stackInSlot == null && slot.isItemValid(stack))
+                if (stackInSlot.getCount() <= 0 && slot.isItemValid(stack))
                 {
-                    stack.stackSize = 0;
+                    stack.setCount(0);
                     canInsert = true;
                     break;
                 }
@@ -514,9 +521,9 @@ public class ContainerBrowser
             return stackCopy;
         }
 
-        if (stackCopy.stackSize <= 0)
+        if (stackCopy.getCount() <= 0)
         {
-            return null;
+            return ItemStack.EMPTY;
         }
 
         return stackCopy;
@@ -529,43 +536,43 @@ public class ContainerBrowser
 
         if (slot == null || !slot.getHasStack())
         {
-            return null;
+            return ItemStack.EMPTY;
         }
 
         if (slotIndex < FakeSlots)
         {
             // Shouldn't even happen, handled above.
-            return null;
+            return ItemStack.EMPTY;
         }
         else
         {
             IItemHandler parent = tile.getCombinedInventory();
             if (parent == null)
-                return null;
+                return ItemStack.EMPTY;
 
             ItemStack stack = slot.getStack();
             ItemStack stackCopy = stack.copy();
 
             ItemStack remaining = AutomationHelper.insertItems(parent, stack);
-            if (remaining != null)
+            if (remaining.getCount() > 0)
             {
-                if (remaining.stackSize == stackCopy.stackSize)
+                if (remaining.getCount() == stackCopy.getCount())
                 {
-                    return null;
+                    return ItemStack.EMPTY;
                 }
 
                 tile.markDirty();
-                stack.stackSize = remaining.stackSize;
+                stack.setCount(remaining.getCount());
                 slot.onSlotChanged();
             }
             else
             {
                 tile.markDirty();
-                stack.stackSize = 0;
-                slot.putStack(null);
+                stack.setCount(0);
+                slot.putStack(ItemStack.EMPTY);
             }
 
-            slot.onPickupFromSlot(player, stack);
+            slot.onTake(player, stack);
             return stackCopy;
         }
     }
@@ -609,7 +616,7 @@ public class ContainerBrowser
             for (int j = 0; j < invSlots; j++)
             {
                 ItemStack invStack = inv.getStackInSlot(j);
-                if (invStack == null)
+                if (invStack.getCount() <= 0)
                     continue;
 
                 boolean found = false;
@@ -618,7 +625,7 @@ public class ContainerBrowser
                 {
                     if (ItemStack.areItemsEqual(cachedStack, invStack) && ItemStack.areItemStackTagsEqual(cachedStack, invStack))
                     {
-                        cachedStack.stackSize += invStack.stackSize;
+                        cachedStack.grow(invStack.getCount());
                         found = true;
                         break;
                     }
@@ -649,7 +656,7 @@ public class ContainerBrowser
         public ItemStack getStackInSlot(int index)
         {
             if (index >= visible.length)
-                return null;
+                return ItemStack.EMPTY;
             return slots.get(visible[index]);
         }
 
@@ -661,13 +668,13 @@ public class ContainerBrowser
         @Override
         public ItemStack insertItem(int slot, ItemStack stack, boolean simulate)
         {
-            return null;
+            return ItemStack.EMPTY;
         }
 
         @Override
         public ItemStack extractItem(int slot, int amount, boolean simulate)
         {
-            return null;
+            return ItemStack.EMPTY;
         }
 
         @Override
@@ -679,13 +686,13 @@ public class ContainerBrowser
     public class FakeInventoryClient implements IItemHandlerModifiable
     {
         private int[] indices;
-        private ItemStack[] stacks;
+        private NonNullList<ItemStack> stacks;
 
         public FakeInventoryClient()
         {
         }
 
-        public void setArray(final ItemStack[] stacks)
+        public void setArray(final NonNullList<ItemStack> stacks)
         {
             this.stacks = stacks;
 
@@ -730,16 +737,16 @@ public class ContainerBrowser
                 {
                     case Alphabetic:
                         indices.sort((ia, ib) -> {
-                            ItemStack a = stacks[ia];
-                            ItemStack b = stacks[ib];
+                            ItemStack a = stacks.get(ia);
+                            ItemStack b = stacks.get(ib);
                             return a.getDisplayName().compareToIgnoreCase(b.getDisplayName());
                         });
                         break;
                     case StackSize:
                         indices.sort((ia, ib) -> {
-                            ItemStack a = stacks[ia];
-                            ItemStack b = stacks[ib];
-                            int diff = a.stackSize - b.stackSize;
+                            ItemStack a = stacks.get(ia);
+                            ItemStack b = stacks.get(ib);
+                            int diff = a.getCount() - b.getCount();
                             if (diff > 0) return -1;
                             if (diff < 0) return 1;
                             return a.getDisplayName().compareToIgnoreCase(b.getDisplayName());
@@ -765,40 +772,37 @@ public class ContainerBrowser
         public ItemStack getStackInSlot(int slot)
         {
             if ((slot + scroll) >= indices.length)
-                return null;
-            ItemStack stack = stacks[indices[slot + scroll]];
-            if (stack != null)
-            {
-                stack = stack.copy();
-                stack.stackSize = 1;
-            }
+                return ItemStack.EMPTY;
+            ItemStack stack = stacks.get(indices[slot + scroll]);
+            stack = stack.copy();
+            stack.setCount(1);
             return stack;
         }
 
         @Override
         public ItemStack insertItem(int slot, ItemStack stack, boolean simulate)
         {
-            return null;
+            return ItemStack.EMPTY;
         }
 
         @Override
         public ItemStack extractItem(int slot, int amount, boolean simulate)
         {
-            return null;
+            return ItemStack.EMPTY;
         }
 
         @Override
         public void setStackInSlot(int slot, ItemStack stack)
         {
             if ((slot + scroll) < indices.length)
-                stacks[indices[slot + scroll]] = stack;
+                stacks.set(indices[slot + scroll], stack);
         }
 
         public int getStackSizeForSlot(int slot)
         {
             if ((slot + scroll) >= indices.length)
                 return 0;
-            return stacks[indices[slot + scroll]].stackSize;
+            return stacks.get(indices[slot + scroll]).getCount();
         }
 
         public int[] getIndices()
