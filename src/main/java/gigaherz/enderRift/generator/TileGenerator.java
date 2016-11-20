@@ -26,16 +26,18 @@ import net.minecraftforge.items.ItemStackHandler;
 public class TileGenerator extends TileEntity
         implements ITickable
 {
-    public static final int SlotCount = 1;
-    public static final int PowerLimit = 100000;
-    public static final int MinHeat = 100;
-    public static final int MaxHeat = 1000;
-    public static final int PowerGenMin = 20;
-    public static final int PowerGenMax = 200;
-    public static final int HeatInterval = 20;
-    public static final int PowerTransferMax = 800;
+    public static final int SLOT_COUNT = 1;
+    public static final int POWER_LIMIT = 100000;
+    public static final int MIN_HEAT = 100;
+    public static final int MAX_HEAT = 1000;
+    public static final int POWERGEN_MIN = 20;
+    public static final int POWERGEN_MAX = 200;
+    public static final int HEAT_INTERVAL = 20;
+    public static final int POWER_TRANSFER_MAX = 800;
 
-    final ItemStackHandler fuelSlot = new ItemStackHandler(SlotCount)
+    private EnergyBuffer energyCapability = new EnergyBuffer(POWER_LIMIT);
+
+    private final ItemStackHandler fuelSlot = new ItemStackHandler(SLOT_COUNT)
     {
         @Override
         protected void onContentsChanged(int slot)
@@ -54,17 +56,15 @@ public class TileGenerator extends TileEntity
         }
     };
 
-    int heatLevel;
-    int burnTimeRemaining;
-    int currentItemBurnTime;
-    int timeInterval;
-
-    EnergyBuffer energyCapability = new EnergyBuffer(PowerLimit);
+    public int heatLevel;
+    public int burnTimeRemaining;
+    public int currentItemBurnTime;
+    public int timeInterval;
 
     private Capability teslaProducerCap;
-    private Object teslaProducerInstance;
-
     private Capability teslaHolderCap;
+
+    private Object teslaProducerInstance;
     private Object teslaHolderInstance;
 
     public TileGenerator()
@@ -113,7 +113,7 @@ public class TileGenerator extends TileEntity
     @Override
     public void update()
     {
-        if (worldObj.isRemote)
+        if (world.isRemote)
             return;
 
         boolean anyChanged;
@@ -130,23 +130,23 @@ public class TileGenerator extends TileEntity
         boolean anyChanged = false;
 
         int minHeatLevel = 0;
-        int heatInterval = HeatInterval;
-        if (worldObj.getBlockState(pos.down()).getBlock() == Blocks.LAVA)
+        int heatInterval = HEAT_INTERVAL;
+        if (world.getBlockState(pos.down()).getBlock() == Blocks.LAVA)
         {
-            minHeatLevel = MinHeat - 1;
+            minHeatLevel = MIN_HEAT - 1;
             if (heatLevel < minHeatLevel)
                 heatInterval = Math.max(1, heatInterval / 2);
         }
 
-        if (timeInterval < HeatInterval)
+        if (timeInterval < HEAT_INTERVAL)
             timeInterval++;
 
         if (burnTimeRemaining > 0)
         {
-            burnTimeRemaining -= Math.max(1, heatLevel / MinHeat);
+            burnTimeRemaining -= Math.max(1, heatLevel / MIN_HEAT);
             if (burnTimeRemaining <= 0)
                 timeInterval = 0;
-            if (timeInterval >= heatInterval && heatLevel < MaxHeat)
+            if (timeInterval >= heatInterval && heatLevel < MAX_HEAT)
             {
                 timeInterval = 0;
                 heatLevel++;
@@ -155,7 +155,7 @@ public class TileGenerator extends TileEntity
         }
         else if (heatLevel > minHeatLevel)
         {
-            if (timeInterval >= HeatInterval)
+            if (timeInterval >= HEAT_INTERVAL)
             {
                 timeInterval = 0;
                 heatLevel--;
@@ -164,7 +164,7 @@ public class TileGenerator extends TileEntity
         }
         else if (minHeatLevel > 0 && heatLevel < minHeatLevel)
         {
-            if (timeInterval >= HeatInterval)
+            if (timeInterval >= HEAT_INTERVAL)
             {
                 timeInterval = 0;
                 heatLevel++;
@@ -172,14 +172,14 @@ public class TileGenerator extends TileEntity
             }
         }
 
-        if (heatLevel >= MinHeat && energyCapability.getEnergyStored() < PowerLimit)
+        if (heatLevel >= MIN_HEAT && energyCapability.getEnergyStored() < POWER_LIMIT)
         {
             int powerGen = getGenerationPower();
-            energyCapability.setEnergy(Math.min(energyCapability.getEnergyStored() + powerGen, PowerLimit));
+            energyCapability.setEnergy(Math.min(energyCapability.getEnergyStored() + powerGen, POWER_LIMIT));
             anyChanged = true;
         }
 
-        if (burnTimeRemaining <= 0 && energyCapability.getEnergyStored() < PowerLimit)
+        if (burnTimeRemaining <= 0 && energyCapability.getEnergyStored() < POWER_LIMIT)
         {
             ItemStack stack = fuelSlot.getStackInSlot(0);
             if (stack != null)
@@ -200,7 +200,7 @@ public class TileGenerator extends TileEntity
     {
         boolean anyChanged = false;
 
-        int sendPower = Math.min(PowerTransferMax, energyCapability.getEnergyStored());
+        int sendPower = Math.min(POWER_TRANSFER_MAX, energyCapability.getEnergyStored());
         if (sendPower > 0)
         {
             IEnergyStorage[] handlers = new IEnergyStorage[6];
@@ -209,7 +209,7 @@ public class TileGenerator extends TileEntity
 
             for (EnumFacing neighbor : EnumFacing.VALUES)
             {
-                TileEntity e = worldObj.getTileEntity(pos.offset(neighbor));
+                TileEntity e = world.getTileEntity(pos.offset(neighbor));
                 EnumFacing from = neighbor.getOpposite();
 
                 if (e == null)
@@ -315,7 +315,7 @@ public class TileGenerator extends TileEntity
 
     public boolean isUseableByPlayer(EntityPlayer player)
     {
-        return worldObj.getTileEntity(pos) == this
+        return world.getTileEntity(pos) == this
                 && player.getDistanceSq(pos.getX() + 0.5D, pos.getY() + 0.5D, pos.getZ() + 0.5D) <= 64.0D;
     }
 
@@ -345,9 +345,9 @@ public class TileGenerator extends TileEntity
 
     public int getGenerationPower()
     {
-        if (heatLevel < MinHeat)
+        if (heatLevel < MIN_HEAT)
             return 0;
-        return Math.max(0, Math.round(PowerGenMin + (PowerGenMax - PowerGenMin) * (heatLevel - MinHeat) / (float) (MaxHeat - MinHeat)));
+        return Math.max(0, Math.round(POWERGEN_MIN + (POWERGEN_MAX - POWERGEN_MIN) * (heatLevel - MIN_HEAT) / (float) (MAX_HEAT - MIN_HEAT)));
     }
 
     public int getContainedEnergy()

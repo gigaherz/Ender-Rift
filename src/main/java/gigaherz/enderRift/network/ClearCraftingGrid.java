@@ -40,19 +40,15 @@ public class ClearCraftingGrid
         public IMessage onMessage(final ClearCraftingGrid message, MessageContext ctx)
         {
             final EntityPlayerMP player = ctx.getServerHandler().playerEntity;
-            final WorldServer world = (WorldServer) player.worldObj;
+            final WorldServer world = (WorldServer) player.world;
 
-            world.addScheduledTask(new Runnable()
+            world.addScheduledTask(() ->
             {
-                @Override
-                public void run()
+                if (player.openContainer != null
+                        && player.openContainer.windowId == message.windowId
+                        && player.openContainer instanceof ContainerCraftingBrowser)
                 {
-                    if (player.openContainer != null
-                            && player.openContainer.windowId == message.windowId
-                            && player.openContainer instanceof ContainerCraftingBrowser)
-                    {
-                        ((ContainerCraftingBrowser) player.openContainer).clearCraftingGrid(player);
-                    }
+                    ((ContainerCraftingBrowser) player.openContainer).clearCraftingGrid(player);
                 }
             });
 

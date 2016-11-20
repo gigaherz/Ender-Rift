@@ -1,6 +1,7 @@
 package gigaherz.enderRift.rift;
 
 import gigaherz.enderRift.EnderRiftMod;
+import gigaherz.enderRift.automation.TileAggregator;
 import gigaherz.enderRift.plugins.tesla.TeslaControllerBase;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.tileentity.TileEntity;
@@ -10,8 +11,10 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.IEnergyStorage;
 
+import javax.annotation.Nullable;
+
 public class TileEnderRiftCorner
-        extends TileEntity
+        extends TileAggregator
 {
     TileEnderRift energyParent;
 
@@ -62,15 +65,43 @@ public class TileEnderRiftCorner
         return super.getCapability(capability, facing);
     }
 
+    @Nullable
+    @Override
+    public IEnergyStorage getEnergyBuffer()
+    {
+        return getInternalBuffer();
+    }
+
+    @Nullable
+    @Override
+    public IEnergyStorage getInternalBuffer()
+    {
+        TileEnderRift parent = getParent();
+        return parent != null ? parent.getEnergyBuffer() : null;
+    }
+
+    @Override
+    protected void lazyDirty()
+    {
+        // Nothing to do
+    }
+
+    @Override
+    protected boolean canConnectSide(EnumFacing side)
+    {
+        return false;
+    }
+
+    @Nullable
     public TileEnderRift getParent()
     {
         if (energyParent == null)
         {
-            IBlockState state = worldObj.getBlockState(pos);
+            IBlockState state = world.getBlockState(pos);
             if (state.getBlock() != EnderRiftMod.structure)
                 return null;
 
-            TileEntity te = worldObj.getTileEntity(getRiftFromCorner(state, pos));
+            TileEntity te = world.getTileEntity(getRiftFromCorner(state, pos));
             if (te instanceof TileEnderRift)
             {
                 energyParent = (TileEnderRift) te;
@@ -81,11 +112,6 @@ public class TileEnderRiftCorner
             }
         }
         return energyParent;
-    }
-
-    public IEnergyStorage getEnergyBuffer()
-    {
-        return getParent().getEnergyBuffer();
     }
 
     private static BlockPos getRiftFromCorner(IBlockState state, BlockPos pos)

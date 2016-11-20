@@ -1,6 +1,7 @@
 package gigaherz.enderRift.rift;
 
 import gigaherz.enderRift.EnderRiftMod;
+import gigaherz.enderRift.automation.TileAggregator;
 import gigaherz.enderRift.common.EnergyBuffer;
 import gigaherz.enderRift.rift.storage.RiftInventory;
 import gigaherz.enderRift.rift.storage.RiftStorageWorldData;
@@ -21,13 +22,14 @@ import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 
 import javax.annotation.Nullable;
+import java.util.List;
 import java.util.Random;
 
 public class TileEnderRift
         extends TileEntity implements ITickable
 {
     private static final int STARTUP_POWER =  10000;
-    private static final int BUFFER_POWER = 1000000;
+    public static final int BUFFER_POWER = 1000000;
     private final Random rand = new Random();
 
     private EnergyBuffer energyBuffer = new EnergyBuffer(BUFFER_POWER);
@@ -52,7 +54,7 @@ public class TileEnderRift
     @Override
     public void update()
     {
-        if (worldObj.isRemote)
+        if (world.isRemote)
         {
             lastPoweringState = poweringState;
             if (powered)
@@ -63,8 +65,8 @@ public class TileEnderRift
 
                     for (int i = 0; i < 32; ++i)
                     {
-                        this.worldObj.spawnParticle(EnumParticleTypes.CRIT_MAGIC, this.pos.getX() + 0.5, this.pos.getY() + 0.5, this.pos.getZ() + 0.5, this.rand.nextGaussian(), this.rand.nextGaussian(), this.rand.nextGaussian());
-                        this.worldObj.spawnParticle(EnumParticleTypes.PORTAL, this.pos.getX() + 0.5, this.pos.getY() + 0.5, this.pos.getZ() + 0.5, this.rand.nextGaussian(), this.rand.nextGaussian(), this.rand.nextGaussian());
+                        this.world.spawnParticle(EnumParticleTypes.CRIT_MAGIC, this.pos.getX() + 0.5, this.pos.getY() + 0.5, this.pos.getZ() + 0.5, this.rand.nextGaussian(), this.rand.nextGaussian(), this.rand.nextGaussian());
+                        this.world.spawnParticle(EnumParticleTypes.PORTAL, this.pos.getX() + 0.5, this.pos.getY() + 0.5, this.pos.getZ() + 0.5, this.rand.nextGaussian(), this.rand.nextGaussian(), this.rand.nextGaussian());
                     }
                 }
                 if (poweringState < 1)
@@ -90,7 +92,7 @@ public class TileEnderRift
             energyStored = energyBuffer.getMaxEnergyStored();
             energyBuffer.setEnergy(energyStored);
         }
-        if (energyStored > energyUsage && !worldObj.isBlockPowered(pos))
+        if (energyStored > energyUsage && !world.isBlockPowered(pos))
         {
             if (powered)
             {
@@ -100,16 +102,16 @@ public class TileEnderRift
             {
                 powered = true;
                 energyBuffer.setEnergy(energyStored - STARTUP_POWER);
-                IBlockState state = worldObj.getBlockState(pos);
-                worldObj.notifyBlockUpdate(pos, state, state, 3);
+                IBlockState state = world.getBlockState(pos);
+                world.notifyBlockUpdate(pos, state, state, 3);
             }
         }
         else
         {
             energyBuffer.setEnergy(0);
             powered = false;
-            IBlockState state = worldObj.getBlockState(pos);
-            worldObj.notifyBlockUpdate(pos, state, state, 3);
+            IBlockState state = world.getBlockState(pos);
+            world.notifyBlockUpdate(pos, state, state, 3);
         }
     }
 
@@ -135,16 +137,16 @@ public class TileEnderRift
 
         if (inventory == null)
         {
-            inventory = RiftStorageWorldData.get(worldObj).getRift(riftId);
+            inventory = RiftStorageWorldData.get(world).getRift(riftId);
             inventory.addWeakListener(this);
         }
         return inventory;
     }
 
     @Override
-    public boolean shouldRefresh(World world, BlockPos pos, IBlockState oldState, IBlockState newSate)
+    public boolean shouldRefresh(World world, BlockPos pos, IBlockState oldState, IBlockState newState)
     {
-        return oldState.getBlock() != newSate.getBlock();
+        return oldState.getBlock() != newState.getBlock();
     }
 
     @Override
@@ -258,7 +260,7 @@ public class TileEnderRift
         IItemHandler handler = getInventory();
         if (handler == null)
             return 0;
-        return MathHelper.ceiling_double_int(Math.pow(handler.getSlots(), 0.8));
+        return MathHelper.ceil(Math.pow(handler.getSlots(), 0.8));
     }
 
     public boolean isPowered()

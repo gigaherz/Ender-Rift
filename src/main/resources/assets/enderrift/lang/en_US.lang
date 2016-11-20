@@ -19,6 +19,7 @@ text.enderrift.interface.filters=Filters
 itemGroup.tabEnderRift=Ender-Rift
 
 text.enderrift.rift.isFormed=Is Formed? %s
+text.enderrift.rift.isPowered=Is Powered? %s
 text.enderrift.rift.riftId=Rift Id: %s
 text.enderrift.rift.usedSlots=%s slots used.
 text.enderrift.rift.energyUsageInsert=%s RF used by next insertion.

@@ -24,7 +24,7 @@ public class RenderRift extends TileEntitySpecialRenderer<TileEnderRift>
         float nextPoweringState = te.getPoweringState();
         float poweringState = lerp(lastPoweringState, nextPoweringState, partialTicks);
 
-        EntityPlayer player = Minecraft.getMinecraft().thePlayer;
+        EntityPlayer player = Minecraft.getMinecraft().player;
 
         double ty = y + 0.5 - player.getEyeHeight();
         double tx = x + 0.5;

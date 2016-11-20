@@ -3,6 +3,7 @@ package gigaherz.enderRift.rift;
 import com.google.common.collect.Lists;
 import gigaherz.common.BlockRegistered;
 import gigaherz.enderRift.EnderRiftMod;
+import gigaherz.enderRift.automation.BlockAggregator;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.PropertyBool;
@@ -24,7 +25,7 @@ import net.minecraft.world.World;
 import java.util.List;
 
 public class BlockStructure
-        extends BlockRegistered
+        extends BlockAggregator<TileEnderRiftCorner>
 {
     public static final PropertyEnum<Type1> TYPE1 = PropertyEnum.create("type1", Type1.class);
     public static final PropertyEnum<Type2> TYPE2 = PropertyEnum.create("type2", Type2.class);
@@ -55,29 +56,9 @@ public class BlockStructure
     }
 
     @Override
-    public TileEntity createTileEntity(World world, IBlockState state)
+    public TileEnderRiftCorner createTileEntity(World world, IBlockState state)
     {
         return new TileEnderRiftCorner();
-    }
-
-    @Deprecated
-    @Override
-    public boolean isOpaqueCube(IBlockState state)
-    {
-        return false;
-    }
-
-    @Deprecated
-    @Override
-    public boolean isFullCube(IBlockState state)
-    {
-        return false;
-    }
-
-    @Override
-    public boolean canBeReplacedByLeaves(IBlockState state, IBlockAccess world, BlockPos pos)
-    {
-        return false;
     }
 
     @Override

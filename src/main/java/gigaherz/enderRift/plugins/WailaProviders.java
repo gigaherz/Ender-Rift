@@ -2,7 +2,6 @@ package gigaherz.enderRift.plugins;
 
 import gigaherz.enderRift.EnderRiftMod;
 import gigaherz.enderRift.automation.TileAggregator;
-import gigaherz.enderRift.automation.driver.BlockDriver;
 import gigaherz.enderRift.automation.driver.TileDriver;
 import gigaherz.enderRift.generator.TileGenerator;
 import gigaherz.enderRift.rift.BlockStructure;
@@ -29,12 +28,14 @@ public class WailaProviders
 {
     private static final String CONFIG_GENERATOR = EnderRiftMod.MODID + ".generator";
     private static final String CONFIG_RIFT = EnderRiftMod.MODID + ".rift";
+    private static final String CONFIG_DRIVER = EnderRiftMod.MODID + ".driver";
     private static final String CONFIG_RF = EnderRiftMod.MODID + ".rf";
 
     public static void callbackRegister(IWailaRegistrar registrar)
     {
         registrar.addConfig("Ender-Rift", CONFIG_GENERATOR);
         registrar.addConfig("Ender-Rift", CONFIG_RIFT);
+        registrar.addConfig("Ender-Rift", CONFIG_DRIVER);
         registrar.addConfig("Ender-Rift", CONFIG_RF);
 
         {
@@ -107,7 +108,7 @@ public class WailaProviders
                 currenttip.add(I18n.format("text." + EnderRiftMod.MODID + ".generator.heat", tag.getInteger("heat")));
 
                 if (config.getConfig(CONFIG_RF))
-                    currenttip.add(I18n.format("text." + EnderRiftMod.MODID + ".generator.energy", tag.getInteger("energy"), TileGenerator.PowerLimit));
+                    currenttip.add(I18n.format("text." + EnderRiftMod.MODID + ".generator.energy", tag.getInteger("energy"), TileGenerator.POWER_LIMIT));
             }
 
             return currenttip;
@@ -151,12 +152,12 @@ public class WailaProviders
         @Override
         public List<String> getWailaBody(ItemStack itemStack, List<String> currenttip, IWailaDataAccessor accessor, IWailaConfigHandler config)
         {
-            if (config.getConfig(CONFIG_GENERATOR))
+            if (config.getConfig(CONFIG_DRIVER))
             {
                 NBTTagCompound tag = accessor.getNBTData();
 
                 if (config.getConfig(CONFIG_RF))
-                    currenttip.add(I18n.format("text." + EnderRiftMod.MODID + ".generator.energy", tag.getInteger("energy"), TileDriver.PowerLimit));
+                    currenttip.add(I18n.format("text." + EnderRiftMod.MODID + ".generator.energy", tag.getInteger("energy"), TileDriver.POWER_LIMIT));
             }
 
             return currenttip;
@@ -173,7 +174,7 @@ public class WailaProviders
         {
             TileDriver rift = (TileDriver) te;
 
-            tag.setInteger("energy", rift.getEnergyBuffer().getEnergyStored());
+            tag.setInteger("energy", rift.getInternalBuffer().getEnergyStored());
 
             return tag;
         }
@@ -275,11 +276,12 @@ public class WailaProviders
                 if (tag != null && tag.hasKey("isFormed"))
                 {
                     currenttip.add(I18n.format("text." + EnderRiftMod.MODID + ".rift.isFormed", tag.getBoolean("isFormed")));
+                    currenttip.add(I18n.format("text." + EnderRiftMod.MODID + ".rift.isPowered", tag.getBoolean("isPowered")));
                     if (tag.getBoolean("isFormed"))
                     {
                         currenttip.add(I18n.format("text." + EnderRiftMod.MODID + ".rift.riftId", tag.getInteger("riftId")));
                         if (config.getConfig(CONFIG_RF))
-                            currenttip.add(I18n.format("text." + EnderRiftMod.MODID + ".rift.rf", tag.getInteger("energy"), tag.getInteger("energyTotal")));
+                            currenttip.add(I18n.format("text." + EnderRiftMod.MODID + ".rift.rf", tag.getInteger("energy"), TileEnderRift.BUFFER_POWER));
                     }
                     currenttip.add(I18n.format("text." + EnderRiftMod.MODID + ".rift.usedSlots", tag.getInteger("usedSlots")));
                 }
@@ -312,11 +314,13 @@ public class WailaProviders
                 rift = (TileEnderRift) te;
             }
 
+            assert rift != null;
+
             tag.setInteger("usedSlots", rift.countInventoryStacks());
             tag.setBoolean("isFormed", rift.getBlockMetadata() != 0);
+            tag.setBoolean("isPowered", rift.isPowered());
             tag.setInteger("riftId", rift.getRiftId());
             tag.setInteger("energy", rift.getEnergyBuffer().getEnergyStored());
-            tag.setInteger("energyTotal", rift.getEnergyBuffer().getMaxEnergyStored());
 
             return tag;
         }

@@ -1,7 +1,7 @@
 {
   "homepage": "https://github.com/gigaherz/Ender-Rift",
   "promos": {
-    "1.10.2-latest": "1.5.0",
+    "1.10.2-latest": "1.10.2-2.0.0",
     "1.10.2-recommended": "1.5.0",
     "1.10-latest": "1.1.0",
     "1.10-recommended": "1.1.0",
@@ -14,7 +14,8 @@
   },
   "1.10.2": {
     "1.1.0": "EXPERIMENTAL: New GraphLib-based interface/browser network.",
-    "1.5.0": "SHINY NEW: A whole lot of refactorings and new features. See the website for more information."
+    "1.5.0": "SHINY NEW: A whole lot of refactorings and new features. See the website for more information.",
+    "1.10.2-2.0.0": "Big revamp of the energy cost."
   },
   "1.10": {
     "1.0.0": "Tesla API compatibility. Fix generators consuming buckets.",

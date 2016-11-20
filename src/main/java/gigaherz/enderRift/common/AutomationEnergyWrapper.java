@@ -19,7 +19,7 @@ public class AutomationEnergyWrapper implements IItemHandler
 
     private double getEnergyInsert()
     {
-        int sizeInventory = owner.getInventory().getSlots();
+        int sizeInventory = getSlots();
         int sizeInventory2 = sizeInventory * sizeInventory;
         return Math.min(ConfigValues.PowerPerInsertionCap,
                 ConfigValues.PowerPerInsertionConstant
@@ -29,7 +29,7 @@ public class AutomationEnergyWrapper implements IItemHandler
 
     private double getEnergyExtract()
     {
-        int sizeInventory = owner.getInventory().getSlots();
+        int sizeInventory = getSlots();
         int sizeInventory2 = sizeInventory * sizeInventory;
         return Math.min(ConfigValues.PowerPerExtractionCap,
                 ConfigValues.PowerPerExtractionConstant
@@ -39,25 +39,27 @@ public class AutomationEnergyWrapper implements IItemHandler
 
     private int getEffectivePowerUsageToInsert(int stackSize)
     {
-        return owner.getWorld().isRemote ? 0 : (int) Math.ceil(getEnergyInsert() * stackSize);
+        return owner.isRemote() ? 0 : (int) Math.ceil(getEnergyInsert() * stackSize);
     }
 
     private int getEffectivePowerUsageToExtract(int limit)
     {
-        return owner.getWorld().isRemote ? 0 : (int) Math.ceil(getEnergyExtract() * limit);
+        return owner.isRemote() ? 0 : (int) Math.ceil(getEnergyExtract() * limit);
     }
 
     @Override
     public int getSlots()
     {
-        return owner.getInventory().getSlots();
+        IItemHandler inventory = owner.getInventory();
+        return inventory != null ? inventory.getSlots() : 0;
     }
 
     @Nullable
     @Override
     public ItemStack getStackInSlot(int slot)
     {
-        return owner.getInventory().getStackInSlot(slot);
+        IItemHandler inventory = owner.getInventory();
+        return inventory != null ? inventory.getStackInSlot(slot) : null;
     }
 
     @Nullable
@@ -66,7 +68,14 @@ public class AutomationEnergyWrapper implements IItemHandler
     {
         int stackSize = stack.stackSize;
         int cost = getEffectivePowerUsageToInsert(stackSize);
-        while (cost > owner.getEnergyBuffer().getEnergyStored() && stackSize > 0)
+
+        IEnergyStorage energyBuffer = owner.getEnergyBuffer();
+        IItemHandler inventory = owner.getInventory();
+
+        if (inventory == null)
+            return null;
+
+        while (cost > energyBuffer.getEnergyStored() && stackSize > 0)
         {
             stackSize--;
         }
@@ -77,7 +86,7 @@ public class AutomationEnergyWrapper implements IItemHandler
         ItemStack temp = stack.copy();
         temp.stackSize = stackSize;
 
-        ItemStack remaining = owner.getInventory().insertItem(slot, temp, simulate);
+        ItemStack remaining = inventory.insertItem(slot, temp, simulate);
 
         if (!simulate)
         {
@@ -85,9 +94,9 @@ public class AutomationEnergyWrapper implements IItemHandler
                 stackSize -= remaining.stackSize;
 
             int actualCost = getEffectivePowerUsageToInsert(stackSize);
-            owner.getEnergyBuffer().extractEnergy(actualCost, false);
+            energyBuffer.extractEnergy(actualCost, false);
 
-            owner.markDirty();
+            owner.setDirty();
         }
 
         return remaining;
@@ -98,7 +107,14 @@ public class AutomationEnergyWrapper implements IItemHandler
     public ItemStack extractItem(int slot, int wanted, boolean simulate)
     {
         int cost = getEffectivePowerUsageToExtract(wanted);
-        while (cost > owner.getEnergyBuffer().getEnergyStored() && wanted > 0)
+
+        IEnergyStorage energyBuffer = owner.getEnergyBuffer();
+        IItemHandler inventory = owner.getInventory();
+
+        if (inventory == null)
+            return null;
+
+        while (cost > energyBuffer.getEnergyStored() && wanted > 0)
         {
             wanted--;
         }
@@ -106,16 +122,16 @@ public class AutomationEnergyWrapper implements IItemHandler
         if (wanted <= 0)
             return null;
 
-        ItemStack extracted = owner.getInventory().extractItem(slot, wanted, simulate);
+        ItemStack extracted = inventory.extractItem(slot, wanted, simulate);
         if (extracted == null)
             return null;
 
         if (!simulate)
         {
             int actualCost = getEffectivePowerUsageToExtract(extracted.stackSize);
-            owner.getEnergyBuffer().extractEnergy(actualCost, false);
+            energyBuffer.extractEnergy(actualCost, false);
 
-            owner.markDirty();
+            owner.setDirty();
         }
 
         return extracted;

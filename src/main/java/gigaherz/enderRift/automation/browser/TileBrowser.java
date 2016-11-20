@@ -20,9 +20,9 @@ public class TileBrowser extends TileAggregator
 
     public EnumFacing getFacing()
     {
-        if (facing == null && worldObj != null)
+        if (facing == null && world != null)
         {
-            IBlockState state = worldObj.getBlockState(pos);
+            IBlockState state = world.getBlockState(pos);
             if (state.getBlock() == EnderRiftMod.browser)
             {
                 facing = state.getValue(BlockInterface.FACING).getOpposite();

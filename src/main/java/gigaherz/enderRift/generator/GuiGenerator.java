@@ -77,7 +77,7 @@ public class GuiGenerator extends GuiContainer
 
         List<String> tooltip = Lists.newArrayList();
         tooltip.add(I18n.format("text." + EnderRiftMod.MODID + ".generator.energy.label"));
-        tooltip.add(String.format("%d / %d RF", tile.getContainedEnergy(), TileGenerator.PowerLimit));
+        tooltip.add(String.format("%d / %d RF", tile.getContainedEnergy(), TileGenerator.POWER_LIMIT));
 
         drawHoveringText(tooltip, mx - guiLeft, my - guiTop);
     }
@@ -96,7 +96,7 @@ public class GuiGenerator extends GuiContainer
             drawTexturedModalRect(guiLeft + 80, guiTop + 36 + 12 - k, 176, 12 - k, 14, k + 1);
         }
 
-        drawEnergyBar(guiLeft + xSize - 14 - 8, guiTop + 20, tile.getContainedEnergy(), TileGenerator.PowerLimit);
+        drawEnergyBar(guiLeft + xSize - 14 - 8, guiTop + 20, tile.getContainedEnergy(), TileGenerator.POWER_LIMIT);
     }
 
     private void drawEnergyBar(int x, int y, int powerLevel, int powerLimit)
@@ -112,11 +112,11 @@ public class GuiGenerator extends GuiContainer
     private int getHeatColor()
     {
         int heatLevel = tile.getHeatValue();
-        if (heatLevel <= TileGenerator.MinHeat)
+        if (heatLevel <= TileGenerator.MIN_HEAT)
             return 0x404040;
 
 
-        float p = (heatLevel - TileGenerator.MinHeat) / (float) (TileGenerator.MaxHeat - TileGenerator.MinHeat);
+        float p = (heatLevel - TileGenerator.MIN_HEAT) / (float) (TileGenerator.MAX_HEAT - TileGenerator.MIN_HEAT);
 
         int r = 0xA0;
         int g = Math.round(0x40 + (0xA0 - 0x40) * (1 - p));

@@ -1,0 +1,186 @@
+<book title="Ender-Rift Servicing Manual" cover="enderrift:book_cover" fontSize="0.75">
+    <include ref="guidebook:xml/standard.xml" />
+    <template id="isometric3" height="48">
+        <element index="0" x="24" y="0" />
+        <element index="3" x="13" y="6" z="20" />
+        <element index="1" x="35" y="6" z="20" />
+        <element index="6" x="2" y="12" z="40" />
+        <element index="4" x="24" y="12" z="40" />
+        <element index="2" x="46" y="12" z="40" />
+        <element index="7" x="13" y="18" z="60" />
+        <element index="5" x="35" y="18" z="60" />
+        <element index="8" x="24" y="24" z="80" />
+    </template>
+    <chapter>
+        <page>
+            <p color="#606060">This book is a work in progress.</p>
+        </page>
+        <page>
+            <space height="20%" />
+            <p space="12" align="center">Gigaherz Industries</p>
+            <p space="12" align="center">presents</p>
+            <p space="0" align="center">Ender-Rift</p>
+            <p space="0" align="center">Servicing</p>
+            <p space="0" align="center">Manual</p>
+            <p space="6" align="center">__________</p>
+        </page>
+        <page>
+            <title>Index</title>
+            <link ref="intro">1. What is Ender-Rift?</link>
+            <link ref="automation">2. Connecting inventories</link>
+            <link ref="generation">3. Generating power</link>
+            <link ref="structure">4. Building the structure</link>
+            <link ref="activation">5. Activating the rift</link>
+            <link ref="duplication">6. Duplicating rifts</link>
+        </page>
+    </chapter>
+    <chapter id="intro">
+        <page>
+            <title>What is Ender-Rift?</title>
+            <p>Ender-Rift is a mod that provides a bottomless storage solution, where the only limitation is your ability to provide it with power.</p>
+            <p>Besides that, there is also an inventory network system, that allows browsing and access to a virtual combined inventory for all the slots connected to the network.</p>
+            <p>This last feature, is what I will be describing first.</p>
+        </page>
+    </chapter>
+    <chapter id="automation">
+        <page>
+            <space height="32">
+                <stack item="enderrift:browser" x="4" y="0" />
+                <space height="7" />
+                <p indent="29" underline="true" italics="true">Connecting inventories</p>
+            </space>
+            <p>The Automation Browser is a block that lets you access an inventory, such as a Chest, or the Ender-Rift, and see its contents. When connected to Automation Proxy blocks, it will allow accessing multiple inventories at once, showing a combined view of all the items present in the network.</p>
+            <p>Extracting and inserting items requires power, which has to be provided through Automation Driver blocks.</p>
+        </page>
+        <page>
+            <space height="32">
+                <stack item="enderrift:interface" x="4" y="0" />
+            </space>
+            <p>The Automation Interface is a block that allows exporting and importing items into the network. It has 9 in/out slots, that will insert any placed items into the network, and 9 filter slots, that can be configured to auto-fill the corresponding in/out slot.</p>
+            <p>Like the Browser, the Interface block can make use of Proxies to connect to multiple storage blocks, and requires power to operate.</p>
+            <big_recipe_>
+                <special feature="lookup recipe" item="enderrift:interface" />
+            </big_recipe_>
+        </page>
+        <page>
+            <space height="32">
+                <stack item="enderrift:proxy" x="4" y="0" />
+            </space>
+            <p>The Automation Proxy is a block that can connect to other automation blocks and inventories, on each of its sides.</p>
+            <p>All the automation blocks connected together form a network, that will share items and energy.</p>
+            <big_recipe_>
+                <special feature="lookup recipe" item="enderrift:proxy" />
+            </big_recipe_>
+        </page>
+        <page>
+            <space height="32">
+                <stack item="enderrift:driver" x="4" y="0" />
+            </space>
+            <p>The Automation Driver is a block that can provide the network with power, but can not connect to inventories by itself.</p>
+            <p>This block accepts both Forge Energy and Tesla, as a source of power. Both are treated as being equivalent as the old RF, in terms of value scaling.</p>
+            <big_recipe_>
+                <special feature="lookup recipe" item="enderrift:driver" />
+            </big_recipe_>
+        </page>
+    </chapter>
+    <chapter id="generation">
+        <page>
+            <space height="32">
+                <stack item="enderrift:generator" x="4" y="0" />
+                <space height="7" />
+                <p indent="29" underline="true" italics="true">Generating power</p>
+            </space>
+            <p>Although any third-party generator/cable using the Forge Energy or Tesla APIs will work to power the Rift and the Driver, for the sake of not relying on external mods, Ender-Rift has its own limited power generation solution.</p>
+            <p>The Rudimentary Generator is slow to start, but once it's heated up, it will reach up to 200 RF-equivalent power units per tick. It is powered by the same fuels that can power a furnace, but it will do no smelting of its own, and it can't be used to charge items.</p>
+        </page>
+        <page>
+            <p>The Rudimentary Generator will push power to Forge- and Tesla-aware consumers/receivers, at no more than 800 RF-equivalent units per tick.</p>
+        </page>
+    </chapter>
+    <chapter id="structure">
+        <page>
+            <space height="32">
+                <stack item="enderrift:rift" x="4" y="0" />
+                <space height="7" />
+                <p indent="29" underline="true" italics="true">Building the structure</p>
+            </space>
+            <p>We have seen so far how to use the automation network to interact with inventories, but we have skipped the most important feature of the mod: The Ender Rift.</p>
+            <p>The Rift is a multiblock structure that provides bottomless storage, so far as you can handle the power drain that maintaining a big rift will require.</p>
+        </page>
+        <page>
+            <p>In order to build the structure, you will need the following items:</p>
+            <p indent="10">* 8x Iron Blocks</p>
+            <p indent="10">* 12x Redstone Blocks</p>
+            <p indent="10">* 1x Rift Core</p>
+            <p indent="10">* 1x Rift Orb (bound or unbound)</p>
+        </page>
+        <page>
+            <isometric3>
+                <stack item="minecraft:iron_block" />
+                <stack item="minecraft:redstone_block" />
+                <stack item="minecraft:iron_block" />
+                <stack item="minecraft:redstone_block" />
+                <space />
+                <stack item="minecraft:redstone_block" />
+                <stack item="minecraft:iron_block" />
+                <stack item="minecraft:redstone_block" />
+                <stack item="minecraft:iron_block" />
+            </isometric3>
+            <p>On the bottom level, you will want 4x Iron Blocks on the corner of the 3x3 area, and on the edges, 4x Redstone Blocks connecting the iron blocks into a square. The center block does not affect the structure and can be anything.</p>
+        </page>
+        <page>
+            <isometric3>
+                <stack item="minecraft:redstone_block" />
+                <space />
+                <stack item="minecraft:redstone_block" />
+                <space />
+                <stack item="enderrift:rift" />
+                <space />
+                <stack item="minecraft:redstone_block" />
+                <space />
+                <stack item="minecraft:redstone_block" />
+            </isometric3>
+            <p>On the middle level, you will want 4x Redstone Blocks on the corners, above the iron blocks placed before. In the center, you will need the rift core block. You can make use of some other block to help you place it.</p>
+        </page>
+        <page>
+            <isometric3>
+                <stack item="minecraft:iron_block" />
+                <stack item="minecraft:redstone_block" />
+                <stack item="minecraft:iron_block" />
+                <stack item="minecraft:redstone_block" />
+                <space />
+                <stack item="minecraft:redstone_block" />
+                <stack item="minecraft:iron_block" />
+                <stack item="minecraft:redstone_block" />
+                <stack item="minecraft:iron_block" />
+            </isometric3>
+            <p>The top level is identical to the bottom, with 4x Iron Blocks and 4x Redstone Blocks.</p>
+        </page>
+    </chapter>
+    <chapter id="activation">
+        <page>
+            <space height="32">
+                <stack item="enderrift:rift_orb" x="4" y="0" />
+                <space height="7" />
+                <p indent="29" underline="true" italics="true">Activating the rift</p>
+            </space>
+            <p>The original Ender-Rift experiment happened in very precise circumstances, that would be practically impossible to reproduce. Thankfully, the great efforts of the engineers have simplified this task considerably.</p>
+            <p>In order to punch a hole into the between-space, you will need a specially prepared, slightly explosive, variant of the ender pearl.</p>
+        </page>
+        <page>
+            <p>When placed inside the Rift Core block, the Rift Orb will react with the energy field of the structure, tearing the barrier between realities.</p>
+            <p>Although this hole will remain stable inside the orb, you will need to maintain a constant supply increasing amounts of power to the structure in order to expand the rift and reach the contents.</p>
+        </page>
+    </chapter>
+    <chapter id="duplication">
+        <page>
+            <space height="32">
+                <stack item="enderrift:rift_orb" count="2" x="4" y="0" />
+                <space height="7" />
+                <p indent="29" underline="true" italics="true">Duplicating rifts</p>
+            </space>
+            <p>Although it has no reasonable explanation, it has been observed experimentally, that if you cram in an unbound orb into an existing activated rift, it will bond together with the existing rift, essentially creating a second hole into the same area of the between-space.</p>
+            <p>It is also possible to achieve the same effect by adding more ender matter and more explosive compound to the rift, and then very carefully splitting the resulting mass into two equally-sized orbs.</p>
+        </page>
+    </chapter>
+</book>

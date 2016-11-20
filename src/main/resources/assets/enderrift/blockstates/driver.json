@@ -1,7 +1,10 @@
 {
   "forge_marker": 1,
   "defaults": {
-    "model": "enderrift:driver_main.obj"
+    "model": "enderrift:driver_main.obj",
+    "textures": {
+      "particle": "minecraft:blocks/hopper_inside"
+    }
   },
   "variants": {
     "inventory": [{ "transform": "forge:default-block" }],

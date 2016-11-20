@@ -2,7 +2,6 @@ package gigaherz.enderRift.automation;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import gigaherz.enderRift.automation.driver.TileDriver;
 import gigaherz.enderRift.common.AutomationEnergyWrapper;
 import gigaherz.enderRift.common.IPoweredAutomation;
 import gigaherz.graph.api.Graph;
@@ -26,6 +25,8 @@ public abstract class TileAggregator extends TileEntity implements ITickable, Gr
     private Graph graph;
     private boolean firstUpdate = true;
     private final List<IItemHandler> connectedInventories = Lists.newArrayList();
+
+    private AutomationEnergyWrapper wrapper = new AutomationEnergyWrapper(this);
 
     // =============================================================================================
     // Graph API bindings
@@ -96,7 +97,7 @@ public abstract class TileAggregator extends TileEntity implements ITickable, Gr
         List<GraphObject> neighbours = Lists.newArrayList();
         for (EnumFacing f : EnumFacing.VALUES)
         {
-            TileEntity teOther = worldObj.getTileEntity(pos.offset(f));
+            TileEntity teOther = world.getTileEntity(pos.offset(f));
             if (!(teOther instanceof TileAggregator))
                 continue;
             GraphObject thingOther = ((TileAggregator) teOther);
@@ -132,6 +133,7 @@ public abstract class TileAggregator extends TileEntity implements ITickable, Gr
         return getCombinedInventoryInternal();
     }
 
+    @Nullable
     @Override
     public IEnergyStorage getEnergyBuffer()
     {
@@ -146,7 +148,7 @@ public abstract class TileAggregator extends TileEntity implements ITickable, Gr
         return oldState.getBlock() != newState.getBlock();
     }
 
-    void updateConnectedInventories()
+    protected void updateConnectedInventories()
     {
         connectedInventories.clear();
 
@@ -155,7 +157,7 @@ public abstract class TileAggregator extends TileEntity implements ITickable, Gr
             if (!canConnectSide(f))
                 continue;
 
-            TileEntity teOther = worldObj.getTileEntity(pos.offset(f));
+            TileEntity teOther = world.getTileEntity(pos.offset(f));
             if (teOther == null)
                 continue;
 
@@ -166,7 +168,7 @@ public abstract class TileAggregator extends TileEntity implements ITickable, Gr
             {
                 if (teOther.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, f.getOpposite()))
                 {
-                    connectedInventories.add(teOther.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, f.getOpposite()));
+                    this.connectedInventories.add(teOther.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, f.getOpposite()));
                 }
             }
         }
@@ -176,14 +178,15 @@ public abstract class TileAggregator extends TileEntity implements ITickable, Gr
 
     protected abstract boolean canConnectSide(EnumFacing side);
 
-    AutomationEnergyWrapper wrapper = new AutomationEnergyWrapper(this);
-
     public IItemHandler getCombinedInventory()
     {
         return wrapper;
     }
 
-    protected IItemHandler getCombinedInventoryInternal()
+    @Nullable
+    public IEnergyStorage getInternalBuffer() {return null;}
+
+    private IItemHandler getCombinedInventoryInternal()
     {
         InventoryAggregator aggregator = new InventoryAggregator();
 
@@ -205,7 +208,7 @@ public abstract class TileAggregator extends TileEntity implements ITickable, Gr
         return aggregator;
     }
 
-    protected IEnergyStorage getCombinedPowerBuffer()
+    private IEnergyStorage getCombinedPowerBuffer()
     {
         EnergyAggregator energy = new EnergyAggregator();
 
@@ -214,14 +217,28 @@ public abstract class TileAggregator extends TileEntity implements ITickable, Gr
 
         for (GraphObject object : getGraph().getObjects())
         {
-            if (!(object instanceof TileDriver))
+            if (!(object instanceof TileAggregator))
                 continue;
-            TileDriver proxy = (TileDriver) object;
 
-            energy.add(proxy.getEnergyBuffer());
+            TileAggregator proxy = (TileAggregator) object;
+
+            IEnergyStorage internalBuffer = proxy.getInternalBuffer();
+            if (internalBuffer != null)
+                energy.add(internalBuffer);
         }
 
         return energy;
     }
 
+    @Override
+    public boolean isRemote()
+    {
+        return getWorld().isRemote;
+    }
+
+    @Override
+    public void setDirty()
+    {
+        markDirty();
+    }
 }

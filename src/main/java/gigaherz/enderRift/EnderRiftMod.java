@@ -29,6 +29,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
@@ -47,7 +48,7 @@ import org.apache.logging.log4j.Logger;
 @Mod.EventBusSubscriber
 @Mod(modid = EnderRiftMod.MODID,
      version = EnderRiftMod.VERSION,
-     dependencies = "after:Waila;required-after:Forge@[12.16.0.1825,)",
+     dependencies = "after:Waila;after:gbook",
      updateJSON = "https://raw.githubusercontent.com/gigaherz/Ender-Rift/master/update.json")
 public class EnderRiftMod
 {
@@ -85,6 +86,9 @@ public class EnderRiftMod
     public static final Logger logger = LogManager.getLogger(MODID);
     public static final GuiHandler guiHandler = new GuiHandler();
     public static final RenamingHelper helper = new RenamingHelper();
+
+    @GameRegistry.ItemStackHolder(value="gbook:guidebook", nbt="{Book:\""+MODID+":xml/book.xml\"}")
+    public static ItemStack book;
 
     @Mod.EventHandler
     public void onMissingMapping(FMLMissingMappingsEvent ev)
@@ -238,6 +242,11 @@ public class EnderRiftMod
                 'c', Blocks.CRAFTING_TABLE,
                 'b', new ItemStack(browser, 1, 0));
 
+        if (book != null)
+        {
+            GameRegistry.addShapelessRecipe(book, Items.BOOK, Items.ENDER_PEARL);
+        }
+
         GameRegistry.addRecipe(new RecipeRiftDuplication());
         RecipeSorter.register(MODID + ":rift_duplication", RecipeRiftDuplication.class, RecipeSorter.Category.SHAPELESS, "after:minecraft:shapeless");
 
@@ -245,7 +254,7 @@ public class EnderRiftMod
 
         FMLInterModComms.sendMessage("Waila", "register", "gigaherz.enderRift.plugins.WailaProviders.callbackRegister");
 
-
+        //FMLInterModComms.sendFunctionMessage("theoneprobe", "getTheOneProbe", "gigaherz.enderRift.plugins.TheOneProbeProviders$initialize");
     }
 
     public static ResourceLocation location(String path)

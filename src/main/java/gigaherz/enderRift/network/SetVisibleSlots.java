@@ -31,7 +31,9 @@ public class SetVisibleSlots
         int num = buf.readInt();
         visible = new int[num];
         for (int i = 0; i < num; i++)
-        { visible[i] = buf.readInt(); }
+        {
+            visible[i] = buf.readInt();
+        }
     }
 
     @Override
@@ -40,7 +42,9 @@ public class SetVisibleSlots
         buf.writeInt(windowId);
         buf.writeInt(visible.length);
         for (int i = 0; i < visible.length; i++)
-        { buf.writeInt(visible[i]); }
+        {
+            buf.writeInt(visible[i]);
+        }
     }
 
     public static class Handler implements IMessageHandler<SetVisibleSlots, IMessage>
@@ -49,19 +53,15 @@ public class SetVisibleSlots
         public IMessage onMessage(final SetVisibleSlots message, MessageContext ctx)
         {
             final EntityPlayerMP player = ctx.getServerHandler().playerEntity;
-            final WorldServer world = (WorldServer) player.worldObj;
+            final WorldServer world = (WorldServer) player.world;
 
-            world.addScheduledTask(new Runnable()
+            world.addScheduledTask(() ->
             {
-                @Override
-                public void run()
+                if (player.openContainer != null
+                        && player.openContainer.windowId == message.windowId
+                        && player.openContainer instanceof ContainerBrowser)
                 {
-                    if (player.openContainer != null
-                            && player.openContainer.windowId == message.windowId
-                            && player.openContainer instanceof ContainerBrowser)
-                    {
-                        ((ContainerBrowser) player.openContainer).setVisibleSlots(message.visible);
-                    }
+                    ((ContainerBrowser) player.openContainer).setVisibleSlots(message.visible);
                 }
             });
 

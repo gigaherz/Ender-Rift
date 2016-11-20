@@ -188,6 +188,7 @@ public class RiftStructure
         {
             rift.assemble(RiftStorageWorldData.get(world).getNextRiftId());
         }
+
     }
 
     public static void dismantle(World world, BlockPos pos)

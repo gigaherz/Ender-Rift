@@ -51,9 +51,10 @@ public abstract class BlockAggregator<T extends TileAggregator> extends BlockReg
     public void neighborChanged(IBlockState state, World worldIn, BlockPos pos, Block blockIn)
     {
         super.neighborChanged(state, worldIn, pos, blockIn);
-        TileAggregator teSelf = (TileAggregator) worldIn.getTileEntity(pos);
-        assert teSelf != null;
-        teSelf.updateNeighbours();
+        TileEntity teSelf = worldIn.getTileEntity(pos);
+        if (!(teSelf instanceof TileAggregator))
+            return;
+        ((TileAggregator)teSelf).updateNeighbours();
     }
 
     @Override
@@ -76,9 +77,10 @@ public abstract class BlockAggregator<T extends TileAggregator> extends BlockReg
 
         if (side != null && isAutomatable(world, pos, side))
         {
-            TileAggregator teSelf = (TileAggregator) world.getTileEntity(pos);
-            assert teSelf != null;
-            teSelf.updateConnectedInventories();
+            TileEntity teSelf = world.getTileEntity(pos);
+            if (!(teSelf instanceof TileAggregator))
+                return;
+            ((TileAggregator)teSelf).updateConnectedInventories();
         }
     }
 

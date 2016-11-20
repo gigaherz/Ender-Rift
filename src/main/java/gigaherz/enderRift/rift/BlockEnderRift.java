@@ -4,6 +4,8 @@ import com.google.common.collect.Lists;
 import gigaherz.common.BlockRegistered;
 import gigaherz.enderRift.EnderRiftMod;
 import gigaherz.enderRift.automation.AutomationHelper;
+import gigaherz.enderRift.automation.BlockAggregator;
+import net.minecraft.block.Block;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.PropertyBool;
@@ -16,6 +18,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
@@ -28,6 +31,8 @@ public class BlockEnderRift
         extends BlockRegistered
 {
     public static final PropertyBool ASSEMBLED = PropertyBool.create("assembled");
+
+    private static final AxisAlignedBB BOUNDS = new AxisAlignedBB(2f/16,2f/16,2f/16,14f/16,14f/16,14f/16);
 
     public BlockEnderRift(String name)
     {
@@ -84,6 +89,13 @@ public class BlockEnderRift
         return state.getValue(ASSEMBLED) ? 1 : 15;
     }
 
+    @Deprecated
+    @Override
+    public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos)
+    {
+        return BOUNDS;
+    }
+
     @Override
     public boolean hasTileEntity(IBlockState state)
     {
@@ -91,7 +103,7 @@ public class BlockEnderRift
     }
 
     @Override
-    public TileEntity createTileEntity(World world, IBlockState state)
+    public TileEnderRift createTileEntity(World world, IBlockState state)
     {
         return new TileEnderRift();
     }

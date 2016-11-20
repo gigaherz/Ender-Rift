@@ -13,9 +13,9 @@ import net.minecraftforge.energy.IEnergyStorage;
 
 public class TileDriver extends TileAggregator
 {
-    public static final int PowerLimit = 100000;
+    public static final int POWER_LIMIT = 100000;
 
-    EnergyBuffer energyBuffer = new EnergyBuffer(PowerLimit);
+    EnergyBuffer energyBuffer = new EnergyBuffer(POWER_LIMIT);
 
     private Capability teslaConsumerCap;
     private Object teslaConsumerInstance;
@@ -74,7 +74,8 @@ public class TileDriver extends TileAggregator
         return false;
     }
 
-    public IEnergyStorage getEnergyBuffer()
+    @Override
+    public IEnergyStorage getInternalBuffer()
     {
         return energyBuffer;
     }

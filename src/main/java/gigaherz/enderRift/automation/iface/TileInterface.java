@@ -39,9 +39,9 @@ public class TileInterface extends TileAggregator implements IPoweredAutomation
 
     public EnumFacing getFacing()
     {
-        if (facing == null && worldObj != null)
+        if (facing == null && world != null)
         {
-            IBlockState state = worldObj.getBlockState(pos);
+            IBlockState state = world.getBlockState(pos);
             if (state.getBlock() == EnderRiftMod.riftInterface)
             {
                 facing = state.getValue(BlockInterface.FACING).getOpposite();
@@ -81,12 +81,6 @@ public class TileInterface extends TileAggregator implements IPoweredAutomation
                 return (T)outputs;
         }
         return super.getCapability(capability, facing);
-    }
-
-    @Override
-    public IEnergyStorage getEnergyBuffer()
-    {
-        return super.getEnergyBuffer();
     }
 
     @Override
@@ -238,7 +232,7 @@ public class TileInterface extends TileAggregator implements IPoweredAutomation
 
     public boolean isUseableByPlayer(EntityPlayer player)
     {
-        return worldObj.getTileEntity(pos) == this
+        return world.getTileEntity(pos) == this
                 && player.getDistanceSq(pos.getX() + 0.5D, pos.getY() + 0.5D, pos.getZ() + 0.5D) <= 64.0D;
     }
 
