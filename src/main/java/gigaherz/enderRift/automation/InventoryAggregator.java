@@ -89,4 +89,19 @@ public class InventoryAggregator implements IItemHandler
         return ItemStack.EMPTY;
     }
 
+    @Override
+    public int getSlotLimit(int index)
+    {
+        for (IItemHandler inv : aggregated)
+        {
+            int size = inv.getSlots();
+            if (index < size)
+            {
+                return inv.getSlotLimit(index);
+            }
+
+            index -= size;
+        }
+        return 0;
+    }
 }

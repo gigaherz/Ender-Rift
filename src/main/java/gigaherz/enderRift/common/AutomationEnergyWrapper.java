@@ -132,4 +132,10 @@ public class AutomationEnergyWrapper implements IItemHandler
 
         return extracted;
     }
+
+    @Override
+    public int getSlotLimit(int slot)
+    {
+        return 64;
+    }
 }

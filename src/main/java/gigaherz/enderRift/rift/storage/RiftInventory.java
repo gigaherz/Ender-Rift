@@ -93,28 +93,28 @@ public class RiftInventory implements IItemHandler
     @Override
     public int getSlots()
     {
-        return inventorySlots.size() + 1;
+        return inventorySlots.size() + 2;
     }
 
     @Override
     public ItemStack getStackInSlot(int index)
     {
-        if (index >= inventorySlots.size())
+        if (index <= 0 || (index-1) >= inventorySlots.size())
             return ItemStack.EMPTY;
-        return inventorySlots.get(index);
+        return inventorySlots.get(index - 1);
     }
 
     @Override
     public ItemStack insertItem(int index, ItemStack stack, boolean simulate)
     {
-        if (index >= inventorySlots.size())
+        if (index <= 0 || (index-1) >= inventorySlots.size())
         {
             inventorySlots.add(stack.copy());
             return ItemStack.EMPTY;
         }
 
         ItemStack remaining = stack.copy();
-        ItemStack slot = inventorySlots.get(index);
+        ItemStack slot = inventorySlots.get(index - 1);
         if (slot != null)
         {
             int max = Math.min(remaining.getMaxStackSize(), 64);
@@ -136,10 +136,12 @@ public class RiftInventory implements IItemHandler
     @Override
     public ItemStack extractItem(int index, int wanted, boolean simulate)
     {
-        if (index >= inventorySlots.size())
+        if (index <= 0 || (index-1) >= inventorySlots.size())
         {
             return ItemStack.EMPTY;
         }
+
+        index--;
 
         ItemStack slot = inventorySlots.get(index);
         if (slot == null)
@@ -168,5 +170,11 @@ public class RiftInventory implements IItemHandler
 
         _extracted.setCount(extractedCount);
         return _extracted;
+    }
+
+    @Override
+    public int getSlotLimit(int slot)
+    {
+        return 64;
     }
 }

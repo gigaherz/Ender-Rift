@@ -678,6 +678,12 @@ public class ContainerBrowser
         }
 
         @Override
+        public int getSlotLimit(int slot)
+        {
+            return 64;
+        }
+
+        @Override
         public void setStackInSlot(int slot, ItemStack stack)
         {
         }
@@ -789,6 +795,12 @@ public class ContainerBrowser
         public ItemStack extractItem(int slot, int amount, boolean simulate)
         {
             return ItemStack.EMPTY;
+        }
+
+        @Override
+        public int getSlotLimit(int slot)
+        {
+            return 64;
         }
 
         @Override

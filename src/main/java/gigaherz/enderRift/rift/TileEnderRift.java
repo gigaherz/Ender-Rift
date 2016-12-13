@@ -1,7 +1,6 @@
 package gigaherz.enderRift.rift;
 
 import gigaherz.enderRift.EnderRiftMod;
-import gigaherz.enderRift.automation.TileAggregator;
 import gigaherz.enderRift.common.EnergyBuffer;
 import gigaherz.enderRift.rift.storage.RiftInventory;
 import gigaherz.enderRift.rift.storage.RiftStorageWorldData;
@@ -22,7 +21,6 @@ import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 
 import javax.annotation.Nullable;
-import java.util.List;
 import java.util.Random;
 
 public class TileEnderRift
@@ -285,6 +283,7 @@ public class TileEnderRift
             IItemHandler handler = getInventory();
             if (handler == null)
                 return 0;
+
             return handler.getSlots();
         }
 
@@ -319,6 +318,12 @@ public class TileEnderRift
             if (handler == null)
                 return ItemStack.EMPTY;
             return handler.extractItem(slot, amount, simulate);
+        }
+
+        @Override
+        public int getSlotLimit(int slot)
+        {
+            return 64;
         }
     }
 }

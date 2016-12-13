@@ -282,6 +282,12 @@ public class TileInterface extends TileAggregator implements IPoweredAutomation
         }
 
         @Override
+        public int getSlotLimit(int slot)
+        {
+            return 1;
+        }
+
+        @Override
         public void setStackInSlot(int index, ItemStack stack)
         {
             filters[index] = stack;
