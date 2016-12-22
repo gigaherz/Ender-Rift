@@ -45,7 +45,7 @@ public class ClientProxy implements IModProxy
         ClientRegistry.bindTileEntitySpecialRenderer(TileEnderRift.class, new RenderRift());
     }
 
-    @Optional.Method(modid="gbook")
+    @Optional.Method(modid = "gbook")
     @SubscribeEvent
     public static void registerBook(BookRegistryEvent event)
     {

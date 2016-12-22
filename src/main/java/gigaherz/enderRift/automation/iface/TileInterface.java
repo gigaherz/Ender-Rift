@@ -1,9 +1,8 @@
 package gigaherz.enderRift.automation.iface;
 
 import gigaherz.enderRift.EnderRiftMod;
-import gigaherz.enderRift.automation.TileAggregator;
 import gigaherz.enderRift.automation.AutomationHelper;
-import gigaherz.enderRift.common.AutomationEnergyWrapper;
+import gigaherz.enderRift.automation.TileAggregator;
 import gigaherz.enderRift.common.IPoweredAutomation;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
@@ -13,7 +12,6 @@ import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.EnumFacing;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.Constants;
-import net.minecraftforge.energy.IEnergyStorage;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.IItemHandlerModifiable;
@@ -79,7 +77,7 @@ public class TileInterface extends TileAggregator implements IPoweredAutomation
         if (facing == getFacing())
         {
             if (capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
-                return (T)outputs;
+                return (T) outputs;
         }
         return super.getCapability(capability, facing);
     }

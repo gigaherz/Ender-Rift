@@ -9,7 +9,6 @@ import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemHandlerHelper;
 
-import javax.annotation.Nullable;
 import java.lang.ref.Reference;
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;
@@ -99,7 +98,7 @@ public class RiftInventory implements IItemHandler
     @Override
     public ItemStack getStackInSlot(int index)
     {
-        if (index <= 0 || (index-1) >= inventorySlots.size())
+        if (index <= 0 || (index - 1) >= inventorySlots.size())
             return ItemStack.EMPTY;
         return inventorySlots.get(index - 1);
     }
@@ -107,7 +106,7 @@ public class RiftInventory implements IItemHandler
     @Override
     public ItemStack insertItem(int index, ItemStack stack, boolean simulate)
     {
-        if (index <= 0 || (index-1) >= inventorySlots.size())
+        if (index <= 0 || (index - 1) >= inventorySlots.size())
         {
             inventorySlots.add(stack.copy());
             return ItemStack.EMPTY;
@@ -136,7 +135,7 @@ public class RiftInventory implements IItemHandler
     @Override
     public ItemStack extractItem(int index, int wanted, boolean simulate)
     {
-        if (index <= 0 || (index-1) >= inventorySlots.size())
+        if (index <= 0 || (index - 1) >= inventorySlots.size())
         {
             return ItemStack.EMPTY;
         }

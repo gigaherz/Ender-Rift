@@ -4,8 +4,6 @@ import com.google.common.collect.Lists;
 import gigaherz.common.BlockRegistered;
 import gigaherz.enderRift.EnderRiftMod;
 import gigaherz.enderRift.automation.AutomationHelper;
-import gigaherz.enderRift.automation.BlockAggregator;
-import net.minecraft.block.Block;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.PropertyBool;
@@ -33,7 +31,7 @@ public class BlockEnderRift
 {
     public static final PropertyBool ASSEMBLED = PropertyBool.create("assembled");
 
-    private static final AxisAlignedBB BOUNDS = new AxisAlignedBB(2f/16,2f/16,2f/16,14f/16,14f/16,14f/16);
+    private static final AxisAlignedBB BOUNDS = new AxisAlignedBB(2f / 16, 2f / 16, 2f / 16, 14f / 16, 14f / 16, 14f / 16);
 
     public BlockEnderRift(String name)
     {

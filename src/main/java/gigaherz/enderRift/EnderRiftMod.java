@@ -1,7 +1,6 @@
 package gigaherz.enderRift;
 
 import gigaherz.common.BlockRegistered;
-import gigaherz.common.RenamingHelper;
 import gigaherz.enderRift.automation.browser.BlockBrowser;
 import gigaherz.enderRift.automation.browser.TileBrowser;
 import gigaherz.enderRift.automation.driver.BlockDriver;
@@ -17,10 +16,8 @@ import gigaherz.enderRift.network.ClearCraftingGrid;
 import gigaherz.enderRift.network.SendSlotChanges;
 import gigaherz.enderRift.network.SetVisibleSlots;
 import gigaherz.enderRift.network.UpdateField;
-import gigaherz.enderRift.rift.RecipeRiftDuplication;
 import gigaherz.enderRift.rift.*;
 import net.minecraft.block.Block;
-import net.minecraft.client.Minecraft;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
@@ -29,12 +26,10 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.event.RegistryEvent;
-import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLInterModComms;
-import net.minecraftforge.fml.common.event.FMLMissingMappingsEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
@@ -47,9 +42,9 @@ import org.apache.logging.log4j.Logger;
 
 @Mod.EventBusSubscriber
 @Mod(modid = EnderRiftMod.MODID,
-     version = EnderRiftMod.VERSION,
-     dependencies = "after:Waila;after:gbook",
-     updateJSON = "https://raw.githubusercontent.com/gigaherz/Ender-Rift/master/update.json")
+        version = EnderRiftMod.VERSION,
+        dependencies = "after:Waila;after:gbook",
+        updateJSON = "https://raw.githubusercontent.com/gigaherz/Ender-Rift/master/update.json")
 public class EnderRiftMod
 {
     public static final String MODID = "enderrift";
@@ -78,7 +73,7 @@ public class EnderRiftMod
     public static EnderRiftMod instance;
 
     @SidedProxy(clientSide = "gigaherz.enderRift.client.ClientProxy",
-                serverSide = "gigaherz.enderRift.server.ServerProxy")
+            serverSide = "gigaherz.enderRift.server.ServerProxy")
     public static IModProxy proxy;
 
     public static SimpleNetworkWrapper channel;
@@ -86,7 +81,7 @@ public class EnderRiftMod
     public static final Logger logger = LogManager.getLogger(MODID);
     public static final GuiHandler guiHandler = new GuiHandler();
 
-    @GameRegistry.ItemStackHolder(value="gbook:guidebook", nbt="{Book:\""+MODID+":xml/book.xml\"}")
+    @GameRegistry.ItemStackHolder(value = "gbook:guidebook", nbt = "{Book:\"" + MODID + ":xml/book.xml\"}")
     public static ItemStack book;
 
     @SubscribeEvent
@@ -240,7 +235,7 @@ public class EnderRiftMod
 
         FMLInterModComms.sendMessage("Waila", "register", "gigaherz.enderRift.plugins.WailaProviders.callbackRegister");
 
-        //FMLInterModComms.sendFunctionMessage("theoneprobe", "getTheOneProbe", "gigaherz.enderRift.plugins.TheOneProbeProviders$initialize");
+        FMLInterModComms.sendFunctionMessage("theoneprobe", "getTheOneProbe", "gigaherz.enderRift.plugins.TheOneProbeProviders");
     }
 
     public static ResourceLocation location(String path)

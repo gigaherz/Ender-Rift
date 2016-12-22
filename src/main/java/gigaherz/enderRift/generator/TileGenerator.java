@@ -96,9 +96,9 @@ public class TileGenerator extends TileEntity
     public <T> T getCapability(Capability<T> capability, @Nullable EnumFacing facing)
     {
         if (capability == CapabilityEnergy.ENERGY)
-            return (T)energyCapability;
+            return (T) energyCapability;
         if (capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
-            return (T)fuelSlot;
+            return (T) fuelSlot;
         if (teslaProducerCap != null && capability == teslaProducerCap)
             return (T) teslaProducerInstance;
         if (teslaHolderCap != null && capability == teslaHolderCap)

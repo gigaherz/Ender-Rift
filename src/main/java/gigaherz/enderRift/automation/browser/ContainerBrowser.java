@@ -21,7 +21,6 @@ import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import org.apache.commons.lang3.StringUtils;
 
-import javax.annotation.Nullable;
 import java.util.Arrays;
 import java.util.List;
 
@@ -202,8 +201,8 @@ public class ContainerBrowser
     {
         NonNullList<ItemStack> oldStacks = currentStacks;
         currentStacks = NonNullList.withSize(newLength, ItemStack.EMPTY);
-        for(int i=0;i<Math.min(newLength,oldLength);i++)
-            currentStacks.set(i, oldStacks.get(i));
+        for (int i = 0; i < Math.min(newLength, oldLength); i++)
+        { currentStacks.set(i, oldStacks.get(i)); }
     }
 
     private void sendStackInCursor(EntityPlayerMP player, ItemStack newStack)
@@ -435,7 +434,7 @@ public class ContainerBrowser
     {
         if (fakeInventoryClient != null)
             return ItemStack.EMPTY;
-        return AutomationHelper.insertItems(parent,dropping);
+        return AutomationHelper.insertItems(parent, dropping);
     }
 
     private ItemStack simulateAddToPlayer(ItemStack stack, int amount)
@@ -742,14 +741,16 @@ public class ContainerBrowser
                 switch (sortMode)
                 {
                     case Alphabetic:
-                        indices.sort((ia, ib) -> {
+                        indices.sort((ia, ib) ->
+                        {
                             ItemStack a = stacks.get(ia);
                             ItemStack b = stacks.get(ib);
                             return a.getDisplayName().compareToIgnoreCase(b.getDisplayName());
                         });
                         break;
                     case StackSize:
-                        indices.sort((ia, ib) -> {
+                        indices.sort((ia, ib) ->
+                        {
                             ItemStack a = stacks.get(ia);
                             ItemStack b = stacks.get(ib);
                             int diff = a.getCount() - b.getCount();

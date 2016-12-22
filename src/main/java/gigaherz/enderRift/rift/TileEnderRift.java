@@ -26,7 +26,7 @@ import java.util.Random;
 public class TileEnderRift
         extends TileEntity implements ITickable
 {
-    private static final int STARTUP_POWER =  10000;
+    private static final int STARTUP_POWER = 10000;
     public static final int BUFFER_POWER = 1000000;
     private final Random rand = new Random();
 
@@ -90,6 +90,7 @@ public class TileEnderRift
             energyStored = energyBuffer.getMaxEnergyStored();
             energyBuffer.setEnergy(energyStored);
         }
+
         if (energyStored > energyUsage && !world.isBlockPowered(pos))
         {
             if (powered)
@@ -106,7 +107,6 @@ public class TileEnderRift
         }
         else
         {
-            energyBuffer.setEnergy(0);
             powered = false;
             IBlockState state = world.getBlockState(pos);
             world.notifyBlockUpdate(pos, state, state, 3);
@@ -212,7 +212,7 @@ public class TileEnderRift
     @Override
     public void onDataPacket(NetworkManager net, SPacketUpdateTileEntity pkt)
     {
-        readFromNBT(pkt.getNbtCompound());
+        handleUpdateTag(pkt.getNbtCompound());
     }
 
     @Override
@@ -228,7 +228,7 @@ public class TileEnderRift
     public <T> T getCapability(Capability<T> capability, @Nullable EnumFacing facing)
     {
         if (capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
-            return (T)poweredInventory;
+            return (T) poweredInventory;
         return super.getCapability(capability, facing);
     }
 

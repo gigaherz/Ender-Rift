@@ -7,6 +7,7 @@ import gigaherz.enderRift.common.IPoweredAutomation;
 import gigaherz.graph.api.Graph;
 import gigaherz.graph.api.GraphObject;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
@@ -183,7 +184,10 @@ public abstract class TileAggregator extends TileEntity implements ITickable, Gr
     }
 
     @Nullable
-    public IEnergyStorage getInternalBuffer() {return null;}
+    public IEnergyStorage getInternalBuffer()
+    {
+        return null;
+    }
 
     private IItemHandler getCombinedInventoryInternal()
     {
@@ -239,5 +243,10 @@ public abstract class TileAggregator extends TileEntity implements ITickable, Gr
     public void setDirty()
     {
         markDirty();
+    }
+
+    @Override
+    public void handleUpdateTag(NBTTagCompound tag)
+    {
     }
 }
