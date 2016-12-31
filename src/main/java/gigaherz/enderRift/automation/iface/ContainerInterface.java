@@ -76,9 +76,9 @@ public class ContainerInterface
                     copy.setCount(1);
                     slot.putStack(copy);
                 }
-                else if (slot.getStack() != null)
+                else if (slot.getStack().getCount() > 0)
                 {
-                    slot.putStack(null);
+                    slot.putStack(ItemStack.EMPTY);
                 }
 
                 return slot.getStack().copy();
