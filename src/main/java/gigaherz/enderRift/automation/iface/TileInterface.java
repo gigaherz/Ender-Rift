@@ -242,7 +242,7 @@ public class TileInterface extends TileAggregator implements IPoweredAutomation
 
         public FilterInventory(int slotCount)
         {
-            filters = NonNullList.withSize(slotCount,ItemStack.EMPTY);
+            filters = NonNullList.withSize(slotCount, ItemStack.EMPTY);
         }
 
         @Override

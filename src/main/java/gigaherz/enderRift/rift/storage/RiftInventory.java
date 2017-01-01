@@ -92,29 +92,32 @@ public class RiftInventory implements IItemHandler
     @Override
     public int getSlots()
     {
-        return inventorySlots.size() + 2;
+        return inventorySlots.size() + 1;
     }
 
     @Override
     public ItemStack getStackInSlot(int index)
     {
-        if (index <= 0 || (index - 1) >= inventorySlots.size())
+        if (index >= inventorySlots.size())
             return ItemStack.EMPTY;
-        return inventorySlots.get(index - 1);
+        return inventorySlots.get(index);
     }
 
     @Override
     public ItemStack insertItem(int index, ItemStack stack, boolean simulate)
     {
-        if (index <= 0 || (index - 1) >= inventorySlots.size())
+        if (index >= inventorySlots.size())
         {
-            inventorySlots.add(stack.copy());
+            if (!simulate) {
+                inventorySlots.add(stack.copy());
+                onContentsChanged();
+            }
             return ItemStack.EMPTY;
         }
 
         ItemStack remaining = stack.copy();
-        ItemStack slot = inventorySlots.get(index - 1);
-        if (slot != null)
+        ItemStack slot = inventorySlots.get(index);
+        if (slot.getCount() > 0)
         {
             int max = Math.min(remaining.getMaxStackSize(), 64);
             int transfer = Math.min(remaining.getCount(), max - slot.getCount());
@@ -127,7 +130,7 @@ public class RiftInventory implements IItemHandler
             }
         }
 
-        onContentsChanged();
+        if (!simulate) onContentsChanged();
 
         return remaining;
     }
@@ -135,12 +138,10 @@ public class RiftInventory implements IItemHandler
     @Override
     public ItemStack extractItem(int index, int wanted, boolean simulate)
     {
-        if (index <= 0 || (index - 1) >= inventorySlots.size())
+        if (index >= inventorySlots.size())
         {
             return ItemStack.EMPTY;
         }
-
-        index--;
 
         ItemStack slot = inventorySlots.get(index);
         if (slot == null)
@@ -165,7 +166,7 @@ public class RiftInventory implements IItemHandler
         if (extractedCount <= 0)
             return ItemStack.EMPTY;
 
-        onContentsChanged();
+        if (!simulate) onContentsChanged();
 
         _extracted.setCount(extractedCount);
         return _extracted;

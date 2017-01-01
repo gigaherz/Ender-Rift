@@ -110,6 +110,7 @@ public class AutomationEnergyWrapper implements IItemHandler
         while (cost > energyBuffer.getEnergyStored() && wanted > 0)
         {
             wanted--;
+            cost = getEffectivePowerUsageToExtract(wanted);
         }
 
         if (wanted <= 0)

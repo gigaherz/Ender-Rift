@@ -72,18 +72,6 @@ public abstract class AutomationHelper
                 {
                     ItemStack obtained = parent.extractItem(i, requested, simulate);
 
-                    if (obtained.getCount() > 0 && !simulate)
-                    {
-                        int remaining = slot.getCount() - obtained.getCount();
-                        int found = 0;
-                        slot = parent.getStackInSlot(i);
-                        if (slot.getCount() > 0)
-                            found = slot.getCount();
-
-                        if (found != remaining)
-                            EnderRiftMod.logger.warn("DAFUQ, Found an incorrect number of items in the slot " + i + " after extraction! Found: " + found + " expected " + remaining);
-                    }
-
                     int returned = obtained.getCount();
 
                     extractCount += returned;

@@ -333,7 +333,7 @@ public class ContainerBrowser
 
                         dropping.shrink(push.getCount());
 
-                        if (remaining != null)
+                        if (remaining.getCount() > 0)
                         {
                             if (push.getCount() != remaining.getCount())
                                 tile.markDirty();
