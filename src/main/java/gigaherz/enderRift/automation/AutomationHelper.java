@@ -1,6 +1,5 @@
 package gigaherz.enderRift.automation;
 
-import gigaherz.enderRift.EnderRiftMod;
 import gigaherz.enderRift.plugins.tesla.TeslaControllerBase;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
