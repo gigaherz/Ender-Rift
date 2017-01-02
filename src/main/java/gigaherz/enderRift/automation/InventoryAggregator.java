@@ -1,12 +1,9 @@
 package gigaherz.enderRift.automation;
 
 import com.google.common.collect.Lists;
-import gigaherz.enderRift.ConfigValues;
-import gigaherz.enderRift.EnderRiftMod;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.items.IItemHandler;
 
-import javax.annotation.Nonnull;
 import java.util.List;
 
 public class InventoryAggregator implements IItemHandler
@@ -88,5 +85,4 @@ public class InventoryAggregator implements IItemHandler
         }
         return null;
     }
-
 }

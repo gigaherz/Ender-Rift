@@ -1,7 +1,9 @@
 package gigaherz.enderRift.plugins.tesla;
-;
+
 import net.darkhax.tesla.api.ITeslaProducer;
 import net.minecraftforge.energy.IEnergyStorage;
+
+;
 
 public class TeslaEnergyProducer implements ITeslaProducer
 {

@@ -1,9 +1,8 @@
 package gigaherz.enderRift.automation.iface;
 
 import gigaherz.enderRift.EnderRiftMod;
-import gigaherz.enderRift.automation.TileAggregator;
 import gigaherz.enderRift.automation.AutomationHelper;
-import gigaherz.enderRift.common.AutomationEnergyWrapper;
+import gigaherz.enderRift.automation.TileAggregator;
 import gigaherz.enderRift.common.IPoweredAutomation;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
@@ -13,7 +12,6 @@ import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.EnumFacing;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.Constants;
-import net.minecraftforge.energy.IEnergyStorage;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.IItemHandlerModifiable;
@@ -37,6 +35,7 @@ public class TileInterface extends TileAggregator implements IPoweredAutomation
 
     private EnumFacing facing = null;
 
+    @Nullable
     public EnumFacing getFacing()
     {
         if (facing == null && world != null)
@@ -61,7 +60,7 @@ public class TileInterface extends TileAggregator implements IPoweredAutomation
     }
 
     @Override
-    public boolean hasCapability(Capability<?> capability, EnumFacing facing)
+    public boolean hasCapability(Capability<?> capability, @Nullable EnumFacing facing)
     {
         if (facing == getFacing())
         {
@@ -73,12 +72,12 @@ public class TileInterface extends TileAggregator implements IPoweredAutomation
 
     @SuppressWarnings("unchecked")
     @Override
-    public <T> T getCapability(Capability<T> capability, EnumFacing facing)
+    public <T> T getCapability(Capability<T> capability, @Nullable EnumFacing facing)
     {
         if (facing == getFacing())
         {
             if (capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
-                return (T)outputs;
+                return (T) outputs;
         }
         return super.getCapability(capability, facing);
     }
@@ -283,27 +282,12 @@ public class TileInterface extends TileAggregator implements IPoweredAutomation
         @Override
         public void setStackInSlot(int index, ItemStack stack)
         {
+            stack = stack != null ? stack.copy() : null;
+            if (stack != null) stack.stackSize = 1;
+
             filters[index] = stack;
 
-            if (stack != null && stack.stackSize > this.getInventoryStackLimit())
-            {
-                stack.stackSize = this.getInventoryStackLimit();
-            }
-
             markDirty();
-        }
-
-        public int getInventoryStackLimit()
-        {
-            return 1;
-        }
-
-        public void clear()
-        {
-            for (int i = 0; i < filters.length; ++i)
-            {
-                filters[i] = null;
-            }
         }
     }
 }

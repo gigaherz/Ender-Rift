@@ -4,8 +4,6 @@ import com.google.common.collect.Lists;
 import gigaherz.common.BlockRegistered;
 import gigaherz.enderRift.EnderRiftMod;
 import gigaherz.enderRift.automation.AutomationHelper;
-import gigaherz.enderRift.automation.BlockAggregator;
-import net.minecraft.block.Block;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.PropertyBool;
@@ -24,6 +22,7 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.items.CapabilityItemHandler;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,7 +31,7 @@ public class BlockEnderRift
 {
     public static final PropertyBool ASSEMBLED = PropertyBool.create("assembled");
 
-    private static final AxisAlignedBB BOUNDS = new AxisAlignedBB(2f/16,2f/16,2f/16,14f/16,14f/16,14f/16);
+    private static final AxisAlignedBB BOUNDS = new AxisAlignedBB(2f / 16, 2f / 16, 2f / 16, 14f / 16, 14f / 16, 14f / 16);
 
     public BlockEnderRift(String name)
     {
@@ -131,7 +130,7 @@ public class BlockEnderRift
     }
 
     @Override
-    public void harvestBlock(World worldIn, EntityPlayer player, BlockPos pos, IBlockState state, TileEntity te, ItemStack stack)
+    public void harvestBlock(World worldIn, EntityPlayer player, BlockPos pos, IBlockState state, @Nullable TileEntity te, ItemStack stack)
     {
         super.harvestBlock(worldIn, player, pos, state, te, stack);
         worldIn.setBlockToAir(pos);
@@ -221,7 +220,7 @@ public class BlockEnderRift
         if (extracted != null && extracted.stackSize > 0)
         {
             EntityItem entityItem = new EntityItem(worldIn, playerIn.posX, playerIn.posY + playerIn.getEyeHeight() / 2, playerIn.posZ, extracted);
-            worldIn.spawnEntityInWorld(entityItem);
+            worldIn.spawnEntity(entityItem);
         }
     }
 

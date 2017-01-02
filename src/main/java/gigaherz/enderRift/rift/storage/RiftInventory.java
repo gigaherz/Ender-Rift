@@ -111,7 +111,10 @@ public class RiftInventory implements IItemHandler
     {
         if (index >= inventorySlots.size())
         {
-            inventorySlots.add(stack.copy());
+            if (!simulate) {
+                inventorySlots.add(stack.copy());
+                onContentsChanged();
+            }
             return null;
         }
 
@@ -130,7 +133,7 @@ public class RiftInventory implements IItemHandler
             }
         }
 
-        onContentsChanged();
+        if (!simulate) onContentsChanged();
 
         return remaining;
     }
@@ -167,7 +170,8 @@ public class RiftInventory implements IItemHandler
         if (extracted.stackSize <= 0)
             return null;
 
-        onContentsChanged();
+        if (!simulate) onContentsChanged();
+
         return extracted;
     }
 }

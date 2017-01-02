@@ -428,7 +428,7 @@ public class ContainerBrowser
     {
         if (fakeInventoryClient != null)
             return null;
-        return AutomationHelper.insertItems(parent,dropping);
+        return AutomationHelper.insertItems(parent, dropping);
     }
 
     @Nullable
@@ -464,8 +464,9 @@ public class ContainerBrowser
                 Slot slot = this.inventorySlots.get(i);
                 ItemStack stackInSlot = slot.getStack();
 
-                if (stackInSlot != null && stackInSlot.stackSize < stackInSlot.getMaxStackSize() &&
-                        ItemStack.areItemsEqual(stackInSlot, stack) && ItemStack.areItemStackTagsEqual(stack, stackInSlot))
+                if (stackInSlot != null && stackInSlot.stackSize < stackInSlot.getMaxStackSize()
+                        && ItemStack.areItemsEqual(stackInSlot, stack)
+                        && ItemStack.areItemStackTagsEqual(stack, stackInSlot))
                 {
                     int j = stackInSlot.stackSize + stack.stackSize;
 
@@ -729,14 +730,16 @@ public class ContainerBrowser
                 switch (sortMode)
                 {
                     case Alphabetic:
-                        indices.sort((ia, ib) -> {
+                        indices.sort((ia, ib) ->
+                        {
                             ItemStack a = stacks[ia];
                             ItemStack b = stacks[ib];
                             return a.getDisplayName().compareToIgnoreCase(b.getDisplayName());
                         });
                         break;
                     case StackSize:
-                        indices.sort((ia, ib) -> {
+                        indices.sort((ia, ib) ->
+                        {
                             ItemStack a = stacks[ia];
                             ItemStack b = stacks[ib];
                             int diff = a.stackSize - b.stackSize;

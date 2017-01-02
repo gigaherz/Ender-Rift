@@ -186,8 +186,8 @@ public class GuiBrowser extends GuiContainer
         zLevel = 100.0F;
         itemRender.zLevel = 100.0F;
 
-        int xPosition = slotIn.xDisplayPosition;
-        int yPosition = slotIn.yDisplayPosition;
+        int xPosition = slotIn.xPos;
+        int yPosition = slotIn.yPos;
         ItemStack stack = slotIn.getStack();
 
         if (stack != null)

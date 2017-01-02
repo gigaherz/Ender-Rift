@@ -90,7 +90,7 @@ public class RiftStructure
         ItemStack stack = ((TileEnderRift) te).getRiftItem();
 
         Entity entity = new EntityItem(world, player.posX, player.posY + 0.5f, player.posZ, stack);
-        world.spawnEntityInWorld(entity);
+        world.spawnEntity(entity);
 
         return true;
     }
@@ -188,7 +188,6 @@ public class RiftStructure
         {
             rift.assemble(RiftStorageWorldData.get(world).getNextRiftId());
         }
-
     }
 
     public static void dismantle(World world, BlockPos pos)
@@ -220,7 +219,7 @@ public class RiftStructure
 
             ItemStack stack = rift.getRiftItem();
             Entity entity = new EntityItem(world, pos.getX(), pos.getY(), pos.getZ(), stack);
-            world.spawnEntityInWorld(entity);
+            world.spawnEntity(entity);
 
             rift.unassemble();
         }

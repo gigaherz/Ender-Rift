@@ -2,7 +2,6 @@ package gigaherz.enderRift.common;
 
 import gigaherz.enderRift.ConfigValues;
 import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.energy.IEnergyStorage;
 import net.minecraftforge.items.IItemHandler;
 
@@ -23,8 +22,8 @@ public class AutomationEnergyWrapper implements IItemHandler
         int sizeInventory2 = sizeInventory * sizeInventory;
         return Math.min(ConfigValues.PowerPerInsertionCap,
                 ConfigValues.PowerPerInsertionConstant
-                + (sizeInventory * ConfigValues.PowerPerInsertionLinear)
-                + (sizeInventory2 * ConfigValues.PowerPerInsertionGeometric));
+                        + (sizeInventory * ConfigValues.PowerPerInsertionLinear)
+                        + (sizeInventory2 * ConfigValues.PowerPerInsertionGeometric));
     }
 
     private double getEnergyExtract()
@@ -33,8 +32,8 @@ public class AutomationEnergyWrapper implements IItemHandler
         int sizeInventory2 = sizeInventory * sizeInventory;
         return Math.min(ConfigValues.PowerPerExtractionCap,
                 ConfigValues.PowerPerExtractionConstant
-                + (sizeInventory * ConfigValues.PowerPerExtractionLinear)
-                + (sizeInventory2 * ConfigValues.PowerPerExtractionGeometric));
+                        + (sizeInventory * ConfigValues.PowerPerExtractionLinear)
+                        + (sizeInventory2 * ConfigValues.PowerPerExtractionGeometric));
     }
 
     private int getEffectivePowerUsageToInsert(int stackSize)

@@ -1,9 +1,9 @@
 package gigaherz.enderRift.automation.driver;
 
 import gigaherz.enderRift.EnderRiftMod;
+import gigaherz.enderRift.automation.AutomationHelper;
 import gigaherz.enderRift.automation.BlockAggregator;
 import gigaherz.enderRift.automation.TileAggregator;
-import gigaherz.enderRift.automation.AutomationHelper;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
@@ -26,13 +26,13 @@ public class BlockDriver extends BlockAggregator<TileDriver>
     public static final PropertyBool UP = PropertyBool.create("up");
     public static final PropertyBool DOWN = PropertyBool.create("down");
 
-    private static final AxisAlignedBB BOUNDS = new AxisAlignedBB(3.5f/16,3.5f/16,3.5f/16,12.5f/16,12.5f/16,12.5f/16);
-    private static final AxisAlignedBB BOUNDS_NORTH = new AxisAlignedBB(6/16f,6/16f,0/16f,10/16f,10/16f,10/16f);
-    private static final AxisAlignedBB BOUNDS_SOUTH = new AxisAlignedBB(6/16f,6/16f,6/16f,10/16f,10/16f,16/16f);
-    private static final AxisAlignedBB BOUNDS_EAST = new AxisAlignedBB(6/16f,6/16f,6/16f,16/16f,10/16f,10/16f);
-    private static final AxisAlignedBB BOUNDS_WEST = new AxisAlignedBB(0/16f,6/16f,6/16f,10/16f,10/16f,10/16f);
-    private static final AxisAlignedBB BOUNDS_UP = new AxisAlignedBB(6/16f,6/16f,6/16f,10/16f,16/16f,10/16f);
-    private static final AxisAlignedBB BOUNDS_DOWN = new AxisAlignedBB(6/16f,0/16f,6/16f,10/16f,10/16f,10/16f);
+    private static final AxisAlignedBB BOUNDS = new AxisAlignedBB(3.5f / 16, 3.5f / 16, 3.5f / 16, 12.5f / 16, 12.5f / 16, 12.5f / 16);
+    private static final AxisAlignedBB BOUNDS_NORTH = new AxisAlignedBB(6 / 16f, 6 / 16f, 0 / 16f, 10 / 16f, 10 / 16f, 10 / 16f);
+    private static final AxisAlignedBB BOUNDS_SOUTH = new AxisAlignedBB(6 / 16f, 6 / 16f, 6 / 16f, 10 / 16f, 10 / 16f, 16 / 16f);
+    private static final AxisAlignedBB BOUNDS_EAST = new AxisAlignedBB(6 / 16f, 6 / 16f, 6 / 16f, 16 / 16f, 10 / 16f, 10 / 16f);
+    private static final AxisAlignedBB BOUNDS_WEST = new AxisAlignedBB(0 / 16f, 6 / 16f, 6 / 16f, 10 / 16f, 10 / 16f, 10 / 16f);
+    private static final AxisAlignedBB BOUNDS_UP = new AxisAlignedBB(6 / 16f, 6 / 16f, 6 / 16f, 10 / 16f, 16 / 16f, 10 / 16f);
+    private static final AxisAlignedBB BOUNDS_DOWN = new AxisAlignedBB(6 / 16f, 0 / 16f, 6 / 16f, 10 / 16f, 10 / 16f, 10 / 16f);
 
     public BlockDriver(String name)
     {
@@ -69,12 +69,12 @@ public class BlockDriver extends BlockAggregator<TileDriver>
         state = state.getActualState(source, pos);
 
         AxisAlignedBB bb = BOUNDS;
-        if (state.getValue(NORTH)) bb=bb.union(BOUNDS_NORTH);
-        if (state.getValue(SOUTH)) bb=bb.union(BOUNDS_SOUTH);
-        if (state.getValue(EAST)) bb=bb.union(BOUNDS_EAST);
-        if (state.getValue(WEST)) bb=bb.union(BOUNDS_WEST);
-        if (state.getValue(UP)) bb=bb.union(BOUNDS_UP);
-        if (state.getValue(DOWN)) bb=bb.union(BOUNDS_DOWN);
+        if (state.getValue(NORTH)) bb = bb.union(BOUNDS_NORTH);
+        if (state.getValue(SOUTH)) bb = bb.union(BOUNDS_SOUTH);
+        if (state.getValue(EAST)) bb = bb.union(BOUNDS_EAST);
+        if (state.getValue(WEST)) bb = bb.union(BOUNDS_WEST);
+        if (state.getValue(UP)) bb = bb.union(BOUNDS_UP);
+        if (state.getValue(DOWN)) bb = bb.union(BOUNDS_DOWN);
         return bb;
     }
 

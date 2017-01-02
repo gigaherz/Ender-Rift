@@ -1,6 +1,5 @@
 package gigaherz.enderRift.automation;
 
-import gigaherz.enderRift.EnderRiftMod;
 import gigaherz.enderRift.plugins.tesla.TeslaControllerBase;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
@@ -39,7 +38,7 @@ public abstract class AutomationHelper
         return cap.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, facing);
     }
 
-    public static ItemStack insertItems( @Nonnull IItemHandler parent, @Nonnull ItemStack stack)
+    public static ItemStack insertItems(@Nonnull IItemHandler parent, @Nonnull ItemStack stack)
     {
         ItemStack remaining = stack.copy();
 
@@ -56,7 +55,7 @@ public abstract class AutomationHelper
         return null;
     }
 
-    public static ItemStack extractItems( @Nonnull IItemHandler parent, @Nonnull ItemStack stack, int wanted, boolean simulate)
+    public static ItemStack extractItems(@Nonnull IItemHandler parent, @Nonnull ItemStack stack, int wanted, boolean simulate)
     {
         if (stack.stackSize <= 0 || wanted <= 0)
             return null;
@@ -73,18 +72,6 @@ public abstract class AutomationHelper
                 if (requested > 0 && ItemStack.areItemsEqual(slot, stack) && ItemStack.areItemStackTagsEqual(slot, stack))
                 {
                     ItemStack obtained = parent.extractItem(i, requested, simulate);
-
-                    if (obtained != null && !simulate)
-                    {
-                        int remaining = slot.stackSize - obtained.stackSize;
-                        int found = 0;
-                        slot = parent.getStackInSlot(i);
-                        if (slot != null)
-                            found = slot.stackSize;
-
-                        if (found != remaining)
-                            EnderRiftMod.logger.warn("DAFUQ, Found an incorrect number of items in the slot " + i + " after extraction! Found: " + found + " expected " + remaining);
-                    }
 
                     int returned = (obtained != null) ? obtained.stackSize : 0;
 

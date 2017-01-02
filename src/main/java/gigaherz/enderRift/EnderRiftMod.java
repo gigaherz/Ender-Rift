@@ -17,10 +17,8 @@ import gigaherz.enderRift.network.ClearCraftingGrid;
 import gigaherz.enderRift.network.SendSlotChanges;
 import gigaherz.enderRift.network.SetVisibleSlots;
 import gigaherz.enderRift.network.UpdateField;
-import gigaherz.enderRift.rift.RecipeRiftDuplication;
 import gigaherz.enderRift.rift.*;
 import net.minecraft.block.Block;
-import net.minecraft.client.Minecraft;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
@@ -29,7 +27,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.event.RegistryEvent;
-import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
@@ -47,9 +44,9 @@ import org.apache.logging.log4j.Logger;
 
 @Mod.EventBusSubscriber
 @Mod(modid = EnderRiftMod.MODID,
-     version = EnderRiftMod.VERSION,
-     dependencies = "after:Waila;after:gbook",
-     updateJSON = "https://raw.githubusercontent.com/gigaherz/Ender-Rift/master/update.json")
+        version = EnderRiftMod.VERSION,
+        dependencies = "after:Waila;after:gbook",
+        updateJSON = "https://raw.githubusercontent.com/gigaherz/Ender-Rift/master/update.json")
 public class EnderRiftMod
 {
     public static final String MODID = "enderrift";
@@ -78,7 +75,7 @@ public class EnderRiftMod
     public static EnderRiftMod instance;
 
     @SidedProxy(clientSide = "gigaherz.enderRift.client.ClientProxy",
-                serverSide = "gigaherz.enderRift.server.ServerProxy")
+            serverSide = "gigaherz.enderRift.server.ServerProxy")
     public static IModProxy proxy;
 
     public static SimpleNetworkWrapper channel;
@@ -87,7 +84,7 @@ public class EnderRiftMod
     public static final GuiHandler guiHandler = new GuiHandler();
     public static final RenamingHelper helper = new RenamingHelper();
 
-    @GameRegistry.ItemStackHolder(value="gbook:guidebook", nbt="{Book:\""+MODID+":xml/book.xml\"}")
+    @GameRegistry.ItemStackHolder(value = "gbook:guidebook", nbt = "{Book:\"" + MODID + ":xml/book.xml\"}")
     public static ItemStack book;
 
     @Mod.EventHandler
@@ -128,12 +125,12 @@ public class EnderRiftMod
 
     private static void registerTileEntities()
     {
-        GameRegistry.registerTileEntity(TileEnderRift.class, rift.getRegistryName().toString());
-        GameRegistry.registerTileEntity(TileEnderRiftCorner.class, location("rift_structure_corner").toString());
-        GameRegistry.registerTileEntity(TileInterface.class, riftInterface.getRegistryName().toString());
-        GameRegistry.registerTileEntity(TileBrowser.class, browser.getRegistryName().toString());
-        GameRegistry.registerTileEntity(TileProxy.class, extension.getRegistryName().toString());
-        GameRegistry.registerTileEntity(TileGenerator.class, generator.getRegistryName().toString());
+        GameRegistry.registerTileEntityWithAlternatives(TileEnderRift.class, rift.getRegistryName().toString(), "tileEnderRift");
+        GameRegistry.registerTileEntityWithAlternatives(TileEnderRiftCorner.class, location("rift_structure_corner").toString(), "tileStructureCorner");
+        GameRegistry.registerTileEntityWithAlternatives(TileInterface.class, riftInterface.getRegistryName().toString(), "tileInterface");
+        GameRegistry.registerTileEntityWithAlternatives(TileBrowser.class, browser.getRegistryName().toString(), "tileBrowser");
+        GameRegistry.registerTileEntityWithAlternatives(TileProxy.class, extension.getRegistryName().toString(), "tileProxy");
+        GameRegistry.registerTileEntityWithAlternatives(TileGenerator.class, generator.getRegistryName().toString(), "tileGenerator");
         GameRegistry.registerTileEntity(TileDriver.class, driver.getRegistryName().toString());
     }
 
@@ -152,13 +149,6 @@ public class EnderRiftMod
         helper.addAlternativeName(browser, location("blockBrowser"));
         helper.addAlternativeName(extension, location("blockProxy"));
         helper.addAlternativeName(generator, location("blockGenerator"));
-
-        helper.addAlternativeName(TileEnderRift.class, "tileEnderRift");
-        helper.addAlternativeName(TileEnderRiftCorner.class, "tileStructureCorner");
-        helper.addAlternativeName(TileInterface.class, "tileInterface");
-        helper.addAlternativeName(TileBrowser.class, "tileBrowser");
-        helper.addAlternativeName(TileProxy.class, "tileProxy");
-        helper.addAlternativeName(TileGenerator.class, "tileGenerator");
 
         channel = NetworkRegistry.INSTANCE.newSimpleChannel(CHANNEL);
 
@@ -254,7 +244,7 @@ public class EnderRiftMod
 
         FMLInterModComms.sendMessage("Waila", "register", "gigaherz.enderRift.plugins.WailaProviders.callbackRegister");
 
-        //FMLInterModComms.sendFunctionMessage("theoneprobe", "getTheOneProbe", "gigaherz.enderRift.plugins.TheOneProbeProviders$initialize");
+        FMLInterModComms.sendFunctionMessage("theoneprobe", "getTheOneProbe", "gigaherz.enderRift.plugins.TheOneProbeProviders");
     }
 
     public static ResourceLocation location(String path)

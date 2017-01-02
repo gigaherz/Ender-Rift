@@ -54,7 +54,7 @@ public abstract class BlockAggregator<T extends TileAggregator> extends BlockReg
         TileEntity teSelf = worldIn.getTileEntity(pos);
         if (!(teSelf instanceof TileAggregator))
             return;
-        ((TileAggregator)teSelf).updateNeighbours();
+        ((TileAggregator) teSelf).updateNeighbours();
     }
 
     @Override
@@ -68,25 +68,28 @@ public abstract class BlockAggregator<T extends TileAggregator> extends BlockReg
     protected void recheckNeighbour(IBlockAccess world, BlockPos pos, BlockPos neighbor)
     {
         EnumFacing side = null;
-        if(neighbor.equals(pos.east())) side = EnumFacing.EAST;
-        if(neighbor.equals(pos.west())) side = EnumFacing.WEST;
-        if(neighbor.equals(pos.north())) side = EnumFacing.NORTH;
-        if(neighbor.equals(pos.south())) side = EnumFacing.SOUTH;
-        if(neighbor.equals(pos.up())) side = EnumFacing.UP;
-        if(neighbor.equals(pos.down())) side = EnumFacing.DOWN;
+        if (neighbor.equals(pos.east())) side = EnumFacing.EAST;
+        if (neighbor.equals(pos.west())) side = EnumFacing.WEST;
+        if (neighbor.equals(pos.north())) side = EnumFacing.NORTH;
+        if (neighbor.equals(pos.south())) side = EnumFacing.SOUTH;
+        if (neighbor.equals(pos.up())) side = EnumFacing.UP;
+        if (neighbor.equals(pos.down())) side = EnumFacing.DOWN;
 
         if (side != null && isAutomatable(world, pos, side))
         {
             TileEntity teSelf = world.getTileEntity(pos);
             if (!(teSelf instanceof TileAggregator))
                 return;
-            ((TileAggregator)teSelf).updateConnectedInventories();
+            ((TileAggregator) teSelf).updateConnectedInventories();
         }
     }
 
     protected boolean isAutomatable(IBlockAccess worldIn, BlockPos pos, EnumFacing facing)
     {
         TileEntity te = worldIn.getTileEntity(pos.offset(facing));
+
+        if (te == null)
+            return false;
 
         return AutomationHelper.isAutomatable(te, facing.getOpposite());
     }
@@ -95,10 +98,12 @@ public abstract class BlockAggregator<T extends TileAggregator> extends BlockReg
     {
         TileEntity te = worldIn.getTileEntity(pos.offset(facing));
 
+        if (te == null)
+            return false;
+
         if (te instanceof TileAggregator)
             return true;
 
         return AutomationHelper.isAutomatable(te, facing.getOpposite());
     }
-
 }
