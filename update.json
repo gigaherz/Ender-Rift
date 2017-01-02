@@ -16,12 +16,13 @@
   },
   "1.11": {
     "2.0.2": "Ported to 1.11.",
-    "2.1.0": "Compatibility with 'The One Probe' and other fixes."
+    "2.1.0": "Compatibility with 'The One Probe' and other fixes.",
+    "2.1.2": "Fix a few huge bugs that somehow slipped through my testing."
   },
   "1.10.2": {
     "1.1.0": "EXPERIMENTAL: New GraphLib-based interface/browser network.",
     "1.5.0": "SHINY NEW: A whole lot of refactorings and new features. See the website for more information.",
-    "2.0.1": "Big revamp of the energy cost."
+    "2.0.0": "Big revamp of the energy cost."
   },
   "1.10": {
     "1.0.0": "Tesla API compatibility. Fix generators consuming buckets.",
