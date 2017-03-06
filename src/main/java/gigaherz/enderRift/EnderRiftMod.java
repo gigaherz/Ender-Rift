@@ -195,6 +195,14 @@ public class EnderRiftMod
                 'r', Items.REDSTONE,
                 'i', Items.IRON_INGOT);
 
+        GameRegistry.addRecipe(new ItemStack(driver),
+                "iri",
+                "rhr",
+                "iri",
+                'h', Blocks.HOPPER,
+                'r', Blocks.REDSTONE_BLOCK,
+                'i', Items.IRON_INGOT);
+
         GameRegistry.addRecipe(new ItemStack(riftInterface),
                 "ir ",
                 "rer",
