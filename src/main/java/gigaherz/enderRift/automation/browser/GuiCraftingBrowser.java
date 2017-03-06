@@ -65,7 +65,7 @@ public class GuiCraftingBrowser extends GuiBrowser
         {
             if (visible)
             {
-                FontRenderer fontrenderer = mc.fontRendererObj;
+                FontRenderer fontrenderer = mc.fontRenderer;
                 mc.getTextureManager().bindTexture(BUTTON_TEXTURES);
 
                 GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);

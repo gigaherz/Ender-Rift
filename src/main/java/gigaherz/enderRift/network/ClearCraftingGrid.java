@@ -39,7 +39,7 @@ public class ClearCraftingGrid
         @Override
         public IMessage onMessage(final ClearCraftingGrid message, MessageContext ctx)
         {
-            final EntityPlayerMP player = ctx.getServerHandler().playerEntity;
+            final EntityPlayerMP player = ctx.getServerHandler().player;
             final WorldServer world = (WorldServer) player.world;
 
             world.addScheduledTask(() ->

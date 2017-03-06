@@ -59,7 +59,7 @@ public class GuiBrowser extends GuiContainer
         buttonList.add(btn);
 
         Keyboard.enableRepeatEvents(true);
-        this.searchField = new GuiTextField(2, this.fontRendererObj, guiLeft + 114, guiTop + 6, 71, this.fontRendererObj.FONT_HEIGHT)
+        this.searchField = new GuiTextField(2, this.fontRenderer , guiLeft + 114, guiTop + 6, 71, this.fontRenderer.FONT_HEIGHT)
         {
             @Override
             public void mouseClicked(int mouseX, int mouseY, int mouseButton)
@@ -168,8 +168,8 @@ public class GuiBrowser extends GuiContainer
         RenderHelper.disableStandardItemLighting();
 
         String name = I18n.format(textBrowser);
-        mc.fontRendererObj.drawString(name, 8, 6, 0x404040);
-        mc.fontRendererObj.drawString(I18n.format(player.getName()), 8, ySize - 96 + 2, 0x404040);
+        mc.fontRenderer.drawString(name, 8, 6, 0x404040);
+        mc.fontRenderer.drawString(I18n.format(player.getName()), 8, ySize - 96 + 2, 0x404040);
     }
 
     private void drawCustomSlotTexts()
@@ -215,7 +215,7 @@ public class GuiBrowser extends GuiContainer
                 GlStateManager.disableLighting();
                 GlStateManager.disableDepth();
                 GlStateManager.disableBlend();
-                fontRendererObj.drawStringWithShadow(s, (float) (xPosition + 19 - 2 - fontRendererObj.getStringWidth(s)), (float) (yPosition + 6 + 3), 16777215);
+                fontRenderer.drawStringWithShadow(s, (float) (xPosition + 19 - 2 - fontRenderer.getStringWidth(s)), (float) (yPosition + 6 + 3), 16777215);
                 GlStateManager.enableLighting();
                 GlStateManager.enableDepth();
             }

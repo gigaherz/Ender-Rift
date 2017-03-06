@@ -36,33 +36,33 @@ public class GuiGenerator extends GuiContainer
     protected void drawGuiContainerForegroundLayer(int i, int j)
     {
         String name = I18n.format(tile.getName());
-        mc.fontRendererObj.drawString(name, (xSize - mc.fontRendererObj.getStringWidth(name)) / 2, 6, 0x404040);
-        mc.fontRendererObj.drawString(I18n.format(player.getName()), 8, ySize - 96 + 2, 0x404040);
+        mc.fontRenderer.drawString(name, (xSize - mc.fontRenderer.getStringWidth(name)) / 2, 6, 0x404040);
+        mc.fontRenderer.drawString(I18n.format(player.getName()), 8, ySize - 96 + 2, 0x404040);
 
         String label;
         if (tile.getGenerationPower() > 0)
         {
             label = I18n.format("text." + EnderRiftMod.MODID + ".generator.status.generating.label");
-            mc.fontRendererObj.drawString(label, 8, 22, 0x404040);
-            mc.fontRendererObj.drawString(String.format("%d RF/t", tile.getGenerationPower()), 12, 32, 0x404040);
+            mc.fontRenderer.drawString(label, 8, 22, 0x404040);
+            mc.fontRenderer.drawString(String.format("%d RF/t", tile.getGenerationPower()), 12, 32, 0x404040);
         }
         else if (tile.isBurning())
         {
             label = I18n.format("text." + EnderRiftMod.MODID + ".generator.status.heating");
-            mc.fontRendererObj.drawString(label, 8, 22, 0x404040);
+            mc.fontRenderer.drawString(label, 8, 22, 0x404040);
         }
         else
         {
             label = I18n.format("text." + EnderRiftMod.MODID + ".generator.status.idle");
-            mc.fontRendererObj.drawString(label, 8, 22, 0x404040);
+            mc.fontRenderer.drawString(label, 8, 22, 0x404040);
         }
 
         label = I18n.format("text." + EnderRiftMod.MODID + ".generator.heat.label");
-        mc.fontRendererObj.drawString(label, 8, 46, 0x404040);
-        mc.fontRendererObj.drawString(String.format("%d C", tile.getHeatValue()), 12, 56, getHeatColor());
+        mc.fontRenderer.drawString(label, 8, 46, 0x404040);
+        mc.fontRenderer.drawString(String.format("%d C", tile.getHeatValue()), 12, 56, getHeatColor());
 
         String str = String.format("%d RF", tile.getContainedEnergy());
-        mc.fontRendererObj.drawString(str, xSize - 8 - mc.fontRendererObj.getStringWidth(str), 64, 0x404040);
+        mc.fontRenderer.drawString(str, xSize - 8 - mc.fontRenderer.getStringWidth(str), 64, 0x404040);
 
         drawBarTooltip(i, j, xSize - 14 - 8, 20);
     }

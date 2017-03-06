@@ -28,9 +28,9 @@ public class GuiInterface extends GuiContainer
     protected void drawGuiContainerForegroundLayer(int i, int j)
     {
         String name = I18n.format(textName);
-        fontRendererObj.drawString(name, (xSize - fontRendererObj.getStringWidth(name)) / 2, 6, 0x404040);
-        fontRendererObj.drawString(I18n.format(this.player.getName()), 8, ySize - 96 + 2, 0x404040);
-        fontRendererObj.drawString(I18n.format(textFilters), 8, 20, 0x404040);
+        fontRenderer.drawString(name, (xSize - fontRenderer.getStringWidth(name)) / 2, 6, 0x404040);
+        fontRenderer.drawString(I18n.format(this.player.getName()), 8, ySize - 96 + 2, 0x404040);
+        fontRenderer.drawString(I18n.format(textFilters), 8, 20, 0x404040);
     }
 
     @Override
