@@ -28,7 +28,9 @@ public class UpdateField
         windowId = buf.readInt();
         fields = new int[buf.readByte()];
         for (int i = 0; i < fields.length; i++)
-        { fields[i] = buf.readInt(); }
+        {
+            fields[i] = buf.readInt();
+        }
     }
 
     @Override
@@ -37,7 +39,9 @@ public class UpdateField
         buf.writeInt(windowId);
         buf.writeByte(fields.length);
         for (int i = 0; i < fields.length; i++)
-        { buf.writeInt(fields[i]); }
+        {
+            buf.writeInt(fields[i]);
+        }
     }
 
     public static class Handler implements IMessageHandler<UpdateField, IMessage>

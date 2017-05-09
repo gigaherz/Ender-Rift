@@ -108,7 +108,8 @@ public class RiftInventory implements IItemHandler
     {
         if (index >= inventorySlots.size())
         {
-            if (!simulate) {
+            if (!simulate)
+            {
                 inventorySlots.add(stack.copy());
                 onContentsChanged();
             }
