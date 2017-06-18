@@ -33,12 +33,12 @@ repositories {
 
 apply plugin: 'net.minecraftforge.gradle.forge'
 
-version = "2.1.4"
+version = "2.1.7"
 group= "gigaherz.enderRift"
 archivesBaseName = "EnderRift-1.10.2"
 
 minecraft {
-    version = "1.10.2-12.18.3.2185"
+    version = "1.10.2-12.18.3.2422"
     runDir = "run"
 
     mappings = "stable_29"
@@ -57,7 +57,7 @@ shadowJar {
         include(dependency(':GraphLib:'))
         include(dependency(':Commons:'))
     }
-    relocate 'gigaherz.common', 'gigaherz.enderRift.shadow.common'
+    relocate 'gigaherz.common', "${project.group}.shadow.common"
 }
 
 reobf {
@@ -80,6 +80,7 @@ dependencies {
     deobfCompile "net.darkhax.tesla:Tesla:1.10.2-1.2.1.49"
     deobfCompile "mezz.jei:jei_1.10.2:3.13.6.392:api"
     runtime "mezz.jei:jei_1.10.2:3.13.6.392"
+
 }
 
 compileJava {
