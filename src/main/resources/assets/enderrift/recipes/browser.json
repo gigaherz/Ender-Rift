@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "ig ",
+    "geg",
+    "ig "
+  ],
+  "key": {
+    "e": { "item": "enderrift:proxy" },
+    "g": { "item": "minecraft:glowstone_dust" },
+    "i": { "item": "minecraft:iron_ingot" }
+  },
+  "result": {
+    "item": "enderrift:browser",
+    "data": 0
+  }
+}

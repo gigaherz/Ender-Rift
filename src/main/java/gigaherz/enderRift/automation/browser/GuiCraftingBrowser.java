@@ -61,7 +61,7 @@ public class GuiCraftingBrowser extends GuiBrowser
         }
 
         @Override
-        public void drawButton(Minecraft mc, int mouseX, int mouseY)
+        public void drawButton(Minecraft mc, int mouseX, int mouseY, float partialTicks)
         {
             if (visible)
             {
@@ -70,7 +70,7 @@ public class GuiCraftingBrowser extends GuiBrowser
 
                 GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
 
-                hovered = mouseX >= xPosition && mouseY >= yPosition && mouseX < xPosition + width && mouseY < yPosition + height;
+                hovered = mouseX >= x && mouseY >= y && mouseX < x + width && mouseY < y + height;
 
                 int i = getHoverState(hovered);
 
@@ -82,14 +82,14 @@ public class GuiCraftingBrowser extends GuiBrowser
                 int halfwidth2 = this.width - halfwidth1;
                 int halfheight1 = this.height / 2;
                 int halfheight2 = this.height - halfheight1;
-                drawTexturedModalRect(xPosition, yPosition, 0,
+                drawTexturedModalRect(x, y, 0,
                         46 + i * 20, halfwidth1, halfheight1);
-                drawTexturedModalRect(xPosition + halfwidth1, yPosition, 200 - halfwidth2,
+                drawTexturedModalRect(x + halfwidth1, y, 200 - halfwidth2,
                         46 + i * 20, halfwidth2, halfheight1);
 
-                drawTexturedModalRect(xPosition, yPosition + halfheight1,
+                drawTexturedModalRect(x, y + halfheight1,
                         0, 46 + i * 20 + 20 - halfheight2, halfwidth1, halfheight2);
-                drawTexturedModalRect(xPosition + halfwidth1, yPosition + halfheight1,
+                drawTexturedModalRect(x + halfwidth1, y + halfheight1,
                         200 - halfwidth2, 46 + i * 20 + 20 - halfheight2, halfwidth2, halfheight2);
 
                 int textColor = 14737632;
@@ -107,7 +107,7 @@ public class GuiCraftingBrowser extends GuiBrowser
                     textColor = 16777120;
                 }
 
-                this.drawCenteredString(fontrenderer, displayString, xPosition + halfwidth2, yPosition + (this.height - 8) / 2, textColor);
+                this.drawCenteredString(fontrenderer, displayString, x + halfwidth2, y + (this.height - 8) / 2, textColor);
             }
         }
     }

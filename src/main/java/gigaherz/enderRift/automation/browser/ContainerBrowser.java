@@ -6,6 +6,7 @@ import gigaherz.enderRift.automation.AutomationHelper;
 import gigaherz.enderRift.common.slots.SlotFake;
 import gigaherz.enderRift.network.SendSlotChanges;
 import gigaherz.enderRift.network.SetVisibleSlots;
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.player.InventoryPlayer;
@@ -717,7 +718,7 @@ public class ContainerBrowser
                     Item item = invStack.getItem();
                     itemData.add(stack.getDisplayName());
                     itemData.add(Item.REGISTRY.getNameForObject(item).toString());
-                    item.addInformation(stack, player, itemData, false);
+                    item.addInformation(stack, player.world, itemData, ITooltipFlag.TooltipFlags.NORMAL);
                     matchesSearch = false;
                     for (String s : itemData)
                     {

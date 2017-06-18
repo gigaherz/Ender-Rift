@@ -7,7 +7,6 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.*;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.CraftingManager;
 import net.minecraft.world.World;
 import net.minecraftforge.items.IItemHandler;
 
@@ -17,8 +16,10 @@ public class ContainerCraftingBrowser extends ContainerBrowser
     private final static int CraftingOffset = 59;
 
     public InventoryCrafting craftMatrix = new InventoryCrafting(this, 3, 3);
-    public IInventory craftResult = new InventoryCraftResult();
-    private World worldObj;
+    public InventoryCraftResult craftResult = new InventoryCraftResult();
+
+    private final World world;
+    private final EntityPlayer player;
 
     public static int InventorySlotStart = FakeSlots;
     public static int CraftingSlotStart = FakeSlots + PlayerSlots + 1;
@@ -27,7 +28,8 @@ public class ContainerCraftingBrowser extends ContainerBrowser
     {
         super(tileEntity, player, isClient);
 
-        this.worldObj = tileEntity.getWorld();
+        this.world = tileEntity.getWorld();
+        this.player = player;
 
         bindCraftingGrid(player.inventory, CraftingOffset);
     }
@@ -57,7 +59,7 @@ public class ContainerCraftingBrowser extends ContainerBrowser
     public void onCraftMatrixChanged(IInventory inventoryIn)
     {
         if (inventoryIn == craftMatrix)
-            this.craftResult.setInventorySlotContents(0, CraftingManager.getInstance().findMatchingRecipe(this.craftMatrix, this.worldObj));
+            this.func_192389_a(this.world, this.player, this.craftMatrix, this.craftResult);
         else
             super.onCraftMatrixChanged(inventoryIn);
     }
@@ -67,7 +69,7 @@ public class ContainerCraftingBrowser extends ContainerBrowser
     {
         super.onContainerClosed(playerIn);
 
-        if (!this.worldObj.isRemote)
+        if (!this.world.isRemote)
         {
             for (int i = 0; i < 9; ++i)
             {
@@ -139,7 +141,7 @@ public class ContainerCraftingBrowser extends ContainerBrowser
     {
         boolean isRemote = tile.getWorld().isRemote;
 
-        if (!this.worldObj.isRemote)
+        if (!this.world.isRemote)
         {
             IItemHandler parent = tile.getCombinedInventory();
 

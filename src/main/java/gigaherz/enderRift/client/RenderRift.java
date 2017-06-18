@@ -15,7 +15,7 @@ public class RenderRift extends TileEntitySpecialRenderer<TileEnderRift>
     private ModelHandle modelHandle = ModelHandle.of(EnderRiftMod.location("block/sphere.obj"));
 
     @Override
-    public void renderTileEntityAt(TileEnderRift te, double x, double y, double z, float partialTicks, int destroyStage)
+    public void renderTileEntityAt(TileEnderRift te, double x, double y, double z, float partialTicks, int destroyStage, float something)
     {
         if (te.getBlockMetadata() == 0)
             return;

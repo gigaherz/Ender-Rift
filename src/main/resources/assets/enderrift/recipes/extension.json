@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "iri",
+    "rhr",
+    "iri"
+  ],
+  "key": {
+    "h": { "item": "minecraft:hopper" },
+    "r": { "item": "minecraft:redstone" },
+    "i": { "item": "minecraft:iron_ingot" }
+  },
+  "result": {
+    "item": "enderrift:proxy"
+  }
+}

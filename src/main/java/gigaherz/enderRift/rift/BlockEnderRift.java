@@ -240,7 +240,7 @@ public class BlockEnderRift
         TileEnderRift rift = (TileEnderRift) te;
 
         EntityItem item = (EntityItem) entityIn;
-        ItemStack stack = item.getEntityItem().copy();
+        ItemStack stack = item.getItem().copy();
 
         ItemStack remaining = AutomationHelper.insertItems(rift.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null), stack);
 
@@ -250,7 +250,7 @@ public class BlockEnderRift
         }
         else
         {
-            item.setEntityItemStack(remaining);
+            item.setItem(remaining);
         }
     }
 }

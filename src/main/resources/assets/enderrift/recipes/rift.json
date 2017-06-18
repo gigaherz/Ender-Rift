@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "oho",
+    "r r",
+    "oco"
+  ],
+  "key": {
+    "o": { "item": "minecraft:obsidian" },
+    "h": { "item": "minecraft:hopper" },
+    "r": { "item": "minecraft:redstone_block" },
+    "c": { "item": "minecraft:ender_chest" }
+  },
+  "result": {
+    "item": "enderrift:rift"
+  }
+}

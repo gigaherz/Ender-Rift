@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "gdg",
+    "dbd",
+    "gcg"
+  ],
+  "key": {
+    "g": { "item": "minecraft:gold_ingot" },
+    "d": { "item": "minecraft:diamond" },
+    "c": { "item": "minecraft:crafting_table" },
+    "b": { "item": "enderrift:browser", "data": 0 }
+  },
+  "result": {
+    "item": "enderrift:browser",
+    "data": 1
+  }
+}

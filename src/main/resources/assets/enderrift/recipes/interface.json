@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "ir ",
+    "rer",
+    "ir "
+  ],
+  "key": {
+    "e": { "item": "enderrift:proxy" },
+    "r": { "item": "minecraft:redstone" },
+    "i": { "item": "minecraft:iron_ingot" }
+  },
+  "result": {
+    "item": "enderrift:interface"
+  }
+}

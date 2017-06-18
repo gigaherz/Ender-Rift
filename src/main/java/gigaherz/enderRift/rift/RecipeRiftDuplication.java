@@ -8,13 +8,19 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.NonNullList;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.common.registry.IForgeRegistryEntry;
 
-public class RecipeRiftDuplication implements IRecipe
+import javax.annotation.Nullable;
+
+public class RecipeRiftDuplication extends IForgeRegistryEntry.Impl<IRecipe> implements IRecipe
 {
-    /**
-     * Used to check if a recipe matches current crafting inventory
-     */
+    {
+        setRegistryName(EnderRiftMod.location("rift_duplication"));
+    }
+
+    @Override
     public boolean matches(InventoryCrafting crafting, World p_77569_2_)
     {
         if (crafting.getSizeInventory() < 9)
@@ -64,9 +70,7 @@ public class RecipeRiftDuplication implements IRecipe
         return stack.getItem() == item;
     }
 
-    /**
-     * Returns an Item that is the result of this recipe
-     */
+    @Override
     public ItemStack getCraftingResult(InventoryCrafting crafting)
     {
         ItemStack stack = crafting.getStackInSlot(4).copy();
@@ -74,14 +78,13 @@ public class RecipeRiftDuplication implements IRecipe
         return stack;
     }
 
-    /**
-     * Returns the size of the recipe area
-     */
-    public int getRecipeSize()
+    @Override
+    public boolean canFit(int width, int height)
     {
-        return 9;
+        return (width == 3) && (height == 3);
     }
 
+    @Override
     public ItemStack getRecipeOutput()
     {
         return ItemStack.EMPTY;

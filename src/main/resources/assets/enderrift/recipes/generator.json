@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "conditions": [
+    {
+      "type": "enderrift:config_property",
+      "category": "Generator",
+      "key": "Enable"
+    }
+  ],
+  "pattern": [
+    "iri",
+    "rwr",
+    "ifi"
+  ],
+  "key": {
+    "f": { "item": "minecraft:furnace" },
+    "w": { "item": "minecraft:water_bucket" },
+    "r": { "item": "minecraft:redstone" },
+    "i": { "item": "minecraft:iron_ingot" }
+  },
+  "result": {
+    "item": "enderrift:generator"
+  }
+}

@@ -40,11 +40,11 @@ public class BlockGenerator
     }
 
     @Override
-    public void getSubBlocks(Item itemIn, CreativeTabs tab, NonNullList<ItemStack> list)
+    public void getSubBlocks(CreativeTabs tab, NonNullList<ItemStack> list)
     {
         if (ConfigValues.EnableRudimentaryGenerator)
         {
-            super.getSubBlocks(itemIn, tab, list);
+            super.getSubBlocks(tab, list);
         }
     }
 

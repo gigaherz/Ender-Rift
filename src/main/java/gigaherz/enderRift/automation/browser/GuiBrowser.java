@@ -62,14 +62,14 @@ public class GuiBrowser extends GuiContainer
         this.searchField = new GuiTextField(2, this.fontRenderer , guiLeft + 114, guiTop + 6, 71, this.fontRenderer.FONT_HEIGHT)
         {
             @Override
-            public void mouseClicked(int mouseX, int mouseY, int mouseButton)
+            public boolean mouseClicked(int mouseX, int mouseY, int mouseButton)
             {
                 if (mouseButton == 1 && getText() != null && getText().length() > 0)
                 {
                     setText("");
                     updateSearchFilter();
                 }
-                super.mouseClicked(mouseX, mouseY, mouseButton);
+                return super.mouseClicked(mouseX, mouseY, mouseButton);
             }
         };
 
@@ -292,8 +292,8 @@ public class GuiBrowser extends GuiContainer
         {
             final int w = searchField.width;
             final int h = searchField.height;
-            int mx = mouseX - searchField.xPosition;
-            int my = mouseY - searchField.yPosition;
+            int mx = mouseX - searchField.x;
+            int my = mouseY - searchField.y;
             if (mx >= 0 && mx < w && my >= 0 && my < h)
             {
                 searchField.mouseClicked(mx, my, mouseButton);

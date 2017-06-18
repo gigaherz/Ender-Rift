@@ -20,9 +20,13 @@ public class ConfigValues
 
     public static boolean EnableRudimentaryGenerator;
 
+    public static Configuration config;
+
     public static void readConfig(Configuration config)
     {
         config.load();
+
+        ConfigValues.config = config;
 
         Property cfg = config.get("General", "PreferContainersWithExistingStacks", true);
         cfg.setComment("If the game lags when using the Rift Browser or Interface, disable this to make item insertion take a bit less time.");
