@@ -1,10 +1,14 @@
 {
   "homepage": "https://github.com/gigaherz/Ender-Rift",
   "promos": {
+    "1.12-latest": "2.1.5",
+    "1.12-recommended": "2.1.5",
+    "1.11.2-latest": "2.1.4",
+    "1.11.2-recommended": "2.1.4",
     "1.11-latest": "2.1.3",
     "1.11-recommended": "2.1.3",
-    "1.10.2-latest": "2.1.3",
-    "1.10.2-recommended": "2.1.3",
+    "1.10.2-latest": "2.1.4",
+    "1.10.2-recommended": "2.1.4",
     "1.10-latest": "1.1.0",
     "1.10-recommended": "1.1.0",
     "1.9.4-latest": "1.1.0",
@@ -13,6 +17,13 @@
     "1.9-recommended": "0.16.3",
     "1.8.9-latest": "0.16.3",
     "1.8.9-recommended": "0.16.3"
+  },
+  "1.12": {
+    "2.1.5": "Ported to 1.12."
+  },
+  "1.11.2": {
+    "2.1.3": "Reenabled Tesla support. I forgot.",
+    "2.1.4": "Added missing recipe for Automation Driver."
   },
   "1.11": {
     "2.0.2": "Ported to 1.11.",
@@ -24,7 +35,8 @@
     "1.1.0": "EXPERIMENTAL: New GraphLib-based interface/browser network.",
     "1.5.0": "SHINY NEW: A whole lot of refactorings and new features. See the website for more information.",
     "2.0.0": "Big revamp of the energy cost.",
-    "2.1.3": "Backport most of the functional changes from 1.11."
+    "2.1.3": "Backport most of the functional changes from 1.11.",
+    "2.1.4": "Added missing recipe for Automation Driver."
   },
   "1.10": {
     "1.0.0": "Tesla API compatibility. Fix generators consuming buckets.",
