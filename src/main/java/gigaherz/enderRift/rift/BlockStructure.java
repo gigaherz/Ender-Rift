@@ -149,11 +149,9 @@ public class BlockStructure
     }
 
     @Override
-    public List<ItemStack> getDrops(IBlockAccess world, BlockPos pos, IBlockState state, int fortune)
+    public void getDrops(NonNullList<ItemStack> drops, IBlockAccess world, BlockPos pos, IBlockState state, int fortune)
     {
-        List<ItemStack> ret = Lists.newArrayList();
-        ret.add(new ItemStack(RiftStructure.getOriginalBlock((World) world, pos)));
-        return ret;
+        drops.add(new ItemStack(RiftStructure.getOriginalBlock((World) world, pos)));
     }
 
     @Override

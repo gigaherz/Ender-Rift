@@ -59,7 +59,7 @@ public class ContainerCraftingBrowser extends ContainerBrowser
     public void onCraftMatrixChanged(IInventory inventoryIn)
     {
         if (inventoryIn == craftMatrix)
-            this.func_192389_a(this.world, this.player, this.craftMatrix, this.craftResult);
+            this.slotChangedCraftingGrid(this.world, this.player, this.craftMatrix, this.craftResult);
         else
             super.onCraftMatrixChanged(inventoryIn);
     }

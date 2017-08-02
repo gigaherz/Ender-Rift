@@ -23,6 +23,7 @@ import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.event.RegistryEvent;
@@ -36,7 +37,6 @@ import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.oredict.RecipeSorter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -93,6 +93,13 @@ public class EnderRiftMod
                 driver = new BlockDriver("driver"),
                 generator = new BlockGenerator("generator")
         );
+        GameRegistry.registerTileEntity(TileEnderRift.class, rift.getRegistryName().toString());
+        GameRegistry.registerTileEntity(TileEnderRiftCorner.class, location("rift_structure_corner").toString());
+        GameRegistry.registerTileEntity(TileInterface.class, riftInterface.getRegistryName().toString());
+        GameRegistry.registerTileEntity(TileBrowser.class, browser.getRegistryName().toString());
+        GameRegistry.registerTileEntity(TileProxy.class, extension.getRegistryName().toString());
+        GameRegistry.registerTileEntity(TileGenerator.class, generator.getRegistryName().toString());
+        GameRegistry.registerTileEntity(TileDriver.class, driver.getRegistryName().toString());
     }
 
     @SubscribeEvent
@@ -111,15 +118,12 @@ public class EnderRiftMod
         );
     }
 
-    private static void registerTileEntities()
+    @SubscribeEvent
+    public static void registerRecipes(RegistryEvent.Register<IRecipe> event)
     {
-        GameRegistry.registerTileEntityWithAlternatives(TileEnderRift.class, rift.getRegistryName().toString(), "tileEnderRift");
-        GameRegistry.registerTileEntityWithAlternatives(TileEnderRiftCorner.class, location("rift_structure_corner").toString(), "tileStructureCorner");
-        GameRegistry.registerTileEntityWithAlternatives(TileInterface.class, riftInterface.getRegistryName().toString(), "tileInterface");
-        GameRegistry.registerTileEntityWithAlternatives(TileBrowser.class, browser.getRegistryName().toString(), "tileBrowser");
-        GameRegistry.registerTileEntityWithAlternatives(TileProxy.class, extension.getRegistryName().toString(), "tileProxy");
-        GameRegistry.registerTileEntityWithAlternatives(TileGenerator.class, generator.getRegistryName().toString(), "tileGenerator");
-        GameRegistry.registerTileEntity(TileDriver.class, driver.getRegistryName().toString());
+        event.getRegistry().registerAll(
+                new RecipeRiftDuplication()
+        );
     }
 
     @Mod.EventHandler
@@ -127,8 +131,6 @@ public class EnderRiftMod
     {
         Configuration config = new Configuration(event.getSuggestedConfigurationFile());
         ConfigValues.readConfig(config);
-
-        registerTileEntities();
 
         channel = NetworkRegistry.INSTANCE.newSimpleChannel(CHANNEL);
 
@@ -148,8 +150,6 @@ public class EnderRiftMod
         proxy.init();
 
         RiftStructure.init();
-
-        GameRegistry.register(new RecipeRiftDuplication());
 
         NetworkRegistry.INSTANCE.registerGuiHandler(this, guiHandler);
 

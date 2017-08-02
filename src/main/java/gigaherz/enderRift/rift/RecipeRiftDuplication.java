@@ -6,18 +6,34 @@ import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
+import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.NonNullList;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.common.registry.IForgeRegistryEntry;
+import net.minecraftforge.registries.IForgeRegistryEntry;
 
-import javax.annotation.Nullable;
 
 public class RecipeRiftDuplication extends IForgeRegistryEntry.Impl<IRecipe> implements IRecipe
 {
     {
         setRegistryName(EnderRiftMod.location("rift_duplication"));
+    }
+
+    @Override
+    public NonNullList<Ingredient> getIngredients()
+    {
+        return NonNullList.from(
+                Ingredient.EMPTY,
+                Ingredient.fromItem(Items.MAGMA_CREAM),
+                Ingredient.fromItem(Items.ENDER_PEARL),
+                Ingredient.fromItem(Items.MAGMA_CREAM),
+                Ingredient.fromItem(Items.ENDER_PEARL),
+                Ingredient.fromItem(EnderRiftMod.riftOrb),
+                Ingredient.fromItem(Items.ENDER_PEARL),
+                Ingredient.fromItem(Items.MAGMA_CREAM),
+                Ingredient.fromItem(Items.ENDER_PEARL),
+                Ingredient.fromItem(Items.MAGMA_CREAM)
+        );
     }
 
     @Override
@@ -87,7 +103,7 @@ public class RecipeRiftDuplication extends IForgeRegistryEntry.Impl<IRecipe> imp
     @Override
     public ItemStack getRecipeOutput()
     {
-        return ItemStack.EMPTY;
+        return new ItemStack(EnderRiftMod.riftOrb,2);
     }
 
     @Override

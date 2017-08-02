@@ -9,6 +9,7 @@ import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.PropertyBool;
 import net.minecraft.block.properties.PropertyDirection;
+import net.minecraft.block.state.BlockFaceShape;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
@@ -56,10 +57,33 @@ public class BlockBrowser extends BlockAggregator<TileBrowser>
         return new TileBrowser();
     }
 
+    @Deprecated
+    @Override
+    public BlockFaceShape getBlockFaceShape(IBlockAccess worldIn, IBlockState state, BlockPos pos, EnumFacing face)
+    {
+        EnumFacing st = state.getValue(FACING);
+
+        if (st == face)
+            return BlockFaceShape.CENTER;
+
+        EnumFacing op = face.getOpposite();
+        if (st == op)
+            return BlockFaceShape.SOLID;
+
+        return BlockFaceShape.UNDEFINED;
+    }
+
+    @Deprecated
     @Override
     public boolean isSideSolid(IBlockState base_state, IBlockAccess world, BlockPos pos, EnumFacing side)
     {
         return base_state.getValue(FACING) == side.getOpposite();
+    }
+
+    @Override
+    public boolean canPlaceTorchOnTop(IBlockState state, IBlockAccess world, BlockPos pos)
+    {
+        return state.getValue(FACING) == EnumFacing.UP || state.getValue(FACING) == EnumFacing.DOWN;
     }
 
     @Deprecated

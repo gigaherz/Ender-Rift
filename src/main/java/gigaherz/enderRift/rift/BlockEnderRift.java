@@ -16,6 +16,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
@@ -115,18 +116,14 @@ public class BlockEnderRift
     }
 
     @Override
-    public List<ItemStack> getDrops(IBlockAccess world, BlockPos pos, IBlockState state, int fortune)
+    public void getDrops(NonNullList<ItemStack> drops, IBlockAccess world, BlockPos pos, IBlockState state, int fortune)
     {
-        ArrayList<ItemStack> ret = Lists.newArrayList();
-
-        ret.add(new ItemStack(this));
+        drops.add(new ItemStack(this));
 
         TileEntity te = world.getTileEntity(pos);
 
         if (te instanceof TileEnderRift)
-            ret.add(((TileEnderRift) te).getRiftItem());
-
-        return ret;
+            drops.add(((TileEnderRift) te).getRiftItem());
     }
 
     @Override
