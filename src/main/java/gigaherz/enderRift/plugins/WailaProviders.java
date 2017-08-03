@@ -9,10 +9,7 @@ import gigaherz.enderRift.rift.TileEnderRift;
 import gigaherz.enderRift.rift.TileEnderRiftCorner;
 import gigaherz.graph.api.Graph;
 import gigaherz.graph.api.GraphObject;
-import mcp.mobius.waila.api.IWailaConfigHandler;
-import mcp.mobius.waila.api.IWailaDataAccessor;
-import mcp.mobius.waila.api.IWailaDataProvider;
-import mcp.mobius.waila.api.IWailaRegistrar;
+import mcp.mobius.waila.api.*;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
@@ -24,14 +21,17 @@ import net.minecraftforge.fml.common.Optional;
 
 import java.util.List;
 
-public class WailaProviders
+@WailaPlugin
+public class WailaProviders implements IWailaPlugin
 {
     private static final String CONFIG_GENERATOR = EnderRiftMod.MODID + ".generator";
     private static final String CONFIG_RIFT = EnderRiftMod.MODID + ".rift";
     private static final String CONFIG_DRIVER = EnderRiftMod.MODID + ".driver";
     private static final String CONFIG_RF = EnderRiftMod.MODID + ".rf";
 
-    public static void callbackRegister(IWailaRegistrar registrar)
+
+    @Override
+    public void register(IWailaRegistrar registrar)
     {
         registrar.addConfig("Ender-Rift", CONFIG_GENERATOR);
         registrar.addConfig("Ender-Rift", CONFIG_RIFT);
@@ -70,7 +70,6 @@ public class WailaProviders
         }
     }
 
-    @Optional.Interface(modid = "Waila", iface = "mcp.mobius.waila.api.IWailaDataProvider")
     public static class GeneratorTooltipProvider implements IWailaDataProvider
     {
         @Override
@@ -134,7 +133,6 @@ public class WailaProviders
         }
     }
 
-    @Optional.Interface(modid = "Waila", iface = "mcp.mobius.waila.api.IWailaDataProvider")
     public static class DriverTooltipProvider implements IWailaDataProvider
     {
         @Override
@@ -180,7 +178,6 @@ public class WailaProviders
         }
     }
 
-    @Optional.Interface(modid = "Waila", iface = "mcp.mobius.waila.api.IWailaDataProvider")
     public static class NetworkTooltipProvider implements IWailaDataProvider
     {
         @Override
@@ -217,7 +214,6 @@ public class WailaProviders
         }
     }
 
-    @Optional.Interface(modid = "Waila", iface = "mcp.mobius.waila.api.IWailaDataProvider")
     public static class StructureTooltipProvider implements IWailaDataProvider
     {
         @Override
@@ -251,7 +247,6 @@ public class WailaProviders
         }
     }
 
-    @Optional.Interface(modid = "Waila", iface = "mcp.mobius.waila.api.IWailaDataProvider")
     public static class RiftTooltipProvider implements IWailaDataProvider
     {
         @Override
