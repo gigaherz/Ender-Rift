@@ -155,8 +155,11 @@ public class BlockBrowser extends BlockAggregator<TileBrowser>
         @Override
         public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> subItems)
         {
-            subItems.add(new ItemStack(this, 1, 0));
-            subItems.add(new ItemStack(this, 1, 1));
+            if (this.isInCreativeTab(tab))
+            {
+                subItems.add(new ItemStack(this, 1, 0));
+                subItems.add(new ItemStack(this, 1, 1));
+            }
         }
     }
 }

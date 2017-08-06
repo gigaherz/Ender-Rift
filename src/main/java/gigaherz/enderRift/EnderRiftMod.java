@@ -43,6 +43,7 @@ import org.apache.logging.log4j.Logger;
 @Mod.EventBusSubscriber
 @Mod(modid = EnderRiftMod.MODID,
         version = EnderRiftMod.VERSION,
+        acceptedMinecraftVersions = "[1.12.0,1.13.0)",
         dependencies = "after:Waila;after:gbook",
         updateJSON = "https://raw.githubusercontent.com/gigaherz/Ender-Rift/master/update.json")
 public class EnderRiftMod

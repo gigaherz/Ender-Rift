@@ -101,6 +101,9 @@ public class TileInterface extends TileAggregator implements IPoweredAutomation
     {
         super.update();
 
+        if (world.isRemote)
+            return;
+
         if (getCombinedInventory() == null)
             return;
 
@@ -114,7 +117,7 @@ public class TileInterface extends TileAggregator implements IPoweredAutomation
             {
                 if (inSlot.getCount() <= 0)
                 {
-                    int free = 64;
+                    int free = Math.min(64, inFilter.getMaxStackSize());
                     inSlot = AutomationHelper.extractItems(getCombinedInventory(), inFilter, free, false);
                     outputs.setStackInSlot(i, inSlot);
                     if (inSlot.getCount() > 0)

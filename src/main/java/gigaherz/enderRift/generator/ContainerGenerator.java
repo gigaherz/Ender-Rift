@@ -28,7 +28,7 @@ public class ContainerGenerator
         bindPlayerInventory(playerInventory);
     }
 
-    protected void bindPlayerInventory(InventoryPlayer playerInventory)
+    private void bindPlayerInventory(InventoryPlayer playerInventory)
     {
         for (int y = 0; y < 3; y++)
         {
