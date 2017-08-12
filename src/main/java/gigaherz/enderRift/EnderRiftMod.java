@@ -12,10 +12,7 @@ import gigaherz.enderRift.automation.proxy.TileProxy;
 import gigaherz.enderRift.common.GuiHandler;
 import gigaherz.enderRift.generator.BlockGenerator;
 import gigaherz.enderRift.generator.TileGenerator;
-import gigaherz.enderRift.network.ClearCraftingGrid;
-import gigaherz.enderRift.network.SendSlotChanges;
-import gigaherz.enderRift.network.SetVisibleSlots;
-import gigaherz.enderRift.network.UpdateField;
+import gigaherz.enderRift.network.*;
 import gigaherz.enderRift.rift.*;
 import net.minecraft.block.Block;
 import net.minecraft.creativetab.CreativeTabs;
@@ -140,6 +137,7 @@ public class EnderRiftMod
         channel.registerMessage(SetVisibleSlots.Handler.class, SetVisibleSlots.class, messageNumber++, Side.SERVER);
         channel.registerMessage(UpdateField.Handler.class, UpdateField.class, messageNumber++, Side.CLIENT);
         channel.registerMessage(ClearCraftingGrid.Handler.class, ClearCraftingGrid.class, messageNumber++, Side.SERVER);
+        channel.registerMessage(UpdatePowerStatus.Handler.class, UpdatePowerStatus.class, messageNumber++, Side.CLIENT);
         logger.debug("Final message number: " + messageNumber);
 
         proxy.preInit();

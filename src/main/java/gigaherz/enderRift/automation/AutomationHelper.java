@@ -58,6 +58,8 @@ public abstract class AutomationHelper
         if (stack.getCount() <= 0 || wanted <= 0)
             return ItemStack.EMPTY;
 
+        wanted = Math.min(stack.getMaxStackSize(), wanted);
+
         ItemStack _extracted = stack.copy();
         int extractCount = 0;
 

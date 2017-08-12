@@ -29,6 +29,8 @@ public abstract class TileAggregator extends TileEntity implements ITickable, Gr
 
     private AutomationEnergyWrapper wrapper = new AutomationEnergyWrapper(this);
 
+    private int temporaryLowOnPowerTicks = 0;
+
     // =============================================================================================
     // Graph API bindings
 
@@ -62,6 +64,9 @@ public abstract class TileAggregator extends TileEntity implements ITickable, Gr
             firstUpdate = false;
             init();
         }
+
+        if (temporaryLowOnPowerTicks > 0)
+            temporaryLowOnPowerTicks--;
     }
 
     private void init()
@@ -248,5 +253,16 @@ public abstract class TileAggregator extends TileEntity implements ITickable, Gr
     @Override
     public void handleUpdateTag(NBTTagCompound tag)
     {
+    }
+
+    @Override
+    public void setLowOnPowerTemporary()
+    {
+        temporaryLowOnPowerTicks = 60;
+    }
+
+    public boolean isLowOnPower()
+    {
+        return temporaryLowOnPowerTicks > 0 || wrapper.isLowOnPower();
     }
 }

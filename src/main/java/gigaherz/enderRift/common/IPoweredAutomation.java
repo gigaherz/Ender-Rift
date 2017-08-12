@@ -15,4 +15,6 @@ public interface IPoweredAutomation
     boolean isRemote();
 
     void setDirty();
+
+    void setLowOnPowerTemporary();
 }

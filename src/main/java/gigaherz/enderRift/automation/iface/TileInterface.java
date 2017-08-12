@@ -6,6 +6,7 @@ import gigaherz.enderRift.automation.TileAggregator;
 import gigaherz.enderRift.common.IPoweredAutomation;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.inventory.ItemStackHelper;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
@@ -13,10 +14,7 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.NonNullList;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.Constants;
-import net.minecraftforge.items.CapabilityItemHandler;
-import net.minecraftforge.items.IItemHandler;
-import net.minecraftforge.items.IItemHandlerModifiable;
-import net.minecraftforge.items.ItemStackHandler;
+import net.minecraftforge.items.*;
 
 import javax.annotation.Nullable;
 
@@ -117,13 +115,13 @@ public class TileInterface extends TileAggregator implements IPoweredAutomation
             {
                 if (inSlot.getCount() <= 0)
                 {
-                    int free = Math.min(64, inFilter.getMaxStackSize());
+                    int free = 64;
                     inSlot = AutomationHelper.extractItems(getCombinedInventory(), inFilter, free, false);
                     outputs.setStackInSlot(i, inSlot);
                     if (inSlot.getCount() > 0)
                         anyChanged = true;
                 }
-                else if (inSlot.isItemEqual(inFilter))
+                else if (ItemHandlerHelper.canItemStacksStack(inSlot, inFilter))
                 {
                     int free = inSlot.getMaxStackSize() - inSlot.getCount();
                     if (free > 0)

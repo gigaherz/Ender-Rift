@@ -6,6 +6,8 @@ import gigaherz.enderRift.automation.AutomationHelper;
 import gigaherz.enderRift.common.slots.SlotFake;
 import gigaherz.enderRift.network.SendSlotChanges;
 import gigaherz.enderRift.network.SetVisibleSlots;
+import gigaherz.enderRift.network.UpdatePowerStatus;
+import joptsimple.internal.Strings;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -116,11 +118,28 @@ public class ContainerBrowser
         return true;
     }
 
+
+    private boolean isLowOnPowerPrev;
+
     @Override
     public void detectAndSendChanges()
     {
         if (tile.getWorld().isRemote)
             return;
+
+        boolean isLowOnPowerNew = tile.isLowOnPower();
+        if (isLowOnPowerPrev != isLowOnPowerNew)
+        {
+            for (IContainerListener crafter : this.listeners)
+            {
+                if (!(crafter instanceof EntityPlayerMP))
+                    continue;
+
+                EnderRiftMod.channel.sendTo(new UpdatePowerStatus(windowId, isLowOnPowerNew), (EntityPlayerMP) crafter);
+            }
+
+            isLowOnPowerPrev = isLowOnPowerNew;
+        }
 
         if (prevChangeCount != tile.getChangeCount())
         {
@@ -398,7 +417,7 @@ public class ContainerBrowser
 
                 ItemStack remaining = simulateAddToPlayer(existing, amount);
 
-                if (remaining != null)
+                if (remaining.getCount() > 0)
                     amount -= remaining.getCount();
 
                 if (amount > 0)
@@ -453,7 +472,7 @@ public class ContainerBrowser
 
         if (stackCopy.getCount() <= 0)
         {
-            return null;
+            return ItemStack.EMPTY;
         }
 
         return stackCopy;
@@ -556,6 +575,11 @@ public class ContainerBrowser
             ItemStack remaining = AutomationHelper.insertItems(parent, stack);
             if (remaining.getCount() > 0)
             {
+                if (player instanceof IContainerListener)
+                {
+                    ((IContainerListener) player).sendSlotContents(this, slotIndex, remaining);
+                }
+
                 if (remaining.getCount() == stackCopy.getCount())
                 {
                     return ItemStack.EMPTY;
@@ -580,6 +604,16 @@ public class ContainerBrowser
     public int getActualSlotCount()
     {
         return fakeInventoryClient.getSlots();
+    }
+
+    public boolean isLowOnPower()
+    {
+        return isLowOnPowerPrev;
+    }
+
+    public void updatePowerStatus(boolean status)
+    {
+        isLowOnPowerPrev = status;
     }
 
     public class FakeInventoryServer implements IItemHandlerModifiable
@@ -712,7 +746,7 @@ public class ContainerBrowser
                 ItemStack stack = invStack.copy();
 
                 boolean matchesSearch = true;
-                if (filterText != null && filterText.length() > 0)
+                if (!Strings.isNullOrEmpty(filterText))
                 {
                     itemData.clear();
                     Item item = invStack.getItem();

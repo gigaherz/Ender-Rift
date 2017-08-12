@@ -7,6 +7,7 @@ import gigaherz.enderRift.automation.browser.ContainerBrowser;
 import gigaherz.enderRift.generator.ContainerGenerator;
 import gigaherz.enderRift.network.SendSlotChanges;
 import gigaherz.enderRift.network.UpdateField;
+import gigaherz.enderRift.network.UpdatePowerStatus;
 import gigaherz.enderRift.rift.TileEnderRift;
 import gigaherz.guidebook.client.BookRegistryEvent;
 import net.minecraft.client.Minecraft;
@@ -97,6 +98,22 @@ public class ClientProxy implements IModProxy
             if (entityplayer.openContainer != null && entityplayer.openContainer.windowId == message.windowId)
             {
                 ((ContainerGenerator) entityplayer.openContainer).updateFields(message.fields);
+            }
+        });
+    }
+
+    @Override
+    public void handleUpdatePowerStatus(UpdatePowerStatus message)
+    {
+        Minecraft.getMinecraft().addScheduledTask(() ->
+        {
+            Minecraft gameController = Minecraft.getMinecraft();
+
+            EntityPlayer entityplayer = gameController.player;
+
+            if (entityplayer.openContainer != null && entityplayer.openContainer.windowId == message.windowId)
+            {
+                ((ContainerBrowser) entityplayer.openContainer).updatePowerStatus(message.status);
             }
         });
     }
