@@ -2,14 +2,17 @@ package gigaherz.enderRift;
 
 import gigaherz.enderRift.network.SendSlotChanges;
 import gigaherz.enderRift.network.UpdateField;
+import gigaherz.enderRift.network.UpdatePowerStatus;
 
 public interface IModProxy
 {
-    void preInit();
+    default void preInit() {}
 
-    void init();
+    default void init() {}
 
-    void handleSendSlotChanges(SendSlotChanges message);
+    default void handleSendSlotChanges(SendSlotChanges message) {}
 
-    void handleUpdateField(UpdateField message);
+    default void handleUpdateField(UpdateField message) {}
+
+    default void handleUpdatePowerStatus(UpdatePowerStatus message) {}
 }

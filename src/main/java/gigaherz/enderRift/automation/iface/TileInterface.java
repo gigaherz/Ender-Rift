@@ -101,6 +101,9 @@ public class TileInterface extends TileAggregator implements IPoweredAutomation
     {
         super.update();
 
+        if (world.isRemote)
+            return;
+
         if (getCombinedInventory() == null)
             return;
 
