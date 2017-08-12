@@ -4,11 +4,16 @@ import gigaherz.enderRift.EnderRiftMod;
 import gigaherz.enderRift.automation.AutomationHelper;
 import gigaherz.enderRift.network.ClearCraftingGrid;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.*;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.crafting.CraftingManager;
+import net.minecraft.item.crafting.IRecipe;
+import net.minecraft.network.play.server.SPacketSetSlot;
 import net.minecraft.world.World;
 import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.items.ItemHandlerHelper;
 
 public class ContainerCraftingBrowser extends ContainerBrowser
 {
@@ -24,6 +29,8 @@ public class ContainerCraftingBrowser extends ContainerBrowser
     public static int InventorySlotStart = FakeSlots;
     public static int CraftingSlotStart = FakeSlots + PlayerSlots + 1;
 
+    Slot slotCraftResult;
+
     public ContainerCraftingBrowser(TileBrowser tileEntity, EntityPlayer player, boolean isClient)
     {
         super(tileEntity, player, isClient);
@@ -36,7 +43,7 @@ public class ContainerCraftingBrowser extends ContainerBrowser
 
     protected void bindCraftingGrid(InventoryPlayer playerInventory, int top)
     {
-        this.addSlotToContainer(new SlotCrafting(playerInventory.player, this.craftMatrix, this.craftResult, 0, 124, 35 + top));
+        slotCraftResult = this.addSlotToContainer(new SlotCrafting(playerInventory.player, this.craftMatrix, this.craftResult, 0, 124, 35 + top));
 
         for (int i = 0; i < 3; ++i)
         {
@@ -65,6 +72,26 @@ public class ContainerCraftingBrowser extends ContainerBrowser
     }
 
     @Override
+    protected void slotChangedCraftingGrid(World world, EntityPlayer player, InventoryCrafting inventoryCrafting, InventoryCraftResult craftingResult)
+    {
+        if (!world.isRemote)
+        {
+            EntityPlayerMP entityplayermp = (EntityPlayerMP)player;
+            ItemStack itemstack = ItemStack.EMPTY;
+            IRecipe irecipe = CraftingManager.findMatchingRecipe(inventoryCrafting, world);
+
+            if (irecipe != null && (irecipe.isHidden() || !world.getGameRules().getBoolean("doLimitedCrafting") || entityplayermp.getRecipeBook().containsRecipe(irecipe)))
+            {
+                craftingResult.setRecipeUsed(irecipe);
+                itemstack = irecipe.getCraftingResult(inventoryCrafting);
+            }
+
+            craftingResult.setInventorySlotContents(0, itemstack);
+            entityplayermp.connection.sendPacket(new SPacketSetSlot(this.windowId, slotCraftResult.slotNumber, itemstack));
+        }
+    }
+
+    @Override
     public void onContainerClosed(EntityPlayer playerIn)
     {
         super.onContainerClosed(playerIn);
@@ -77,7 +104,7 @@ public class ContainerCraftingBrowser extends ContainerBrowser
 
                 if (itemstack.getCount() > 0)
                 {
-                    playerIn.dropItem(itemstack, false);
+                    ItemHandlerHelper.giveItemToPlayer(playerIn, itemstack);
                 }
             }
         }
@@ -157,7 +184,7 @@ public class ContainerCraftingBrowser extends ContainerBrowser
 
                     if (remaining.getCount() > 0)
                     {
-                        playerIn.dropItem(remaining, false);
+                        ItemHandlerHelper.giveItemToPlayer(playerIn, remaining);
 
                         if (remaining.getCount() != itemstack.getCount())
                             tile.markDirty();
@@ -174,5 +201,7 @@ public class ContainerCraftingBrowser extends ContainerBrowser
         {
             EnderRiftMod.channel.sendToServer(new ClearCraftingGrid(windowId));
         }
+
+        this.onCraftMatrixChanged(craftMatrix);
     }
 }
