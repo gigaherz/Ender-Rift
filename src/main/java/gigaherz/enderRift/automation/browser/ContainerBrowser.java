@@ -6,6 +6,7 @@ import gigaherz.enderRift.automation.AutomationHelper;
 import gigaherz.enderRift.common.slots.SlotFake;
 import gigaherz.enderRift.network.SendSlotChanges;
 import gigaherz.enderRift.network.SetVisibleSlots;
+import gigaherz.enderRift.network.UpdatePowerStatus;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.player.InventoryPlayer;
@@ -115,11 +116,28 @@ public class ContainerBrowser
         return true;
     }
 
+
+    private boolean isLowOnPowerPrev;
+
     @Override
     public void detectAndSendChanges()
     {
         if (tile.getWorld().isRemote)
             return;
+
+        boolean isLowOnPowerNew = tile.isLowOnPower();
+        if (isLowOnPowerPrev != isLowOnPowerNew)
+        {
+            for (IContainerListener crafter : this.listeners)
+            {
+                if (!(crafter instanceof EntityPlayerMP))
+                    continue;
+
+                EnderRiftMod.channel.sendTo(new UpdatePowerStatus(windowId, isLowOnPowerNew), (EntityPlayerMP) crafter);
+            }
+
+            isLowOnPowerPrev = isLowOnPowerNew;
+        }
 
         if (prevChangeCount != tile.getChangeCount())
         {
@@ -550,6 +568,11 @@ public class ContainerBrowser
             ItemStack remaining = AutomationHelper.insertItems(parent, stack);
             if (remaining != null)
             {
+                if (player instanceof IContainerListener)
+                {
+                    ((IContainerListener) player).sendSlotContents(this, slotIndex, remaining);
+                }
+
                 if (remaining.stackSize == stackCopy.stackSize)
                 {
                     return null;
@@ -574,6 +597,16 @@ public class ContainerBrowser
     public int getActualSlotCount()
     {
         return fakeInventoryClient.getSlots();
+    }
+
+    public boolean isLowOnPower()
+    {
+        return isLowOnPowerPrev;
+    }
+
+    public void updatePowerStatus(boolean status)
+    {
+        isLowOnPowerPrev = status;
     }
 
     public class FakeInventoryServer implements IItemHandlerModifiable

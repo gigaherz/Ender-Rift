@@ -74,10 +74,16 @@ public class AutomationEnergyWrapper implements IItemHandler
         if (inventory == null)
             return null;
 
+        boolean powerFailure = false;
         while (cost > energyBuffer.getEnergyStored() && stackSize > 0)
         {
+            powerFailure = true;
+
             stackSize--;
         }
+
+        if (powerFailure)
+            owner.setLowOnPowerTemporary();
 
         if (stackSize <= 0)
             return stack;
@@ -113,10 +119,20 @@ public class AutomationEnergyWrapper implements IItemHandler
         if (inventory == null)
             return null;
 
+        ItemStack existing = inventory.extractItem(slot, wanted, true);
+        wanted = Math.min(wanted, existing != null ? existing.stackSize : 0);
+
+        boolean powerFailure = false;
         while (cost > energyBuffer.getEnergyStored() && wanted > 0)
         {
+            powerFailure = true;
+
             wanted--;
+            cost = getEffectivePowerUsageToExtract(wanted);
         }
+
+        if (powerFailure)
+            owner.setLowOnPowerTemporary();
 
         if (wanted <= 0)
             return null;
@@ -134,5 +150,11 @@ public class AutomationEnergyWrapper implements IItemHandler
         }
 
         return extracted;
+    }
+
+    public boolean isLowOnPower()
+    {
+        IEnergyStorage energyBuffer = owner.getEnergyBuffer();
+        return getEffectivePowerUsageToExtract(1) > energyBuffer.getEnergyStored();
     }
 }

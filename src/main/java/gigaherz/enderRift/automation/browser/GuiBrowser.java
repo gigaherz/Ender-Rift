@@ -1,6 +1,7 @@
 package gigaherz.enderRift.automation.browser;
 
 import gigaherz.enderRift.EnderRiftMod;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.client.gui.inventory.GuiContainer;
@@ -32,17 +33,47 @@ public class GuiBrowser extends GuiContainer
 
     private GuiTextField searchField;
 
-    protected GuiBrowser(Container container)
+    private ContainerBrowser containerBrowser;
+
+    protected GuiBrowser(ContainerBrowser container)
     {
         super(container);
+        containerBrowser = container;
     }
 
     public GuiBrowser(EntityPlayer player, TileBrowser tileEntity)
     {
-        super(new ContainerBrowser(tileEntity, player, true));
+        this(new ContainerBrowser(tileEntity, player, true));
         this.player = player.inventory;
         xSize = 194;
         ySize = 168;
+    }
+
+    @Override
+    public void drawScreen(int mouseX, int mouseY, float partialTicks)
+    {
+        super.drawScreen(mouseX, mouseY, partialTicks);
+        this.renderLowPowerOverlay(mouseX, mouseY);
+    }
+
+    private void renderLowPowerOverlay(int mouseX, int mouseY)
+    {
+        if (containerBrowser.isLowOnPower())
+        {
+            int l = guiLeft + 7;
+            int t = guiTop + 17;
+            int w = 162;
+            int h = 54;
+            GlStateManager.disableDepth();
+            GlStateManager.color(1,1,1,1);
+            drawRect(l,t,l+w,t+h, 0x7f000000);
+            long tm = Minecraft.getMinecraft().world.getTotalWorldTime() % 30;
+            if (tm < 15)
+            {
+                drawCenteredString(fontRendererObj, "NO POWER", l + w / 2, t + h / 2 - fontRendererObj.FONT_HEIGHT / 2, 0xFFFFFF);
+            }
+            GlStateManager.enableDepth();
+        }
     }
 
     protected ResourceLocation getBackgroundTexture()
