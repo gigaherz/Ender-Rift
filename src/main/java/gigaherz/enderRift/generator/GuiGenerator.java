@@ -29,7 +29,7 @@ public class GuiGenerator extends GuiContainer
         tile = tileEntity;
         ySize = 165;
         guiTextureLocation = new ResourceLocation(EnderRiftMod.MODID, "textures/gui/generator.png");
-        energyTextureLocation = new ResourceLocation(EnderRiftMod.MODID, "textures/gui/Energy.png");
+        energyTextureLocation = new ResourceLocation(EnderRiftMod.MODID, "textures/gui/energy.png");
     }
 
     @Override
