@@ -415,7 +415,7 @@ public class ContainerBrowser
 
                 ItemStack remaining = simulateAddToPlayer(existing, amount);
 
-                if (remaining != null)
+                if (remaining.getCount() > 0)
                     amount -= remaining.getCount();
 
                 if (amount > 0)
