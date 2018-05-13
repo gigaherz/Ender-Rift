@@ -80,7 +80,7 @@ public class ContainerCraftingBrowser extends ContainerBrowser
             ItemStack itemstack = ItemStack.EMPTY;
             IRecipe irecipe = CraftingManager.findMatchingRecipe(inventoryCrafting, world);
 
-            if (irecipe != null && (irecipe.isHidden() || !world.getGameRules().getBoolean("doLimitedCrafting") || entityplayermp.getRecipeBook().containsRecipe(irecipe)))
+            if (irecipe != null && (irecipe.isDynamic() || !world.getGameRules().getBoolean("doLimitedCrafting") || entityplayermp.getRecipeBook().isUnlocked(irecipe)))
             {
                 craftingResult.setRecipeUsed(irecipe);
                 itemstack = irecipe.getCraftingResult(inventoryCrafting);
