@@ -3,15 +3,20 @@
   "conditions": [
     {
       "type": "forge:mod_loaded",
-      "modid": "guidebook"
+      "modid": "gbook"
     }
   ],
   "ingredients": [
-    { "item": "minecraft:book" },
-    { "item": "minecraft:ender_pearl" }
+    { "item": "minecraft:book",
+      "data": 0
+    },
+    { "item": "minecraft:ender_pearl",
+      "data": 0
+    }
   ],
   "result": {
     "item": "gbook:guidebook",
-    "nbt": "{Book:\"enderrift:xml/book.xml\"}"
+    "nbt": "{Book:\"enderrift:xml/book.xml\"}",
+    "data": 0
   }
 }

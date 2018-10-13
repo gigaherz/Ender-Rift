@@ -1,5 +1,8 @@
 {
   "conditions": {
     "config_property" : "gigaherz.enderRift.ConfigurationCondition"
+  },
+  "recipes": {
+    "rift_duplication": "gigaherz.enderRift.rift.RecipeRiftDuplicationFactory"
   }
 }

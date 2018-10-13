@@ -15,10 +15,6 @@ import net.minecraftforge.registries.IForgeRegistryEntry;
 
 public class RecipeRiftDuplication extends IForgeRegistryEntry.Impl<IRecipe> implements IRecipe
 {
-    {
-        setRegistryName(EnderRiftMod.location("rift_duplication"));
-    }
-
     @Override
     public NonNullList<Ingredient> getIngredients()
     {
@@ -110,5 +106,11 @@ public class RecipeRiftDuplication extends IForgeRegistryEntry.Impl<IRecipe> imp
     public NonNullList<ItemStack> getRemainingItems(InventoryCrafting inv)
     {
         return NonNullList.withSize(inv.getSizeInventory(), ItemStack.EMPTY);
+    }
+
+    @Override
+    public boolean isDynamic()
+    {
+        return true;
     }
 }

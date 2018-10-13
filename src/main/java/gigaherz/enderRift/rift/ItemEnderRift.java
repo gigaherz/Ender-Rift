@@ -26,13 +26,13 @@ public class ItemEnderRift extends ItemRegistered
     }
 
     @Override
-    public String getUnlocalizedName(ItemStack stack)
+    public String getTranslationKey(ItemStack stack)
     {
         NBTTagCompound tag = stack.getTagCompound();
         if (tag == null || !tag.hasKey("RiftId"))
-            return this.getUnlocalizedName() + ".empty";
+            return this.getTranslationKey() + ".empty";
         else
-            return this.getUnlocalizedName() + ".bound";
+            return this.getTranslationKey() + ".bound";
     }
 
     @Override

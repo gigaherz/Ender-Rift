@@ -38,7 +38,7 @@ public class BlockBrowser extends BlockAggregator<TileBrowser>
     {
         super(name, Material.IRON, MapColor.STONE);
         setSoundType(SoundType.METAL);
-        setUnlocalizedName(unlocStandard);
+        setTranslationKey(unlocStandard);
         setCreativeTab(EnderRiftMod.tabEnderRift);
         setDefaultState(blockState.getBaseState().withProperty(FACING, EnumFacing.NORTH));
         setHardness(3.0F);
@@ -147,7 +147,7 @@ public class BlockBrowser extends BlockAggregator<TileBrowser>
         }
 
         @Override
-        public String getUnlocalizedName(ItemStack stack)
+        public String getTranslationKey(ItemStack stack)
         {
             return "tile." + ((stack.getMetadata() != 0) ? unlocCrafting : unlocStandard);
         }

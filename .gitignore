@@ -5,3 +5,7 @@
 /run
 
 /*.iml
+/bin
+/.classpath
+/.project
+/.settings

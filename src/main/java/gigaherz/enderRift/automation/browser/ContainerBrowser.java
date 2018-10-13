@@ -691,6 +691,9 @@ public class ContainerBrowser
         {
             if (index >= visible.length)
                 return ItemStack.EMPTY;
+            int i = visible[index];
+            if (i >= slots.size())
+                return ItemStack.EMPTY;
             return slots.get(visible[index]);
         }
 

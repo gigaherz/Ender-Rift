@@ -14,16 +14,13 @@ buildscript {
 
 repositories {
     maven {
-        url "http://maven.tterrag.com/"
+        url "https://maven.tterrag.com/"
     }
     maven {
-        url "http://dvs1.progwml6.com/files/maven"
+        url "https://dvs1.progwml6.com/files/maven"
     }
     maven {
-        url 'http://maven.epoxide.xyz'
-    }
-    maven {
-        url 'http://dogforce-games.com/maven'
+        url 'https://dogforce-games.com/maven'
     }
     maven {
         url 'https://maven.mcmoddev.com/'
@@ -32,6 +29,7 @@ repositories {
         name = "CoFH Maven"
         url = "http://maven.covers1624.net"
     }
+    maven {url "http://tehnut.info/maven"}
 }
 
 apply plugin: 'net.minecraftforge.gradle.forge'
@@ -41,10 +39,9 @@ group= "gigaherz.enderRift"
 archivesBaseName = "EnderRift-1.12.1"
 
 minecraft {
-    version = "1.12.2-14.23.3.2689"
+    version = "1.12.2-14.23.4.2756"
     runDir = "run"
-
-    mappings = "snapshot_20180513"
+    mappings = "stable_39"
 
     replace "@VERSION@", project.version
     replaceIn "EnderRiftMod.java"
@@ -59,16 +56,19 @@ dependencies {
     deobfCompile "gigaherz.commons:gigaherz.commons-1.12.1:0.6.4"
     embed "gigaherz.commons:gigaherz.commons-1.12.1:0.6.4"
 
-    deobfCompile "gigaherz.graph:GraphLib:1.3.1"
-    embed "gigaherz.graph:GraphLib:1.3.0"
+    deobfCompile "gigaherz.graph:GraphLib:1.4.0"
+    embed "gigaherz.graph:GraphLib:1.4.0"
 
-    deobfCompile "gigaherz.guidebook:Guidebook-1.12.0:1.7.3"
+    deobfCompile "gigaherz.guidebook:Guidebook-1.12.2:2.6.0"
 
-    deobfCompile "mcjty.theoneprobe:TheOneProbe-1.12:1.12-1.4.22-13"
+    deobfCompile "mcjty.theoneprobe:TheOneProbe-1.12:1.12-1.4.23-16"
+
     deobfCompile "net.darkhax.tesla:Tesla-1.12.2:1.0.63"
 
-    deobfCompile "mezz.jei:jei_1.12:4.7.4.80:api"
-    runtime "mezz.jei:jei_1.12:4.7.4.80"
+    deobfCompile "mezz.jei:jei_1.12.2:4.10.0.201:api"
+    runtime "mezz.jei:jei_1.12.2:4.10.0.201"
+
+    deobfCompile "mcp.mobius.waila:Hwyla:1.8.26-B41_1.12.2"
 
     compile fileTree(dir: 'libs', include: '*.jar')
 }

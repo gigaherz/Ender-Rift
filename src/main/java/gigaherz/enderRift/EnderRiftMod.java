@@ -49,19 +49,27 @@ public class EnderRiftMod
     public static final String VERSION = "@VERSION@";
     public static final String CHANNEL = "enderrift";
 
+    @GameRegistry.ObjectHolder("enderrift:rift")
     public static BlockEnderRift rift;
+    @GameRegistry.ObjectHolder("enderrift:rift_structure")
     public static BlockStructure structure;
+    @GameRegistry.ObjectHolder("enderrift:interface")
     public static BlockRegistered riftInterface;
+    @GameRegistry.ObjectHolder("enderrift:generator")
     public static BlockRegistered generator;
+    @GameRegistry.ObjectHolder("enderrift:browser")
     public static BlockRegistered browser;
+    @GameRegistry.ObjectHolder("enderrift:proxy")
     public static BlockRegistered extension;
+    @GameRegistry.ObjectHolder("enderrift:driver")
     public static BlockRegistered driver;
+    @GameRegistry.ObjectHolder("enderrift:rift_orb")
     public static Item riftOrb;
 
     public static CreativeTabs tabEnderRift = new CreativeTabs("tabEnderRift")
     {
         @Override
-        public ItemStack getTabIconItem()
+        public ItemStack createIcon()
         {
             return new ItemStack(riftOrb);
         }
@@ -83,26 +91,27 @@ public class EnderRiftMod
     public static void registerBlocks(RegistryEvent.Register<Block> event)
     {
         event.getRegistry().registerAll(
-                rift = new BlockEnderRift("rift"),
-                structure = new BlockStructure("rift_structure"),
-                riftInterface = new BlockInterface("interface"),
-                browser = new BlockBrowser("browser"),
-                extension = new BlockProxy("proxy"),
-                driver = new BlockDriver("driver"),
-                generator = new BlockGenerator("generator")
+                new BlockEnderRift("rift"),
+                new BlockStructure("rift_structure"),
+                new BlockInterface("interface"),
+                new BlockBrowser("browser"),
+                new BlockProxy("proxy"),
+                new BlockDriver("driver"),
+                new BlockGenerator("generator")
         );
-        GameRegistry.registerTileEntity(TileEnderRift.class, rift.getRegistryName().toString());
-        GameRegistry.registerTileEntity(TileEnderRiftCorner.class, location("rift_structure_corner").toString());
-        GameRegistry.registerTileEntity(TileInterface.class, riftInterface.getRegistryName().toString());
-        GameRegistry.registerTileEntity(TileBrowser.class, browser.getRegistryName().toString());
-        GameRegistry.registerTileEntity(TileProxy.class, extension.getRegistryName().toString());
-        GameRegistry.registerTileEntity(TileGenerator.class, generator.getRegistryName().toString());
-        GameRegistry.registerTileEntity(TileDriver.class, driver.getRegistryName().toString());
     }
 
     @SubscribeEvent
     public static void registerItems(RegistryEvent.Register<Item> event)
     {
+        GameRegistry.registerTileEntity(TileEnderRift.class, rift.getRegistryName());
+        GameRegistry.registerTileEntity(TileEnderRiftCorner.class, location("rift_structure_corner"));
+        GameRegistry.registerTileEntity(TileInterface.class, riftInterface.getRegistryName());
+        GameRegistry.registerTileEntity(TileBrowser.class, browser.getRegistryName());
+        GameRegistry.registerTileEntity(TileProxy.class, extension.getRegistryName());
+        GameRegistry.registerTileEntity(TileGenerator.class, generator.getRegistryName());
+        GameRegistry.registerTileEntity(TileDriver.class, driver.getRegistryName());
+
         event.getRegistry().registerAll(
                 rift.createItemBlock(),
                 structure.createItemBlock(),
@@ -112,15 +121,7 @@ public class EnderRiftMod
                 driver.createItemBlock(),
                 generator.createItemBlock(),
 
-                riftOrb = new ItemEnderRift("rift_orb")
-        );
-    }
-
-    @SubscribeEvent
-    public static void registerRecipes(RegistryEvent.Register<IRecipe> event)
-    {
-        event.getRegistry().registerAll(
-                new RecipeRiftDuplication()
+                new ItemEnderRift("rift_orb")
         );
     }
 
@@ -155,6 +156,11 @@ public class EnderRiftMod
         //FMLInterModComms.sendMessage("waila", "register", "gigaherz.enderRift.plugins.WailaProviders.callbackRegister");
 
         FMLInterModComms.sendFunctionMessage("theoneprobe", "getTheOneProbe", "gigaherz.enderRift.plugins.TheOneProbeProviders");
+    }
+
+    private static class IMC
+    {
+
     }
 
     public static ResourceLocation location(String path)
