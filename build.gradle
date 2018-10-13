@@ -39,7 +39,7 @@ group= "gigaherz.enderRift"
 archivesBaseName = "EnderRift-1.12.1"
 
 minecraft {
-    version = "1.12.2-14.23.4.2756"
+    version = "1.12.2-14.23.5.2768"
     runDir = "run"
     mappings = "stable_39"
 
@@ -50,6 +50,7 @@ minecraft {
 configurations {
     // configuration that holds jars to embed inside the jar
     embed
+    embed.transitive = false
 }
 
 dependencies {
@@ -65,8 +66,8 @@ dependencies {
 
     deobfCompile "net.darkhax.tesla:Tesla-1.12.2:1.0.63"
 
-    deobfCompile "mezz.jei:jei_1.12.2:4.10.0.201:api"
-    runtime "mezz.jei:jei_1.12.2:4.10.0.201"
+    deobfCompile "mezz.jei:jei_1.12.2:4.13.1.220:api"
+    runtime "mezz.jei:jei_1.12.2:4.13.1.220"
 
     deobfCompile "mcp.mobius.waila:Hwyla:1.8.26-B41_1.12.2"
 
