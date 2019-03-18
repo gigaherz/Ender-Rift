@@ -40,6 +40,9 @@ public abstract class AutomationHelper
 
     public static ItemStack insertItems(@Nonnull IItemHandler parent, @Nonnull ItemStack stack)
     {
+        if (stack == null)
+            return null;
+
         ItemStack remaining = stack.copy();
 
         for (int i = 0; i < parent.getSlots(); i++)

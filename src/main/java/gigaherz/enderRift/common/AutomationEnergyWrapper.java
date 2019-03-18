@@ -65,6 +65,9 @@ public class AutomationEnergyWrapper implements IItemHandler
     @Override
     public ItemStack insertItem(int slot, ItemStack stack, boolean simulate)
     {
+        if (stack == null)
+            return null;
+
         int stackSize = stack.stackSize;
         int cost = getEffectivePowerUsageToInsert(stackSize);
 

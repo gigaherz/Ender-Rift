@@ -261,11 +261,15 @@ public class TileInterface extends TileAggregator implements IPoweredAutomation
             return filters[slot];
         }
 
+        @Nullable
         @Override
         public ItemStack insertItem(int slot, ItemStack stack, boolean simulate)
         {
             if (slot < 0 || slot >= filters.length)
                 return stack;
+
+            if (stack == null)
+                return null;
 
             if (!simulate)
             {

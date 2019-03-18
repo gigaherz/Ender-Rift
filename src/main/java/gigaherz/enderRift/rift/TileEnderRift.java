@@ -306,6 +306,8 @@ public class TileEnderRift
         {
             if (!powered)
                 return stack;
+            if (stack == null)
+                return null;
             IItemHandler handler = getInventory();
             if (handler == null)
                 return stack;

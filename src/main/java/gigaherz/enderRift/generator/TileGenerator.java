@@ -51,6 +51,9 @@ public class TileGenerator extends TileEntity
         @Override
         public ItemStack insertItem(int slot, ItemStack stack, boolean simulate)
         {
+            if (stack == null)
+                return null;
+
             if (TileEntityFurnace.getItemBurnTime(stack) <= 0)
                 return stack;
 

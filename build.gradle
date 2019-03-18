@@ -29,16 +29,19 @@ repositories {
     maven {
         url 'http://dogforce-games.com/maven'
     }
+    maven {
+        url 'https://maven.mcmoddev.com/'
+    }
 }
 
 apply plugin: 'net.minecraftforge.gradle.forge'
 
-version = "2.1.8"
+version = "2.1.8.1"
 group= "gigaherz.enderRift"
 archivesBaseName = "EnderRift-1.10.2"
 
 minecraft {
-    version = "1.10.2-12.18.3.2422"
+    version = "1.10.2-12.18.3.2511"
     runDir = "run"
 
     mappings = "stable_29"
