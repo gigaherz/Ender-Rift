@@ -1,7 +1,6 @@
 package gigaherz.enderRift.network;
 
-import gigaherz.enderRift.EnderRiftMod;
-import gigaherz.enderRift.client.ClientProxy;
+import gigaherz.enderRift.client.ClientHelper;
 import io.netty.buffer.ByteBuf;
 import net.minecraftforge.fml.network.NetworkEvent;
 
@@ -32,6 +31,6 @@ public class UpdatePowerStatus
 
     public void handle(Supplier<NetworkEvent.Context> context)
     {
-        ClientProxy.handleUpdatePowerStatus(this);
+        ClientHelper.handleUpdatePowerStatus(this);
     }
 }

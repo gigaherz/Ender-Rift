@@ -1,8 +1,7 @@
 package gigaherz.enderRift.network;
 
 import com.google.common.collect.Lists;
-import gigaherz.enderRift.EnderRiftMod;
-import gigaherz.enderRift.client.ClientProxy;
+import gigaherz.enderRift.client.ClientHelper;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
@@ -56,7 +55,7 @@ public class SendSlotChanges
 
     public void handle(Supplier<NetworkEvent.Context> context)
     {
-        ClientProxy.handleSendSlotChanges(this);
+        ClientHelper.handleSendSlotChanges(this);
     }
 
     public static ItemStack readLargeItemStack(PacketBuffer buf)

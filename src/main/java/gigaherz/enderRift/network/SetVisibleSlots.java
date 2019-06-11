@@ -1,7 +1,6 @@
 package gigaherz.enderRift.network;
 
-import gigaherz.enderRift.automation.browser.ContainerBrowser;
-import io.netty.buffer.ByteBuf;
+import gigaherz.enderRift.automation.browser.BrowserContainer;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.world.ServerWorld;
@@ -50,9 +49,9 @@ public class SetVisibleSlots
         {
             if (player.openContainer != null
                     && player.openContainer.windowId == this.windowId
-                    && player.openContainer instanceof ContainerBrowser)
+                    && player.openContainer instanceof BrowserContainer)
             {
-                ((ContainerBrowser) player.openContainer).setVisibleSlots(this.visible);
+                ((BrowserContainer) player.openContainer).setVisibleSlots(this.visible);
             }
         });
     }

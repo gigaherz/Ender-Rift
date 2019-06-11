@@ -1,7 +1,7 @@
 {
   "forge_marker": 1,
   "defaults": {
-    "model": "enderrift:proxy_main.obj"
+    "model": "enderrift:block/proxy_main.obj"
   },
   "variants": {
     "inventory": [{ "transform": "forge:default-block" }],
@@ -11,7 +11,7 @@
       "true": {
         "submodel": {
           "up": {
-            "model": "enderrift:proxy_connection.obj",
+            "model": "enderrift:block/proxy_connection.obj",
             "x": 90
           }
         }
@@ -23,7 +23,7 @@
       "true": {
         "submodel": {
           "down": {
-            "model": "enderrift:proxy_connection.obj",
+            "model": "enderrift:block/proxy_connection.obj",
             "x": 270
           }
         }
@@ -35,7 +35,7 @@
       "true": {
         "submodel": {
           "east": {
-            "model": "enderrift:proxy_connection.obj",
+            "model": "enderrift:block/proxy_connection.obj",
             "y": 270
           }
         }
@@ -47,7 +47,7 @@
       "true": {
         "submodel": {
           "west": {
-            "model": "enderrift:proxy_connection.obj",
+            "model": "enderrift:block/proxy_connection.obj",
             "y": 90
           }
         }
@@ -59,7 +59,7 @@
       "true": {
         "submodel": {
           "north": {
-            "model": "enderrift:proxy_connection.obj",
+            "model": "enderrift:block/proxy_connection.obj",
             "y": 180
           }
         }
@@ -71,7 +71,7 @@
       "true": {
         "submodel": {
           "south": {
-            "model": "enderrift:proxy_connection.obj"
+            "model": "enderrift:block/proxy_connection.obj"
           }
         }
       }

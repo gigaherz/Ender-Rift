@@ -1,7 +1,7 @@
 # Rhino
 newmtl Connection
-map_Kd minecraft:blocks/hopper_outside
+map_Kd minecraft:block/hopper_outside
 
 newmtl Front
-map_Kd enderrift:blocks/items_front
+map_Kd enderrift:block/items_front
 

@@ -200,12 +200,16 @@ public class ModelHandle
 
     private static boolean initialized = false;
 
+    private static ModelLoader MODEL_BAKERY;
+
     public static void init()
     {
         if (initialized)
             return;
 
         initialized = true;
+
+        MODEL_BAKERY = new ModelLoader(Minecraft.getInstance().getResourceManager(), Minecraft.getInstance().getTextureMap(), Minecraft.getInstance().getProfiler());
 
         IResourceManager rm = Minecraft.getInstance().getResourceManager();
         if (rm instanceof IReloadableResourceManager)
@@ -257,8 +261,6 @@ public class ModelHandle
         tessellator.draw();
     }
 
-    private static final ModelLoader ldr = new ModelLoader(Minecraft.getInstance().getResourceManager(), Minecraft.getInstance().getTextureMap(), Minecraft.getInstance().getProfiler());
-
     private static IBakedModel loadModel(ModelHandle handle)
     {
         IBakedModel model = loadedModels.get(handle.getKey());
@@ -274,7 +276,7 @@ public class ModelHandle
             }
             IModelState state = handle.getState();
             if (state == null) state = mod.getDefaultState();
-            model = mod.bake(ldr, ModelLoader.defaultTextureGetter(), new BasicState(state, handle.uvLocked()), handle.getVertexFormat());
+            model = mod.bake(MODEL_BAKERY, ModelLoader.defaultTextureGetter(), new BasicState(state, handle.uvLocked()), handle.getVertexFormat());
             loadedModels.put(handle.getKey(), model);
             return model;
         }

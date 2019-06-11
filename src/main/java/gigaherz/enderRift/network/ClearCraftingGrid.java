@@ -1,6 +1,6 @@
 package gigaherz.enderRift.network;
 
-import gigaherz.enderRift.automation.browser.ContainerCraftingBrowser;
+import gigaherz.enderRift.automation.browser.CraftingBrowserContainer;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.network.NetworkEvent;
@@ -34,9 +34,9 @@ public class ClearCraftingGrid
 
             if (player.openContainer != null
                     && player.openContainer.windowId == this.windowId
-                    && player.openContainer instanceof ContainerCraftingBrowser)
+                    && player.openContainer instanceof CraftingBrowserContainer)
             {
-                ((ContainerCraftingBrowser) player.openContainer).clearCraftingGrid(player);
+                ((CraftingBrowserContainer) player.openContainer).clearCraftingGrid(player);
             }
         });
     }

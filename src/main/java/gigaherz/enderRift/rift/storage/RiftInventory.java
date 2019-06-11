@@ -1,7 +1,7 @@
 package gigaherz.enderRift.rift.storage;
 
 import com.google.common.collect.Lists;
-import gigaherz.enderRift.rift.TileEnderRift;
+import gigaherz.enderRift.rift.RiftTileEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.ListNBT;
@@ -18,25 +18,25 @@ import java.util.List;
 
 public class RiftInventory implements IItemHandler
 {
-    private final RiftStorageWorldData manager;
+    private final RiftStorage manager;
 
-    final List<Reference<? extends TileEnderRift>> listeners = Lists.newArrayList();
-    final ReferenceQueue<TileEnderRift> deadListeners = new ReferenceQueue<>();
+    final List<Reference<? extends RiftTileEntity>> listeners = Lists.newArrayList();
+    final ReferenceQueue<RiftTileEntity> deadListeners = new ReferenceQueue<>();
     private final List<ItemStack> inventorySlots = Lists.newArrayList();
 
-    RiftInventory(RiftStorageWorldData manager)
+    RiftInventory(RiftStorage manager)
     {
         this.manager = manager;
     }
 
-    public void addWeakListener(TileEnderRift e)
+    public void addWeakListener(RiftTileEntity e)
     {
         listeners.add(new WeakReference<>(e, deadListeners));
     }
 
     private void onContentsChanged()
     {
-        for (Reference<? extends TileEnderRift>
+        for (Reference<? extends RiftTileEntity>
              ref = deadListeners.poll();
              ref != null;
              ref = deadListeners.poll())
@@ -44,9 +44,9 @@ public class RiftInventory implements IItemHandler
             listeners.remove(ref);
         }
 
-        for (Iterator<Reference<? extends TileEnderRift>> it = listeners.iterator(); it.hasNext(); )
+        for (Iterator<Reference<? extends RiftTileEntity>> it = listeners.iterator(); it.hasNext(); )
         {
-            TileEnderRift rift = it.next().get();
+            RiftTileEntity rift = it.next().get();
             if (rift == null || rift.isRemoved())
             {
                 it.remove();

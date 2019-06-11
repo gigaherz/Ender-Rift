@@ -1,12 +1,10 @@
 package gigaherz.enderRift.rift;
 
 import gigaherz.enderRift.EnderRiftMod;
-import gigaherz.enderRift.rift.storage.RiftStorageWorldData;
+import gigaherz.enderRift.rift.storage.RiftStorage;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.InventoryHelper;
 import net.minecraft.item.ItemStack;
@@ -43,42 +41,42 @@ public class RiftStructure
         StructureStates = new BlockState[]{
 
                 // Bottom
-                EnderRiftMod.structure.cornerState(BlockStructure.Corner.NW, true),
-                EnderRiftMod.structure.edgeState(BlockStructure.Type2.SIDE_EW, true),
-                EnderRiftMod.structure.cornerState(BlockStructure.Corner.NE, true),
+                EnderRiftMod.structure.cornerState(StructureBlock.Corner.NW, true),
+                EnderRiftMod.structure.edgeState(StructureBlock.Type2.SIDE_EW, true),
+                EnderRiftMod.structure.cornerState(StructureBlock.Corner.NE, true),
 
 
-                EnderRiftMod.structure.edgeState(BlockStructure.Type2.SIDE_NS, true),
+                EnderRiftMod.structure.edgeState(StructureBlock.Type2.SIDE_NS, true),
                 null,
-                EnderRiftMod.structure.edgeState(BlockStructure.Type2.SIDE_NS, true),
+                EnderRiftMod.structure.edgeState(StructureBlock.Type2.SIDE_NS, true),
 
-                EnderRiftMod.structure.cornerState(BlockStructure.Corner.SW, true),
-                EnderRiftMod.structure.edgeState(BlockStructure.Type2.SIDE_EW, true),
-                EnderRiftMod.structure.cornerState(BlockStructure.Corner.SE, true),
+                EnderRiftMod.structure.cornerState(StructureBlock.Corner.SW, true),
+                EnderRiftMod.structure.edgeState(StructureBlock.Type2.SIDE_EW, true),
+                EnderRiftMod.structure.cornerState(StructureBlock.Corner.SE, true),
 
                 // Middle
-                EnderRiftMod.structure.edgeState(BlockStructure.Type2.VERTICAL, false),
+                EnderRiftMod.structure.edgeState(StructureBlock.Type2.VERTICAL, false),
                 null,
-                EnderRiftMod.structure.edgeState(BlockStructure.Type2.VERTICAL, false),
+                EnderRiftMod.structure.edgeState(StructureBlock.Type2.VERTICAL, false),
 
                 null, null, null,
 
-                EnderRiftMod.structure.edgeState(BlockStructure.Type2.VERTICAL, false),
+                EnderRiftMod.structure.edgeState(StructureBlock.Type2.VERTICAL, false),
                 null,
-                EnderRiftMod.structure.edgeState(BlockStructure.Type2.VERTICAL, false),
+                EnderRiftMod.structure.edgeState(StructureBlock.Type2.VERTICAL, false),
 
                 // Top
-                EnderRiftMod.structure.cornerState(BlockStructure.Corner.NW, false),
-                EnderRiftMod.structure.edgeState(BlockStructure.Type2.SIDE_EW, false),
-                EnderRiftMod.structure.cornerState(BlockStructure.Corner.NE, false),
+                EnderRiftMod.structure.cornerState(StructureBlock.Corner.NW, false),
+                EnderRiftMod.structure.edgeState(StructureBlock.Type2.SIDE_EW, false),
+                EnderRiftMod.structure.cornerState(StructureBlock.Corner.NE, false),
 
-                EnderRiftMod.structure.edgeState(BlockStructure.Type2.SIDE_NS, false),
+                EnderRiftMod.structure.edgeState(StructureBlock.Type2.SIDE_NS, false),
                 null,
-                EnderRiftMod.structure.edgeState(BlockStructure.Type2.SIDE_NS, false),
+                EnderRiftMod.structure.edgeState(StructureBlock.Type2.SIDE_NS, false),
 
-                EnderRiftMod.structure.cornerState(BlockStructure.Corner.SW, false),
-                EnderRiftMod.structure.edgeState(BlockStructure.Type2.SIDE_EW, false),
-                EnderRiftMod.structure.cornerState(BlockStructure.Corner.SE, false),
+                EnderRiftMod.structure.cornerState(StructureBlock.Corner.SW, false),
+                EnderRiftMod.structure.edgeState(StructureBlock.Type2.SIDE_EW, false),
+                EnderRiftMod.structure.cornerState(StructureBlock.Corner.SE, false),
         };
     }
 
@@ -86,10 +84,10 @@ public class RiftStructure
     {
         TileEntity te = world.getTileEntity(pos);
 
-        if (!(te instanceof TileEnderRift))
+        if (!(te instanceof RiftTileEntity))
             return false;
 
-        ItemStack stack = ((TileEnderRift) te).getRiftItem();
+        ItemStack stack = ((RiftTileEntity) te).getRiftItem();
 
         InventoryHelper.spawnItemStack(world, player.posX, player.posY + 0.5f, player.posZ, stack);
 
@@ -122,7 +120,7 @@ public class RiftStructure
         if (state.getBlock() != EnderRiftMod.rift)
             return false;
 
-        if (state.get(BlockEnderRift.ASSEMBLED))
+        if (state.get(RiftBlock.ASSEMBLED))
             return false;
 
         for (int yy = 0; yy <= 2; yy++)
@@ -175,9 +173,9 @@ public class RiftStructure
             }
         }
 
-        world.setBlockState(pos, state.with(BlockEnderRift.ASSEMBLED, true));
+        world.setBlockState(pos, state.with(RiftBlock.ASSEMBLED, true));
 
-        TileEnderRift rift = (TileEnderRift) world.getTileEntity(pos);
+        RiftTileEntity rift = (RiftTileEntity) world.getTileEntity(pos);
 
         CompoundNBT tagCompound = itemStack.getTag();
 
@@ -187,7 +185,7 @@ public class RiftStructure
         }
         else
         {
-            rift.assemble(RiftStorageWorldData.get(world).getNextRiftId());
+            rift.assemble(RiftStorage.get(world).getNextRiftId());
         }
     }
 
@@ -212,16 +210,35 @@ public class RiftStructure
 
         BlockState state = world.getBlockState(pos);
 
-        if (state.getBlock() == EnderRiftMod.rift && state.get(BlockEnderRift.ASSEMBLED))
+        if (state.getBlock() == EnderRiftMod.rift && state.get(RiftBlock.ASSEMBLED))
         {
-            world.setBlockState(pos, state.with(BlockEnderRift.ASSEMBLED, false));
+            world.setBlockState(pos, state.with(RiftBlock.ASSEMBLED, false));
 
-            TileEnderRift rift = (TileEnderRift) world.getTileEntity(pos);
+            RiftTileEntity rift = (RiftTileEntity) world.getTileEntity(pos);
 
             ItemStack stack = rift.getRiftItem();
             InventoryHelper.spawnItemStack(world, pos.getX(), pos.getY(), pos.getZ(), stack);
 
             rift.unassemble();
+        }
+    }
+
+    public static Block getOriginalBlock(BlockState state)
+    {
+        if (state.getBlock() == EnderRiftMod.structure)
+        {
+            if (state.get(StructureBlock.TYPE1) ==StructureBlock.Type1.CORNER)
+            {
+                return StructurePattern[0];
+            }
+            else
+            {
+                return StructurePattern[1];
+            }
+        }
+        else
+        {
+            return StructurePattern[13];
         }
     }
 

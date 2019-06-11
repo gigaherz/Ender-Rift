@@ -1,9 +1,9 @@
 {
   "forge_marker": 1,
   "defaults": {
-    "model": "enderrift:driver_main.obj",
+    "model": "enderrift:block/driver_main.obj",
     "textures": {
-      "particle": "minecraft:blocks/hopper_inside"
+      "particle": "minecraft:block/hopper_inside"
     }
   },
   "variants": {
@@ -14,8 +14,8 @@
       "true": {
         "submodel": {
           "up": {
-            "model": "enderrift:proxy_connection.obj",
-            "textures": { "#Front": "enderrift:blocks/items_front" },
+            "model": "enderrift:block/proxy_connection.obj",
+            "textures": { "#Front": "enderrift:block/items_front" },
             "x": 90
           }
         }
@@ -27,8 +27,8 @@
       "true": {
         "submodel": {
           "down": {
-            "model": "enderrift:proxy_connection.obj",
-            "textures": { "#Front": "enderrift:blocks/items_front" },
+            "model": "enderrift:block/proxy_connection.obj",
+            "textures": { "#Front": "enderrift:block/items_front" },
             "x": 270
           }
         }
@@ -40,8 +40,8 @@
       "true": {
         "submodel": {
           "east": {
-            "model": "enderrift:proxy_connection.obj",
-            "textures": { "#Front": "enderrift:blocks/items_front" },
+            "model": "enderrift:block/proxy_connection.obj",
+            "textures": { "#Front": "enderrift:block/items_front" },
             "y": 270
           }
         }
@@ -53,8 +53,8 @@
       "true": {
         "submodel": {
           "west": {
-            "model": "enderrift:proxy_connection.obj",
-            "textures": { "#Front": "enderrift:blocks/items_front" },
+            "model": "enderrift:block/proxy_connection.obj",
+            "textures": { "#Front": "enderrift:block/items_front" },
             "y": 90
           }
         }
@@ -66,8 +66,8 @@
       "true": {
         "submodel": {
           "north": {
-            "model": "enderrift:proxy_connection.obj",
-            "textures": { "#Front": "enderrift:blocks/items_front" },
+            "model": "enderrift:block/proxy_connection.obj",
+            "textures": { "#Front": "enderrift:block/items_front" },
             "y": 180
           }
         }
