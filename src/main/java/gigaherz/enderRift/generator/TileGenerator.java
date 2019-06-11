@@ -2,32 +2,33 @@ package gigaherz.enderRift.generator;
 
 import gigaherz.enderRift.EnderRiftMod;
 import gigaherz.enderRift.common.EnergyBuffer;
-import gigaherz.enderRift.plugins.tesla.TeslaControllerBase;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
+import net.minecraft.block.Blocks;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.tileentity.TileEntityFurnace;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.ITickable;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.ListNBT;
+import net.minecraft.tileentity.*;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.Constants;
+import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.IEnergyStorage;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
+import net.minecraftforge.registries.ObjectHolder;
 
 import javax.annotation.Nullable;
 
-public class TileGenerator extends TileEntity
-        implements ITickable
+public class TileGenerator extends TileEntity implements ITickableTileEntity
 {
+    @ObjectHolder("enderrift:generator")
+    public static TileEntityType<?> TYPE;
+
     public static final int SLOT_COUNT = 1;
     public static final int POWER_LIMIT = 100000;
     public static final int MIN_HEAT = 100;
@@ -37,7 +38,8 @@ public class TileGenerator extends TileEntity
     public static final int HEAT_INTERVAL = 20;
     public static final int POWER_TRANSFER_MAX = 800;
 
-    private EnergyBuffer energyCapability = new EnergyBuffer(POWER_LIMIT);
+    private EnergyBuffer energyBuffer = new EnergyBuffer(POWER_LIMIT);
+    final LazyOptional<EnergyBuffer> energyBufferGetter = LazyOptional.of(() -> energyBuffer);
 
     private final ItemStackHandler fuelSlot = new ItemStackHandler(SLOT_COUNT)
     {
@@ -51,69 +53,37 @@ public class TileGenerator extends TileEntity
         @Override
         public ItemStack insertItem(int slot, ItemStack stack, boolean simulate)
         {
-            if (TileEntityFurnace.getItemBurnTime(stack) <= 0)
+            if (getBurnTime(stack) <= 0)
                 return stack;
 
             return super.insertItem(slot, stack, simulate);
         }
     };
+    public LazyOptional<IItemHandler> fuelSlotProvider = LazyOptional.of(() -> fuelSlot);
 
     public int heatLevel;
     public int burnTimeRemaining;
     public int currentItemBurnTime;
     public int timeInterval;
 
-    private Capability teslaProducerCap;
-    private Capability teslaHolderCap;
-
-    private Object teslaProducerInstance;
-    private Object teslaHolderInstance;
-
     public TileGenerator()
     {
-        teslaProducerCap = TeslaControllerBase.PRODUCER.getCapability();
-        teslaProducerInstance = TeslaControllerBase.PRODUCER.createInstance(energyCapability);
-        teslaHolderCap = TeslaControllerBase.HOLDER.getCapability();
-        teslaHolderInstance = TeslaControllerBase.HOLDER.createInstance(energyCapability);
-    }
-
-    @Override
-    public boolean hasCapability(Capability<?> capability, @Nullable EnumFacing facing)
-    {
-        if (capability == CapabilityEnergy.ENERGY)
-            return true;
-        if (capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
-            return true;
-        if (teslaProducerCap != null && capability == teslaProducerCap)
-            return true;
-        if (teslaHolderCap != null && capability == teslaHolderCap)
-            return true;
-        return super.hasCapability(capability, facing);
+        super(TYPE);
     }
 
     @SuppressWarnings("unchecked")
     @Override
-    public <T> T getCapability(Capability<T> capability, @Nullable EnumFacing facing)
+    public <T> LazyOptional<T> getCapability(Capability<T> cap, @Nullable Direction side)
     {
-        if (capability == CapabilityEnergy.ENERGY)
-            return (T) energyCapability;
-        if (capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
-            return (T) fuelSlot;
-        if (teslaProducerCap != null && capability == teslaProducerCap)
-            return (T) teslaProducerInstance;
-        if (teslaHolderCap != null && capability == teslaHolderCap)
-            return (T) teslaHolderInstance;
-        return super.getCapability(capability, facing);
+        if (cap == CapabilityEnergy.ENERGY)
+            return energyBufferGetter.cast();
+        if (cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
+            return fuelSlotProvider.cast();
+        return super.getCapability(cap, side);
     }
 
     @Override
-    public boolean shouldRefresh(World world, BlockPos pos, IBlockState oldState, IBlockState newState)
-    {
-        return oldState.getBlock() != newState.getBlock();
-    }
-
-    @Override
-    public void update()
+    public void tick()
     {
         if (world.isRemote)
             return;
@@ -174,19 +144,19 @@ public class TileGenerator extends TileEntity
             }
         }
 
-        if (heatLevel >= MIN_HEAT && energyCapability.getEnergyStored() < POWER_LIMIT)
+        if (heatLevel >= MIN_HEAT && energyBuffer.getEnergyStored() < POWER_LIMIT)
         {
             int powerGen = getGenerationPower();
-            energyCapability.setEnergy(Math.min(energyCapability.getEnergyStored() + powerGen, POWER_LIMIT));
+            energyBuffer.setEnergy(Math.min(energyBuffer.getEnergyStored() + powerGen, POWER_LIMIT));
             anyChanged = true;
         }
 
-        if (burnTimeRemaining <= 0 && energyCapability.getEnergyStored() < POWER_LIMIT)
+        if (burnTimeRemaining <= 0 && energyBuffer.getEnergyStored() < POWER_LIMIT)
         {
             ItemStack stack = fuelSlot.getStackInSlot(0);
             if (stack.getCount() > 0)
             {
-                currentItemBurnTime = burnTimeRemaining = TileEntityFurnace.getItemBurnTime(fuelSlot.getStackInSlot(0));
+                currentItemBurnTime = burnTimeRemaining = getBurnTime(fuelSlot.getStackInSlot(0));
                 timeInterval = 0;
                 stack.shrink(1);
                 if (stack.getCount() <= 0)
@@ -202,32 +172,28 @@ public class TileGenerator extends TileEntity
     {
         boolean anyChanged = false;
 
-        int sendPower = Math.min(POWER_TRANSFER_MAX, energyCapability.getEnergyStored());
+        int sendPower = Math.min(POWER_TRANSFER_MAX, energyBuffer.getEnergyStored());
         if (sendPower > 0)
         {
             IEnergyStorage[] handlers = new IEnergyStorage[6];
             int[] wantedSide = new int[6];
             int accepted = 0;
 
-            for (EnumFacing neighbor : EnumFacing.VALUES)
+            for (Direction neighbor : Direction.values())
             {
                 TileEntity e = world.getTileEntity(pos.offset(neighbor));
-                EnumFacing from = neighbor.getOpposite();
+                Direction from = neighbor.getOpposite();
 
                 if (e == null)
                     continue;
 
                 IEnergyStorage handler = null;
-                if (e.hasCapability(CapabilityEnergy.ENERGY, from))
+                LazyOptional<IEnergyStorage> opt = e.getCapability(CapabilityEnergy.ENERGY, from);
+                if (opt.isPresent())
                 {
-                    handler = e.getCapability(CapabilityEnergy.ENERGY, from);
+                    handler = opt.orElse(null);
                     if (!handler.canReceive())
                         handler = null;
-                }
-
-                if (handler == null)
-                {
-                    handler = TeslaControllerBase.CONSUMER.wrapReverse(e, from);
                 }
 
                 if (handler != null)
@@ -241,17 +207,17 @@ public class TileGenerator extends TileEntity
 
             if (accepted > 0)
             {
-                for (EnumFacing from : EnumFacing.VALUES)
+                for (Direction from : Direction.values())
                 {
                     IEnergyStorage handler = handlers[from.ordinal()];
                     int wanted = wantedSide[from.ordinal()];
                     if (handler == null || wanted == 0)
                         continue;
 
-                    int given = Math.min(Math.min(energyCapability.getEnergyStored(), wanted), wanted * accepted / sendPower);
+                    int given = Math.min(Math.min(energyBuffer.getEnergyStored(), wanted), wanted * accepted / sendPower);
                     int received = Math.min(given, handler.receiveEnergy(given, false));
-                    energyCapability.setEnergy(energyCapability.getEnergyStored() - received);
-                    if (energyCapability.getEnergyStored() <= 0)
+                    energyBuffer.setEnergy(energyBuffer.getEnergyStored() - received);
+                    if (energyBuffer.getEnergyStored() <= 0)
                         break;
                 }
                 anyChanged = true;
@@ -267,55 +233,55 @@ public class TileGenerator extends TileEntity
     }
 
     @Override
-    public void readFromNBT(NBTTagCompound compound)
+    public void read(CompoundNBT compound)
     {
-        super.readFromNBT(compound);
+        super.read(compound);
 
-        heatLevel = compound.getInteger("heatLevel");
-        burnTimeRemaining = compound.getInteger("burnTimeRemaining");
-        currentItemBurnTime = compound.getInteger("currentItemBurnTime");
-        timeInterval = compound.getInteger("timeInterval");
-        CapabilityEnergy.ENERGY.readNBT(energyCapability, null, compound.getTag("storedEnergy"));
-        CapabilityItemHandler.ITEM_HANDLER_CAPABILITY.readNBT(fuelSlot, null, compound.getTagList("fuelSlot", Constants.NBT.TAG_COMPOUND));
+        heatLevel = compound.getInt("heatLevel");
+        burnTimeRemaining = compound.getInt("burnTimeRemaining");
+        currentItemBurnTime = compound.getInt("currentItemBurnTime");
+        timeInterval = compound.getInt("timeInterval");
+        CapabilityEnergy.ENERGY.readNBT(energyBuffer, null, compound.getCompound("storedEnergy"));
+        CapabilityItemHandler.ITEM_HANDLER_CAPABILITY.readNBT(fuelSlot, null, compound.getList("fuelSlot", Constants.NBT.TAG_COMPOUND));
 
-        if (compound.hasKey("Items", Constants.NBT.TAG_LIST))
+        if (compound.contains("Items", Constants.NBT.TAG_LIST))
         {
-            NBTTagList _outputs = compound.getTagList("Items", Constants.NBT.TAG_COMPOUND);
-            for (int i = 0; i < _outputs.tagCount(); ++i)
+            ListNBT _outputs = compound.getList("Items", Constants.NBT.TAG_COMPOUND);
+            for (int i = 0; i < _outputs.size(); ++i)
             {
-                NBTTagCompound nbttagcompound = _outputs.getCompoundTagAt(i);
+                CompoundNBT nbttagcompound = _outputs.getCompound(i);
                 int j = nbttagcompound.getByte("Slot") & 255;
 
                 if (j >= 0 && j < fuelSlot.getSlots())
                 {
-                    fuelSlot.setStackInSlot(j, new ItemStack(nbttagcompound));
+                    fuelSlot.setStackInSlot(j, ItemStack.read(nbttagcompound));
                 }
             }
         }
     }
 
     @Override
-    public void handleUpdateTag(NBTTagCompound tag)
+    public CompoundNBT write(CompoundNBT compound)
     {
-        super.readFromNBT(tag);
-    }
+        compound = super.write(compound);
 
-    @Override
-    public NBTTagCompound writeToNBT(NBTTagCompound compound)
-    {
-        compound = super.writeToNBT(compound);
-
-        compound.setInteger("heatLevel", heatLevel);
-        compound.setInteger("burnTimeRemaining", burnTimeRemaining);
-        compound.setInteger("currentItemBurnTime", currentItemBurnTime);
-        compound.setInteger("timeInterval", timeInterval);
-        compound.setTag("storedEnergy", CapabilityEnergy.ENERGY.writeNBT(energyCapability, null));
-        compound.setTag("fuelSlot", CapabilityItemHandler.ITEM_HANDLER_CAPABILITY.writeNBT(fuelSlot, null));
+        compound.putInt("heatLevel", heatLevel);
+        compound.putInt("burnTimeRemaining", burnTimeRemaining);
+        compound.putInt("currentItemBurnTime", currentItemBurnTime);
+        compound.putInt("timeInterval", timeInterval);
+        compound.put("storedEnergy", CapabilityEnergy.ENERGY.writeNBT(energyBuffer, null));
+        compound.put("fuelSlot", CapabilityItemHandler.ITEM_HANDLER_CAPABILITY.writeNBT(fuelSlot, null));
 
         return compound;
     }
 
-    public boolean isUseableByPlayer(EntityPlayer player)
+    @Override
+    public void handleUpdateTag(CompoundNBT tag)
+    {
+        super.read(tag);
+    }
+
+    public boolean isUseableByPlayer(PlayerEntity player)
     {
         return world.getTileEntity(pos) == this
                 && player.getDistanceSq(pos.getX() + 0.5D, pos.getY() + 0.5D, pos.getZ() + 0.5D) <= 64.0D;
@@ -323,14 +289,14 @@ public class TileGenerator extends TileEntity
 
     public int[] getFields()
     {
-        return new int[]{burnTimeRemaining, currentItemBurnTime, energyCapability.getEnergyStored(), heatLevel};
+        return new int[]{burnTimeRemaining, currentItemBurnTime, energyBuffer.getEnergyStored(), heatLevel};
     }
 
     public void setFields(int[] values)
     {
         burnTimeRemaining = values[0];
         currentItemBurnTime = values[1];
-        energyCapability.setEnergy(values[2]);
+        energyBuffer.setEnergy(values[2]);
         heatLevel = values[3];
         //this.markDirty();
     }
@@ -354,7 +320,7 @@ public class TileGenerator extends TileEntity
 
     public int getContainedEnergy()
     {
-        return energyCapability.getEnergyStored();
+        return energyBuffer.getEnergyStored();
     }
 
     public IItemHandler inventory()
@@ -370,5 +336,15 @@ public class TileGenerator extends TileEntity
     public int getBurnTimeRemaining()
     {
         return burnTimeRemaining;
+    }
+
+    public int getBurnTime(ItemStack p_213997_1_) {
+        if (p_213997_1_.isEmpty()) {
+            return 0;
+        } else {
+            Item item = p_213997_1_.getItem();
+            int ret = p_213997_1_.getBurnTime();
+            return net.minecraftforge.event.ForgeEventFactory.getItemBurnTime(p_213997_1_, ret == -1 ? AbstractFurnaceTileEntity.getBurnTimes().getOrDefault(item, 0) : ret);
+        }
     }
 }

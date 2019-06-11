@@ -1,5 +1,5 @@
 package gigaherz.enderRift.plugins;
-
+/*
 import gigaherz.enderRift.EnderRiftMod;
 import gigaherz.enderRift.automation.TileAggregator;
 import gigaherz.enderRift.automation.driver.TileDriver;
@@ -7,13 +7,13 @@ import gigaherz.enderRift.generator.TileGenerator;
 import gigaherz.enderRift.rift.BlockStructure;
 import gigaherz.enderRift.rift.TileEnderRift;
 import gigaherz.enderRift.rift.TileEnderRiftCorner;
-import gigaherz.graph.api.Graph;
-import gigaherz.graph.api.GraphObject;
+import gigaherz.graph2.Graph;
+import gigaherz.graph2.GraphObject;
 import mcp.mobius.waila.api.*;
 import net.minecraft.client.resources.I18n;
-import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -89,7 +89,7 @@ public class WailaProviders implements IWailaPlugin
         {
             if (config.getConfig(CONFIG_GENERATOR))
             {
-                NBTTagCompound tag = accessor.getNBTData();
+                CompoundNBT tag = accessor.getNBTData();
 
                 if (tag.getInteger("powerGen") > 0)
                 {
@@ -120,7 +120,7 @@ public class WailaProviders implements IWailaPlugin
         }
 
         @Override
-        public NBTTagCompound getNBTData(EntityPlayerMP player, TileEntity te, NBTTagCompound tag, World world, BlockPos pos)
+        public CompoundNBT getNBTData(ServerPlayerEntity player, TileEntity te, CompoundNBT tag, World world, BlockPos pos)
         {
             TileGenerator rift = (TileGenerator) te;
 
@@ -152,7 +152,7 @@ public class WailaProviders implements IWailaPlugin
         {
             if (config.getConfig(CONFIG_DRIVER))
             {
-                NBTTagCompound tag = accessor.getNBTData();
+                CompoundNBT tag = accessor.getNBTData();
 
                 if (config.getConfig(CONFIG_RF))
                     currenttip.add(I18n.format("text." + EnderRiftMod.MODID + ".generator.energy", tag.getInteger("energy"), TileDriver.POWER_LIMIT));
@@ -168,7 +168,7 @@ public class WailaProviders implements IWailaPlugin
         }
 
         @Override
-        public NBTTagCompound getNBTData(EntityPlayerMP player, TileEntity te, NBTTagCompound tag, World world, BlockPos pos)
+        public CompoundNBT getNBTData(ServerPlayerEntity player, TileEntity te, CompoundNBT tag, World world, BlockPos pos)
         {
             TileDriver rift = (TileDriver) te;
 
@@ -208,7 +208,7 @@ public class WailaProviders implements IWailaPlugin
         }
 
         @Override
-        public NBTTagCompound getNBTData(EntityPlayerMP player, TileEntity te, NBTTagCompound tag, World world, BlockPos pos)
+        public CompoundNBT getNBTData(ServerPlayerEntity player, TileEntity te, CompoundNBT tag, World world, BlockPos pos)
         {
             return tag;
         }
@@ -241,7 +241,7 @@ public class WailaProviders implements IWailaPlugin
         }
 
         @Override
-        public NBTTagCompound getNBTData(EntityPlayerMP player, TileEntity te, NBTTagCompound tag, World world, BlockPos pos)
+        public CompoundNBT getNBTData(ServerPlayerEntity player, TileEntity te, CompoundNBT tag, World world, BlockPos pos)
         {
             return tag;
         }
@@ -266,7 +266,7 @@ public class WailaProviders implements IWailaPlugin
         {
             if (config.getConfig(CONFIG_RIFT))
             {
-                NBTTagCompound tag = accessor.getNBTData();
+                CompoundNBT tag = accessor.getNBTData();
 
                 if (tag != null && tag.hasKey("isFormed"))
                 {
@@ -296,7 +296,7 @@ public class WailaProviders implements IWailaPlugin
         }
 
         @Override
-        public NBTTagCompound getNBTData(EntityPlayerMP player, TileEntity te, NBTTagCompound tag, World world, BlockPos pos)
+        public CompoundNBT getNBTData(ServerPlayerEntity player, TileEntity te, CompoundNBT tag, World world, BlockPos pos)
         {
             TileEnderRift rift;
 
@@ -321,3 +321,4 @@ public class WailaProviders implements IWailaPlugin
         }
     }
 }
+*/

@@ -1,10 +1,20 @@
 package gigaherz.enderRift.automation.proxy;
 
 import gigaherz.enderRift.automation.TileAggregator;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.tileentity.TileEntityType;
+import net.minecraft.util.Direction;
+import net.minecraftforge.registries.ObjectHolder;
 
 public class TileProxy extends TileAggregator
 {
+    @ObjectHolder("enderrift:proxy")
+    public static TileEntityType<?> TYPE;
+
+    public TileProxy()
+    {
+        super(TYPE);
+    }
+
     @Override
     protected void lazyDirty()
     {
@@ -12,7 +22,7 @@ public class TileProxy extends TileAggregator
     }
 
     @Override
-    protected boolean canConnectSide(EnumFacing side)
+    protected boolean canConnectSide(Direction side)
     {
         return true;
     }

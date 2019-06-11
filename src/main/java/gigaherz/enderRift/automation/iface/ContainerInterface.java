@@ -1,46 +1,59 @@
 package gigaherz.enderRift.automation.iface;
 
 import gigaherz.enderRift.common.slots.SlotFilter;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.inventory.ClickType;
-import net.minecraft.inventory.Container;
-import net.minecraft.inventory.Slot;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.inventory.container.ContainerType;
+import net.minecraft.inventory.container.Slot;
+import net.minecraft.inventory.container.ClickType;
+import net.minecraft.inventory.container.Container;
 import net.minecraft.item.ItemStack;
+import net.minecraft.network.PacketBuffer;
+import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.SlotItemHandler;
+import net.minecraftforge.registries.ObjectHolder;
 
-public class ContainerInterface
-        extends Container
+public class ContainerInterface extends Container
 {
+    @ObjectHolder("enderrift:interface")
+    public static ContainerType<ContainerInterface> TYPE;
+
     protected TileInterface tile;
 
-    public ContainerInterface(TileInterface tileEntity, InventoryPlayer playerInventory)
+    public ContainerInterface(int id, PlayerInventory playerInventory, PacketBuffer extraData)
     {
-        this.tile = tileEntity;
+        this(id, extraData.readBlockPos(), playerInventory);
+    }
 
-        IItemHandler filters = tileEntity.inventoryFilter();
+    public ContainerInterface(int id, BlockPos pos, PlayerInventory playerInventory)
+    {
+        super(TYPE, id);
+
+        this.tile = (TileInterface)playerInventory.player.world.getTileEntity(pos);
+
+        IItemHandler filters = tile.inventoryFilter();
         for (int x = 0; x < 9; x++)
         {
-            addSlotToContainer(new SlotFilter(filters, x, 8 + x * 18, 33));
+            addSlot(new SlotFilter(filters, x, 8 + x * 18, 33));
         }
 
-        IItemHandler outputs = tileEntity.inventoryOutputs();
+        IItemHandler outputs = tile.inventoryOutputs();
         for (int x = 0; x < 9; x++)
         {
-            addSlotToContainer(new SlotItemHandler(outputs, x, 8 + x * 18, 62));
+            addSlot(new SlotItemHandler(outputs, x, 8 + x * 18, 62));
         }
 
         bindPlayerInventory(playerInventory);
     }
 
-    protected void bindPlayerInventory(InventoryPlayer playerInventory)
+    protected void bindPlayerInventory(PlayerInventory playerInventory)
     {
         for (int y = 0; y < 3; y++)
         {
             for (int x = 0; x < 9; x++)
             {
-                addSlotToContainer(new Slot(playerInventory,
+                addSlot(new Slot(playerInventory,
                         x + y * 9 + 9,
                         8 + x * 18, 94 + y * 18));
             }
@@ -48,18 +61,18 @@ public class ContainerInterface
 
         for (int x = 0; x < 9; x++)
         {
-            addSlotToContainer(new Slot(playerInventory, x, 8 + x * 18, 152));
+            addSlot(new Slot(playerInventory, x, 8 + x * 18, 152));
         }
     }
 
     @Override
-    public boolean canInteractWith(EntityPlayer player)
+    public boolean canInteractWith(PlayerEntity player)
     {
         return tile.isUseableByPlayer(player);
     }
 
     @Override
-    public ItemStack slotClick(int slotId, int clickedButton, ClickType mode, EntityPlayer playerIn)
+    public ItemStack slotClick(int slotId, int clickedButton, ClickType mode, PlayerEntity playerIn)
     {
         if (slotId >= 0 && slotId < 9)
         {
@@ -91,7 +104,7 @@ public class ContainerInterface
     }
 
     @Override
-    public ItemStack transferStackInSlot(EntityPlayer player, int slotIndex)
+    public ItemStack transferStackInSlot(PlayerEntity player, int slotIndex)
     {
         if (slotIndex < 8)
         {

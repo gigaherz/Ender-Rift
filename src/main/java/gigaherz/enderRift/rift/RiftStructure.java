@@ -3,21 +3,23 @@ package gigaherz.enderRift.rift;
 import gigaherz.enderRift.EnderRiftMod;
 import gigaherz.enderRift.rift.storage.RiftStorageWorldData;
 import net.minecraft.block.Block;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.item.EntityItem;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
+import net.minecraft.entity.item.ItemEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.inventory.InventoryHelper;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
 
 public class RiftStructure
 {
     static Block[] StructurePattern;
-    static IBlockState[] StructureStates;
+    static BlockState[] StructureStates;
 
     public static void init()
     {
@@ -38,7 +40,7 @@ public class RiftStructure
                 Blocks.IRON_BLOCK, Blocks.REDSTONE_BLOCK, Blocks.IRON_BLOCK,
         };
 
-        StructureStates = new IBlockState[]{
+        StructureStates = new BlockState[]{
 
                 // Bottom
                 EnderRiftMod.structure.cornerState(BlockStructure.Corner.NW, true),
@@ -80,7 +82,7 @@ public class RiftStructure
         };
     }
 
-    public static boolean duplicateOrb(World world, BlockPos pos, EntityPlayer player)
+    public static boolean duplicateOrb(World world, BlockPos pos, PlayerEntity player)
     {
         TileEntity te = world.getTileEntity(pos);
 
@@ -89,8 +91,7 @@ public class RiftStructure
 
         ItemStack stack = ((TileEnderRift) te).getRiftItem();
 
-        Entity entity = new EntityItem(world, player.posX, player.posY + 0.5f, player.posZ, stack);
-        world.spawnEntity(entity);
+        InventoryHelper.spawnItemStack(world, player.posX, player.posY + 0.5f, player.posZ, stack);
 
         return true;
     }
@@ -116,12 +117,12 @@ public class RiftStructure
 
     public static boolean assemble(World world, BlockPos pos, ItemStack itemStack)
     {
-        IBlockState state = world.getBlockState(pos);
+        BlockState state = world.getBlockState(pos);
 
         if (state.getBlock() != EnderRiftMod.rift)
             return false;
 
-        if (state.getValue(BlockEnderRift.ASSEMBLED))
+        if (state.get(BlockEnderRift.ASSEMBLED))
             return false;
 
         for (int yy = 0; yy <= 2; yy++)
@@ -137,7 +138,7 @@ public class RiftStructure
                     {
                         if (b == Blocks.AIR)
                         {
-                            IBlockState st = world.getBlockState(bp);
+                            BlockState st = world.getBlockState(bp);
                             if (!w.isAir(st, world, bp))
                                 return false;
                         }
@@ -156,7 +157,7 @@ public class RiftStructure
         return true;
     }
 
-    private static void buildStructure(World world, BlockPos pos, ItemStack itemStack, IBlockState state)
+    private static void buildStructure(World world, BlockPos pos, ItemStack itemStack, BlockState state)
     {
         for (int yy = 0; yy <= 2; yy++)
         {
@@ -164,7 +165,7 @@ public class RiftStructure
             {
                 for (int xx = 0; xx <= 2; xx++)
                 {
-                    IBlockState bs = StructureStates[yy * 9 + zz * 3 + xx];
+                    BlockState bs = StructureStates[yy * 9 + zz * 3 + xx];
                     if (bs == null)
                         continue;
 
@@ -174,15 +175,15 @@ public class RiftStructure
             }
         }
 
-        world.setBlockState(pos, state.withProperty(BlockEnderRift.ASSEMBLED, true));
+        world.setBlockState(pos, state.with(BlockEnderRift.ASSEMBLED, true));
 
         TileEnderRift rift = (TileEnderRift) world.getTileEntity(pos);
 
-        NBTTagCompound tagCompound = itemStack.getTagCompound();
+        CompoundNBT tagCompound = itemStack.getTag();
 
-        if (tagCompound != null && tagCompound.hasKey("RiftId"))
+        if (tagCompound != null && tagCompound.contains("RiftId"))
         {
-            rift.assemble(tagCompound.getInteger("RiftId"));
+            rift.assemble(tagCompound.getInt("RiftId"));
         }
         else
         {
@@ -209,23 +210,22 @@ public class RiftStructure
             }
         }
 
-        IBlockState state = world.getBlockState(pos);
+        BlockState state = world.getBlockState(pos);
 
-        if (state.getBlock() == EnderRiftMod.rift && state.getValue(BlockEnderRift.ASSEMBLED))
+        if (state.getBlock() == EnderRiftMod.rift && state.get(BlockEnderRift.ASSEMBLED))
         {
-            world.setBlockState(pos, state.withProperty(BlockEnderRift.ASSEMBLED, false));
+            world.setBlockState(pos, state.with(BlockEnderRift.ASSEMBLED, false));
 
             TileEnderRift rift = (TileEnderRift) world.getTileEntity(pos);
 
             ItemStack stack = rift.getRiftItem();
-            Entity entity = new EntityItem(world, pos.getX(), pos.getY(), pos.getZ(), stack);
-            world.spawnEntity(entity);
+            InventoryHelper.spawnItemStack(world, pos.getX(), pos.getY(), pos.getZ(), stack);
 
             rift.unassemble();
         }
     }
 
-    public static Block getOriginalBlock(World worldIn, BlockPos pos)
+    public static Block getOriginalBlock(IBlockReader worldIn, BlockPos pos)
     {
         for (int yy = 0; yy <= 2; yy++)
         {

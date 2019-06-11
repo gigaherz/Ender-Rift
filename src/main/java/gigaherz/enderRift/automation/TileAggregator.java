@@ -4,24 +4,23 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import gigaherz.enderRift.common.AutomationEnergyWrapper;
 import gigaherz.enderRift.common.IPoweredAutomation;
-import gigaherz.graph.api.Graph;
-import gigaherz.graph.api.GraphObject;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.nbt.NBTTagCompound;
+import gigaherz.graph2.Graph;
+import gigaherz.graph2.GraphObject;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.tileentity.ITickableTileEntity;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.ITickable;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.tileentity.TileEntityType;
+import net.minecraft.util.Direction;
 import net.minecraftforge.energy.IEnergyStorage;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 
 import javax.annotation.Nullable;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
-public abstract class TileAggregator extends TileEntity implements ITickable, GraphObject, IPoweredAutomation
+public abstract class TileAggregator extends TileEntity implements ITickableTileEntity, GraphObject, IPoweredAutomation
 {
     private Graph graph;
     private boolean firstUpdate = true;
@@ -30,6 +29,11 @@ public abstract class TileAggregator extends TileEntity implements ITickable, Gr
     private AutomationEnergyWrapper wrapper = new AutomationEnergyWrapper(this);
 
     private int temporaryLowOnPowerTicks = 0;
+
+    public TileAggregator(TileEntityType<?> tileEntityTypeIn)
+    {
+        super(tileEntityTypeIn);
+    }
 
     // =============================================================================================
     // Graph API bindings
@@ -57,7 +61,7 @@ public abstract class TileAggregator extends TileEntity implements ITickable, Gr
     }
 
     @Override
-    public void update()
+    public void tick()
     {
         if (firstUpdate)
         {
@@ -78,9 +82,9 @@ public abstract class TileAggregator extends TileEntity implements ITickable, Gr
     }
 
     @Override
-    public void invalidate()
+    public void remove()
     {
-        super.invalidate();
+        super.remove();
 
         Graph graph = this.getGraph();
         if (graph != null)
@@ -92,7 +96,7 @@ public abstract class TileAggregator extends TileEntity implements ITickable, Gr
         Graph graph = this.getGraph();
         if (graph != null)
         {
-            graph.addNeighours(this, getNeighbours());
+            graph.addDirectedEdges(this, getNeighbours());
         }
 
         updateConnectedInventories();
@@ -101,7 +105,7 @@ public abstract class TileAggregator extends TileEntity implements ITickable, Gr
     private List<GraphObject> getNeighbours()
     {
         List<GraphObject> neighbours = Lists.newArrayList();
-        for (EnumFacing f : EnumFacing.VALUES)
+        for (Direction f : Direction.values())
         {
             TileEntity teOther = world.getTileEntity(pos.offset(f));
             if (!(teOther instanceof TileAggregator))
@@ -127,7 +131,7 @@ public abstract class TileAggregator extends TileEntity implements ITickable, Gr
 
             TileAggregator other = (TileAggregator) object;
 
-            if (!other.isInvalid())
+            if (!other.isRemoved())
                 other.lazyDirty();
         }
     }
@@ -140,24 +144,18 @@ public abstract class TileAggregator extends TileEntity implements ITickable, Gr
     }
 
     @Override
-    public IEnergyStorage getEnergyBuffer()
+    public Optional<IEnergyStorage> getEnergyBuffer()
     {
         return getCombinedPowerBuffer();
     }
 
     protected abstract void lazyDirty();
 
-    @Override
-    public boolean shouldRefresh(World world, BlockPos pos, IBlockState oldState, IBlockState newState)
-    {
-        return oldState.getBlock() != newState.getBlock();
-    }
-
     protected void updateConnectedInventories()
     {
         connectedInventories.clear();
 
-        for (EnumFacing f : EnumFacing.VALUES)
+        for (Direction f : Direction.values())
         {
             if (!canConnectSide(f))
                 continue;
@@ -171,27 +169,24 @@ public abstract class TileAggregator extends TileEntity implements ITickable, Gr
 
             if (AutomationHelper.isAutomatable(teOther, f.getOpposite()))
             {
-                if (teOther.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, f.getOpposite()))
-                {
-                    this.connectedInventories.add(teOther.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, f.getOpposite()));
-                }
+                teOther.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, f.getOpposite())
+                        .ifPresent(this.connectedInventories::add);
             }
         }
 
         lazyNotifyDirty();
     }
 
-    protected abstract boolean canConnectSide(EnumFacing side);
+    protected abstract boolean canConnectSide(Direction side);
 
     public IItemHandler getCombinedInventory()
     {
         return wrapper;
     }
 
-    @Nullable
-    public IEnergyStorage getInternalBuffer()
+    public Optional<IEnergyStorage> getInternalBuffer()
     {
-        return null;
+        return Optional.empty();
     }
 
     private IItemHandler getCombinedInventoryInternal()
@@ -216,12 +211,12 @@ public abstract class TileAggregator extends TileEntity implements ITickable, Gr
         return aggregator;
     }
 
-    private IEnergyStorage getCombinedPowerBuffer()
+    private Optional<IEnergyStorage> getCombinedPowerBuffer()
     {
         EnergyAggregator energy = new EnergyAggregator();
 
         if (getGraph() == null)
-            return energy;
+            return Optional.of(energy);
 
         for (GraphObject object : getGraph().getObjects())
         {
@@ -230,12 +225,10 @@ public abstract class TileAggregator extends TileEntity implements ITickable, Gr
 
             TileAggregator proxy = (TileAggregator) object;
 
-            IEnergyStorage internalBuffer = proxy.getInternalBuffer();
-            if (internalBuffer != null)
-                energy.add(internalBuffer);
+            proxy.getInternalBuffer().ifPresent(energy::add);
         }
 
-        return energy;
+        return Optional.of(energy);
     }
 
     @Override
@@ -251,7 +244,7 @@ public abstract class TileAggregator extends TileEntity implements ITickable, Gr
     }
 
     @Override
-    public void handleUpdateTag(NBTTagCompound tag)
+    public void handleUpdateTag(CompoundNBT tag)
     {
     }
 

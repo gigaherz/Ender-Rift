@@ -3,12 +3,13 @@ package gigaherz.enderRift.rift.storage;
 import com.google.common.collect.Lists;
 import gigaherz.enderRift.rift.TileEnderRift;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.ListNBT;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemHandlerHelper;
 
+import javax.annotation.Nonnull;
 import java.lang.ref.Reference;
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;
@@ -46,7 +47,7 @@ public class RiftInventory implements IItemHandler
         for (Iterator<Reference<? extends TileEnderRift>> it = listeners.iterator(); it.hasNext(); )
         {
             TileEnderRift rift = it.next().get();
-            if (rift == null || rift.isInvalid())
+            if (rift == null || rift.isRemoved())
             {
                 it.remove();
             }
@@ -59,34 +60,34 @@ public class RiftInventory implements IItemHandler
         manager.markDirty();
     }
 
-    public void readFromNBT(NBTTagCompound nbtTagCompound)
+    public void readFromNBT(CompoundNBT nbtTagCompound)
     {
-        NBTTagList itemList = nbtTagCompound.getTagList("Items", Constants.NBT.TAG_COMPOUND);
+        ListNBT itemList = nbtTagCompound.getList("Items", Constants.NBT.TAG_COMPOUND);
 
         inventorySlots.clear();
 
-        for (int i = 0; i < itemList.tagCount(); ++i)
+        for (int i = 0; i < itemList.size(); ++i)
         {
-            NBTTagCompound slot = itemList.getCompoundTagAt(i);
-            inventorySlots.add(new ItemStack(slot));
+            CompoundNBT slot = itemList.getCompound(i);
+            inventorySlots.add(ItemStack.read(slot));
         }
     }
 
-    public void writeToNBT(NBTTagCompound nbtTagCompound)
+    public void writeToNBT(CompoundNBT nbtTagCompound)
     {
-        NBTTagList itemList = new NBTTagList();
+        ListNBT itemList = new ListNBT();
 
         for (ItemStack stack : inventorySlots)
         {
             if (stack != null)
             {
-                NBTTagCompound slot = new NBTTagCompound();
-                stack.writeToNBT(slot);
-                itemList.appendTag(slot);
+                CompoundNBT slot = new CompoundNBT();
+                stack.write(slot);
+                itemList.add(slot);
             }
         }
 
-        nbtTagCompound.setTag("Items", itemList);
+        nbtTagCompound.put("Items", itemList);
     }
 
     @Override
@@ -177,5 +178,11 @@ public class RiftInventory implements IItemHandler
     public int getSlotLimit(int slot)
     {
         return 64;
+    }
+
+    @Override
+    public boolean isItemValid(int slot, @Nonnull ItemStack stack)
+    {
+        return true;
     }
 }

@@ -1,30 +1,30 @@
 package gigaherz.enderRift.client;
 
-import gigaherz.common.client.ModelHandle;
+import com.mojang.blaze3d.platform.GlStateManager;
 import gigaherz.enderRift.EnderRiftMod;
+import gigaherz.enderRift.rift.BlockEnderRift;
 import gigaherz.enderRift.rift.TileEnderRift;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.texture.TextureMap;
-import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.client.renderer.texture.AtlasTexture;
+import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
+import net.minecraft.entity.player.PlayerEntity;
 import org.lwjgl.opengl.GL11;
 
-public class RenderRift extends TileEntitySpecialRenderer<TileEnderRift>
+public class RenderRift extends TileEntityRenderer<TileEnderRift>
 {
     private ModelHandle modelHandle = ModelHandle.of(EnderRiftMod.location("block/sphere.obj"));
 
     @Override
-    public void render(TileEnderRift te, double x, double y, double z, float partialTicks, int destroyStage, float something)
+    public void render(TileEnderRift te, double x, double y, double z, float partialTicks, int destroyStage)
     {
-        if (te.getBlockMetadata() == 0)
+        if (!te.getBlockState().get(BlockEnderRift.ASSEMBLED))
             return;
 
         float lastPoweringState = te.getLastPoweringState();
         float nextPoweringState = te.getPoweringState();
         float poweringState = lerp(lastPoweringState, nextPoweringState, partialTicks);
 
-        EntityPlayer player = Minecraft.getMinecraft().player;
+        PlayerEntity player = Minecraft.getInstance().player;
 
         double ty = y + 0.5 - player.getEyeHeight();
         double tx = x + 0.5;
@@ -33,26 +33,26 @@ public class RenderRift extends TileEntitySpecialRenderer<TileEnderRift>
         float xz = (float) Math.sqrt(tx * tx + tz * tz);
         float pitch = (float) Math.atan2(ty, xz);
 
-        bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
+        bindTexture(AtlasTexture.LOCATION_BLOCKS_TEXTURE);
 
         GlStateManager.disableLighting();
-        GlStateManager.disableAlpha();
+        GlStateManager.disableAlphaTest();
         GlStateManager.disableRescaleNormal();
         GlStateManager.enableBlend();
         GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 
         GlStateManager.pushMatrix();
-        GlStateManager.translate(x, y, z);
-        GlStateManager.translate(0.5, 0.5, 0.5);
-        GlStateManager.rotate((float) Math.toDegrees(-yaw), 0.0F, 1.0F, 0.0F);
-        GlStateManager.rotate((float) Math.toDegrees(pitch), 0.0F, 0.0F, 1.0F);
-        GlStateManager.translate(-0.5, -0.5, -0.5);
+        GlStateManager.translated(x, y, z);
+        GlStateManager.translated(0.5, 0.5, 0.5);
+        GlStateManager.rotatef((float) Math.toDegrees(-yaw), 0.0F, 1.0F, 0.0F);
+        GlStateManager.rotatef((float) Math.toDegrees(pitch), 0.0F, 0.0F, 1.0F);
+        GlStateManager.translated(-0.5, -0.5, -0.5);
 
         int step_time = 20;
         int steps = 5;
         int time_loop = step_time * steps;
 
-        long time = te.getWorld().getTotalWorldTime();
+        long time = te.getWorld().getGameTime();
         int tm = (int) (time % step_time);
 
         float c0 = 1.0f / steps;
@@ -66,9 +66,9 @@ public class RenderRift extends TileEntitySpecialRenderer<TileEnderRift>
             float scale = (1.0f + poweringState) + (0.6f + poweringState) * progress0;
 
             GlStateManager.pushMatrix();
-            GlStateManager.translate(0.5, 0.5, 0.5);
-            GlStateManager.scale(scale, scale, scale);
-            GlStateManager.translate(-0.5, -0.5, -0.5);
+            GlStateManager.translated(0.5, 0.5, 0.5);
+            GlStateManager.scalef(scale, scale, scale);
+            GlStateManager.translated(-0.5, -0.5, -0.5);
 
             int a = Math.round(Math.min(255, Math.max(0, (1 - progress1) * 255)));
             int b = Math.round(Math.min(255, Math.max(0, progress1 * 255)));

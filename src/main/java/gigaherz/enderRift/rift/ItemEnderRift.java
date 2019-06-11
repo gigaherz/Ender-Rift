@@ -1,87 +1,92 @@
 package gigaherz.enderRift.rift;
 
-import gigaherz.common.ItemRegistered;
 import gigaherz.enderRift.EnderRiftMod;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.EnumActionResult;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumHand;
+import net.minecraft.item.ItemUseContext;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.util.ActionResultType;
+import net.minecraft.util.Direction;
+import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 
 import javax.annotation.Nullable;
 import java.util.List;
 
-public class ItemEnderRift extends ItemRegistered
+public class ItemEnderRift extends Item
 {
-    public ItemEnderRift(String name)
+    public ItemEnderRift(Properties properties)
     {
-        super(name);
-        this.maxStackSize = 16;
-        this.setCreativeTab(EnderRiftMod.tabEnderRift);
+        super(properties);
     }
 
     @Override
     public String getTranslationKey(ItemStack stack)
     {
-        NBTTagCompound tag = stack.getTagCompound();
-        if (tag == null || !tag.hasKey("RiftId"))
+        CompoundNBT tag = stack.getTag();
+        if (tag == null || !tag.contains("RiftId"))
             return this.getTranslationKey() + ".empty";
         else
             return this.getTranslationKey() + ".bound";
     }
 
     @Override
-    public void addInformation(ItemStack stack, @Nullable World worldIn, List<String> tooltip, ITooltipFlag flagIn)
+    public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn)
     {
-        NBTTagCompound tag = stack.getTagCompound();
-        if (tag != null && tag.hasKey("RiftId"))
+        CompoundNBT tag = stack.getTag();
+        if (tag != null && tag.contains("RiftId"))
         {
-            tooltip.add("Rift ID: " + tag.getInteger("RiftId"));
+            tooltip.add(new TranslationTextComponent("text.enderrift.tooltip.riftid", tag.getInt("RiftId")));
         }
     }
 
-
     @Override
-    public EnumActionResult onItemUse(EntityPlayer playerIn, World worldIn, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ)
+    public ActionResultType onItemUse(ItemUseContext context)
     {
-        ItemStack stack = playerIn.getHeldItem(hand);
+        PlayerEntity player = context.getPlayer();
+        ItemStack stack = context.getItem();
+        World world = context.getWorld();
 
-        if (worldIn.isRemote)
-            return EnumActionResult.SUCCESS;
+        if (world.isRemote)
+            return ActionResultType.SUCCESS;
 
-        if (!playerIn.canPlayerEdit(pos, facing, stack))
-            return EnumActionResult.PASS;
+        BlockPos pos = context.getPos();
+        Direction facing = context.getFace();
+        if (!player.canPlayerEdit(pos, facing, stack))
+            return ActionResultType.PASS;
 
-        IBlockState state = worldIn.getBlockState(pos);
+        BlockState state = world.getBlockState(pos);
 
         if (state.getBlock() != EnderRiftMod.rift)
-            return EnumActionResult.PASS;
+            return ActionResultType.PASS;
 
-        if (state.getValue(BlockEnderRift.ASSEMBLED))
+        if (state.get(BlockEnderRift.ASSEMBLED))
         {
-            NBTTagCompound tag = stack.getTagCompound();
-            if (tag == null || !tag.hasKey("RiftId"))
+            CompoundNBT tag = stack.getTag();
+            if (tag == null || !tag.contains("RiftId"))
             {
-                if (!RiftStructure.duplicateOrb(worldIn, pos, playerIn))
-                    return EnumActionResult.PASS;
+                if (!RiftStructure.duplicateOrb(world, pos, player))
+                    return ActionResultType.PASS;
             }
         }
         else
         {
-            if (!RiftStructure.assemble(worldIn, pos, stack))
-                return EnumActionResult.PASS;
+            if (!RiftStructure.assemble(world, pos, stack))
+                return ActionResultType.PASS;
         }
 
-        if (!playerIn.capabilities.isCreativeMode)
+        if (!player.abilities.isCreativeMode)
         {
             stack.shrink(1);
         }
 
-        return EnumActionResult.SUCCESS;
+        return ActionResultType.SUCCESS;
     }
 }

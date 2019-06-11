@@ -1,122 +1,84 @@
 package gigaherz.enderRift.rift;
 
-import com.google.common.collect.Lists;
-import gigaherz.common.BlockRegistered;
 import gigaherz.enderRift.EnderRiftMod;
 import gigaherz.enderRift.automation.AutomationHelper;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
-import net.minecraft.block.properties.PropertyBool;
-import net.minecraft.block.state.BlockStateContainer;
-import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.item.EntityItem;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.item.ItemEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.fluid.IFluidState;
 import net.minecraft.item.ItemStack;
+import net.minecraft.state.BooleanProperty;
+import net.minecraft.state.StateContainer;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumHand;
+import net.minecraft.util.Direction;
+import net.minecraft.util.Hand;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IBlockAccess;
+import net.minecraft.util.math.BlockRayTraceResult;
+import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
+import net.minecraft.world.chunk.BlockStateContainer;
 import net.minecraftforge.items.CapabilityItemHandler;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.List;
 
-public class BlockEnderRift
-        extends BlockRegistered
+public class BlockEnderRift extends Block
 {
-    public static final PropertyBool ASSEMBLED = PropertyBool.create("assembled");
+    public static final BooleanProperty ASSEMBLED = BooleanProperty.create("assembled");
 
     private static final AxisAlignedBB BOUNDS = new AxisAlignedBB(2f / 16, 2f / 16, 2f / 16, 14f / 16, 14f / 16, 14f / 16);
 
-    public BlockEnderRift(String name)
+    public BlockEnderRift(Properties properties)
     {
-        super(name, Material.ROCK);
-        setCreativeTab(EnderRiftMod.tabEnderRift);
-        setHardness(3.0F);
-        setSoundType(SoundType.METAL);
-        setDefaultState(this.blockState.getBaseState()
-                .withProperty(ASSEMBLED, false));
+        super(properties);
+        setDefaultState(this.getStateContainer().getBaseState()
+                .with(ASSEMBLED, false));
     }
 
-
     @Override
-    protected BlockStateContainer createBlockState()
+    protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder)
     {
-        return new BlockStateContainer(this, ASSEMBLED);
+        builder.add(ASSEMBLED);
     }
 
     @Deprecated
     @Override
-    public IBlockState getStateFromMeta(int meta)
-    {
-        return getDefaultState().withProperty(ASSEMBLED, meta != 0);
-    }
-
-    @Override
-    public int getMetaFromState(IBlockState state)
-    {
-        return state.getValue(ASSEMBLED) ? 1 : 0;
-    }
-
-    @Deprecated
-    @Override
-    public boolean isOpaqueCube(IBlockState state)
-    {
-        return false;
-    }
-
-    @Deprecated
-    @Override
-    public int getLightValue(IBlockState state)
+    public int getLightValue(BlockState state)
     {
         if (state.getBlock() != this)
             return super.getLightValue(state);
-        return state.getValue(ASSEMBLED) ? 15 : 0;
+        return state.get(ASSEMBLED) ? 15 : 0;
     }
 
     @Deprecated
     @Override
-    public int getLightOpacity(IBlockState state)
+    public int getOpacity(BlockState state, IBlockReader worldIn, BlockPos pos)
     {
         if (state.getBlock() != this)
-            return super.getLightOpacity(state);
-        return state.getValue(ASSEMBLED) ? 1 : 15;
-    }
-
-    @Deprecated
-    @Override
-    public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos)
-    {
-        return BOUNDS;
+            return super.getOpacity(state, worldIn, pos);
+        return state.get(ASSEMBLED) ? 1 : 15;
     }
 
     @Override
-    public boolean hasTileEntity(IBlockState state)
+    public boolean hasTileEntity(BlockState state)
     {
         return true;
     }
 
+    @Nullable
     @Override
-    public TileEnderRift createTileEntity(World world, IBlockState state)
+    public TileEntity createTileEntity(BlockState state, IBlockReader world)
     {
         return new TileEnderRift();
     }
 
-    @Override
-    public boolean removedByPlayer(IBlockState state, World world, BlockPos pos, EntityPlayer player, boolean willHarvest)
-    {
-        //If it will harvest, delay deletion of the block until after getDrops
-        return willHarvest || super.removedByPlayer(state, world, pos, player, false);
-    }
-
-    @Override
-    public void getDrops(NonNullList<ItemStack> drops, IBlockAccess world, BlockPos pos, IBlockState state, int fortune)
+    /*@Override
+    public void getDrops(NonNullList<ItemStack> drops, IBlockReader world, BlockPos pos, BlockState state, int fortune)
     {
         drops.add(new ItemStack(this));
 
@@ -124,24 +86,18 @@ public class BlockEnderRift
 
         if (te instanceof TileEnderRift)
             drops.add(((TileEnderRift) te).getRiftItem());
-    }
+    }*/
 
-    @Override
-    public void harvestBlock(World worldIn, EntityPlayer player, BlockPos pos, IBlockState state, @Nullable TileEntity te, ItemStack stack)
-    {
-        super.harvestBlock(worldIn, player, pos, state, te, stack);
-        worldIn.setBlockToAir(pos);
-    }
-
-    @Override
-    public void breakBlock(World worldIn, BlockPos pos, IBlockState state)
+    /*@Override
+    public void breakBlock(World worldIn, BlockPos pos, BlockState state)
     {
         super.breakBlock(worldIn, pos, state);
         RiftStructure.dismantle(worldIn, pos);
-    }
+    }*/
 
+    @Deprecated
     @Override
-    public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ)
+    public boolean onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity playerIn, Hand handIn, BlockRayTraceResult hit)
     {
         if (playerIn.isSneaking())
             return false;
@@ -155,7 +111,7 @@ public class BlockEnderRift
         if (worldIn.isRemote)
             return true;
 
-        if (state.getBlock() != this || !state.getValue(ASSEMBLED))
+        if (state.getBlock() != this || !state.get(ASSEMBLED))
             return false;
 
         TileEntity te = worldIn.getTileEntity(pos);
@@ -165,8 +121,8 @@ public class BlockEnderRift
         TileEnderRift rift = (TileEnderRift) te;
 
         int count = stack.getCount();
-        ItemStack stackToPush = stack.splitStack(count);
-        ItemStack remaining = AutomationHelper.insertItems(rift.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null), stackToPush);
+        ItemStack stackToPush = stack.split(count);
+        ItemStack remaining = AutomationHelper.insertItems(rift.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null).orElseThrow(() -> new RuntimeException("WAT")), stackToPush);
         stack.grow(remaining.getCount());
 
         if (stack.getCount() <= 0)
@@ -177,15 +133,14 @@ public class BlockEnderRift
         return true;
     }
 
+    @Deprecated
     @Override
-    public void onBlockClicked(World worldIn, BlockPos pos, EntityPlayer playerIn)
+    public void onBlockClicked(BlockState state, World worldIn, BlockPos pos, PlayerEntity playerIn)
     {
-
         if (worldIn.isRemote)
             return;
 
-        IBlockState state = worldIn.getBlockState(pos);
-        if (state.getBlock() != this || !state.getValue(ASSEMBLED))
+        if (state.getBlock() != this || !state.get(ASSEMBLED))
             return;
 
         TileEntity te = worldIn.getTileEntity(pos);
@@ -194,7 +149,7 @@ public class BlockEnderRift
 
         TileEnderRift rift = (TileEnderRift) te;
 
-        ItemStack stack = playerIn.getHeldItem(EnumHand.MAIN_HAND);
+        ItemStack stack = playerIn.getHeldItem(Hand.MAIN_HAND);
         if (stack.getCount() <= 0)
         {
             if (stack.getItem() == EnderRiftMod.riftOrb)
@@ -209,25 +164,24 @@ public class BlockEnderRift
 
         int numberToExtract = playerIn.isSneaking() ? 1 : stack.getMaxStackSize();
 
-        ItemStack extracted = AutomationHelper.extractItems(rift.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null), stack.copy(), numberToExtract, false);
-
+        ItemStack extracted = AutomationHelper.extractItems(rift.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null).orElseThrow(() -> new RuntimeException("WAT")), stack.copy(), numberToExtract, false);
         if (extracted.getCount() > 0)
         {
-            EntityItem entityItem = new EntityItem(worldIn, playerIn.posX, playerIn.posY + playerIn.getEyeHeight() / 2, playerIn.posZ, extracted);
-            worldIn.spawnEntity(entityItem);
+            spawnAsEntity(worldIn, pos, extracted);
         }
     }
 
+    @Deprecated
     @Override
-    public void onEntityCollision(World worldIn, BlockPos pos, IBlockState state, Entity entityIn)
+    public void onEntityCollision(BlockState state, World worldIn, BlockPos pos, Entity entityIn)
     {
         if (worldIn.isRemote)
             return;
 
-        if (!(entityIn instanceof EntityItem))
+        if (!(entityIn instanceof ItemEntity))
             return;
 
-        if (state.getBlock() != this || !state.getValue(ASSEMBLED))
+        if (state.getBlock() != this || !state.get(ASSEMBLED))
             return;
 
         TileEntity te = worldIn.getTileEntity(pos);
@@ -236,14 +190,14 @@ public class BlockEnderRift
 
         TileEnderRift rift = (TileEnderRift) te;
 
-        EntityItem item = (EntityItem) entityIn;
+        ItemEntity item = (ItemEntity) entityIn;
         ItemStack stack = item.getItem().copy();
 
-        ItemStack remaining = AutomationHelper.insertItems(rift.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null), stack);
+        ItemStack remaining = AutomationHelper.insertItems(rift.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null).orElseThrow(() -> new RuntimeException("WAT")), stack);
 
         if (remaining.getCount() <= 0)
         {
-            entityIn.setDead();
+            entityIn.remove();
         }
         else
         {

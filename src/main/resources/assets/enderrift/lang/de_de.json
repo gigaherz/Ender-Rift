@@ -1,0 +1,42 @@
+{
+    "block.enderrift.rift": "Ender-Rift-Kern",
+    "block.enderrift.rift_structure": "Ender-Rift-Struktur",
+    "block.enderrift.interface": "Riftinterface",
+    "block.enderrift.browser": "Riftbrowser",
+    "block.enderrift.crafting_browser": "Handwerksbrowser",
+    "block.enderrift.generator": "Rudimentärer Generator",
+    "block.enderrift.proxy": "Automatisierungsproxy",
+    "block.enderrift.driver": "Automatisierungstreiber",
+
+    "item.enderrift.rift_orb.empty": "Ender-Rift-Orb (Ungebunden)",
+    "item.enderrift.rift_orb.bound": "Ender-Rift-Orb (Gebunden)",
+
+    "container.enderrift.interface": "Riftinterface",
+    "container.enderrift.generator": "Rudimentärer Generator",
+    "container.enderrift.browser": "Riftbrowser",
+
+    "text.enderrift.interface.filters": "Filter",
+
+    "itemGroup.tabEnderRift": "Ender-Rift",
+
+    "text.enderrift.rift.isFormed": "Ist geformt? %s",
+    "text.enderrift.rift.isPowered": "Ist betrieben? %s",
+    "text.enderrift.rift.riftId": "Rift-ID: %s",
+    "text.enderrift.rift.usedSlots": "%s Slots verwendet.",
+    "text.enderrift.rift.energyUsageInsert": "%s RF verwendet bei nächstem Einschub.",
+    "text.enderrift.rift.energyUsageExtract": "%s RF verwendet bei nächstem Auszug.",
+    "text.enderrift.rift.rf": "%s / %s RF.",
+
+    "text.enderrift.generator.status.generating.label": "Generiert:",
+    "text.enderrift.generator.status.generating": "Generiert: %d RF/t",
+    "text.enderrift.generator.status.heating": "Aufheizen....",
+    "text.enderrift.generator.status.idle": "Leerlauf",
+    "text.enderrift.generator.heat.label": "Hitze:",
+    "text.enderrift.generator.heat": "Hitze: %d C",
+    "text.enderrift.generator.energy.label": "Energie:",
+    "text.enderrift.generator.energy": "Energie: %d / %d RF",
+
+    "option.enderrift.generator": "Generator",
+    "option.enderrift.rift": "Rift",
+    "option.enderrift.rf": "RF zeigen"
+}

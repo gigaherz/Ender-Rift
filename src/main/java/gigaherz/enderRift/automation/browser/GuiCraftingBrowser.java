@@ -1,21 +1,21 @@
 package gigaherz.enderRift.automation.browser;
 
+import com.mojang.blaze3d.platform.GlStateManager;
 import gigaherz.enderRift.EnderRiftMod;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.gui.GuiButton;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.client.gui.widget.button.Button;
+import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.text.ITextComponent;
 
-public class GuiCraftingBrowser extends GuiBrowser
+public class GuiCraftingBrowser extends GuiBrowser<ContainerCraftingBrowser>
 {
     private static final ResourceLocation backgroundTexture = new ResourceLocation(EnderRiftMod.MODID, "textures/gui/crafting_browser.png");
 
-    public GuiCraftingBrowser(EntityPlayer player, TileBrowser tileEntity)
+    public GuiCraftingBrowser(ContainerCraftingBrowser container, PlayerInventory playerInventory, ITextComponent title)
     {
-        super(new ContainerCraftingBrowser(tileEntity, player, true));
-        this.player = player.inventory;
+        super(container, playerInventory, title);
         xSize = 194;
         ySize = 226;
     }
@@ -27,87 +27,76 @@ public class GuiCraftingBrowser extends GuiBrowser
     }
 
     @Override
-    public void initGui()
+    public void init()
     {
-        super.initGui();
+        super.init();
 
-        GuiButton btn = new GuiButtonFlexible(2, guiLeft + 85, guiTop + 75, 9, 9, "x");
-        buttonList.add(btn);
-    }
-
-    @Override
-    protected void actionPerformed(GuiButton guibutton)
-    {
-        if (guibutton.id == 2)
-        {
+        addButton(new GuiButtonFlexible(guiLeft + 85, guiTop + 75, 9, 9, "x", (btn) -> {
             clearCraftingGrid();
-        }
-        else
-        {
-            super.actionPerformed(guibutton);
-        }
+        }));
     }
 
     private void clearCraftingGrid()
     {
-        ((ContainerCraftingBrowser) inventorySlots).clearCraftingGrid(player.player);
+        getContainer().clearCraftingGrid(playerInventory.player);
     }
 
-    private static class GuiButtonFlexible extends GuiButton
+    private static class GuiButtonFlexible extends Button
     {
-        public GuiButtonFlexible(int buttonId, int x, int y, int widthIn, int heightIn, String buttonText)
+        public GuiButtonFlexible(int x, int y, int widthIn, int heightIn, String buttonText, IPressable callback)
         {
-            super(buttonId, x, y, widthIn, heightIn, buttonText);
+            super(x, y, widthIn, heightIn, buttonText, callback);
         }
 
         @Override
-        public void drawButton(Minecraft mc, int mouseX, int mouseY, float partialTicks)
+        public void render(int mouseX, int mouseY, float partialTicks)
         {
             if (visible)
             {
-                FontRenderer fontrenderer = mc.fontRenderer;
-                mc.getTextureManager().bindTexture(BUTTON_TEXTURES);
+                Minecraft minecraft = Minecraft.getInstance();
+                FontRenderer fontrenderer = minecraft.fontRenderer;
+                minecraft.getTextureManager().bindTexture(WIDGETS_LOCATION);
 
-                GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+                GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1.0F);
 
-                hovered = mouseX >= x && mouseY >= y && mouseX < x + width && mouseY < y + height;
+                isHovered = mouseX >= x && mouseY >= y && mouseX < x + width && mouseY < y + height;
 
-                int i = getHoverState(hovered);
+                int i = getYImage(isHovered);
 
                 GlStateManager.enableBlend();
-                GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0);
+                GlStateManager.blendFuncSeparate(770, 771, 1, 0);
                 GlStateManager.blendFunc(770, 771);
 
                 int halfwidth1 = this.width / 2;
                 int halfwidth2 = this.width - halfwidth1;
                 int halfheight1 = this.height / 2;
                 int halfheight2 = this.height - halfheight1;
-                drawTexturedModalRect(x, y, 0,
+                blit(x, y, 0,
                         46 + i * 20, halfwidth1, halfheight1);
-                drawTexturedModalRect(x + halfwidth1, y, 200 - halfwidth2,
+                blit(x + halfwidth1, y, 200 - halfwidth2,
                         46 + i * 20, halfwidth2, halfheight1);
 
-                drawTexturedModalRect(x, y + halfheight1,
+                blit(x, y + halfheight1,
                         0, 46 + i * 20 + 20 - halfheight2, halfwidth1, halfheight2);
-                drawTexturedModalRect(x + halfwidth1, y + halfheight1,
+                blit(x + halfwidth1, y + halfheight1,
                         200 - halfwidth2, 46 + i * 20 + 20 - halfheight2, halfwidth2, halfheight2);
 
                 int textColor = 14737632;
 
-                if (packedFGColour != 0)
+                if (packedFGColor != 0)
                 {
-                    textColor = packedFGColour;
+                    textColor = packedFGColor;
                 }
-                else if (!this.enabled)
+                else if (!this.visible)
                 {
                     textColor = 10526880;
                 }
-                else if (this.hovered)
+                else if (this.isHovered)
                 {
                     textColor = 16777120;
                 }
 
-                this.drawCenteredString(fontrenderer, displayString, x + halfwidth2, y + (this.height - 8) / 2, textColor);
+                this.drawCenteredString(fontrenderer, getMessage(), x + halfwidth2, y + (this.height - 8) / 2, textColor);
             }
         }
     }

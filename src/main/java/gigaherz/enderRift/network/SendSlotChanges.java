@@ -2,30 +2,22 @@ package gigaherz.enderRift.network;
 
 import com.google.common.collect.Lists;
 import gigaherz.enderRift.EnderRiftMod;
-import io.netty.buffer.ByteBuf;
+import gigaherz.enderRift.client.ClientProxy;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraftforge.fml.common.network.ByteBufUtils;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
-import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.network.PacketBuffer;
+import net.minecraftforge.fml.network.NetworkEvent;
 
 import java.util.List;
+import java.util.function.Supplier;
 
 public class SendSlotChanges
-        implements IMessage
 {
     public int windowId;
     public int slotCount;
     public List<Integer> indices;
     public List<ItemStack> stacks;
-
-    public SendSlotChanges()
-    {
-        indices = Lists.newArrayList();
-        stacks = Lists.newArrayList();
-    }
 
     public SendSlotChanges(int windowId, int slotCount, List<Integer> indices, List<ItemStack> stacks)
     {
@@ -35,9 +27,10 @@ public class SendSlotChanges
         this.stacks = stacks;
     }
 
-    @Override
-    public void fromBytes(ByteBuf buf)
+    public SendSlotChanges(PacketBuffer buf)
     {
+        indices = Lists.newArrayList();
+        stacks = Lists.newArrayList();
         windowId = buf.readInt();
         slotCount = buf.readInt();
 
@@ -45,12 +38,11 @@ public class SendSlotChanges
         while (count-- > 0)
         {
             indices.add(buf.readInt());
-            stacks.add(readItemStackFromBuffer(buf));
+            stacks.add(readLargeItemStack(buf));
         }
     }
 
-    @Override
-    public void toBytes(ByteBuf buf)
+    public void encode(PacketBuffer buf)
     {
         buf.writeInt(windowId);
         buf.writeInt(slotCount);
@@ -58,56 +50,45 @@ public class SendSlotChanges
         for (int i = 0; i < indices.size(); i++)
         {
             buf.writeInt(indices.get(i));
-            writeItemStackToBuffer(buf, stacks.get(i));
+            writeLargeItemStack(buf, stacks.get(i));
         }
     }
 
-    private ItemStack readItemStackFromBuffer(ByteBuf buf)
+    public void handle(Supplier<NetworkEvent.Context> context)
+    {
+        ClientProxy.handleSendSlotChanges(this);
+    }
+
+    public static ItemStack readLargeItemStack(PacketBuffer buf)
     {
         ItemStack itemstack = ItemStack.EMPTY;
-        int i = buf.readShort();
+        int itemId = buf.readVarInt();
 
-        if (i >= 0)
+        if (itemId >= 0)
         {
-            int j = buf.readInt();
-            int k = buf.readShort();
-            itemstack = new ItemStack(Item.getItemById(i), j, k);
-            itemstack.setTagCompound(ByteBufUtils.readTag(buf));
+            int count = buf.readVarInt();
+            itemstack = new ItemStack(Item.getItemById(itemId), count);
+            itemstack.readShareTag(buf.readCompoundTag());
         }
 
         return itemstack;
     }
 
-    private void writeItemStackToBuffer(ByteBuf buf, ItemStack stack)
+    public static void writeLargeItemStack(PacketBuffer buf, ItemStack stack)
     {
         if (stack.getCount() <= 0)
         {
-            buf.writeShort(-1);
+            buf.writeVarInt(-1);
         }
         else
         {
-            buf.writeShort(Item.getIdFromItem(stack.getItem()));
-            buf.writeInt(stack.getCount());
-            buf.writeShort(stack.getMetadata());
-            NBTTagCompound nbttagcompound = null;
-
-            if (stack.getItem().isDamageable() || stack.getItem().getShareTag())
-            {
-                nbttagcompound = stack.getTagCompound();
+            buf.writeVarInt(Item.getIdFromItem(stack.getItem()));
+            buf.writeVarInt(stack.getCount());
+            CompoundNBT nbttagcompound = null;
+            if (stack.isDamageable() || stack.getItem().shouldSyncTag()) {
+                nbttagcompound = stack.getShareTag();
             }
-
-            ByteBufUtils.writeTag(buf, nbttagcompound);
-        }
-    }
-
-    public static class Handler implements IMessageHandler<SendSlotChanges, IMessage>
-    {
-        @Override
-        public IMessage onMessage(SendSlotChanges message, MessageContext ctx)
-        {
-            EnderRiftMod.proxy.handleSendSlotChanges(message);
-
-            return null; // no response in this case
+            buf.writeCompoundTag(nbttagcompound);
         }
     }
 }

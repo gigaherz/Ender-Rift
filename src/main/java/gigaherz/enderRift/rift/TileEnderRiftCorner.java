@@ -2,82 +2,53 @@ package gigaherz.enderRift.rift;
 
 import gigaherz.enderRift.EnderRiftMod;
 import gigaherz.enderRift.automation.TileAggregator;
-import gigaherz.enderRift.plugins.tesla.TeslaControllerBase;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.tileentity.TileEntityType;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.IEnergyStorage;
+import net.minecraftforge.registries.ObjectHolder;
 
 import javax.annotation.Nullable;
+import java.util.Optional;
 
-public class TileEnderRiftCorner
-        extends TileAggregator
+public class TileEnderRiftCorner extends TileAggregator
 {
+    @ObjectHolder("enderrift:rift_corner")
+    public static TileEntityType<?> TYPE;
+
     TileEnderRift energyParent;
 
-    private Capability teslaConsumerCap;
-    private Object teslaConsumerInstance;
-
-    private Capability teslaHolderCap;
-    private Object teslaHolderInstance;
+    LazyOptional<IEnergyStorage> bufferProvider = LazyOptional.of(() -> getEnergyBuffer().orElse(null));
 
     public TileEnderRiftCorner()
     {
-        teslaConsumerCap = TeslaControllerBase.CONSUMER.getCapability();
-        teslaHolderCap = TeslaControllerBase.HOLDER.getCapability();
-    }
-
-    @Override
-    public boolean hasCapability(Capability<?> capability, @Nullable EnumFacing facing)
-    {
-        IEnergyStorage buffer = getEnergyBuffer();
-        if (capability == CapabilityEnergy.ENERGY)
-            return buffer != null;
-        if (teslaConsumerCap != null && capability == teslaConsumerCap)
-            return buffer != null;
-        if (teslaHolderCap != null && capability == teslaHolderCap)
-            return buffer != null;
-        return super.hasCapability(capability, facing);
+        super(TYPE);
     }
 
     @SuppressWarnings("unchecked")
     @Override
-    public <T> T getCapability(Capability<T> capability, @Nullable EnumFacing facing)
+    public <T> LazyOptional<T> getCapability(Capability<T> capability, @Nullable Direction facing)
     {
-        IEnergyStorage buffer = getEnergyBuffer();
         if (capability == CapabilityEnergy.ENERGY)
-            return (T) buffer;
-        if (teslaConsumerCap != null && capability == teslaConsumerCap)
-        {
-            if (teslaConsumerInstance == null && buffer != null)
-                teslaConsumerInstance = TeslaControllerBase.CONSUMER.createInstance(getEnergyBuffer());
-            return (T) teslaConsumerInstance;
-        }
-        if (teslaHolderCap != null && capability == teslaHolderCap)
-        {
-            if (teslaHolderInstance == null && buffer != null)
-                teslaHolderInstance = TeslaControllerBase.HOLDER.createInstance(getEnergyBuffer());
-            return (T) teslaHolderInstance;
-        }
+            return bufferProvider.cast();
         return super.getCapability(capability, facing);
     }
 
-    @Nullable
     @Override
-    public IEnergyStorage getEnergyBuffer()
+    public Optional<IEnergyStorage> getEnergyBuffer()
     {
         return getInternalBuffer();
     }
 
-    @Nullable
     @Override
-    public IEnergyStorage getInternalBuffer()
+    public Optional<IEnergyStorage> getInternalBuffer()
     {
-        TileEnderRift parent = getParent();
-        return parent != null ? parent.getEnergyBuffer() : null;
+        return getParent().flatMap(TileEnderRift::getEnergyBuffer);
     }
 
     @Override
@@ -87,19 +58,18 @@ public class TileEnderRiftCorner
     }
 
     @Override
-    protected boolean canConnectSide(EnumFacing side)
+    protected boolean canConnectSide(Direction side)
     {
         return false;
     }
 
-    @Nullable
-    public TileEnderRift getParent()
+    public Optional<TileEnderRift> getParent()
     {
         if (energyParent == null)
         {
-            IBlockState state = world.getBlockState(pos);
+            BlockState state = world.getBlockState(pos);
             if (state.getBlock() != EnderRiftMod.structure)
-                return null;
+                return Optional.empty();
 
             TileEntity te = world.getTileEntity(getRiftFromCorner(state, pos));
             if (te instanceof TileEnderRift)
@@ -108,16 +78,16 @@ public class TileEnderRiftCorner
             }
             else
             {
-                return null;
+                return Optional.empty();
             }
         }
-        return energyParent;
+        return Optional.of(energyParent);
     }
 
-    private static BlockPos getRiftFromCorner(IBlockState state, BlockPos pos)
+    private static BlockPos getRiftFromCorner(BlockState state, BlockPos pos)
     {
-        boolean base = state.getValue(BlockStructure.BASE);
-        BlockStructure.Corner corner = state.getValue(BlockStructure.CORNER);
+        boolean base = state.get(BlockStructure.BASE);
+        BlockStructure.Corner corner = state.get(BlockStructure.CORNER);
         int xParent = pos.getX();
         int yParent = pos.getY() + (base ? 1 : -1);
         int zParent = pos.getZ();

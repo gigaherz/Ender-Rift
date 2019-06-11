@@ -4,22 +4,28 @@ import gigaherz.enderRift.EnderRiftMod;
 import gigaherz.enderRift.automation.AutomationHelper;
 import gigaherz.enderRift.automation.TileAggregator;
 import gigaherz.enderRift.common.IPoweredAutomation;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.inventory.ItemStackHelper;
+import net.minecraft.block.BlockState;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.ListNBT;
+import net.minecraft.tileentity.TileEntityType;
+import net.minecraft.util.Direction;
 import net.minecraft.util.NonNullList;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.Constants;
+import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.*;
+import net.minecraftforge.registries.ObjectHolder;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 public class TileInterface extends TileAggregator implements IPoweredAutomation
 {
+    @ObjectHolder("enderrift:interface")
+    public static TileEntityType<?> TYPE;
+
     private static final int FilterCount = 9;
 
     private FilterInventory filters = new FilterInventory(FilterCount);
@@ -31,18 +37,24 @@ public class TileInterface extends TileAggregator implements IPoweredAutomation
             markDirty();
         }
     };
+    public LazyOptional<IItemHandler> outputsProvider = LazyOptional.of(() -> outputs);
 
-    private EnumFacing facing = null;
+    private Direction facing = null;
+
+    public TileInterface()
+    {
+        super(TYPE);
+    }
 
     @Nullable
-    public EnumFacing getFacing()
+    public Direction getFacing()
     {
         if (facing == null && world != null)
         {
-            IBlockState state = world.getBlockState(pos);
+            BlockState state = world.getBlockState(pos);
             if (state.getBlock() == EnderRiftMod.riftInterface)
             {
-                facing = state.getValue(BlockInterface.FACING).getOpposite();
+                facing = state.get(BlockInterface.FACING).getOpposite();
             }
         }
         return facing;
@@ -58,25 +70,14 @@ public class TileInterface extends TileAggregator implements IPoweredAutomation
         return filters;
     }
 
-    @Override
-    public boolean hasCapability(Capability<?> capability, @Nullable EnumFacing facing)
-    {
-        if (facing == getFacing())
-        {
-            if (capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
-                return true;
-        }
-        return super.hasCapability(capability, facing);
-    }
-
     @SuppressWarnings("unchecked")
     @Override
-    public <T> T getCapability(Capability<T> capability, @Nullable EnumFacing facing)
+    public <T> LazyOptional<T> getCapability(Capability<T> capability, @Nullable Direction facing)
     {
         if (facing == getFacing())
         {
             if (capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
-                return (T) outputs;
+                return outputsProvider.cast();
         }
         return super.getCapability(capability, facing);
     }
@@ -89,15 +90,15 @@ public class TileInterface extends TileAggregator implements IPoweredAutomation
     }
 
     @Override
-    protected boolean canConnectSide(EnumFacing side)
+    protected boolean canConnectSide(Direction side)
     {
         return side == getFacing().getOpposite();
     }
 
     @Override
-    public void update()
+    public void tick()
     {
-        super.update();
+        super.tick();
 
         if (world.isRemote)
             return;
@@ -164,74 +165,74 @@ public class TileInterface extends TileAggregator implements IPoweredAutomation
     }
 
     @Override
-    public void readFromNBT(NBTTagCompound compound)
+    public void read(CompoundNBT compound)
     {
-        super.readFromNBT(compound);
+        super.read(compound);
 
-        NBTTagList _filters = compound.getTagList("Filters", Constants.NBT.TAG_COMPOUND);
-        for (int i = 0; i < _filters.tagCount(); ++i)
+        ListNBT _filters = compound.getList("Filters", Constants.NBT.TAG_COMPOUND);
+        for (int i = 0; i < _filters.size(); ++i)
         {
-            NBTTagCompound nbttagcompound = _filters.getCompoundTagAt(i);
+            CompoundNBT nbttagcompound = _filters.getCompound(i);
             int j = nbttagcompound.getByte("Slot") & 255;
 
             if (j >= 0 && j < filters.getSlots())
             {
-                filters.setStackInSlot(j, new ItemStack(nbttagcompound));
+                filters.setStackInSlot(j, ItemStack.read(nbttagcompound));
             }
         }
 
-        NBTTagList _outputs = compound.getTagList("Outputs", Constants.NBT.TAG_COMPOUND);
-        for (int i = 0; i < _outputs.tagCount(); ++i)
+        ListNBT _outputs = compound.getList("Outputs", Constants.NBT.TAG_COMPOUND);
+        for (int i = 0; i < _outputs.size(); ++i)
         {
-            NBTTagCompound slot = _outputs.getCompoundTagAt(i);
+            CompoundNBT slot = _outputs.getCompound(i);
             int j = slot.getByte("Slot") & 255;
 
             if (j >= 0 && j < outputs.getSlots())
             {
-                outputs.setStackInSlot(j, new ItemStack(slot));
+                outputs.setStackInSlot(j, ItemStack.read(slot));
             }
         }
     }
 
     @Override
-    public NBTTagCompound writeToNBT(NBTTagCompound compound)
+    public CompoundNBT write(CompoundNBT compound)
     {
-        compound = super.writeToNBT(compound);
+        compound = super.write(compound);
 
-        NBTTagList _filters = new NBTTagList();
+        ListNBT _filters = new ListNBT();
         for (int i = 0; i < filters.getSlots(); ++i)
         {
             ItemStack stack = filters.getStackInSlot(i);
             if (stack.getCount() > 0)
             {
-                NBTTagCompound nbttagcompound = new NBTTagCompound();
-                nbttagcompound.setByte("Slot", (byte) i);
-                stack.writeToNBT(nbttagcompound);
-                _filters.appendTag(nbttagcompound);
+                CompoundNBT nbttagcompound = new CompoundNBT();
+                nbttagcompound.putByte("Slot", (byte) i);
+                stack.write(nbttagcompound);
+                _filters.add(nbttagcompound);
             }
         }
 
-        compound.setTag("Filters", _filters);
+        compound.put("Filters", _filters);
 
-        NBTTagList _outputs = new NBTTagList();
+        ListNBT _outputs = new ListNBT();
         for (int i = 0; i < outputs.getSlots(); ++i)
         {
             ItemStack stack = outputs.getStackInSlot(i);
             if (stack.getCount() > 0)
             {
-                NBTTagCompound slot = new NBTTagCompound();
-                slot.setByte("Slot", (byte) i);
-                stack.writeToNBT(slot);
-                _outputs.appendTag(slot);
+                CompoundNBT slot = new CompoundNBT();
+                slot.putByte("Slot", (byte) i);
+                stack.write(slot);
+                _outputs.add(slot);
             }
         }
 
-        compound.setTag("Outputs", _outputs);
+        compound.put("Outputs", _outputs);
 
         return compound;
     }
 
-    public boolean isUseableByPlayer(EntityPlayer player)
+    public boolean isUseableByPlayer(PlayerEntity player)
     {
         return world.getTileEntity(pos) == this
                 && player.getDistanceSq(pos.getX() + 0.5D, pos.getY() + 0.5D, pos.getZ() + 0.5D) <= 64.0D;
@@ -286,6 +287,12 @@ public class TileInterface extends TileAggregator implements IPoweredAutomation
         public int getSlotLimit(int slot)
         {
             return 1;
+        }
+
+        @Override
+        public boolean isItemValid(int slot, @Nonnull ItemStack stack)
+        {
+            return true;
         }
 
         @Override

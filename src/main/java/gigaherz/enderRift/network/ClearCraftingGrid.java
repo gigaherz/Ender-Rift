@@ -1,58 +1,43 @@
 package gigaherz.enderRift.network;
 
 import gigaherz.enderRift.automation.browser.ContainerCraftingBrowser;
-import io.netty.buffer.ByteBuf;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.world.WorldServer;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
-import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
+import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.network.PacketBuffer;
+import net.minecraftforge.fml.network.NetworkEvent;
+
+import java.util.function.Supplier;
 
 public class ClearCraftingGrid
-        implements IMessage
 {
     public int windowId;
-
-    public ClearCraftingGrid()
-    {
-    }
 
     public ClearCraftingGrid(int windowId)
     {
         this.windowId = windowId;
     }
 
-    @Override
-    public void fromBytes(ByteBuf buf)
+    public ClearCraftingGrid(PacketBuffer buf)
     {
         windowId = buf.readInt();
     }
 
-    @Override
-    public void toBytes(ByteBuf buf)
+    public void encode(PacketBuffer buf)
     {
         buf.writeInt(windowId);
     }
 
-    public static class Handler implements IMessageHandler<ClearCraftingGrid, IMessage>
+    public void handle(Supplier<NetworkEvent.Context> context)
     {
-        @Override
-        public IMessage onMessage(final ClearCraftingGrid message, MessageContext ctx)
+        context.get().enqueueWork(() ->
         {
-            final EntityPlayerMP player = ctx.getServerHandler().player;
-            final WorldServer world = (WorldServer) player.world;
+            final ServerPlayerEntity player = context.get().getSender();
 
-            world.addScheduledTask(() ->
+            if (player.openContainer != null
+                    && player.openContainer.windowId == this.windowId
+                    && player.openContainer instanceof ContainerCraftingBrowser)
             {
-                if (player.openContainer != null
-                        && player.openContainer.windowId == message.windowId
-                        && player.openContainer instanceof ContainerCraftingBrowser)
-                {
-                    ((ContainerCraftingBrowser) player.openContainer).clearCraftingGrid(player);
-                }
-            });
-
-            return null; // no response in this case
-        }
+                ((ContainerCraftingBrowser) player.openContainer).clearCraftingGrid(player);
+            }
+        });
     }
 }

@@ -1,8 +1,5 @@
 package gigaherz.enderRift;
 
-import net.minecraftforge.common.config.Configuration;
-import net.minecraftforge.common.config.Property;
-
 public class ConfigValues
 {
 
@@ -19,9 +16,7 @@ public class ConfigValues
     public static boolean PreferContainersWithExistingStacks;
 
     public static boolean EnableRudimentaryGenerator;
-
-    public static Configuration config;
-
+/*
     public static void readConfig(Configuration config)
     {
         config.load();
@@ -45,4 +40,5 @@ public class ConfigValues
 
         config.save();
     }
+ */
 }

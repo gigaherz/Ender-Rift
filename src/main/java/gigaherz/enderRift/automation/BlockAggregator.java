@@ -1,79 +1,61 @@
 package gigaherz.enderRift.automation;
 
-import gigaherz.common.BlockRegistered;
 import net.minecraft.block.Block;
-import net.minecraft.block.material.MapColor;
-import net.minecraft.block.material.Material;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IBlockAccess;
+import net.minecraft.world.IBlockReader;
+import net.minecraft.world.IWorldReader;
 import net.minecraft.world.World;
 
-public abstract class BlockAggregator<T extends TileAggregator> extends BlockRegistered
+import javax.annotation.Nullable;
+
+public abstract class BlockAggregator<T extends TileAggregator> extends Block
 {
-    public BlockAggregator(String name, Material blockMaterialIn, MapColor blockMapColorIn)
+    protected BlockAggregator(Properties properties)
     {
-        super(name, blockMaterialIn, blockMapColorIn);
-    }
-
-    public BlockAggregator(String name, Material materialIn)
-    {
-        super(name, materialIn);
-    }
-
-    @Deprecated
-    @Override
-    public boolean isOpaqueCube(IBlockState state)
-    {
-        return false;
-    }
-
-    @Deprecated
-    @Override
-    public boolean isFullCube(IBlockState state)
-    {
-        return false;
+        super(properties);
     }
 
     @Override
-    public boolean hasTileEntity(IBlockState state)
+    public boolean hasTileEntity(BlockState state)
     {
         return true;
     }
 
+    @Nullable
     @Override
-    public abstract T createTileEntity(World world, IBlockState state);
+    public abstract TileEntity createTileEntity(BlockState state, IBlockReader world);
 
-    @Deprecated
     @Override
-    public void neighborChanged(IBlockState state, World worldIn, BlockPos pos, Block otherBlock, BlockPos otherPos)
+    public void neighborChanged(BlockState state, World world, BlockPos pos, Block otherBlock, BlockPos otherPos, boolean p_220069_6_)
     {
-        super.neighborChanged(state, worldIn, pos, otherBlock, otherPos);
-        TileEntity teSelf = worldIn.getTileEntity(pos);
+        super.neighborChanged(state, world, pos, otherBlock, otherPos, p_220069_6_);
+
+        TileEntity teSelf = world.getTileEntity(pos);
         if (!(teSelf instanceof TileAggregator))
             return;
         ((TileAggregator) teSelf).updateNeighbours();
     }
 
     @Override
-    public void onNeighborChange(IBlockAccess world, BlockPos pos, BlockPos neighbor)
+    public void onNeighborChange(BlockState state, IWorldReader world, BlockPos pos, BlockPos neighbor)
     {
-        super.onNeighborChange(world, pos, neighbor);
+        super.onNeighborChange(state, world, pos, neighbor);
 
         recheckNeighbour(world, pos, neighbor);
     }
 
-    protected void recheckNeighbour(IBlockAccess world, BlockPos pos, BlockPos neighbor)
+    protected void recheckNeighbour(IBlockReader world, BlockPos pos, BlockPos neighbor)
     {
-        EnumFacing side = null;
-        if (neighbor.equals(pos.east())) side = EnumFacing.EAST;
-        if (neighbor.equals(pos.west())) side = EnumFacing.WEST;
-        if (neighbor.equals(pos.north())) side = EnumFacing.NORTH;
-        if (neighbor.equals(pos.south())) side = EnumFacing.SOUTH;
-        if (neighbor.equals(pos.up())) side = EnumFacing.UP;
-        if (neighbor.equals(pos.down())) side = EnumFacing.DOWN;
+        Direction side = null;
+        if (neighbor.equals(pos.east())) side = Direction.EAST;
+        if (neighbor.equals(pos.west())) side = Direction.WEST;
+        if (neighbor.equals(pos.north())) side = Direction.NORTH;
+        if (neighbor.equals(pos.south())) side = Direction.SOUTH;
+        if (neighbor.equals(pos.up())) side = Direction.UP;
+        if (neighbor.equals(pos.down())) side = Direction.DOWN;
 
         if (side != null && isAutomatable(world, pos, side))
         {
@@ -84,7 +66,7 @@ public abstract class BlockAggregator<T extends TileAggregator> extends BlockReg
         }
     }
 
-    protected boolean isAutomatable(IBlockAccess worldIn, BlockPos pos, EnumFacing facing)
+    protected boolean isAutomatable(IBlockReader worldIn, BlockPos pos, Direction facing)
     {
         TileEntity te = worldIn.getTileEntity(pos.offset(facing));
 
@@ -94,7 +76,7 @@ public abstract class BlockAggregator<T extends TileAggregator> extends BlockReg
         return AutomationHelper.isAutomatable(te, facing.getOpposite());
     }
 
-    protected boolean isConnectableAutomation(IBlockAccess worldIn, BlockPos pos, EnumFacing facing)
+    protected boolean isConnectableAutomation(IBlockReader worldIn, BlockPos pos, Direction facing)
     {
         TileEntity te = worldIn.getTileEntity(pos.offset(facing));
 

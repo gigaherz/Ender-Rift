@@ -4,28 +4,36 @@ import gigaherz.enderRift.EnderRiftMod;
 import gigaherz.enderRift.common.EnergyBuffer;
 import gigaherz.enderRift.rift.storage.RiftInventory;
 import gigaherz.enderRift.rift.storage.RiftStorageWorldData;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.NetworkManager;
-import net.minecraft.network.play.server.SPacketUpdateTileEntity;
+import net.minecraft.network.play.server.SUpdateTileEntityPacket;
+import net.minecraft.particles.ParticleTypes;
+import net.minecraft.tileentity.ITickableTileEntity;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumParticleTypes;
-import net.minecraft.util.ITickable;
+import net.minecraft.tileentity.TileEntityType;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.util.LazyOptional;
+import net.minecraftforge.energy.IEnergyStorage;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.registries.ObjectHolder;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.Optional;
 import java.util.Random;
 
-public class TileEnderRift
-        extends TileEntity implements ITickable
+public class TileEnderRift extends TileEntity implements ITickableTileEntity
 {
+    @ObjectHolder("enderrift:rift")
+    public static TileEntityType<?> TYPE;
+
     private static final int STARTUP_POWER = 10000;
     public static final int BUFFER_POWER = 1000000;
     private final Random rand = new Random();
@@ -43,14 +51,20 @@ public class TileEnderRift
     // End of Client-side fields
 
     public PoweredInventory poweredInventory = new PoweredInventory();
+    public LazyOptional<IItemHandler> poweredInventoryProvider = LazyOptional.of(() -> poweredInventory);
 
-    public EnergyBuffer getEnergyBuffer()
+    public TileEnderRift()
     {
-        return energyBuffer;
+        super(TYPE);
+    }
+
+    public Optional<IEnergyStorage> getEnergyBuffer()
+    {
+        return Optional.of(energyBuffer);
     }
 
     @Override
-    public void update()
+    public void tick()
     {
         if (world.isRemote)
         {
@@ -63,8 +77,8 @@ public class TileEnderRift
 
                     for (int i = 0; i < 32; ++i)
                     {
-                        this.world.spawnParticle(EnumParticleTypes.CRIT_MAGIC, this.pos.getX() + 0.5, this.pos.getY() + 0.5, this.pos.getZ() + 0.5, this.rand.nextGaussian(), this.rand.nextGaussian(), this.rand.nextGaussian());
-                        this.world.spawnParticle(EnumParticleTypes.PORTAL, this.pos.getX() + 0.5, this.pos.getY() + 0.5, this.pos.getZ() + 0.5, this.rand.nextGaussian(), this.rand.nextGaussian(), this.rand.nextGaussian());
+                        this.world.addParticle(ParticleTypes.CRIT, this.pos.getX() + 0.5, this.pos.getY() + 0.5, this.pos.getZ() + 0.5, this.rand.nextGaussian(), this.rand.nextGaussian(), this.rand.nextGaussian());
+                        this.world.addParticle(ParticleTypes.PORTAL, this.pos.getX() + 0.5, this.pos.getY() + 0.5, this.pos.getZ() + 0.5, this.rand.nextGaussian(), this.rand.nextGaussian(), this.rand.nextGaussian());
                     }
                 }
                 if (poweringState < 1)
@@ -101,14 +115,14 @@ public class TileEnderRift
             {
                 powered = true;
                 energyBuffer.setEnergy(energyStored - STARTUP_POWER);
-                IBlockState state = world.getBlockState(pos);
+                BlockState state = world.getBlockState(pos);
                 world.notifyBlockUpdate(pos, state, state, 3);
             }
         }
         else
         {
             powered = false;
-            IBlockState state = world.getBlockState(pos);
+            BlockState state = world.getBlockState(pos);
             world.notifyBlockUpdate(pos, state, state, 3);
         }
     }
@@ -141,17 +155,12 @@ public class TileEnderRift
         return inventory;
     }
 
-    @Override
-    public boolean shouldRefresh(World world, BlockPos pos, IBlockState oldState, IBlockState newState)
-    {
-        return oldState.getBlock() != newState.getBlock();
-    }
 
-    @Override
-    public boolean shouldRenderInPass(int pass)
-    {
-        return pass == 1;
-    }
+    //@Override
+    //public boolean shouldRenderInPass(int pass)
+    //{
+    //    return pass == 1;
+    //}
 
     public int countInventoryStacks()
     {
@@ -162,74 +171,66 @@ public class TileEnderRift
     {
         ItemStack stack = new ItemStack(EnderRiftMod.riftOrb);
 
-        NBTTagCompound tag = new NBTTagCompound();
+        CompoundNBT tag = new CompoundNBT();
 
-        tag.setInteger("RiftId", riftId);
+        tag.putInt("RiftId", riftId);
 
-        stack.setTagCompound(tag);
+        stack.setTag(tag);
 
         return stack;
     }
 
-    public void readFromNBT(NBTTagCompound compound)
+    public void read(CompoundNBT compound)
     {
-        super.readFromNBT(compound);
-        energyBuffer.setEnergy(compound.getInteger("Energy"));
+        super.read(compound);
+        energyBuffer.setEnergy(compound.getInt("Energy"));
         powered = compound.getBoolean("Powered");
-        riftId = compound.getInteger("RiftId");
+        riftId = compound.getInt("RiftId");
     }
 
-    public NBTTagCompound writeToNBT(NBTTagCompound compound)
+    public CompoundNBT write(CompoundNBT compound)
     {
-        compound = super.writeToNBT(compound);
-        compound.setInteger("Energy", energyBuffer.getEnergyStored());
-        compound.setBoolean("Powered", powered);
-        compound.setInteger("RiftId", riftId);
+        compound = super.write(compound);
+        compound.putInt("Energy", energyBuffer.getEnergyStored());
+        compound.putBoolean("Powered", powered);
+        compound.putInt("RiftId", riftId);
         return compound;
     }
 
     @Override
-    public NBTTagCompound getUpdateTag()
+    public CompoundNBT getUpdateTag()
     {
-        NBTTagCompound tag = super.getUpdateTag();
-        tag.setBoolean("Powered", powered);
+        CompoundNBT tag = super.getUpdateTag();
+        tag.putBoolean("Powered", powered);
         return tag;
     }
 
     @Override
-    public void handleUpdateTag(NBTTagCompound tag)
+    public void handleUpdateTag(CompoundNBT tag)
     {
         powered = tag.getBoolean("Powered");
     }
 
     @Nullable
     @Override
-    public SPacketUpdateTileEntity getUpdatePacket()
+    public SUpdateTileEntityPacket getUpdatePacket()
     {
-        return new SPacketUpdateTileEntity(pos, getBlockMetadata(), getUpdateTag());
+        return new SUpdateTileEntityPacket(pos, 0, getUpdateTag());
     }
 
     @Override
-    public void onDataPacket(NetworkManager net, SPacketUpdateTileEntity pkt)
+    public void onDataPacket(NetworkManager net, SUpdateTileEntityPacket pkt)
     {
         handleUpdateTag(pkt.getNbtCompound());
     }
 
+    @Nonnull
     @Override
-    public boolean hasCapability(Capability<?> capability, @Nullable EnumFacing facing)
+    public <T> LazyOptional<T> getCapability(@Nonnull final Capability<T> cap, final @Nullable Direction side)
     {
-        if (capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
-            return true;
-        return super.hasCapability(capability, facing);
-    }
-
-    @SuppressWarnings("unchecked")
-    @Override
-    public <T> T getCapability(Capability<T> capability, @Nullable EnumFacing facing)
-    {
-        if (capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
-            return (T) poweredInventory;
-        return super.getCapability(capability, facing);
+        if (cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
+            return poweredInventoryProvider.cast();
+        return super.getCapability(cap, side);
     }
 
     public ItemStack chooseRandomStack()
@@ -324,6 +325,12 @@ public class TileEnderRift
         public int getSlotLimit(int slot)
         {
             return 64;
+        }
+
+        @Override
+        public boolean isItemValid(int slot, @Nonnull ItemStack stack)
+        {
+            return true;
         }
     }
 }

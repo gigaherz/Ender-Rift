@@ -1,27 +1,28 @@
 package gigaherz.enderRift.automation.proxy;
 
-import gigaherz.enderRift.EnderRiftMod;
 import gigaherz.enderRift.automation.BlockAggregator;
-import net.minecraft.block.SoundType;
-import net.minecraft.block.material.MapColor;
-import net.minecraft.block.material.Material;
-import net.minecraft.block.properties.PropertyBool;
-import net.minecraft.block.state.BlockStateContainer;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
+import net.minecraft.state.BooleanProperty;
+import net.minecraft.state.StateContainer;
+import net.minecraft.state.properties.BlockStateProperties;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IBlockAccess;
-import net.minecraft.world.World;
+import net.minecraft.world.IBlockReader;
+import net.minecraft.world.IWorld;
+
+import javax.annotation.Nullable;
 
 public class BlockProxy extends BlockAggregator<TileProxy>
 {
-    public static final PropertyBool NORTH = PropertyBool.create("north");
-    public static final PropertyBool SOUTH = PropertyBool.create("south");
-    public static final PropertyBool WEST = PropertyBool.create("west");
-    public static final PropertyBool EAST = PropertyBool.create("east");
-    public static final PropertyBool UP = PropertyBool.create("up");
-    public static final PropertyBool DOWN = PropertyBool.create("down");
+    public static final BooleanProperty NORTH = BlockStateProperties.NORTH;
+    public static final BooleanProperty SOUTH = BlockStateProperties.SOUTH;
+    public static final BooleanProperty WEST = BlockStateProperties.WEST;
+    public static final BooleanProperty EAST = BlockStateProperties.EAST;
+    public static final BooleanProperty UP = BlockStateProperties.UP;
+    public static final BooleanProperty DOWN = BlockStateProperties.DOWN;
 
     private static final AxisAlignedBB BOUNDS = new AxisAlignedBB(4 / 16f, 4 / 16f, 4 / 16f, 12 / 16f, 12 / 16f, 12 / 16f);
     private static final AxisAlignedBB BOUNDS_NORTH = new AxisAlignedBB(6 / 16f, 6 / 16f, 0 / 16f, 10 / 16f, 10 / 16f, 10 / 16f);
@@ -31,37 +32,34 @@ public class BlockProxy extends BlockAggregator<TileProxy>
     private static final AxisAlignedBB BOUNDS_UP = new AxisAlignedBB(6 / 16f, 6 / 16f, 6 / 16f, 10 / 16f, 16 / 16f, 10 / 16f);
     private static final AxisAlignedBB BOUNDS_DOWN = new AxisAlignedBB(6 / 16f, 0 / 16f, 6 / 16f, 10 / 16f, 10 / 16f, 10 / 16f);
 
-    public BlockProxy(String name)
+    public BlockProxy(Properties properties)
     {
-        super(name, Material.IRON, MapColor.GRAY);
-        setSoundType(SoundType.METAL);
-        setCreativeTab(EnderRiftMod.tabEnderRift);
-        setDefaultState(blockState.getBaseState()
-                .withProperty(NORTH, false)
-                .withProperty(SOUTH, false)
-                .withProperty(WEST, false)
-                .withProperty(EAST, false)
-                .withProperty(UP, false)
-                .withProperty(DOWN, false));
-        setHardness(3.0F);
-        setResistance(8.0F);
+        super(properties);
+        setDefaultState(getStateContainer().getBaseState()
+                .with(NORTH, false)
+                .with(SOUTH, false)
+                .with(WEST, false)
+                .with(EAST, false)
+                .with(UP, false)
+                .with(DOWN, false));
     }
 
     @Override
-    protected BlockStateContainer createBlockState()
+    protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder)
     {
-        return new BlockStateContainer(this, NORTH, SOUTH, WEST, EAST, UP, DOWN);
+        builder.add(NORTH, SOUTH, WEST, EAST, UP, DOWN);
     }
 
+    @Nullable
     @Override
-    public TileProxy createTileEntity(World world, IBlockState state)
+    public TileEntity createTileEntity(BlockState state, IBlockReader world)
     {
         return new TileProxy();
     }
 
-    @Deprecated
+    /*@Deprecated
     @Override
-    public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos)
+    public AxisAlignedBB getBoundingBox(BlockState state, IBlockReader source, BlockPos pos)
     {
         state = state.getActualState(source, pos);
 
@@ -73,31 +71,17 @@ public class BlockProxy extends BlockAggregator<TileProxy>
         if (state.getValue(UP)) bb = bb.union(BOUNDS_UP);
         if (state.getValue(DOWN)) bb = bb.union(BOUNDS_DOWN);
         return bb;
-    }
+    }*/
 
     @Override
-    public int getMetaFromState(IBlockState state)
+    public BlockState updatePostPlacement(BlockState stateIn, Direction facing, BlockState facingState, IWorld worldIn, BlockPos currentPos, BlockPos facingPos)
     {
-        return 0;
-    }
-
-    @Deprecated
-    @Override
-    public IBlockState getStateFromMeta(int meta)
-    {
-        return getDefaultState();
-    }
-
-    @Deprecated
-    @Override
-    public IBlockState getActualState(IBlockState state, IBlockAccess worldIn, BlockPos pos)
-    {
-        return state
-                .withProperty(NORTH, isConnectableAutomation(worldIn, pos, EnumFacing.NORTH))
-                .withProperty(SOUTH, isConnectableAutomation(worldIn, pos, EnumFacing.SOUTH))
-                .withProperty(WEST, isConnectableAutomation(worldIn, pos, EnumFacing.WEST))
-                .withProperty(EAST, isConnectableAutomation(worldIn, pos, EnumFacing.EAST))
-                .withProperty(UP, isConnectableAutomation(worldIn, pos, EnumFacing.UP))
-                .withProperty(DOWN, isConnectableAutomation(worldIn, pos, EnumFacing.DOWN));
+        return stateIn
+                .with(NORTH, isConnectableAutomation(worldIn, currentPos, Direction.NORTH))
+                .with(SOUTH, isConnectableAutomation(worldIn, currentPos, Direction.SOUTH))
+                .with(WEST, isConnectableAutomation(worldIn, currentPos, Direction.WEST))
+                .with(EAST, isConnectableAutomation(worldIn, currentPos, Direction.EAST))
+                .with(UP, isConnectableAutomation(worldIn, currentPos, Direction.UP))
+                .with(DOWN, isConnectableAutomation(worldIn, currentPos, Direction.DOWN));
     }
 }

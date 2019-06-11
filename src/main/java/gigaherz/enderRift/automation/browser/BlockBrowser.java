@@ -2,164 +2,104 @@ package gigaherz.enderRift.automation.browser;
 
 import gigaherz.enderRift.EnderRiftMod;
 import gigaherz.enderRift.automation.BlockAggregator;
-import gigaherz.enderRift.common.GuiHandler;
 import net.minecraft.block.Block;
-import net.minecraft.block.SoundType;
-import net.minecraft.block.material.MapColor;
-import net.minecraft.block.material.Material;
-import net.minecraft.block.properties.PropertyBool;
-import net.minecraft.block.properties.PropertyDirection;
-import net.minecraft.block.state.BlockFaceShape;
-import net.minecraft.block.state.BlockStateContainer;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemBlock;
-import net.minecraft.item.ItemStack;
+import net.minecraft.block.BlockState;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.BlockItemUseContext;
+import net.minecraft.state.DirectionProperty;
+import net.minecraft.state.StateContainer;
+import net.minecraft.state.properties.BlockStateProperties;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumHand;
-import net.minecraft.util.NonNullList;
+import net.minecraft.util.Direction;
+import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IBlockAccess;
+import net.minecraft.util.math.BlockRayTraceResult;
+import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
+
+import javax.annotation.Nullable;
 
 public class BlockBrowser extends BlockAggregator<TileBrowser>
 {
-    public static final PropertyDirection FACING = PropertyDirection.create("facing");
-    public static final PropertyBool CRAFTING = PropertyBool.create("crafting");
+    public static final DirectionProperty FACING = BlockStateProperties.FACING;
 
     private static final String unlocStandard = EnderRiftMod.MODID + ".browser";
     private static final String unlocCrafting = EnderRiftMod.MODID + ".crafting_browser";
 
-    public BlockBrowser(String name)
+    public final boolean crafting;
+
+    public BlockBrowser(boolean crafting, Properties properties)
     {
-        super(name, Material.IRON, MapColor.STONE);
-        setSoundType(SoundType.METAL);
-        setTranslationKey(unlocStandard);
-        setCreativeTab(EnderRiftMod.tabEnderRift);
-        setDefaultState(blockState.getBaseState().withProperty(FACING, EnumFacing.NORTH));
-        setHardness(3.0F);
-        setResistance(8.0F);
+        super(properties);
+        this.crafting = crafting;
+        setDefaultState(getStateContainer().getBaseState().with(FACING, Direction.NORTH));
     }
 
     @Override
-    protected BlockStateContainer createBlockState()
+    protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder)
     {
-        return new BlockStateContainer(this, FACING, CRAFTING);
+        builder.add(FACING);
     }
 
+    @Nullable
     @Override
-    public TileBrowser createTileEntity(World world, IBlockState state)
+    public TileEntity createTileEntity(BlockState state, IBlockReader world)
     {
         return new TileBrowser();
     }
 
-    @Deprecated
+    /*@Deprecated
     @Override
-    public BlockFaceShape getBlockFaceShape(IBlockAccess worldIn, IBlockState state, BlockPos pos, EnumFacing face)
+    public BlockFaceShape getBlockFaceShape(IBlockReader worldIn, BlockState state, BlockPos pos, Direction face)
     {
-        EnumFacing st = state.getValue(FACING);
+        Direction st = state.getValue(FACING);
 
         if (st == face)
             return BlockFaceShape.CENTER;
 
-        EnumFacing op = face.getOpposite();
+        Direction op = face.getOpposite();
         if (st == op)
             return BlockFaceShape.SOLID;
 
         return BlockFaceShape.UNDEFINED;
-    }
+    }*/
 
-    @Deprecated
+    /*@Deprecated
     @Override
-    public boolean isSideSolid(IBlockState base_state, IBlockAccess world, BlockPos pos, EnumFacing side)
+    public boolean isSideSolid(BlockState base_state, IBlockReader world, BlockPos pos, Direction side)
     {
         return base_state.getValue(FACING) == side.getOpposite();
-    }
+    }*/
 
-    @Override
-    public boolean canPlaceTorchOnTop(IBlockState state, IBlockAccess world, BlockPos pos)
+    /*@Override
+    public boolean canPlaceTorchOnTop(BlockState state, IBlockReader world, BlockPos pos)
     {
-        return state.getValue(FACING) == EnumFacing.UP || state.getValue(FACING) == EnumFacing.DOWN;
-    }
+        return state.getValue(FACING) == Direction.UP || state.getValue(FACING) == Direction.DOWN;
+    }*/
 
-    @Deprecated
+    @Nullable
     @Override
-    public IBlockState getStateFromMeta(int meta)
+    public BlockState getStateForPlacement(BlockItemUseContext context)
     {
-        return getDefaultState()
-                .withProperty(FACING, EnumFacing.VALUES[meta & 7])
-                .withProperty(CRAFTING, (meta & 8) != 0);
+        return getDefaultState().with(BlockBrowser.FACING, context.getFace().getOpposite());
     }
 
     @Override
-    public int getMetaFromState(IBlockState state)
-    {
-        return state.getValue(FACING).ordinal()
-                | (state.getValue(CRAFTING) ? 8 : 0);
-    }
-
-    @Override
-    public IBlockState getStateForPlacement(World world, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer, EnumHand hand)
-    {
-        return getDefaultState().withProperty(BlockBrowser.FACING, facing.getOpposite()).withProperty(CRAFTING, meta != 0);
-    }
-
-    @Override
-    public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ)
+    public boolean onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit)
     {
         TileEntity tileEntity = worldIn.getTileEntity(pos);
 
-        if (!(tileEntity instanceof TileBrowser) || playerIn.isSneaking())
+        if (!(tileEntity instanceof TileBrowser) || player.isSneaking())
             return false;
 
-        int which = state.getValue(CRAFTING) ?
+        /*
+        int which = crafting ?
                 GuiHandler.GUI_BROWSER_CRAFTING :
                 GuiHandler.GUI_BROWSER;
 
-        playerIn.openGui(EnderRiftMod.instance, which, worldIn, pos.getX(), pos.getY(), pos.getZ());
+        player.openGui(EnderRiftMod.instance, which, worldIn, pos.getX(), pos.getY(), pos.getZ());
+         */
 
         return true;
-    }
-
-    @Override
-    public ItemBlock createItemBlock()
-    {
-        return new AsItem(this);
-    }
-
-    public static class AsItem extends ItemBlock
-    {
-        public AsItem(Block block)
-        {
-            super(block);
-            setRegistryName(block.getRegistryName());
-            setHasSubtypes(true);
-        }
-
-        @Override
-        public int getMetadata(int damage)
-        {
-            return damage & 1;
-        }
-
-        @Override
-        public String getTranslationKey(ItemStack stack)
-        {
-            return "tile." + ((stack.getMetadata() != 0) ? unlocCrafting : unlocStandard);
-        }
-
-        @Override
-        public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> subItems)
-        {
-            if (this.isInCreativeTab(tab))
-            {
-                subItems.add(new ItemStack(this, 1, 0));
-                subItems.add(new ItemStack(this, 1, 1));
-            }
-        }
     }
 }

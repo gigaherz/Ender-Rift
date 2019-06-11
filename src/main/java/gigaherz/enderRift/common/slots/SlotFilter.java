@@ -1,6 +1,6 @@
 package gigaherz.enderRift.common.slots;
 
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.SlotItemHandler;
@@ -19,7 +19,7 @@ public class SlotFilter extends SlotItemHandler
     }
 
     @Override
-    public ItemStack onTake(EntityPlayer p_190901_1_, ItemStack p_190901_2_)
+    public ItemStack onTake(PlayerEntity p_190901_1_, ItemStack p_190901_2_)
     {
         return ItemStack.EMPTY;
     }
@@ -37,7 +37,7 @@ public class SlotFilter extends SlotItemHandler
     }
 
     @Override
-    public boolean canTakeStack(final EntityPlayer par1EntityPlayer)
+    public boolean canTakeStack(final PlayerEntity par1EntityPlayer)
     {
         return false;
     }

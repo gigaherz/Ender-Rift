@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.items.IItemHandler;
 
+import javax.annotation.Nonnull;
 import java.util.List;
 
 public class InventoryAggregator implements IItemHandler
@@ -100,5 +101,21 @@ public class InventoryAggregator implements IItemHandler
             index -= size;
         }
         return 0;
+    }
+
+    @Override
+    public boolean isItemValid(int index, @Nonnull ItemStack stack)
+    {
+        for (IItemHandler inv : aggregated)
+        {
+            int size = inv.getSlots();
+            if (index < size)
+            {
+                return inv.isItemValid(index, stack);
+            }
+
+            index -= size;
+        }
+        return false;
     }
 }

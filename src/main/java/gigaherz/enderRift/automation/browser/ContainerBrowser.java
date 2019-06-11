@@ -3,33 +3,46 @@ package gigaherz.enderRift.automation.browser;
 import com.google.common.collect.Lists;
 import gigaherz.enderRift.EnderRiftMod;
 import gigaherz.enderRift.automation.AutomationHelper;
+import gigaherz.enderRift.automation.iface.ContainerInterface;
+import gigaherz.enderRift.automation.iface.TileInterface;
 import gigaherz.enderRift.common.slots.SlotFake;
 import gigaherz.enderRift.network.SendSlotChanges;
 import gigaherz.enderRift.network.SetVisibleSlots;
 import gigaherz.enderRift.network.UpdatePowerStatus;
 import joptsimple.internal.Strings;
 import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.inventory.ClickType;
-import net.minecraft.inventory.Container;
-import net.minecraft.inventory.IContainerListener;
-import net.minecraft.inventory.Slot;
+import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.inventory.container.*;
+import net.minecraft.inventory.container.Slot;
+import net.minecraft.inventory.container.ClickType;
+import net.minecraft.inventory.container.IContainerListener;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.network.play.server.SPacketSetSlot;
+import net.minecraft.network.PacketBuffer;
+import net.minecraft.network.play.server.SSetSlotPacket;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.NonNullList;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.StringTextComponent;
+import net.minecraftforge.fml.network.NetworkDirection;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.IItemHandlerModifiable;
+import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.registries.ObjectHolder;
 import org.apache.commons.lang3.StringUtils;
 
+import javax.annotation.Nonnull;
 import java.util.Arrays;
 import java.util.List;
 
-public class ContainerBrowser
-        extends Container
+public class ContainerBrowser extends Container
 {
+    @ObjectHolder("enderrift:browser")
+    public static ContainerType<ContainerBrowser> TYPE;
+
     public final FakeInventoryClient fakeInventoryClient;
     public final FakeInventoryServer fakeInventoryServer;
     protected TileBrowser tile;
@@ -39,7 +52,7 @@ public class ContainerBrowser
     private String filterText = "";
     private ItemStack stackInCursor = ItemStack.EMPTY;
 
-    private EntityPlayer player;
+    private PlayerEntity player;
 
     private NonNullList<ItemStack> currentStacks = NonNullList.create();
 
@@ -56,10 +69,21 @@ public class ContainerBrowser
     protected final static int PlayerColumns = 9;
     protected final static int PlayerSlots = PlayerRows * PlayerColumns;
 
-    public ContainerBrowser(TileBrowser tileEntity, EntityPlayer player, boolean isClient)
+    private boolean isClient = false;
+
+    public ContainerBrowser(int id, PlayerInventory playerInventory, PacketBuffer extraData)
     {
-        this.tile = tileEntity;
-        this.player = player;
+        this(id, extraData.readBlockPos(), playerInventory, TYPE);
+    }
+
+    protected ContainerBrowser(int id, BlockPos pos, PlayerInventory playerInventory, ContainerType<? extends ContainerBrowser> type)
+    {
+        super(type, id);
+
+        TileEntity tileEntity = playerInventory.player.world.getTileEntity(pos);
+
+        this.tile = (TileBrowser)tileEntity;
+        this.player = playerInventory.player;
 
         IItemHandlerModifiable fake;
         if (isClient)
@@ -79,27 +103,27 @@ public class ContainerBrowser
         {
             for (int x = 0; x < FakeColumns; x++)
             {
-                addSlotToContainer(new SlotFake(fake,
+                addSlot(new SlotFake(fake,
                         x + y * FakeColumns,
                         Left + x * SlotWidth, Top + y * SlotHeight));
             }
         }
 
-        bindPlayerInventory(player.inventory);
+        bindPlayerInventory(playerInventory);
     }
 
-    protected void bindPlayerInventory(InventoryPlayer playerInventory)
+    protected void bindPlayerInventory(PlayerInventory playerInventory)
     {
         bindPlayerInventory(playerInventory, Top + FakeRows * SlotHeight + 14);
     }
 
-    protected void bindPlayerInventory(InventoryPlayer playerInventory, int top)
+    protected void bindPlayerInventory(PlayerInventory playerInventory, int top)
     {
         for (int y = 0; y < 3; y++)
         {
             for (int x = 0; x < 9; x++)
             {
-                addSlotToContainer(new Slot(playerInventory,
+                addSlot(new Slot(playerInventory,
                         x + y * 9 + 9,
                         Left + x * SlotWidth, top + y * SlotHeight));
             }
@@ -108,12 +132,12 @@ public class ContainerBrowser
         top += 3 * SlotHeight + 4;
         for (int x = 0; x < 9; x++)
         {
-            addSlotToContainer(new Slot(playerInventory, x, Left + x * SlotWidth, top));
+            addSlot(new Slot(playerInventory, x, Left + x * SlotWidth, top));
         }
     }
 
     @Override
-    public boolean canInteractWith(EntityPlayer player)
+    public boolean canInteractWith(PlayerEntity player)
     {
         return true;
     }
@@ -132,10 +156,10 @@ public class ContainerBrowser
         {
             for (IContainerListener crafter : this.listeners)
             {
-                if (!(crafter instanceof EntityPlayerMP))
+                if (!(crafter instanceof ServerPlayerEntity))
                     continue;
 
-                EnderRiftMod.channel.sendTo(new UpdatePowerStatus(windowId, isLowOnPowerNew), (EntityPlayerMP) crafter);
+                EnderRiftMod.channel.sendTo(new UpdatePowerStatus(windowId, isLowOnPowerNew), ((ServerPlayerEntity) crafter).connection.getNetworkManager(), NetworkDirection.PLAY_TO_CLIENT);
             }
 
             isLowOnPowerPrev = isLowOnPowerNew;
@@ -194,15 +218,15 @@ public class ContainerBrowser
 
         for (IContainerListener crafter : this.listeners)
         {
-            if (!(crafter instanceof EntityPlayerMP))
+            if (!(crafter instanceof ServerPlayerEntity))
                 continue;
 
             if (newLength != oldLength || indicesChanged.size() > 0)
             {
-                EnderRiftMod.channel.sendTo(new SendSlotChanges(windowId, newLength, indicesChanged, stacksChanged), (EntityPlayerMP) crafter);
+                EnderRiftMod.channel.sendTo(new SendSlotChanges(windowId, newLength, indicesChanged, stacksChanged), ((ServerPlayerEntity) crafter).connection.getNetworkManager(), NetworkDirection.PLAY_TO_CLIENT);
             }
 
-            EntityPlayerMP player = (EntityPlayerMP) crafter;
+            ServerPlayerEntity player = (ServerPlayerEntity) crafter;
             ItemStack newStack = player.inventory.getItemStack();
 
             if (!ItemStack.areItemStacksEqual(stackInCursor, newStack))
@@ -225,11 +249,11 @@ public class ContainerBrowser
         { currentStacks.set(i, oldStacks.get(i)); }
     }
 
-    private void sendStackInCursor(EntityPlayerMP player, ItemStack newStack)
+    private void sendStackInCursor(ServerPlayerEntity player, ItemStack newStack)
     {
         stackInCursor = newStack.copy();
 
-        player.connection.sendPacket(new SPacketSetSlot(-1, -1, newStack));
+        player.connection.sendPacket(new SSetSlotPacket(-1, -1, newStack));
     }
 
     public void slotsChanged(int slotCount, List<Integer> indices, List<ItemStack> stacks)
@@ -304,9 +328,9 @@ public class ContainerBrowser
     }
 
     @Override
-    public ItemStack slotClick(int slotId, int clickedButton, ClickType mode, EntityPlayer playerIn)
+    public ItemStack slotClick(int slotId, int clickedButton, ClickType mode, PlayerEntity playerIn)
     {
-        InventoryPlayer inventoryPlayer = playerIn.inventory;
+        PlayerInventory inventoryPlayer = playerIn.inventory;
 
         if (slotId >= 0 && slotId < FakeSlots)
         {
@@ -331,10 +355,10 @@ public class ContainerBrowser
 
                             for (IContainerListener crafter : this.listeners)
                             {
-                                if (!(crafter instanceof EntityPlayerMP))
+                                if (!(crafter instanceof ServerPlayerEntity))
                                     continue;
 
-                                sendStackInCursor((EntityPlayerMP) crafter, remaining);
+                                sendStackInCursor((ServerPlayerEntity) crafter, remaining);
                             }
                         }
                         else
@@ -361,10 +385,10 @@ public class ContainerBrowser
 
                             for (IContainerListener crafter : this.listeners)
                             {
-                                if (!(crafter instanceof EntityPlayerMP))
+                                if (!(crafter instanceof ServerPlayerEntity))
                                     continue;
 
-                                sendStackInCursor((EntityPlayerMP) crafter, remaining);
+                                sendStackInCursor((ServerPlayerEntity) crafter, remaining);
                             }
                         }
                         else
@@ -394,10 +418,10 @@ public class ContainerBrowser
 
                         for (IContainerListener crafter : this.listeners)
                         {
-                            if (!(crafter instanceof EntityPlayerMP))
+                            if (!(crafter instanceof ServerPlayerEntity))
                                 continue;
 
-                            sendStackInCursor((EntityPlayerMP) crafter, extracted);
+                            sendStackInCursor((ServerPlayerEntity) crafter, extracted);
                         }
                     }
                     inventoryPlayer.setItemStack(extracted);
@@ -549,7 +573,7 @@ public class ContainerBrowser
     }
 
     @Override
-    public ItemStack transferStackInSlot(EntityPlayer player, int slotIndex)
+    public ItemStack transferStackInSlot(PlayerEntity player, int slotIndex)
     {
         Slot slot = this.inventorySlots.get(slotIndex);
 
@@ -721,6 +745,12 @@ public class ContainerBrowser
         }
 
         @Override
+        public boolean isItemValid(int slot, @Nonnull ItemStack stack)
+        {
+            return true;
+        }
+
+        @Override
         public void setStackInSlot(int slot, ItemStack stack)
         {
         }
@@ -741,7 +771,7 @@ public class ContainerBrowser
 
             final List<Integer> indices = Lists.newArrayList();
 
-            final List<String> itemData = Lists.newArrayList();
+            final List<ITextComponent> itemData = Lists.newArrayList();
 
             int indexx = 0;
             for (ItemStack invStack : stacks)
@@ -754,12 +784,12 @@ public class ContainerBrowser
                     itemData.clear();
                     Item item = invStack.getItem();
                     itemData.add(stack.getDisplayName());
-                    itemData.add(Item.REGISTRY.getNameForObject(item).toString());
+                    itemData.add(new StringTextComponent(ForgeRegistries.ITEMS.getKey(item).toString()));
                     item.addInformation(stack, player.world, itemData, ITooltipFlag.TooltipFlags.NORMAL);
                     matchesSearch = false;
-                    for (String s : itemData)
+                    for (ITextComponent s : itemData)
                     {
-                        if (StringUtils.containsIgnoreCase(s, filterText))
+                        if (StringUtils.containsIgnoreCase(s.getString(), filterText))
                         {
                             matchesSearch = true;
                             break;
@@ -783,7 +813,7 @@ public class ContainerBrowser
                         {
                             ItemStack a = stacks.get(ia);
                             ItemStack b = stacks.get(ib);
-                            return a.getDisplayName().compareToIgnoreCase(b.getDisplayName());
+                            return a.getDisplayName().getString().compareToIgnoreCase(b.getDisplayName().getString());
                         });
                         break;
                     case StackSize:
@@ -794,7 +824,7 @@ public class ContainerBrowser
                             int diff = a.getCount() - b.getCount();
                             if (diff > 0) return -1;
                             if (diff < 0) return 1;
-                            return a.getDisplayName().compareToIgnoreCase(b.getDisplayName());
+                            return a.getDisplayName().getString().compareToIgnoreCase(b.getDisplayName().getString());
                         });
                         break;
                 }
@@ -840,6 +870,12 @@ public class ContainerBrowser
         public int getSlotLimit(int slot)
         {
             return 64;
+        }
+
+        @Override
+        public boolean isItemValid(int slot, @Nonnull ItemStack stack)
+        {
+            return true;
         }
 
         @Override

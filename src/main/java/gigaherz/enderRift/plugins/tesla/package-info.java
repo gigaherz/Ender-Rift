@@ -1,7 +1,0 @@
-@MethodsReturnNonnullByDefault
-@ParametersAreNonnullByDefault
-package gigaherz.enderRift.plugins.tesla;
-
-import mcp.MethodsReturnNonnullByDefault;
-
-import javax.annotation.ParametersAreNonnullByDefault;

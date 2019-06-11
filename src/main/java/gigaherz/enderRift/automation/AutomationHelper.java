@@ -1,8 +1,7 @@
 package gigaherz.enderRift.automation;
 
-import gigaherz.enderRift.plugins.tesla.TeslaControllerBase;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.energy.CapabilityEnergy;
@@ -14,26 +13,24 @@ import net.minecraftforge.items.IItemHandler;
  */
 public abstract class AutomationHelper
 {
-    public static boolean isPowerSource(Object object, EnumFacing facing)
+    public static boolean isPowerSource(Object object, Direction facing)
     {
         if (!(object instanceof ICapabilityProvider))
             return false;
 
         ICapabilityProvider cap = (ICapabilityProvider) object;
 
-        Capability teslaCap = TeslaControllerBase.PRODUCER.getCapability();
-        return cap.hasCapability(CapabilityEnergy.ENERGY, facing)
-                || (teslaCap != null && cap.hasCapability(teslaCap, facing));
+        return cap.getCapability(CapabilityEnergy.ENERGY, facing).isPresent();
     }
 
-    public static boolean isAutomatable(Object object, EnumFacing facing)
+    public static boolean isAutomatable(Object object, Direction facing)
     {
         if (!(object instanceof ICapabilityProvider))
             return false;
 
         ICapabilityProvider cap = (ICapabilityProvider) object;
 
-        return cap.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, facing);
+        return cap.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, facing).isPresent();
     }
 
     public static ItemStack insertItems(IItemHandler parent, ItemStack stack)

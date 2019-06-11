@@ -1,20 +1,16 @@
 package gigaherz.enderRift.network;
 
 import gigaherz.enderRift.EnderRiftMod;
+import gigaherz.enderRift.client.ClientProxy;
 import io.netty.buffer.ByteBuf;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
-import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
+import net.minecraftforge.fml.network.NetworkEvent;
+
+import java.util.function.Supplier;
 
 public class UpdateField
-        implements IMessage
 {
     public int windowId;
     public int[] fields;
-
-    public UpdateField()
-    {
-    }
 
     public UpdateField(int windowId, int[] values)
     {
@@ -22,8 +18,7 @@ public class UpdateField
         this.fields = values;
     }
 
-    @Override
-    public void fromBytes(ByteBuf buf)
+    public UpdateField(ByteBuf buf)
     {
         windowId = buf.readInt();
         fields = new int[buf.readByte()];
@@ -33,8 +28,7 @@ public class UpdateField
         }
     }
 
-    @Override
-    public void toBytes(ByteBuf buf)
+    public void encode(ByteBuf buf)
     {
         buf.writeInt(windowId);
         buf.writeByte(fields.length);
@@ -44,14 +38,8 @@ public class UpdateField
         }
     }
 
-    public static class Handler implements IMessageHandler<UpdateField, IMessage>
+    public void handle(Supplier<NetworkEvent.Context> context)
     {
-        @Override
-        public IMessage onMessage(UpdateField message, MessageContext ctx)
-        {
-            EnderRiftMod.proxy.handleUpdateField(message);
-
-            return null; // no response in this case
-        }
+        ClientProxy.handleUpdateField(this);
     }
 }

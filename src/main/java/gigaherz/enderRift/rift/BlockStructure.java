@@ -1,110 +1,63 @@
 package gigaherz.enderRift.rift;
 
 import gigaherz.enderRift.automation.BlockAggregator;
-import net.minecraft.block.SoundType;
-import net.minecraft.block.material.Material;
-import net.minecraft.block.properties.PropertyBool;
-import net.minecraft.block.properties.PropertyEnum;
-import net.minecraft.block.state.BlockStateContainer;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.state.BooleanProperty;
+import net.minecraft.state.EnumProperty;
+import net.minecraft.state.StateContainer;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.IStringSerializable;
-import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.world.IBlockAccess;
+import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
 
-import java.util.List;
+import javax.annotation.Nullable;
 
-public class BlockStructure
-        extends BlockAggregator<TileEnderRiftCorner>
+public class BlockStructure extends BlockAggregator<TileEnderRiftCorner>
 {
-    public static final PropertyEnum<Type1> TYPE1 = PropertyEnum.create("type1", Type1.class);
-    public static final PropertyEnum<Type2> TYPE2 = PropertyEnum.create("type2", Type2.class);
-    public static final PropertyEnum<Corner> CORNER = PropertyEnum.create("corner", Corner.class);
-    public static final PropertyBool BASE = PropertyBool.create("base");
+    public static final EnumProperty<Type1> TYPE1 = EnumProperty.create("type1", Type1.class);
+    public static final EnumProperty<Type2> TYPE2 = EnumProperty.create("type2", Type2.class);
+    public static final EnumProperty<Corner> CORNER = EnumProperty.create("corner", Corner.class);
+    public static final BooleanProperty BASE = BooleanProperty.create("base");
 
-    public BlockStructure(String name)
+    public BlockStructure(Block.Properties properties)
     {
-        super(name, Material.ROCK);
-        setSoundType(SoundType.METAL);
-        setDefaultState(this.blockState.getBaseState()
-                .withProperty(TYPE1, Type1.NORMAL).withProperty(TYPE2, Type2.NONE)
-                .withProperty(CORNER, Corner.values[0]).withProperty(BASE, false));
-        setHardness(3.0F);
-        setLightOpacity(0);
+        super(properties);
+        setDefaultState(this.getStateContainer().getBaseState()
+                .with(TYPE1, BlockStructure.Type1.NORMAL).with(TYPE2, BlockStructure.Type2.NONE)
+                .with(CORNER, BlockStructure.Corner.values[0]).with(BASE, false));
     }
 
     @Override
-    public void getSubBlocks(CreativeTabs tab, NonNullList<ItemStack> list)
+    public boolean hasTileEntity(BlockState state)
     {
-        // None!
+        return state.get(TYPE1) == Type1.CORNER;
     }
 
+    @Nullable
     @Override
-    public boolean hasTileEntity(IBlockState state)
-    {
-        return state.getValue(TYPE1) == Type1.CORNER;
-    }
-
-    @Override
-    public TileEnderRiftCorner createTileEntity(World world, IBlockState state)
+    public TileEntity createTileEntity(BlockState state, IBlockReader world)
     {
         return new TileEnderRiftCorner();
     }
 
     @Override
-    protected BlockStateContainer createBlockState()
+    protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder)
     {
-        return new BlockStateContainer(this, TYPE1, TYPE2, CORNER, BASE);
+        builder.add(TYPE1, TYPE2, CORNER, BASE);
     }
 
     @Deprecated
-    @Override
-    public IBlockState getStateFromMeta(int meta)
+    public AxisAlignedBB getBoundingBox(BlockState state, IBlockReader source, BlockPos pos)
     {
-        Type1 type1 = Type1.values[meta >> 3];
-
-        IBlockState state = getDefaultState().withProperty(TYPE1, type1);
-
-        int type2 = (meta >> 1) & 3;
-        if (type1 == Type1.CORNER)
-            state = state.withProperty(CORNER, Corner.values[type2]);
-        else
-            state = state.withProperty(TYPE2, Type2.values[type2]);
-
-        return state.withProperty(BASE, (meta & 1) == 1);
-    }
-
-    @Override
-    public int getMetaFromState(IBlockState state)
-    {
-        Type1 type1 = state.getValue(TYPE1);
-
-        int type1i = type1.ordinal();
-
-        int type2;
-        if (type1 == Type1.CORNER)
-            type2 = state.getValue(CORNER).ordinal();
-        else
-            type2 = state.getValue(TYPE2).ordinal();
-
-        int base = state.getValue(BASE) ? 1 : 0;
-
-        return (type1i << 3) | (type2 << 1) | base;
-    }
-
-    @Deprecated
-    @Override
-    public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos)
-    {
-        if (state.getValue(TYPE1) == Type1.NORMAL)
+        if (state.get(TYPE1) == Type1.NORMAL)
         {
-            Type2 d = state.getValue(TYPE2);
+            Type2 d = state.get(TYPE2);
             switch (d)
             {
                 case NONE: // base center
@@ -112,7 +65,7 @@ public class BlockStructure
                             0 / 16.0f, 0 / 16.0f, 0 / 16.0f,
                             16 / 16.0f, 4 / 16.0f, 16 / 16.0f);
                 case SIDE_EW:
-                    if (!state.getValue(BASE))
+                    if (!state.get(BASE))
                         return new AxisAlignedBB(
                                 0 / 16.0f, 4 / 16.0f, 4 / 16.0f,
                                 16 / 16.0f, 12 / 16.0f, 12 / 16.0f);
@@ -125,7 +78,7 @@ public class BlockStructure
                             4 / 16.0f, 0 / 16.0f, 4 / 16.0f,
                             12 / 16.0f, 16 / 16.0f, 12 / 16.0f);
                 case SIDE_NS:
-                    if (!state.getValue(BASE))
+                    if (!state.get(BASE))
                         return new AxisAlignedBB(
                                 4 / 16.0f, 4 / 16.0f, 0 / 16.0f,
                                 12 / 16.0f, 12 / 16.0f, 16 / 16.0f);
@@ -136,42 +89,42 @@ public class BlockStructure
             }
         }
 
-        return FULL_BLOCK_AABB;
+        return new AxisAlignedBB(0,0,0,1,1,1);
     }
 
-    @Override
-    public void breakBlock(World worldIn, BlockPos pos, IBlockState state)
+    /*@Override
+    public void breakBlock(World worldIn, BlockPos pos, BlockState state)
     {
         super.breakBlock(worldIn, pos, state);
         RiftStructure.breakStructure(worldIn, pos);
-    }
+    }*/
 
-    @Override
-    public void getDrops(NonNullList<ItemStack> drops, IBlockAccess world, BlockPos pos, IBlockState state, int fortune)
+    /*@Override
+    public void getDrops(NonNullList<ItemStack> drops, IBlockReader world, BlockPos pos, BlockState state, int fortune)
     {
         drops.add(new ItemStack(RiftStructure.getOriginalBlock((World) world, pos)));
-    }
+    }*/
 
     @Override
-    public ItemStack getPickBlock(IBlockState state, RayTraceResult target, World world, BlockPos pos, EntityPlayer player)
+    public ItemStack getPickBlock(BlockState state, RayTraceResult target, IBlockReader world, BlockPos pos, PlayerEntity player)
     {
         return new ItemStack(RiftStructure.getOriginalBlock(world, pos));
     }
 
-    public IBlockState cornerState(Corner corner, boolean base)
+    public BlockState cornerState(Corner corner, boolean base)
     {
         return getDefaultState()
-                .withProperty(BlockStructure.TYPE1, BlockStructure.Type1.CORNER)
-                .withProperty(BlockStructure.CORNER, corner)
-                .withProperty(BlockStructure.BASE, base);
+                .with(BlockStructure.TYPE1, BlockStructure.Type1.CORNER)
+                .with(BlockStructure.CORNER, corner)
+                .with(BlockStructure.BASE, base);
     }
 
-    public IBlockState edgeState(Type2 type2, boolean base)
+    public BlockState edgeState(Type2 type2, boolean base)
     {
         return getDefaultState()
-                .withProperty(BlockStructure.TYPE1, BlockStructure.Type1.NORMAL)
-                .withProperty(BlockStructure.TYPE2, type2)
-                .withProperty(BlockStructure.BASE, base);
+                .with(BlockStructure.TYPE1, BlockStructure.Type1.NORMAL)
+                .with(BlockStructure.TYPE2, type2)
+                .with(BlockStructure.BASE, base);
     }
 
     public enum Type1 implements IStringSerializable

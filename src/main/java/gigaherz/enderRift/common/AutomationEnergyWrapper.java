@@ -5,6 +5,9 @@ import net.minecraft.item.ItemStack;
 import net.minecraftforge.energy.IEnergyStorage;
 import net.minecraftforge.items.IItemHandler;
 
+import javax.annotation.Nonnull;
+import java.util.Optional;
+
 public class AutomationEnergyWrapper implements IItemHandler
 {
     private final IPoweredAutomation owner;
@@ -64,42 +67,50 @@ public class AutomationEnergyWrapper implements IItemHandler
         int stackSize = stack.getCount();
         int cost = getEffectivePowerUsageToInsert(stackSize);
 
-        IEnergyStorage energyBuffer = owner.getEnergyBuffer();
-        IItemHandler inventory = owner.getInventory();
-
-        if (inventory == null)
-            return ItemStack.EMPTY;
-
-        boolean powerFailure = false;
-        while (cost > energyBuffer.getEnergyStored() && stackSize > 0)
+        Optional<IEnergyStorage> optBuffer = owner.getEnergyBuffer();
+        if (optBuffer.isPresent())
         {
-            powerFailure = true;
+            IEnergyStorage energyBuffer = optBuffer.get();
+            IItemHandler inventory = owner.getInventory();
 
-            stackSize--;
+            if (inventory == null)
+                return ItemStack.EMPTY;
+
+            boolean powerFailure = false;
+            while (cost > energyBuffer.getEnergyStored() && stackSize > 0)
+            {
+                powerFailure = true;
+
+                stackSize--;
+            }
+
+            if (powerFailure)
+                owner.setLowOnPowerTemporary();
+
+            if (stackSize <= 0)
+                return stack;
+
+            ItemStack temp = stack.copy();
+            temp.setCount(stackSize);
+
+            ItemStack remaining = inventory.insertItem(slot, temp, simulate);
+
+            if (!simulate)
+            {
+                stackSize -= remaining.getCount();
+
+                int actualCost = getEffectivePowerUsageToInsert(stackSize);
+                energyBuffer.extractEnergy(actualCost, false);
+
+                owner.setDirty();
+            }
+
+            return remaining;
         }
-
-        if (powerFailure)
-            owner.setLowOnPowerTemporary();
-
-        if (stackSize <= 0)
+        else
+        {
             return stack;
-
-        ItemStack temp = stack.copy();
-        temp.setCount(stackSize);
-
-        ItemStack remaining = inventory.insertItem(slot, temp, simulate);
-
-        if (!simulate)
-        {
-            stackSize -= remaining.getCount();
-
-            int actualCost = getEffectivePowerUsageToInsert(stackSize);
-            energyBuffer.extractEnergy(actualCost, false);
-
-            owner.setDirty();
         }
-
-        return remaining;
     }
 
     @Override
@@ -107,43 +118,51 @@ public class AutomationEnergyWrapper implements IItemHandler
     {
         int cost = getEffectivePowerUsageToExtract(wanted);
 
-        IEnergyStorage energyBuffer = owner.getEnergyBuffer();
-        IItemHandler inventory = owner.getInventory();
-
-        if (inventory == null)
-            return ItemStack.EMPTY;
-
-        ItemStack existing = inventory.extractItem(slot, wanted, true);
-        wanted = Math.min(wanted, existing.getCount());
-
-        boolean powerFailure = false;
-        while (cost > energyBuffer.getEnergyStored() && wanted > 0)
+        Optional<IEnergyStorage> optBuffer = owner.getEnergyBuffer();
+        if (optBuffer.isPresent())
         {
-            powerFailure = true;
+            IEnergyStorage energyBuffer = optBuffer.get();
+            IItemHandler inventory = owner.getInventory();
 
-            wanted--;
-            cost = getEffectivePowerUsageToExtract(wanted);
+            if (inventory == null)
+                return ItemStack.EMPTY;
+
+            ItemStack existing = inventory.extractItem(slot, wanted, true);
+            wanted = Math.min(wanted, existing.getCount());
+
+            boolean powerFailure = false;
+            while (cost > energyBuffer.getEnergyStored() && wanted > 0)
+            {
+                powerFailure = true;
+
+                wanted--;
+                cost = getEffectivePowerUsageToExtract(wanted);
+            }
+
+            if (powerFailure)
+                owner.setLowOnPowerTemporary();
+
+            if (wanted <= 0)
+                return ItemStack.EMPTY;
+
+            ItemStack extracted = inventory.extractItem(slot, wanted, simulate);
+            if (extracted.getCount() <= 0)
+                return ItemStack.EMPTY;
+
+            if (!simulate)
+            {
+                int actualCost = getEffectivePowerUsageToExtract(extracted.getCount());
+                energyBuffer.extractEnergy(actualCost, false);
+
+                owner.setDirty();
+            }
+
+            return extracted;
         }
-
-        if (powerFailure)
-            owner.setLowOnPowerTemporary();
-
-        if (wanted <= 0)
-            return ItemStack.EMPTY;
-
-        ItemStack extracted = inventory.extractItem(slot, wanted, simulate);
-        if (extracted.getCount() <= 0)
-            return ItemStack.EMPTY;
-
-        if (!simulate)
+        else
         {
-            int actualCost = getEffectivePowerUsageToExtract(extracted.getCount());
-            energyBuffer.extractEnergy(actualCost, false);
-
-            owner.setDirty();
+            return ItemStack.EMPTY;
         }
-
-        return extracted;
     }
 
     @Override
@@ -152,9 +171,14 @@ public class AutomationEnergyWrapper implements IItemHandler
         return 64;
     }
 
+    @Override
+    public boolean isItemValid(int slot, @Nonnull ItemStack stack)
+    {
+        return true;
+    }
+
     public boolean isLowOnPower()
     {
-        IEnergyStorage energyBuffer = owner.getEnergyBuffer();
-        return getEffectivePowerUsageToExtract(1) > energyBuffer.getEnergyStored();
+        return owner.getEnergyBuffer().map(buffer -> getEffectivePowerUsageToExtract(1) > buffer.getEnergyStored()).orElse(false);
     }
 }

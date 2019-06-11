@@ -1,80 +1,66 @@
 package gigaherz.enderRift.automation.browser;
 
+import com.mojang.blaze3d.platform.GlStateManager;
 import gigaherz.enderRift.EnderRiftMod;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiButton;
-import net.minecraft.client.gui.GuiTextField;
-import net.minecraft.client.gui.inventory.GuiContainer;
-import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.gui.screen.inventory.ContainerScreen;
+import net.minecraft.client.gui.widget.button.Button;
+import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.renderer.RenderHelper;
-import net.minecraft.client.resources.I18n;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.inventory.Container;
-import net.minecraft.inventory.Slot;
+import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
-import org.lwjgl.input.Keyboard;
-import org.lwjgl.input.Mouse;
+import net.minecraft.util.text.ITextComponent;
 
 import java.io.IOException;
 
-public class GuiBrowser extends GuiContainer
+public class GuiBrowser<T extends ContainerBrowser> extends ContainerScreen<T>
 {
     private static final ResourceLocation backgroundTexture = new ResourceLocation(EnderRiftMod.MODID, "textures/gui/browser.png");
     private static final ResourceLocation tabsTexture = new ResourceLocation("minecraft:textures/gui/container/creative_inventory/tabs.png");
     private static final String textBrowser = "container." + EnderRiftMod.MODID + ".browser";
 
-    protected InventoryPlayer player;
-
     private boolean isDragging;
     private int scrollY;
     private float scrollAcc = 0;
 
-    private GuiTextField searchField;
+    private TextFieldWidget searchField;
+    private Button sortModeButton;
 
-    private ContainerBrowser containerBrowser;
-
-    protected GuiBrowser(ContainerBrowser container)
+    protected GuiBrowser(T container, PlayerInventory playerInventory, ITextComponent title)
     {
-        super(container);
-        containerBrowser = container;
-    }
-
-    public GuiBrowser(EntityPlayer player, TileBrowser tileEntity)
-    {
-        this(new ContainerBrowser(tileEntity, player, true));
-        this.player = player.inventory;
+        super(container, playerInventory, title);
         xSize = 194;
         ySize = 168;
     }
 
     @Override
-    public void drawScreen(int mouseX, int mouseY, float partialTicks)
+    public void render(int mouseX, int mouseY, float partialTicks)
     {
-        this.drawDefaultBackground();
-        super.drawScreen(mouseX, mouseY, partialTicks);
+        this.renderBackground();
+        super.render(mouseX, mouseY, partialTicks);
         this.renderLowPowerOverlay(mouseX, mouseY);
         this.renderHoveredToolTip(mouseX, mouseY);
     }
 
     private void renderLowPowerOverlay(int mouseX, int mouseY)
     {
-        if (containerBrowser.isLowOnPower())
+        if (getContainer().isLowOnPower())
         {
             int l = guiLeft + 7;
             int t = guiTop + 17;
             int w = 162;
             int h = 54;
-            GlStateManager.disableDepth();
-            GlStateManager.color(1,1,1,1);
-            drawRect(l,t,l+w,t+h, 0x7f000000);
-            long tm = Minecraft.getMinecraft().world.getTotalWorldTime() % 30;
+            GlStateManager.disableDepthTest();
+            GlStateManager.color4f(1,1,1,1);
+            fill(l,t,l+w,t+h, 0x7f000000);
+            long tm = Minecraft.getInstance().world.getGameTime() % 30;
             if (tm < 15)
             {
-                drawCenteredString(fontRenderer, "NO POWER", l + w / 2, t + h / 2 - fontRenderer.FONT_HEIGHT / 2, 0xFFFFFF);
+                drawCenteredString(font, "NO POWER", l + w / 2, t + h / 2 - font.FONT_HEIGHT / 2, 0xFFFFFF);
             }
-            GlStateManager.enableDepth();
+            GlStateManager.enableDepthTest();
         }
     }
 
@@ -84,66 +70,12 @@ public class GuiBrowser extends GuiContainer
     }
 
     @Override
-    public void initGui()
+    public void init()
     {
-        super.initGui();
+        super.init();
 
-        GuiButton btn = new GuiButton(1, guiLeft - 22, guiTop + 12, 20, 20, "");
-        buttonList.add(btn);
-
-        Keyboard.enableRepeatEvents(true);
-        this.searchField = new GuiTextField(2, this.fontRenderer , guiLeft + 114, guiTop + 6, 71, this.fontRenderer.FONT_HEIGHT)
-        {
-            @Override
-            public boolean mouseClicked(int mouseX, int mouseY, int mouseButton)
-            {
-                if (mouseButton == 1 && getText() != null && getText().length() > 0)
-                {
-                    setText("");
-                    updateSearchFilter();
-                }
-                return super.mouseClicked(mouseX, mouseY, mouseButton);
-            }
-        };
-
-        searchField.setMaxStringLength(15);
-        searchField.setEnableBackgroundDrawing(false);
-        searchField.setVisible(true);
-        searchField.setTextColor(16777215);
-        searchField.setCanLoseFocus(false);
-        searchField.setFocused(true);
-        searchField.setText("");
-
-        changeSorting(btn, SortMode.StackSize);
-    }
-
-    @Override
-    protected void keyTyped(char typedChar, int keyCode) throws IOException
-    {
-        if (!checkHotbarKeys(keyCode))
-        {
-            if (searchField.textboxKeyTyped(typedChar, keyCode))
-            {
-                updateSearchFilter();
-            }
-            else
-            {
-                super.keyTyped(typedChar, keyCode);
-            }
-        }
-    }
-
-    private void updateSearchFilter()
-    {
-        ((ContainerBrowser) inventorySlots).setFilterText(searchField.getText());
-    }
-
-    @Override
-    protected void actionPerformed(GuiButton guibutton)
-    {
-        if (guibutton.id == 1)
-        {
-            SortMode mode = ((ContainerBrowser) inventorySlots).sortMode;
+        addButton(this.sortModeButton = new Button(guiLeft - 22, guiTop + 12, 20, 20, "", (btn) -> {
+            SortMode mode = getContainer().sortMode;
             switch (mode)
             {
                 case Alphabetic:
@@ -154,43 +86,84 @@ public class GuiBrowser extends GuiContainer
                     break;
             }
 
-            changeSorting(guibutton, mode);
-        }
+            changeSorting(mode);
+        }));
+
+        //Keyboard.enableRepeatEvents(true);
+        addButton(this.searchField = new TextFieldWidget(this.font, guiLeft + 114, guiTop + 6, 71, this.font.FONT_HEIGHT, ""){
+            @Override
+            public boolean mouseClicked(double p_mouseClicked_1_, double p_mouseClicked_3_, int mouseButton)
+            {
+                if (mouseButton == 1 && getText() != null && getText().length() > 0)
+                {
+                    setText("");
+                    updateSearchFilter();
+                }
+
+                super.mouseClicked(p_mouseClicked_1_, p_mouseClicked_3_, mouseButton);
+
+                return true;
+            }
+        });
+
+        searchField.setMaxStringLength(15);
+        searchField.setEnableBackgroundDrawing(false);
+        searchField.setVisible(true);
+        searchField.setTextColor(16777215);
+        searchField.setCanLoseFocus(false);
+        searchField.setFocused2(true);
+        searchField.setText("");
+
+        changeSorting(SortMode.StackSize);
     }
 
-    private void changeSorting(GuiButton guibutton, SortMode mode)
+    @Override
+    public boolean keyPressed(int key, int scanCode, int modifiers)
+    {
+        if (super.keyPressed(key, scanCode, modifiers))
+            return true;
+
+        return searchField.keyPressed(key, scanCode, modifiers);
+    }
+
+    private void updateSearchFilter()
+    {
+        getContainer().setFilterText(searchField.getText());
+    }
+
+    private void changeSorting(SortMode mode)
     {
         switch (mode)
         {
             case Alphabetic:
-                guibutton.displayString = "Az";
+                sortModeButton.setMessage("Az");
                 break;
             case StackSize:
-                guibutton.displayString = "#";
+                sortModeButton.setMessage("#");
                 break;
         }
 
-        ((ContainerBrowser) inventorySlots).setSortMode(mode);
+        getContainer().setSortMode(mode);
     }
 
     @Override
     protected void drawGuiContainerBackgroundLayer(float partialTicks, int xMouse, int yMouse)
     {
-        mc.renderEngine.bindTexture(getBackgroundTexture());
+        minecraft.getTextureManager().bindTexture(getBackgroundTexture());
 
-        GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f);
-        drawTexturedModalRect(guiLeft, guiTop, 0, 0, xSize, ySize);
-        drawTexturedModalRect(guiLeft - 27, guiTop + 8, 194, 0, 27, 28);
+        GlStateManager.color4f(1.0f, 1.0f, 1.0f, 1.0f);
+        blit(guiLeft, guiTop, 0, 0, xSize, ySize);
+        blit(guiLeft - 27, guiTop + 8, 194, 0, 27, 28);
 
-        mc.renderEngine.bindTexture(tabsTexture);
+        minecraft.getTextureManager().bindTexture(tabsTexture);
 
         boolean isEnabled = needsScrollBar();
         if (isEnabled)
-            drawTexturedModalRect(guiLeft + 174, guiTop + 18 + scrollY, 232, 0, 12, 15);
+            blit(guiLeft + 174, guiTop + 18 + scrollY, 232, 0, 12, 15);
         else
-            drawTexturedModalRect(guiLeft + 174, guiTop + 18, 244, 0, 12, 15);
+            blit(guiLeft + 174, guiTop + 18, 244, 0, 12, 15);
 
-        searchField.drawTextBox();
+        searchField.render(xMouse, yMouse, partialTicks);
     }
 
     @Override
@@ -200,24 +173,23 @@ public class GuiBrowser extends GuiContainer
         drawCustomSlotTexts();
         RenderHelper.disableStandardItemLighting();
 
-        String name = I18n.format(textBrowser);
-        mc.fontRenderer.drawString(name, 8, 6, 0x404040);
-        mc.fontRenderer.drawString(I18n.format(player.getName()), 8, ySize - 96 + 2, 0x404040);
+        minecraft.fontRenderer.drawString(this.title.getFormattedText(), 8, 6, 0x404040);
+        minecraft.fontRenderer.drawString(this.playerInventory.getDisplayName().getFormattedText(), 8, ySize - 96 + 2, 0x404040);
     }
 
     private void drawCustomSlotTexts()
     {
         for (int i = 0; i < ContainerBrowser.FakeSlots; ++i)
         {
-            Slot slot = inventorySlots.inventorySlots.get(i);
+            Slot slot = getContainer().inventorySlots.get(i);
             drawSlotText(slot);
         }
     }
 
     private void drawSlotText(Slot slotIn)
     {
-        zLevel = 100.0F;
-        itemRender.zLevel = 100.0F;
+        blitOffset = 100;
+        minecraft.getItemRenderer().zLevel = 100.0F;
 
         int xPosition = slotIn.xPos;
         int yPosition = slotIn.yPos;
@@ -225,7 +197,7 @@ public class GuiBrowser extends GuiContainer
 
         if (stack.getCount() > 0)
         {
-            int count = ((ContainerBrowser) inventorySlots).fakeInventoryClient.getStackSizeForSlot(slotIn.slotNumber);
+            int count = getContainer().fakeInventoryClient.getStackSizeForSlot(slotIn.slotNumber);
 
             if (count != 1)
             {
@@ -246,32 +218,34 @@ public class GuiBrowser extends GuiContainer
                     s = String.valueOf(count);
 
                 GlStateManager.disableLighting();
-                GlStateManager.disableDepth();
+                GlStateManager.disableDepthTest();
                 GlStateManager.disableBlend();
-                fontRenderer.drawStringWithShadow(s, (float) (xPosition + 19 - 2 - fontRenderer.getStringWidth(s)), (float) (yPosition + 6 + 3), 16777215);
+                font.drawStringWithShadow(s, (float) (xPosition + 19 - 2 - font.getStringWidth(s)), (float) (yPosition + 6 + 3), 16777215);
                 GlStateManager.enableLighting();
-                GlStateManager.enableDepth();
+                GlStateManager.enableDepthTest();
             }
         }
 
-        itemRender.zLevel = 0.0F;
-        zLevel = 0.0F;
+        minecraft.getItemRenderer().zLevel = 0.0F;
+        blitOffset = 0;
     }
 
     private boolean needsScrollBar()
     {
-        int actualSlotCount = ((ContainerBrowser) inventorySlots).getActualSlotCount();
+        int actualSlotCount = getContainer().getActualSlotCount();
 
         return actualSlotCount > ContainerBrowser.FakeSlots;
     }
 
     @Override
-    public void handleMouseInput() throws IOException
+    public boolean mouseScrolled(double mouseX, double mouseY, double wheelDelta)
     {
-        super.handleMouseInput();
-        scrollAcc += Mouse.getEventDWheel();
+        if(super.mouseScrolled(mouseX, mouseY, wheelDelta))
+            return true;
 
-        final ContainerBrowser container = ((ContainerBrowser) inventorySlots);
+        scrollAcc += wheelDelta;
+
+        final ContainerBrowser container = getContainer();
         final int h = 62;
         final int bitHeight = 15;
         final int actualSlotCount = container.getActualSlotCount();
@@ -304,44 +278,49 @@ public class GuiBrowser extends GuiContainer
         {
             scrollAcc = 0;
         }
+
+        return true;
     }
 
     @Override
-    protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException
+    public boolean mouseClicked(double mouseX, double mouseY, int mouseButton)
     {
+        if (super.mouseClicked(mouseX, mouseY, mouseButton))
+            return true;
+
         {
             final int w = 12;
             final int h = 62;
-            int mx = mouseX - 174 - guiLeft;
-            int my = mouseY - 18 - guiTop;
+            double mx = mouseX - 174 - guiLeft;
+            double my = mouseY - 18 - guiTop;
             if (mx >= 0 && mx < w && my >= 0 && my < h)
             {
-                updateScrollPos(my);
+                updateScrollPos((int) my);
                 isDragging = true;
-                return;
+                return true;
             }
         }
 
         {
-            final int w = searchField.width;
-            final int h = searchField.height;
-            int mx = mouseX - searchField.x;
-            int my = mouseY - searchField.y;
+            final int w = searchField.getWidth();
+            final int h = searchField.getHeight();
+            double mx = mouseX - searchField.x;
+            double my = mouseY - searchField.y;
             if (mx >= 0 && mx < w && my >= 0 && my < h)
             {
                 searchField.mouseClicked(mx, my, mouseButton);
-                return;
+                return true;
             }
         }
 
-        super.mouseClicked(mouseX, mouseY, mouseButton);
+        return false;
     }
 
     private void updateScrollPos(int my)
     {
         final int h = 62;
         final int bitHeight = 15;
-        final int actualSlotCount = ((ContainerBrowser) inventorySlots).getActualSlotCount();
+        final int actualSlotCount = getContainer().getActualSlotCount();
         final int rows = (int) Math.ceil(actualSlotCount / 9.0);
         final int scrollRows = rows - ContainerBrowser.FakeRows;
 
@@ -353,33 +332,38 @@ public class GuiBrowser extends GuiContainer
 
             scrollY = row * (h - bitHeight) / scrollRows;
 
-            final ContainerBrowser container = ((ContainerBrowser) inventorySlots);
+            final ContainerBrowser container = getContainer();
             container.setScrollPos(row * 9);
         }
     }
 
     @Override
-    protected void mouseClickMove(int mouseX, int mouseY, int clickedMouseButton, long timeSinceLastClick)
+    public boolean mouseDragged(double mouseX, double mouseY, int mouseButton, double p_mouseDragged_6_, double p_mouseDragged_8_)
     {
-        int my = mouseY - 18 - guiTop;
+        boolean ret = false;
+
+        double my = mouseY - 18 - guiTop;
         if (isDragging)
         {
-            updateScrollPos(my);
-            return;
+            updateScrollPos((int) my);
+            ret = true;
         }
-        super.mouseClickMove(mouseX, mouseY, clickedMouseButton, timeSinceLastClick);
+        return super.mouseDragged(mouseX, mouseY, mouseButton, p_mouseDragged_6_, p_mouseDragged_8_) || ret;
     }
 
     @Override
-    protected void mouseReleased(int mouseX, int mouseY, int state)
+    public boolean mouseReleased(double mouseX, double mouseY, int mouseButton)
     {
-        int my = mouseY - 18 - guiTop;
+        boolean ret = false;
+
+        double my = mouseY - 18 - guiTop;
         if (isDragging)
         {
-            updateScrollPos(my);
+            updateScrollPos((int) my);
             isDragging = false;
-            return;
+            ret = true;
         }
-        super.mouseReleased(mouseX, mouseY, state);
+
+        return super.mouseReleased(mouseX, mouseY, mouseButton) || ret;
     }
 }

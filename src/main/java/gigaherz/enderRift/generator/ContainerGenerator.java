@@ -1,40 +1,56 @@
 package gigaherz.enderRift.generator;
 
 import gigaherz.enderRift.EnderRiftMod;
+import gigaherz.enderRift.automation.iface.ContainerInterface;
+import gigaherz.enderRift.automation.iface.TileInterface;
 import gigaherz.enderRift.network.UpdateField;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.inventory.Container;
-import net.minecraft.inventory.Slot;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.inventory.container.Container;
+import net.minecraft.inventory.container.ContainerType;
+import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntityFurnace;
+import net.minecraft.network.PacketBuffer;
+import net.minecraft.tileentity.FurnaceTileEntity;
+import net.minecraft.util.math.BlockPos;
+import net.minecraftforge.fml.network.NetworkDirection;
 import net.minecraftforge.items.SlotItemHandler;
+import net.minecraftforge.registries.ObjectHolder;
 
-public class ContainerGenerator
-        extends Container
+public class ContainerGenerator extends Container
 {
+    @ObjectHolder("enderrift:generator")
+    public static ContainerType<ContainerGenerator> TYPE;
+
     protected TileGenerator tile;
     private int[] prevFields;
 
-    public ContainerGenerator(TileGenerator tileEntity, InventoryPlayer playerInventory)
+    public ContainerGenerator(int id, PlayerInventory playerInventory, PacketBuffer extraData)
     {
-        this.tile = tileEntity;
+        this(id, extraData.readBlockPos(), playerInventory);
+    }
+
+    public ContainerGenerator(int id, BlockPos pos, PlayerInventory playerInventory)
+    {
+        super(TYPE, id);
+
+        this.tile = (TileGenerator) playerInventory.player.world.getTileEntity(pos);
         prevFields = this.tile.getFields();
         for (int i = 0; i < prevFields.length; i++) { prevFields[i]--; }
 
-        addSlotToContainer(new SlotItemHandler(tileEntity.inventory(), 0, 80, 53));
+        addSlot(new SlotItemHandler(tile.inventory(), 0, 80, 53));
 
         bindPlayerInventory(playerInventory);
     }
 
-    private void bindPlayerInventory(InventoryPlayer playerInventory)
+    private void bindPlayerInventory(PlayerInventory playerInventory)
     {
         for (int y = 0; y < 3; y++)
         {
             for (int x = 0; x < 9; x++)
             {
-                addSlotToContainer(new Slot(playerInventory,
+                addSlot(new Slot(playerInventory,
                         x + y * 9 + 9,
                         8 + x * 18, 84 + y * 18));
             }
@@ -42,7 +58,7 @@ public class ContainerGenerator
 
         for (int x = 0; x < 9; x++)
         {
-            addSlotToContainer(new Slot(playerInventory, x, 8 + x * 18, 142));
+            addSlot(new Slot(playerInventory, x, 8 + x * 18, 142));
         }
     }
 
@@ -65,8 +81,8 @@ public class ContainerGenerator
 
         if (needUpdate)
         {
-            this.listeners.stream().filter(watcher -> watcher instanceof EntityPlayerMP).forEach(watcher ->
-                    EnderRiftMod.channel.sendTo(new UpdateField(this.windowId, prevFields), (EntityPlayerMP) watcher));
+            this.listeners.stream().filter(watcher -> watcher instanceof ServerPlayerEntity).forEach(watcher ->
+                    EnderRiftMod.channel.sendTo(new UpdateField(this.windowId, prevFields), ((ServerPlayerEntity) watcher).connection.getNetworkManager(), NetworkDirection.PLAY_TO_CLIENT));
         }
     }
 
@@ -76,13 +92,13 @@ public class ContainerGenerator
     }
 
     @Override
-    public boolean canInteractWith(EntityPlayer player)
+    public boolean canInteractWith(PlayerEntity player)
     {
         return tile.isUseableByPlayer(player);
     }
 
     @Override
-    public ItemStack transferStackInSlot(EntityPlayer player, int slotIndex)
+    public ItemStack transferStackInSlot(PlayerEntity player, int slotIndex)
     {
         Slot slot = this.inventorySlots.get(slotIndex);
         if (slot == null || !slot.getHasStack())
@@ -103,7 +119,7 @@ public class ContainerGenerator
         }
         else
         {
-            if (TileEntityFurnace.getItemBurnTime(slot.getStack()) <= 0)
+            if (tile.getBurnTime(slot.getStack()) <= 0)
                 return ItemStack.EMPTY;
 
             startIndex = 0;

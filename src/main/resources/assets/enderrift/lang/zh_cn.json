@@ -1,0 +1,42 @@
+{
+    "block.enderrift.rift": "末影裂缝核心",
+    "block.enderrift.rift_structure": "末影裂缝结构",
+    "block.enderrift.interface": "裂缝接口",
+    "block.enderrift.browser": "裂缝浏览面板",
+    "block.enderrift.crafting_browser": "合成浏览面板",
+    "block.enderrift.generator": "基础发电机",
+    "block.enderrift.proxy": "自动化延伸导管",
+    "block.enderrift.driver": "自动化能量驱动导管",
+
+    "item.enderrift.rift_orb.empty": "末影裂缝宝珠（未链接）",
+    "item.enderrift.rift_orb.bound": "末影裂缝宝珠（已链接）",
+
+    "container.enderrift.interface": "裂缝接口",
+    "container.enderrift.generator": "基础发电机",
+    "container.enderrift.browser": "裂缝浏览面板",
+
+    "text.enderrift.interface.filters": "过滤器",
+
+    "itemGroup.tabEnderRift": "Ender-Rift",
+
+    "text.enderrift.rift.isFormed": "是否形成？ %s",
+    "text.enderrift.rift.isPowered": "是否有能量？ %s",
+    "text.enderrift.rift.riftId": "裂缝Id: %s",
+    "text.enderrift.rift.usedSlots": "使用%s个存储位",
+    "text.enderrift.rift.energyUsageInsert": "%sRF将会在下一次被使用。",
+    "text.enderrift.rift.energyUsageExtract": "%sRF将会在下一次被提取。",
+    "text.enderrift.rift.rf": "%s / %s RF.",
+
+    "text.enderrift.generator.status.generating.label": "正在产能：",
+    "text.enderrift.generator.status.generating": "正在产能：%d RF/t",
+    "text.enderrift.generator.status.heating": "升温中……",
+    "text.enderrift.generator.status.idle": "空闲",
+    "text.enderrift.generator.heat.label": "热量：",
+    "text.enderrift.generator.heat": "热量：%d C",
+    "text.enderrift.generator.energy.label": "能量缓存：",
+    "text.enderrift.generator.energy": "Energy: %d / %d RF",
+
+    "option.enderrift.generator": "发电机",
+    "option.enderrift.rift": "裂缝",
+    "option.enderrift.rf": "显示RF"
+}

@@ -1,5 +1,5 @@
 package gigaherz.enderRift.plugins;
-
+/*
 import gigaherz.enderRift.automation.browser.ContainerCraftingBrowser;
 import mezz.jei.api.IJeiRuntime;
 import mezz.jei.api.IModPlugin;
@@ -39,3 +39,4 @@ public class JEIPlugin implements IModPlugin
     {
     }
 }
+*/

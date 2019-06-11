@@ -1,18 +1,19 @@
 package gigaherz.enderRift.plugins;
 
+/*
 import com.google.common.base.Function;
 import gigaherz.enderRift.EnderRiftMod;
 import gigaherz.enderRift.automation.driver.TileDriver;
 import gigaherz.enderRift.generator.TileGenerator;
 import gigaherz.enderRift.rift.TileEnderRift;
 import gigaherz.enderRift.rift.TileEnderRiftCorner;
-import gigaherz.graph.api.Graph;
-import gigaherz.graph.api.GraphObject;
+import gigaherz.graph2.Graph;
+import gigaherz.graph2.GraphObject;
 import mcjty.theoneprobe.api.*;
 import mcjty.theoneprobe.apiimpl.styles.ProgressStyle;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.client.resources.I18n;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 
@@ -34,7 +35,7 @@ public class TheOneProbeProviders implements Function<ITheOneProbe, Void>
             }
 
             @Override
-            public void addProbeInfo(ProbeMode mode, IProbeInfo probeInfo, EntityPlayer player, World world, IBlockState blockState, IProbeHitData data)
+            public void addProbeInfo(ProbeMode mode, IProbeInfo probeInfo, PlayerEntity player, World world, BlockState blockState, IProbeHitData data)
             {
                 TileEntity te = world.getTileEntity(data.getPos());
 
@@ -150,3 +151,4 @@ public class TheOneProbeProviders implements Function<ITheOneProbe, Void>
         }
     }
 }
+*/

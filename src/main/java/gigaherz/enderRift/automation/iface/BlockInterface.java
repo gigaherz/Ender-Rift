@@ -1,116 +1,94 @@
 package gigaherz.enderRift.automation.iface;
 
-import gigaherz.enderRift.EnderRiftMod;
 import gigaherz.enderRift.automation.BlockAggregator;
-import gigaherz.enderRift.common.GuiHandler;
-import net.minecraft.block.SoundType;
-import net.minecraft.block.material.MapColor;
-import net.minecraft.block.material.Material;
-import net.minecraft.block.properties.PropertyDirection;
-import net.minecraft.block.state.BlockFaceShape;
-import net.minecraft.block.state.BlockStateContainer;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.InventoryHelper;
+import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.item.ItemStack;
+import net.minecraft.state.DirectionProperty;
+import net.minecraft.state.StateContainer;
+import net.minecraft.state.properties.BlockStateProperties;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumHand;
+import net.minecraft.util.Direction;
+import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IBlockAccess;
+import net.minecraft.util.math.BlockRayTraceResult;
+import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
 import net.minecraftforge.items.IItemHandler;
 
+import javax.annotation.Nullable;
+
 public class BlockInterface extends BlockAggregator<TileInterface>
 {
-    public static final PropertyDirection FACING = PropertyDirection.create("facing");
+    public static final DirectionProperty FACING = BlockStateProperties.FACING;
 
-    public BlockInterface(String name)
+    public BlockInterface(Properties properties)
     {
-        super(name, Material.IRON, MapColor.STONE);
-        setSoundType(SoundType.METAL);
-        setCreativeTab(EnderRiftMod.tabEnderRift);
-        setDefaultState(blockState.getBaseState().withProperty(FACING, EnumFacing.NORTH));
-        setHardness(3.0F);
-        setResistance(8.0F);
+        super(properties);
+        setDefaultState(getStateContainer().getBaseState().with(FACING, Direction.NORTH));
     }
 
     @Override
-    protected BlockStateContainer createBlockState()
+    protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder)
     {
-        return new BlockStateContainer(this, FACING);
+        builder.add(FACING);
     }
 
+    @Nullable
     @Override
-    public TileInterface createTileEntity(World world, IBlockState state)
+    public TileEntity createTileEntity(BlockState state, IBlockReader world)
     {
         return new TileInterface();
     }
 
-    @Deprecated
+    /*@Deprecated
     @Override
-    public BlockFaceShape getBlockFaceShape(IBlockAccess worldIn, IBlockState state, BlockPos pos, EnumFacing face)
+    public BlockFaceShape getBlockFaceShape(IBlockReader worldIn, BlockState state, BlockPos pos, Direction face)
     {
-        EnumFacing st = state.getValue(FACING);
+        Direction st = state.getValue(FACING);
 
         if (st == face)
             return BlockFaceShape.CENTER;
 
-        EnumFacing op = face.getOpposite();
+        Direction op = face.getOpposite();
         if (st == op)
             return BlockFaceShape.SOLID;
 
         return BlockFaceShape.UNDEFINED;
-    }
+    }*/
 
-    @Deprecated
+    /*@Deprecated
     @Override
-    public boolean isSideSolid(IBlockState base_state, IBlockAccess world, BlockPos pos, EnumFacing side)
+    public boolean isSideSolid(BlockState base_state, IBlockReader world, BlockPos pos, Direction side)
     {
         return base_state.getValue(FACING) == side.getOpposite();
-    }
+    }*/
 
+    @Nullable
     @Override
-    public boolean canPlaceTorchOnTop(IBlockState state, IBlockAccess world, BlockPos pos)
+    public BlockState getStateForPlacement(BlockItemUseContext context)
     {
-        return state.getValue(FACING) == EnumFacing.UP || state.getValue(FACING) == EnumFacing.DOWN;
-    }
-
-    @Deprecated
-    @Override
-    public IBlockState getStateFromMeta(int meta)
-    {
-        return getDefaultState().withProperty(FACING, EnumFacing.VALUES[meta & 7]);
+        return getDefaultState().with(BlockInterface.FACING, context.getFace().getOpposite());
     }
 
     @Override
-    public int getMetaFromState(IBlockState state)
-    {
-        return state.getValue(FACING).ordinal();
-    }
-
-    @Override
-    public IBlockState getStateForPlacement(World world, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer, EnumHand hand)
-    {
-        return getDefaultState().withProperty(BlockInterface.FACING, facing.getOpposite());
-    }
-
-    @Override
-    public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ)
+    public boolean onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity playerIn, Hand handIn, BlockRayTraceResult hit)
     {
         TileEntity tileEntity = worldIn.getTileEntity(pos);
 
         if (!(tileEntity instanceof TileInterface) || playerIn.isSneaking())
             return false;
 
-        playerIn.openGui(EnderRiftMod.instance, GuiHandler.GUI_INTERFACE, worldIn, pos.getX(), pos.getY(), pos.getZ());
+        //NetworkHooks.openGui(EnderRiftMod.instance, GuiHandler.GUI_INTERFACE, worldIn, pos.getX(), pos.getY(), pos.getZ());
 
         return true;
     }
 
-    @Override
-    public void breakBlock(World worldIn, BlockPos pos, IBlockState state)
+    /*@Override
+    public void breakBlock(World worldIn, BlockPos pos, BlockState state)
     {
         TileEntity tileentity = worldIn.getTileEntity(pos);
 
@@ -121,7 +99,7 @@ public class BlockInterface extends BlockAggregator<TileInterface>
         }
 
         super.breakBlock(worldIn, pos, state);
-    }
+    }*/
 
     public static void dropInventoryItems(World worldIn, BlockPos pos, IItemHandler inventory)
     {

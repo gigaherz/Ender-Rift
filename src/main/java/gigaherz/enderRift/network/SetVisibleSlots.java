@@ -2,21 +2,17 @@ package gigaherz.enderRift.network;
 
 import gigaherz.enderRift.automation.browser.ContainerBrowser;
 import io.netty.buffer.ByteBuf;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.world.WorldServer;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
-import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
+import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.network.PacketBuffer;
+import net.minecraft.world.ServerWorld;
+import net.minecraftforge.fml.network.NetworkEvent;
+
+import java.util.function.Supplier;
 
 public class SetVisibleSlots
-        implements IMessage
 {
     public int windowId;
     public int[] visible;
-
-    public SetVisibleSlots()
-    {
-    }
 
     public SetVisibleSlots(int windowId, int[] visible)
     {
@@ -24,8 +20,7 @@ public class SetVisibleSlots
         this.visible = visible;
     }
 
-    @Override
-    public void fromBytes(ByteBuf buf)
+    public SetVisibleSlots(PacketBuffer buf)
     {
         windowId = buf.readInt();
         int num = buf.readInt();
@@ -36,8 +31,7 @@ public class SetVisibleSlots
         }
     }
 
-    @Override
-    public void toBytes(ByteBuf buf)
+    public void encode(PacketBuffer buf)
     {
         buf.writeInt(windowId);
         buf.writeInt(visible.length);
@@ -47,25 +41,19 @@ public class SetVisibleSlots
         }
     }
 
-    public static class Handler implements IMessageHandler<SetVisibleSlots, IMessage>
+    public void handle(Supplier<NetworkEvent.Context> context)
     {
-        @Override
-        public IMessage onMessage(final SetVisibleSlots message, MessageContext ctx)
+        final ServerPlayerEntity player = context.get().getSender();
+        final ServerWorld world = (ServerWorld) player.world;
+
+        context.get().enqueueWork(() ->
         {
-            final EntityPlayerMP player = ctx.getServerHandler().player;
-            final WorldServer world = (WorldServer) player.world;
-
-            world.addScheduledTask(() ->
+            if (player.openContainer != null
+                    && player.openContainer.windowId == this.windowId
+                    && player.openContainer instanceof ContainerBrowser)
             {
-                if (player.openContainer != null
-                        && player.openContainer.windowId == message.windowId
-                        && player.openContainer instanceof ContainerBrowser)
-                {
-                    ((ContainerBrowser) player.openContainer).setVisibleSlots(message.visible);
-                }
-            });
-
-            return null; // no response in this case
-        }
+                ((ContainerBrowser) player.openContainer).setVisibleSlots(this.visible);
+            }
+        });
     }
 }

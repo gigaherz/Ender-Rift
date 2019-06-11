@@ -3,26 +3,36 @@ package gigaherz.enderRift.automation.browser;
 import gigaherz.enderRift.EnderRiftMod;
 import gigaherz.enderRift.automation.TileAggregator;
 import gigaherz.enderRift.automation.iface.BlockInterface;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.block.BlockState;
+import net.minecraft.tileentity.TileEntityType;
+import net.minecraft.util.Direction;
+import net.minecraftforge.registries.ObjectHolder;
 
 import javax.annotation.Nullable;
 
 public class TileBrowser extends TileAggregator
 {
+    @ObjectHolder("enderrift:browser")
+    public static TileEntityType<?> TYPE;
+
     private int changeCount = 1;
 
-    EnumFacing facing = null;
+    Direction facing = null;
+
+    public TileBrowser()
+    {
+        super(TYPE);
+    }
 
     @Nullable
-    public EnumFacing getFacing()
+    public Direction getFacing()
     {
         if (facing == null && world != null)
         {
-            IBlockState state = world.getBlockState(pos);
+            BlockState state = world.getBlockState(pos);
             if (state.getBlock() == EnderRiftMod.browser)
             {
-                facing = state.getValue(BlockInterface.FACING).getOpposite();
+                facing = state.get(BlockInterface.FACING).getOpposite();
             }
         }
         return facing;
@@ -48,7 +58,7 @@ public class TileBrowser extends TileAggregator
     }
 
     @Override
-    protected boolean canConnectSide(EnumFacing side)
+    protected boolean canConnectSide(Direction side)
     {
         return side == getFacing().getOpposite();
     }
