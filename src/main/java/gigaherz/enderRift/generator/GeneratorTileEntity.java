@@ -241,23 +241,8 @@ public class GeneratorTileEntity extends TileEntity implements ITickableTileEnti
         burnTimeRemaining = compound.getInt("burnTimeRemaining");
         currentItemBurnTime = compound.getInt("currentItemBurnTime");
         timeInterval = compound.getInt("timeInterval");
-        CapabilityEnergy.ENERGY.readNBT(energyBuffer, null, compound.getCompound("storedEnergy"));
-        CapabilityItemHandler.ITEM_HANDLER_CAPABILITY.readNBT(fuelSlot, null, compound.getList("fuelSlot", Constants.NBT.TAG_COMPOUND));
-
-        if (compound.contains("Items", Constants.NBT.TAG_LIST))
-        {
-            ListNBT _outputs = compound.getList("Items", Constants.NBT.TAG_COMPOUND);
-            for (int i = 0; i < _outputs.size(); ++i)
-            {
-                CompoundNBT nbttagcompound = _outputs.getCompound(i);
-                int j = nbttagcompound.getByte("Slot") & 255;
-
-                if (j >= 0 && j < fuelSlot.getSlots())
-                {
-                    fuelSlot.setStackInSlot(j, ItemStack.read(nbttagcompound));
-                }
-            }
-        }
+        CapabilityEnergy.ENERGY.readNBT(energyBuffer, null, compound.get("storedEnergy"));
+        CapabilityItemHandler.ITEM_HANDLER_CAPABILITY.readNBT(fuelSlot, null, compound.get("fuelSlot"));
     }
 
     @Override

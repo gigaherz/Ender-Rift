@@ -9,7 +9,7 @@
     "g": { "item": "minecraft:gold_ingot" },
     "d": { "item": "minecraft:diamond" },
     "c": { "item": "minecraft:crafting_table" },
-    "b": { "item": "enderrift:browser", "data": 0 }
+    "b": { "item": "enderrift:browser" }
   },
   "result": {
     "item": "enderrift:browser",

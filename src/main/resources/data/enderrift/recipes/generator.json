@@ -1,12 +1,5 @@
 {
   "type": "minecraft:crafting_shaped",
-  "conditions": [
-    {
-      "type": "enderrift:config_property",
-      "category": "Generator",
-      "key": "Enable"
-    }
-  ],
   "pattern": [
     "iri",
     "rwr",

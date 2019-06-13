@@ -72,6 +72,7 @@ public class BrowserContainer extends Container
     public BrowserContainer(int id, PlayerInventory playerInventory, PacketBuffer extraData)
     {
         this(id, extraData.readBlockPos(), playerInventory);
+
     }
 
     public BrowserContainer(int id, BlockPos pos, PlayerInventory playerInventory)
@@ -87,6 +88,7 @@ public class BrowserContainer extends Container
 
         this.tile = (BrowserEntityTileEntity)tileEntity;
         this.player = playerInventory.player;
+        this.isClient = player.world.isRemote;
 
         IItemHandlerModifiable fake;
         if (isClient)

@@ -18,7 +18,7 @@ import java.util.Optional;
 
 public class StructureTileEntity extends AggregatorTileEntity
 {
-    @ObjectHolder("enderrift:corner")
+    @ObjectHolder("enderrift:structure")
     public static TileEntityType<?> TYPE;
 
     RiftTileEntity energyParent;
@@ -68,7 +68,7 @@ public class StructureTileEntity extends AggregatorTileEntity
         if (energyParent == null)
         {
             BlockState state = world.getBlockState(pos);
-            if (state.getBlock() != EnderRiftMod.structure)
+            if (state.getBlock() != EnderRiftMod.Blocks.STRUCTURE)
                 return Optional.empty();
 
             TileEntity te = world.getTileEntity(getRiftFromCorner(state, pos));

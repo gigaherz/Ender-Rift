@@ -17,12 +17,12 @@ import net.minecraft.world.World;
 import net.minecraftforge.registries.ForgeRegistryEntry;
 
 
-public class RiftDuplicationRecipe implements ICraftingRecipe, net.minecraftforge.common.crafting.IShapedRecipe<CraftingInventory>
+public class OrbDuplicationRecipe implements ICraftingRecipe, net.minecraftforge.common.crafting.IShapedRecipe<CraftingInventory>
 {
     private final ResourceLocation recipeId;
     private final IRecipeSerializer<?> serializer;
 
-    public RiftDuplicationRecipe(ResourceLocation recipeId, IRecipeSerializer<?> serializer)
+    public OrbDuplicationRecipe(ResourceLocation recipeId, IRecipeSerializer<?> serializer)
     {
         this.recipeId = recipeId;
         this.serializer = serializer;
@@ -37,7 +37,7 @@ public class RiftDuplicationRecipe implements ICraftingRecipe, net.minecraftforg
                 Ingredient.fromItems(Items.ENDER_PEARL),
                 Ingredient.fromItems(Items.MAGMA_CREAM),
                 Ingredient.fromItems(Items.ENDER_PEARL),
-                Ingredient.fromItems(EnderRiftMod.riftOrb),
+                Ingredient.fromItems(EnderRiftMod.Items.RIFT_ORB),
                 Ingredient.fromItems(Items.ENDER_PEARL),
                 Ingredient.fromItems(Items.MAGMA_CREAM),
                 Ingredient.fromItems(Items.ENDER_PEARL),
@@ -55,7 +55,7 @@ public class RiftDuplicationRecipe implements ICraftingRecipe, net.minecraftforg
         if (stack.getCount() <= 0)
             return false;
 
-        if (stack.getItem() != EnderRiftMod.riftOrb)
+        if (stack.getItem() != EnderRiftMod.Items.RIFT_ORB)
             return false;
 
         CompoundNBT tag = stack.getTag();
@@ -112,7 +112,7 @@ public class RiftDuplicationRecipe implements ICraftingRecipe, net.minecraftforg
     @Override
     public ItemStack getRecipeOutput()
     {
-        return new ItemStack(EnderRiftMod.riftOrb,2);
+        return new ItemStack(EnderRiftMod.Items.RIFT_ORB,2);
     }
 
     @Override
@@ -151,22 +151,22 @@ public class RiftDuplicationRecipe implements ICraftingRecipe, net.minecraftforg
         return 0;
     }
 
-    public static class Serializer extends ForgeRegistryEntry<IRecipeSerializer<?>> implements IRecipeSerializer<RiftDuplicationRecipe>
+    public static class Serializer extends ForgeRegistryEntry<IRecipeSerializer<?>> implements IRecipeSerializer<OrbDuplicationRecipe>
     {
         @Override
-        public RiftDuplicationRecipe read(ResourceLocation recipeId, JsonObject json)
+        public OrbDuplicationRecipe read(ResourceLocation recipeId, JsonObject json)
         {
-            return new RiftDuplicationRecipe(recipeId, this);
+            return new OrbDuplicationRecipe(recipeId, this);
         }
 
         @Override
-        public RiftDuplicationRecipe read(ResourceLocation recipeId, PacketBuffer buffer)
+        public OrbDuplicationRecipe read(ResourceLocation recipeId, PacketBuffer buffer)
         {
-            return new RiftDuplicationRecipe(recipeId, this);
+            return new OrbDuplicationRecipe(recipeId, this);
         }
 
         @Override
-        public void write(PacketBuffer buffer, RiftDuplicationRecipe recipe)
+        public void write(PacketBuffer buffer, OrbDuplicationRecipe recipe)
         {
 
         }

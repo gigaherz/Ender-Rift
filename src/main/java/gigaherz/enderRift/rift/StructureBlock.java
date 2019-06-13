@@ -14,6 +14,9 @@ import net.minecraft.util.IStringSerializable;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.math.shapes.ISelectionContext;
+import net.minecraft.util.math.shapes.VoxelShape;
+import net.minecraft.util.math.shapes.VoxelShapes;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
 import net.minecraft.world.storage.loot.LootContext;
@@ -55,8 +58,29 @@ public class StructureBlock extends AggregatorBlock<StructureTileEntity>
         builder.add(TYPE1, TYPE2, CORNER, BASE);
     }
 
-    @Deprecated
-    public AxisAlignedBB getBoundingBox(BlockState state, IBlockReader source, BlockPos pos)
+
+    public static final VoxelShape SHAPE_BASE = Block.makeCuboidShape(0,0,0,16,4,16);
+    public static final VoxelShape SHAPE_EW = Block.makeCuboidShape(0,4,4,16,12,12);
+    public static final VoxelShape SHAPE_NS = Block.makeCuboidShape(4,4,0,12,12,16);
+    public static final VoxelShape SHAPE_UD = Block.makeCuboidShape(4,0,4,12,16,12);
+    public static final VoxelShape SHAPE_EWB = VoxelShapes.or(SHAPE_EW, SHAPE_BASE);
+    public static final VoxelShape SHAPE_NSB = VoxelShapes.or(SHAPE_NS, SHAPE_BASE);
+
+
+    public static final VoxelShape SHAPE_CORNER = VoxelShapes.or(
+            VoxelShapes.or(
+                Block.makeCuboidShape(1.5,1.5,1.5,14.5,14.5,14.5),
+                Block.makeCuboidShape(3,0,3,13,16,13)
+            ),
+            VoxelShapes.or(
+                Block.makeCuboidShape(3,0,3,13,16,13),
+                Block.makeCuboidShape(3,0,3,13,16,13)
+            )
+    );
+    public static final VoxelShape CORNER_WITH_BASE = VoxelShapes.or(SHAPE_CORNER, SHAPE_BASE);
+
+    @Override
+    public VoxelShape getShape(BlockState state, IBlockReader world, BlockPos pos, ISelectionContext context)
     {
         if (state.get(TYPE1) == Type1.NORMAL)
         {
@@ -64,35 +88,16 @@ public class StructureBlock extends AggregatorBlock<StructureTileEntity>
             switch (d)
             {
                 case NONE: // base center
-                    return new AxisAlignedBB(
-                            0 / 16.0f, 0 / 16.0f, 0 / 16.0f,
-                            16 / 16.0f, 4 / 16.0f, 16 / 16.0f);
                 case SIDE_EW:
-                    if (!state.get(BASE))
-                        return new AxisAlignedBB(
-                                0 / 16.0f, 4 / 16.0f, 4 / 16.0f,
-                                16 / 16.0f, 12 / 16.0f, 12 / 16.0f);
-                    else
-                        return new AxisAlignedBB(
-                                0 / 16.0f, 0 / 16.0f, 0 / 16.0f,
-                                16 / 16.0f, 12 / 16.0f, 16 / 16.0f);
+                    return state.get(BASE) ? SHAPE_EWB : SHAPE_EW;
                 case VERTICAL:
-                    return new AxisAlignedBB(
-                            4 / 16.0f, 0 / 16.0f, 4 / 16.0f,
-                            12 / 16.0f, 16 / 16.0f, 12 / 16.0f);
+                    return SHAPE_UD;
                 case SIDE_NS:
-                    if (!state.get(BASE))
-                        return new AxisAlignedBB(
-                                4 / 16.0f, 4 / 16.0f, 0 / 16.0f,
-                                12 / 16.0f, 12 / 16.0f, 16 / 16.0f);
-                    else
-                        return new AxisAlignedBB(
-                                0 / 16.0f, 0 / 16.0f, 0 / 16.0f,
-                                16 / 16.0f, 12 / 16.0f, 16 / 16.0f);
+                    return state.get(BASE) ? SHAPE_NSB : SHAPE_NS;
             }
         }
 
-        return new AxisAlignedBB(0,0,0,1,1,1);
+        return state.get(BASE) ? CORNER_WITH_BASE : SHAPE_CORNER;
     }
 
     @Override

@@ -1,0 +1,32 @@
+{
+  "forge_marker": 1,
+  "variants": {
+    "base": {
+      "false": {
+      },
+      "true": {
+        "custom": {},
+        "submodel": {
+          "base": { "model": "enderrift:base" }
+        }
+      }
+    },
+    "corner": {
+      "ne": {},
+      "nw": {},
+      "se": {},
+      "sw": {}
+    },
+    "type1": {
+      "normal": {},
+      "corner": { "model": "enderrift:hedron" }
+    },
+    "type2": {
+      "none": {
+      },
+      "vertical": { "model": "enderrift:straight", "x": 90 },
+      "side_ns": { "model": "enderrift:straight"},
+      "side_ew": { "model": "enderrift:straight", "y": 90 }
+    }
+  }
+}

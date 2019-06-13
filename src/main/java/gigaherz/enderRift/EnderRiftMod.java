@@ -52,34 +52,45 @@ public class EnderRiftMod
 {
     /*
         dependencies = "after:Waila;after:gbook",
-        updateJSON = "https://raw.githubusercontent.com/gigaherz/Ender-Rift/master/update.json"
+        updateJSON =
      */
     
     public static final String MODID = "enderrift";
 
-    @ObjectHolder("enderrift:rift")
-    public static Block rift;
-    @ObjectHolder("enderrift:rift_structure")
-    public static StructureBlock structure;
-    @ObjectHolder("enderrift:interface")
-    public static Block riftInterface;
-    @ObjectHolder("enderrift:generator")
-    public static Block generator;
-    @ObjectHolder("enderrift:browser")
-    public static Block browser;
-    @ObjectHolder("enderrift:proxy")
-    public static Block extension;
-    @ObjectHolder("enderrift:driver")
-    public static Block driver;
-    @ObjectHolder("enderrift:rift_orb")
-    public static Item riftOrb;
+    //@ObjectHolder("enderrift")
+    public static class Blocks
+    {
+        @ObjectHolder("enderrift:rift")
+        public static Block RIFT;
+        @ObjectHolder("enderrift:structure")
+        public static StructureBlock STRUCTURE;
+        @ObjectHolder("enderrift:interface")
+        public static Block INTERFACE;
+        @ObjectHolder("enderrift:generator")
+        public static Block GENERATOR;
+        @ObjectHolder("enderrift:browser")
+        public static Block BROWSER;
+        @ObjectHolder("enderrift:crafting_browser")
+        public static Block CRAFTING_BROWSER;
+        @ObjectHolder("enderrift:proxy")
+        public static Block PROXY;
+        @ObjectHolder("enderrift:driver")
+        public static Block DRIVER;
+    }
+
+    //@ObjectHolder("enderrift")
+    public static class Items
+    {
+        @ObjectHolder("enderrift:rift_orb")
+        public static Item RIFT_ORB;
+    }
 
     public static ItemGroup tabEnderRift = new ItemGroup("tabEnderRift")
     {
         @Override
         public ItemStack createIcon()
         {
-            return new ItemStack(riftOrb);
+            return new ItemStack(Items.RIFT_ORB);
         }
     };
 
@@ -122,7 +133,7 @@ public class EnderRiftMod
                 new RiftBlock(Block.Properties.create(Material.ROCK).sound(SoundType.METAL).hardnessAndResistance(3.0F,8.0F).variableOpacity()
                 ).setRegistryName("rift"),
                 new StructureBlock(Block.Properties.create(Material.ROCK).sound(SoundType.METAL).hardnessAndResistance(3.0F,8.0F)
-                ).setRegistryName("rift_structure"),
+                ).setRegistryName("structure"),
                 new InterfaceBlock(Block.Properties.create(Material.IRON, MaterialColor.STONE).sound(SoundType.METAL).hardnessAndResistance(3.0F,8.0F)
                 ).setRegistryName("interface"),
                 new BrowserBlock(false, Block.Properties.create(Material.IRON, MaterialColor.STONE).sound(SoundType.METAL).hardnessAndResistance(3.0F,8.0F)
@@ -141,13 +152,13 @@ public class EnderRiftMod
     public void registerItems(RegistryEvent.Register<Item> event)
     {
         event.getRegistry().registerAll(
-                new BlockItem(rift, new Item.Properties().group(tabEnderRift)).setRegistryName(rift.getRegistryName()),
-                new BlockItem(structure, new Item.Properties().group(tabEnderRift)).setRegistryName(structure.getRegistryName()),
-                new BlockItem(riftInterface, new Item.Properties().group(tabEnderRift)).setRegistryName(riftInterface.getRegistryName()),
-                new BlockItem(browser, new Item.Properties().group(tabEnderRift)).setRegistryName(browser.getRegistryName()),
-                new BlockItem(extension, new Item.Properties().group(tabEnderRift)).setRegistryName(extension.getRegistryName()),
-                new BlockItem(driver, new Item.Properties().group(tabEnderRift)).setRegistryName(driver.getRegistryName()),
-                new BlockItem(generator, new Item.Properties().group(tabEnderRift)).setRegistryName(generator.getRegistryName()),
+                new BlockItem(Blocks.RIFT, new Item.Properties().group(tabEnderRift)).setRegistryName(Blocks.RIFT.getRegistryName()),
+                new BlockItem(Blocks.INTERFACE, new Item.Properties().group(tabEnderRift)).setRegistryName(Blocks.INTERFACE.getRegistryName()),
+                new BlockItem(Blocks.BROWSER, new Item.Properties().group(tabEnderRift)).setRegistryName(Blocks.BROWSER.getRegistryName()),
+                new BlockItem(Blocks.CRAFTING_BROWSER, new Item.Properties().group(tabEnderRift)).setRegistryName(Blocks.CRAFTING_BROWSER.getRegistryName()),
+                new BlockItem(Blocks.PROXY, new Item.Properties().group(tabEnderRift)).setRegistryName(Blocks.PROXY.getRegistryName()),
+                new BlockItem(Blocks.DRIVER, new Item.Properties().group(tabEnderRift)).setRegistryName(Blocks.DRIVER.getRegistryName()),
+                new BlockItem(Blocks.GENERATOR, new Item.Properties().group(tabEnderRift)).setRegistryName(Blocks.GENERATOR.getRegistryName()),
 
                 new RiftItem(new Item.Properties().maxStackSize(16).group(tabEnderRift)).setRegistryName("rift_orb")
         );
@@ -156,13 +167,13 @@ public class EnderRiftMod
     public void registerTEs(RegistryEvent.Register<TileEntityType<?>> event)
     {
         event.getRegistry().registerAll(
-                TileEntityType.Builder.create(RiftTileEntity::new, rift).build(null).setRegistryName("rift"),
-                TileEntityType.Builder.create(StructureTileEntity::new, structure).build(null).setRegistryName("corner"),
-                TileEntityType.Builder.create(InterfaceTileEntity::new, riftInterface).build(null).setRegistryName("interface"),
-                TileEntityType.Builder.create(BrowserEntityTileEntity::new, browser).build(null).setRegistryName("browser"),
-                TileEntityType.Builder.create(ProxyTileEntity::new, extension).build(null).setRegistryName("proxy"),
-                TileEntityType.Builder.create(DriverEntityTileEntity::new, driver).build(null).setRegistryName("driver"),
-                TileEntityType.Builder.create(GeneratorTileEntity::new, generator).build(null).setRegistryName("generator")
+                TileEntityType.Builder.create(RiftTileEntity::new, Blocks.RIFT).build(null).setRegistryName("rift"),
+                TileEntityType.Builder.create(StructureTileEntity::new, Blocks.STRUCTURE).build(null).setRegistryName("structure"),
+                TileEntityType.Builder.create(InterfaceTileEntity::new, Blocks.INTERFACE).build(null).setRegistryName("interface"),
+                TileEntityType.Builder.create(BrowserEntityTileEntity::new, Blocks.BROWSER).build(null).setRegistryName("browser"),
+                TileEntityType.Builder.create(ProxyTileEntity::new, Blocks.PROXY).build(null).setRegistryName("proxy"),
+                TileEntityType.Builder.create(DriverEntityTileEntity::new, Blocks.DRIVER).build(null).setRegistryName("driver"),
+                TileEntityType.Builder.create(GeneratorTileEntity::new, Blocks.GENERATOR).build(null).setRegistryName("generator")
         );
     }
 
@@ -179,7 +190,7 @@ public class EnderRiftMod
     public void registerRecipeSerializers(RegistryEvent.Register<IRecipeSerializer<?>> event)
     {
         event.getRegistry().registerAll(
-                new RiftDuplicationRecipe.Serializer().setRegistryName("rift_duplication_recipe")
+                new OrbDuplicationRecipe.Serializer().setRegistryName("orb_duplication")
         );
     }
 
