@@ -1,6 +1,6 @@
 package gigaherz.enderRift.automation.browser;
 
-import gigaherz.enderRift.EnderRiftMod;
+import com.google.common.collect.ImmutableMap;
 import gigaherz.enderRift.automation.AggregatorBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -18,6 +18,9 @@ import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
+import net.minecraft.util.math.shapes.ISelectionContext;
+import net.minecraft.util.math.shapes.VoxelShape;
+import net.minecraft.util.math.shapes.VoxelShapes;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.IBlockReader;
@@ -29,11 +32,36 @@ import javax.annotation.Nullable;
 public class BrowserBlock extends AggregatorBlock<BrowserEntityTileEntity>
 {
     public static final DirectionProperty FACING = BlockStateProperties.FACING;
-
-    private static final String unlocStandard = EnderRiftMod.MODID + ".browser";
-    private static final String unlocCrafting = EnderRiftMod.MODID + ".crafting_browser";
-
     public final boolean crafting;
+
+    public static final VoxelShape WEST_PANEL_PART = Block.makeCuboidShape(12,0,0,16,16,16);
+    public static final VoxelShape WEST_PIPE_PART = Block.makeCuboidShape(0,6,6,4,10,10);
+
+    public static final VoxelShape EAST_PANEL_PART = Block.makeCuboidShape(0,0,0,4,16,16);
+    public static final VoxelShape EAST_PIPE_PART = Block.makeCuboidShape(12,6,6,16,10,10);
+
+    public static final VoxelShape SOUTH_PANEL_PART = Block.makeCuboidShape(0,0,0,16,16,4);
+    public static final VoxelShape SOUTH_PIPE_PART = Block.makeCuboidShape(6,6,12,10,10,16);
+
+    public static final VoxelShape NORTH_PANEL_PART = Block.makeCuboidShape(0,0,12,16,16,16);
+    public static final VoxelShape NORTH_PIPE_PART = Block.makeCuboidShape(6,6,0,10,10,4);
+
+    public static final VoxelShape DOWN_PANEL_PART = Block.makeCuboidShape(0,12,0,16,16,16);
+    public static final VoxelShape DOWN_PIPE_PART = Block.makeCuboidShape(6,0,6,10,4,10);
+
+    public static final VoxelShape UP_PANEL_PART = Block.makeCuboidShape(0,0,0,16,4,16);
+    public static final VoxelShape UP_PIPE_PART = Block.makeCuboidShape(6,12,6,10,16,10);
+
+    public static final VoxelShape CENTER_PART = Block.makeCuboidShape(4,4,4,12,12,12);
+
+    public static final ImmutableMap<Direction, VoxelShape> SHAPES = ImmutableMap.<Direction, VoxelShape>builder()
+            .put(Direction.WEST,  VoxelShapes.or(CENTER_PART, VoxelShapes.or(WEST_PANEL_PART, WEST_PIPE_PART)))
+            .put(Direction.EAST,  VoxelShapes.or(CENTER_PART, VoxelShapes.or(EAST_PANEL_PART, EAST_PIPE_PART)))
+            .put(Direction.SOUTH, VoxelShapes.or(CENTER_PART, VoxelShapes.or(SOUTH_PANEL_PART, SOUTH_PIPE_PART)))
+            .put(Direction.NORTH, VoxelShapes.or(CENTER_PART, VoxelShapes.or(NORTH_PANEL_PART, NORTH_PIPE_PART)))
+            .put(Direction.DOWN,  VoxelShapes.or(CENTER_PART, VoxelShapes.or(DOWN_PANEL_PART, DOWN_PIPE_PART)))
+            .put(Direction.UP,    VoxelShapes.or(CENTER_PART, VoxelShapes.or(UP_PANEL_PART, UP_PIPE_PART)))
+            .build();
 
     public BrowserBlock(boolean crafting, Properties properties)
     {
@@ -55,34 +83,11 @@ public class BrowserBlock extends AggregatorBlock<BrowserEntityTileEntity>
         return new BrowserEntityTileEntity();
     }
 
-    /*@Deprecated
     @Override
-    public BlockFaceShape getBlockFaceShape(IBlockReader worldIn, BlockState state, BlockPos pos, Direction face)
+    public VoxelShape getShape(BlockState state, IBlockReader p_220053_2_, BlockPos p_220053_3_, ISelectionContext p_220053_4_)
     {
-        Direction st = state.getValue(FACING);
-
-        if (st == face)
-            return BlockFaceShape.CENTER;
-
-        Direction op = face.getOpposite();
-        if (st == op)
-            return BlockFaceShape.SOLID;
-
-        return BlockFaceShape.UNDEFINED;
-    }*/
-
-    /*@Deprecated
-    @Override
-    public boolean isSideSolid(BlockState base_state, IBlockReader world, BlockPos pos, Direction side)
-    {
-        return base_state.getValue(FACING) == side.getOpposite();
-    }*/
-
-    /*@Override
-    public boolean canPlaceTorchOnTop(BlockState state, IBlockReader world, BlockPos pos)
-    {
-        return state.getValue(FACING) == Direction.UP || state.getValue(FACING) == Direction.DOWN;
-    }*/
+        return SHAPES.get(state.get(FACING));
+    }
 
     @Nullable
     @Override

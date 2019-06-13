@@ -1,0 +1,6 @@
+{
+  "parent": "enderrift:block/interface",
+  "textures": {
+    "face": "enderrift:block/browser"
+  }
+}

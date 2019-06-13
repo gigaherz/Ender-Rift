@@ -4,7 +4,6 @@
     "model": "enderrift:block/generator.obj"
   },
   "variants": {
-    "inventory": [{ "transform": "forge:default-block" }],
     "facing": {
       "east": {
         "y": 90

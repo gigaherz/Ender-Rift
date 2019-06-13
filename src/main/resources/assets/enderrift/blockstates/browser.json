@@ -1,31 +1,27 @@
 {
-  "forge_marker": 1,
-  "defaults": {
-    "model": "enderrift:block/interface.obj",
-    "transform": "forge:default-block",
-    "textures": {
-      "#Face": "enderrift:block/browser"
-    }
-  },
   "variants": {
-    "facing": {
-      "up": {
-        "x": 90
-      },
-      "down": {
-        "x": 270
-      },
-      "east": {
-        "y": 270
-      },
-      "west": {
-        "y": 90
-      },
-      "north": {
-        "y": 180
-      },
-      "south": {
-      }
+    "facing=up": {
+      "model": "enderrift:block/browser",
+      "x": 90
+    },
+    "facing=down": {
+      "model": "enderrift:block/browser",
+      "x": 270
+    },
+    "facing=east": {
+      "model": "enderrift:block/browser",
+      "y": 270
+    },
+    "facing=west": {
+      "model": "enderrift:block/browser",
+      "y": 90
+    },
+    "facing=north": {
+      "model": "enderrift:block/browser",
+      "y": 180
+    },
+    "facing=south": {
+      "model": "enderrift:block/browser"
     }
   }
 }

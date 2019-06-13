@@ -1,32 +1,34 @@
 {
-  "forge_marker": 1,
-  "variants": {
-    "base": {
-      "false": {
-      },
-      "true": {
-        "custom": {},
-        "submodel": {
-          "base": { "model": "enderrift:base" }
-        }
-      }
+  "multipart": [
+    {
+      "when": {"base": "true"},
+      "apply":[
+        { "model":  "enderrift:block/base" }
+      ]
     },
-    "corner": {
-      "ne": {},
-      "nw": {},
-      "se": {},
-      "sw": {}
+    {
+      "when": {"type1": "corner"},
+      "apply":[
+        { "model":  "enderrift:block/hedron" }
+      ]
     },
-    "type1": {
-      "normal": {},
-      "corner": { "model": "enderrift:hedron" }
+    {
+      "when": {"type2": "vertical"},
+      "apply":[
+        { "model":  "enderrift:block/straight", "x": 90 }
+      ]
     },
-    "type2": {
-      "none": {
-      },
-      "vertical": { "model": "enderrift:straight", "x": 90 },
-      "side_ns": { "model": "enderrift:straight"},
-      "side_ew": { "model": "enderrift:straight", "y": 90 }
+    {
+      "when": {"type2": "side_ns"},
+      "apply":[
+        { "model":  "enderrift:block/straight" }
+      ]
+    },
+    {
+      "when": {"type2": "side_ew"},
+      "apply":[
+        { "model":  "enderrift:block/straight", "y": 90 }
+      ]
     }
-  }
+  ]
 }

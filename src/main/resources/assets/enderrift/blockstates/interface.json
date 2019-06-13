@@ -1,28 +1,27 @@
 {
-  "forge_marker": 1,
-  "defaults": {
-    "model": "enderrift:block/interface.obj"
-  },
   "variants": {
-    "inventory": [{ "transform": "forge:default-block" }],
-    "facing": {
-      "up": {
-        "x": 90
-      },
-      "down": {
-        "x": 270
-      },
-      "east": {
-        "y": 270
-      },
-      "west": {
-        "y": 90
-      },
-      "north": {
-        "y": 180
-      },
-      "south": {
-      }
+    "facing=up": {
+      "model": "enderrift:block/interface",
+      "x": 90
+    },
+    "facing=down": {
+      "model": "enderrift:block/interface",
+      "x": 270
+    },
+    "facing=east": {
+      "model": "enderrift:block/interface",
+      "y": 270
+    },
+    "facing=west": {
+      "model": "enderrift:block/interface",
+      "y": 90
+    },
+    "facing=north": {
+      "model": "enderrift:block/interface",
+      "y": 180
+    },
+    "facing=south": {
+      "model": "enderrift:block/interface"
     }
   }
 }

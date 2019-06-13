@@ -1,6 +1,8 @@
 package gigaherz.enderRift.automation.iface;
 
+import com.google.common.collect.ImmutableMap;
 import gigaherz.enderRift.automation.AggregatorBlock;
+import gigaherz.enderRift.automation.browser.BrowserBlock;
 import gigaherz.enderRift.generator.GeneratorContainer;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -20,6 +22,9 @@ import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
+import net.minecraft.util.math.shapes.ISelectionContext;
+import net.minecraft.util.math.shapes.VoxelShape;
+import net.minecraft.util.math.shapes.VoxelShapes;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.IBlockReader;
@@ -52,28 +57,11 @@ public class InterfaceBlock extends AggregatorBlock<InterfaceTileEntity>
         return new InterfaceTileEntity();
     }
 
-    /*@Deprecated
     @Override
-    public BlockFaceShape getBlockFaceShape(IBlockReader worldIn, BlockState state, BlockPos pos, Direction face)
+    public VoxelShape getShape(BlockState state, IBlockReader p_220053_2_, BlockPos p_220053_3_, ISelectionContext p_220053_4_)
     {
-        Direction st = state.getValue(FACING);
-
-        if (st == face)
-            return BlockFaceShape.CENTER;
-
-        Direction op = face.getOpposite();
-        if (st == op)
-            return BlockFaceShape.SOLID;
-
-        return BlockFaceShape.UNDEFINED;
-    }*/
-
-    /*@Deprecated
-    @Override
-    public boolean isSideSolid(BlockState base_state, IBlockReader world, BlockPos pos, Direction side)
-    {
-        return base_state.getValue(FACING) == side.getOpposite();
-    }*/
+        return BrowserBlock.SHAPES.get(state.get(FACING));
+    }
 
     @Nullable
     @Override

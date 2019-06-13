@@ -14,13 +14,26 @@ import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
+import net.minecraftforge.common.crafting.IShapedRecipe;
 import net.minecraftforge.registries.ForgeRegistryEntry;
 
 
-public class OrbDuplicationRecipe implements ICraftingRecipe, net.minecraftforge.common.crafting.IShapedRecipe<CraftingInventory>
+public class OrbDuplicationRecipe implements ICraftingRecipe, IShapedRecipe<CraftingInventory>
 {
     private final ResourceLocation recipeId;
     private final IRecipeSerializer<?> serializer;
+    private NonNullList<Ingredient> ingredients = NonNullList.from(
+            Ingredient.EMPTY,
+            Ingredient.fromItems(Items.MAGMA_CREAM),
+            Ingredient.fromItems(Items.ENDER_PEARL),
+            Ingredient.fromItems(Items.MAGMA_CREAM),
+            Ingredient.fromItems(Items.ENDER_PEARL),
+            Ingredient.fromItems(EnderRiftMod.Items.RIFT_ORB),
+            Ingredient.fromItems(Items.ENDER_PEARL),
+            Ingredient.fromItems(Items.MAGMA_CREAM),
+            Ingredient.fromItems(Items.ENDER_PEARL),
+            Ingredient.fromItems(Items.MAGMA_CREAM)
+    );
 
     public OrbDuplicationRecipe(ResourceLocation recipeId, IRecipeSerializer<?> serializer)
     {
@@ -31,18 +44,7 @@ public class OrbDuplicationRecipe implements ICraftingRecipe, net.minecraftforge
     @Override
     public NonNullList<Ingredient> getIngredients()
     {
-        return NonNullList.from(
-                Ingredient.EMPTY,
-                Ingredient.fromItems(Items.MAGMA_CREAM),
-                Ingredient.fromItems(Items.ENDER_PEARL),
-                Ingredient.fromItems(Items.MAGMA_CREAM),
-                Ingredient.fromItems(Items.ENDER_PEARL),
-                Ingredient.fromItems(EnderRiftMod.Items.RIFT_ORB),
-                Ingredient.fromItems(Items.ENDER_PEARL),
-                Ingredient.fromItems(Items.MAGMA_CREAM),
-                Ingredient.fromItems(Items.ENDER_PEARL),
-                Ingredient.fromItems(Items.MAGMA_CREAM)
-        );
+        return ingredients;
     }
 
     @Override
@@ -142,13 +144,13 @@ public class OrbDuplicationRecipe implements ICraftingRecipe, net.minecraftforge
     @Override
     public int getRecipeWidth()
     {
-        return 0;
+        return 3;
     }
 
     @Override
     public int getRecipeHeight()
     {
-        return 0;
+        return 3;
     }
 
     public static class Serializer extends ForgeRegistryEntry<IRecipeSerializer<?>> implements IRecipeSerializer<OrbDuplicationRecipe>
