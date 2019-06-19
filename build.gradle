@@ -36,10 +36,10 @@ apply plugin: 'net.minecraftforge.gradle.forge'
 
 version = "2.1.9"
 group= "gigaherz.enderRift"
-archivesBaseName = "EnderRift-1.12.1"
+archivesBaseName = "EnderRift-1.12.2"
 
 minecraft {
-    version = "1.12.2-14.23.5.2768"
+    version = "1.12.2-14.23.5.2838"
     runDir = "run"
     mappings = "stable_39"
 
@@ -57,17 +57,20 @@ dependencies {
     deobfCompile "gigaherz.commons:gigaherz.commons-1.12.1:0.6.4"
     embed "gigaherz.commons:gigaherz.commons-1.12.1:0.6.4"
 
-    deobfCompile "gigaherz.graph:GraphLib:1.4.0"
-    embed "gigaherz.graph:GraphLib:1.4.0"
+    deobfCompile "gigaherz.graph:GraphLib2:2.0.0"
+    embed "gigaherz.graph:GraphLib2:2.0.0"
 
-    deobfCompile "gigaherz.guidebook:Guidebook-1.12.2:2.6.0"
+    deobfCompile "net.darkhax.gamestages:GameStages-1.12.2:2.0.113"
+    deobfCompile "net.darkhax.bookshelf:Bookshelf-1.12.2:2.3.584"
 
-    deobfCompile "mcjty.theoneprobe:TheOneProbe-1.12:1.12-1.4.23-16"
+    deobfCompile "gigaherz.guidebook:Guidebook-1.12.2:2.9.0"
+
+    deobfCompile "mcjty.theoneprobe:TheOneProbe-1.12:1.12-1.4.28-17"
 
     deobfCompile "net.darkhax.tesla:Tesla-1.12.2:1.0.63"
 
-    deobfCompile "mezz.jei:jei_1.12.2:4.13.1.220:api"
-    runtime "mezz.jei:jei_1.12.2:4.13.1.220"
+    deobfCompile "mezz.jei:jei_1.12.2:4.15.0.278:api"
+    runtime "mezz.jei:jei_1.12.2:4.15.0.278"
 
     deobfCompile "mcp.mobius.waila:Hwyla:1.8.26-B41_1.12.2"
 

@@ -4,8 +4,8 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import gigaherz.enderRift.common.AutomationEnergyWrapper;
 import gigaherz.enderRift.common.IPoweredAutomation;
-import gigaherz.graph.api.Graph;
-import gigaherz.graph.api.GraphObject;
+import gigaherz.graph2.Graph;
+import gigaherz.graph2.GraphObject;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
@@ -19,6 +19,7 @@ import net.minecraftforge.items.IItemHandler;
 
 import javax.annotation.Nullable;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 public abstract class TileAggregator extends TileEntity implements ITickable, GraphObject, IPoweredAutomation
@@ -92,7 +93,7 @@ public abstract class TileAggregator extends TileEntity implements ITickable, Gr
         Graph graph = this.getGraph();
         if (graph != null)
         {
-            graph.addNeighours(this, getNeighbours());
+            graph.addDirectedEdges(this, getNeighbours());
         }
 
         updateConnectedInventories();
