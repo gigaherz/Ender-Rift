@@ -7,6 +7,7 @@ import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.model.BakedQuad;
 import net.minecraft.client.renderer.model.IBakedModel;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.renderer.vertex.VertexFormat;
 import net.minecraft.crash.CrashReport;
@@ -209,8 +210,6 @@ public class ModelHandle
 
         initialized = true;
 
-        MODEL_BAKERY = new ModelLoader(Minecraft.getInstance().getResourceManager(), Minecraft.getInstance().getTextureMap(), Minecraft.getInstance().getProfiler());
-
         IResourceManager rm = Minecraft.getInstance().getResourceManager();
         if (rm instanceof IReloadableResourceManager)
         {
@@ -223,6 +222,11 @@ public class ModelHandle
                 }
             });
         }
+    }
+
+    public static void initLoader(ModelLoader ldr)
+    {
+        MODEL_BAKERY = ldr;
     }
 
     @Nonnull

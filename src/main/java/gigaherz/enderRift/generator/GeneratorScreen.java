@@ -48,22 +48,22 @@ public class GeneratorScreen extends ContainerScreen<GeneratorContainer>
         String label;
         if (container.tile.getGenerationPower() > 0)
         {
-            label = I18n.format("text." + EnderRiftMod.MODID + ".generator.status.generating.label");
+            label = I18n.format("text.enderrift.generator.status.generating.label");
             minecraft.fontRenderer.drawString(label, 8, 22, 0x404040);
             minecraft.fontRenderer.drawString(String.format("%d RF/t", container.tile.getGenerationPower()), 12, 32, 0x404040);
         }
         else if (container.tile.isBurning())
         {
-            label = I18n.format("text." + EnderRiftMod.MODID + ".generator.status.heating");
+            label = I18n.format("text.enderrift.generator.status.heating");
             minecraft.fontRenderer.drawString(label, 8, 22, 0x404040);
         }
         else
         {
-            label = I18n.format("text." + EnderRiftMod.MODID + ".generator.status.idle");
+            label = I18n.format("text.enderrift.generator.status.idle");
             minecraft.fontRenderer.drawString(label, 8, 22, 0x404040);
         }
 
-        label = I18n.format("text." + EnderRiftMod.MODID + ".generator.heat.label");
+        label = I18n.format("text.enderrift.generator.heat.label");
         minecraft.fontRenderer.drawString(label, 8, 46, 0x404040);
         minecraft.fontRenderer.drawString(String.format("%d C", container.tile.getHeatValue()), 12, 56, getHeatColor());
 
@@ -82,7 +82,7 @@ public class GeneratorScreen extends ContainerScreen<GeneratorContainer>
             return;
 
         List<String> tooltip = Lists.newArrayList();
-        tooltip.add(I18n.format("text." + EnderRiftMod.MODID + ".generator.energy.label"));
+        tooltip.add(I18n.format("text.enderrift.generator.energy.label"));
         tooltip.add(String.format("%d / %d RF", container.tile.getContainedEnergy(), GeneratorTileEntity.POWER_LIMIT));
 
         renderTooltip(tooltip, mx - guiLeft, my - guiTop);

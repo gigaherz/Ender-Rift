@@ -1,10 +1,11 @@
 package gigaherz.enderRift.rift.storage;
 
+import net.minecraft.block.Block;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.ListNBT;
-import net.minecraft.world.ServerWorld;
 import net.minecraft.world.World;
 import net.minecraft.world.dimension.DimensionType;
+import net.minecraft.world.server.ServerWorld;
 import net.minecraft.world.storage.DimensionSavedDataManager;
 import net.minecraft.world.storage.WorldSavedData;
 import net.minecraftforge.common.util.Constants;
@@ -35,7 +36,7 @@ public class RiftStorage extends WorldSavedData
         ServerWorld overworld = world.getServer().getWorld(DimensionType.OVERWORLD);
 
         DimensionSavedDataManager storage = overworld.getSavedData();
-        return storage.func_215752_a(RiftStorage::new, StorageKey);
+        return storage.getOrCreate(RiftStorage::new, StorageKey);
     }
 
     public RiftInventory getRift(int id)
@@ -99,4 +100,5 @@ public class RiftStorage extends WorldSavedData
 
         return nbtTagCompound;
     }
+
 }

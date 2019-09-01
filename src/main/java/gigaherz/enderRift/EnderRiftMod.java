@@ -1,5 +1,6 @@
 package gigaherz.enderRift;
 
+import com.mojang.datafixers.Dynamic;
 import gigaherz.enderRift.automation.browser.*;
 import gigaherz.enderRift.automation.driver.DriverBlock;
 import gigaherz.enderRift.automation.driver.DriverEntityTileEntity;
@@ -29,11 +30,23 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipeSerializer;
 import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.api.distmarker.Dist;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.IWorld;
+import net.minecraft.world.biome.Biome;
+import net.minecraft.world.biome.Biomes;
+import net.minecraft.world.gen.ChunkGenerator;
+import net.minecraft.world.gen.GenerationSettings;
+import net.minecraft.world.gen.GenerationStage;
+import net.minecraft.world.gen.feature.ConfiguredFeature;
+import net.minecraft.world.gen.feature.Feature;
+import net.minecraft.world.gen.feature.IFeatureConfig;
+import net.minecraft.world.gen.feature.NoFeatureConfig;
+import net.minecraft.world.gen.placement.IPlacementConfig;
+import net.minecraft.world.gen.placement.Placement;
 import net.minecraftforge.common.extensions.IForgeContainerType;
+import net.minecraftforge.common.util.NonNullSupplier;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
@@ -46,6 +59,10 @@ import net.minecraftforge.registries.ObjectHolder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import javax.annotation.Nonnull;
+import java.util.Random;
+import java.util.function.Function;
+
 @Mod.EventBusSubscriber
 @Mod(EnderRiftMod.MODID)
 public class EnderRiftMod
@@ -57,32 +74,29 @@ public class EnderRiftMod
     
     public static final String MODID = "enderrift";
 
-    //@ObjectHolder("enderrift")
-    public static class Blocks
-    {
-        @ObjectHolder("enderrift:rift")
-        public static Block RIFT;
-        @ObjectHolder("enderrift:structure")
-        public static StructureBlock STRUCTURE;
-        @ObjectHolder("enderrift:interface")
-        public static Block INTERFACE;
-        @ObjectHolder("enderrift:generator")
-        public static Block GENERATOR;
-        @ObjectHolder("enderrift:browser")
-        public static Block BROWSER;
-        @ObjectHolder("enderrift:crafting_browser")
-        public static Block CRAFTING_BROWSER;
-        @ObjectHolder("enderrift:proxy")
-        public static Block PROXY;
-        @ObjectHolder("enderrift:driver")
-        public static Block DRIVER;
+    @SuppressWarnings("ConstantConditions")
+    @Nonnull
+    private static <T> T sneakyNull() {
+        return null;
     }
 
-    //@ObjectHolder("enderrift")
+    @ObjectHolder("enderrift")
+    public static class Blocks
+    {
+        public static final Block RIFT = sneakyNull();
+        public static final StructureBlock STRUCTURE = sneakyNull();
+        public static final Block INTERFACE = sneakyNull();
+        public static final Block GENERATOR = sneakyNull();
+        public static final Block BROWSER = sneakyNull();
+        public static final Block CRAFTING_BROWSER = sneakyNull();
+        public static final Block PROXY = sneakyNull();
+        public static final Block DRIVER = sneakyNull();
+    }
+
+    @ObjectHolder("enderrift")
     public static class Items
     {
-        @ObjectHolder("enderrift:rift_orb")
-        public static Item RIFT_ORB;
+        public static final Item RIFT_ORB = sneakyNull();
     }
 
     public static ItemGroup tabEnderRift = new ItemGroup("tabEnderRift")
@@ -121,7 +135,6 @@ public class EnderRiftMod
         modEventBus.addGenericListener(IRecipeSerializer.class, this::registerRecipeSerializers);
         modEventBus.addListener(this::commonSetup);
         modEventBus.addListener(this::clientSetup);
-        modEventBus.addListener(this::initLate);
 
         //modLoadingContext.registerConfig(ModConfig.Type.SERVER, ConfigData.SERVER_SPEC);
         //modLoadingContext.registerConfig(ModConfig.Type.CLIENT, ConfigData.CLIENT_SPEC);
@@ -130,22 +143,14 @@ public class EnderRiftMod
     public void registerBlocks(RegistryEvent.Register<Block> event)
     {
         event.getRegistry().registerAll(
-                new RiftBlock(Block.Properties.create(Material.ROCK).sound(SoundType.METAL).hardnessAndResistance(3.0F,8.0F).variableOpacity()
-                ).setRegistryName("rift"),
-                new StructureBlock(Block.Properties.create(Material.ROCK).sound(SoundType.METAL).hardnessAndResistance(3.0F,8.0F)
-                ).setRegistryName("structure"),
-                new InterfaceBlock(Block.Properties.create(Material.IRON, MaterialColor.STONE).sound(SoundType.METAL).hardnessAndResistance(3.0F,8.0F)
-                ).setRegistryName("interface"),
-                new BrowserBlock(false, Block.Properties.create(Material.IRON, MaterialColor.STONE).sound(SoundType.METAL).hardnessAndResistance(3.0F,8.0F)
-                ).setRegistryName("browser"),
-                new BrowserBlock(true, Block.Properties.create(Material.IRON, MaterialColor.STONE).sound(SoundType.METAL).hardnessAndResistance(3.0F,8.0F)
-                ).setRegistryName("crafting_browser"),
-                new ProxyBlock(Block.Properties.create(Material.IRON, MaterialColor.STONE).sound(SoundType.METAL).hardnessAndResistance(3.0F,8.0F)
-                ).setRegistryName("proxy"),
-                new DriverBlock(Block.Properties.create(Material.IRON, MaterialColor.STONE).sound(SoundType.METAL).hardnessAndResistance(3.0F,8.0F)
-                ).setRegistryName("driver"),
-                new GeneratorBlock(Block.Properties.create(Material.IRON, MaterialColor.STONE).sound(SoundType.METAL).hardnessAndResistance(3.0F,8.0F)
-                ).setRegistryName("generator")
+                new RiftBlock(Block.Properties.create(Material.ROCK).sound(SoundType.METAL).hardnessAndResistance(3.0F,8.0F).variableOpacity()).setRegistryName("rift"),
+                new StructureBlock(Block.Properties.create(Material.ROCK).sound(SoundType.METAL).hardnessAndResistance(3.0F,8.0F)).setRegistryName("structure"),
+                new InterfaceBlock(Block.Properties.create(Material.IRON, MaterialColor.STONE).sound(SoundType.METAL).hardnessAndResistance(3.0F,8.0F)).setRegistryName("interface"),
+                new BrowserBlock(false, Block.Properties.create(Material.IRON, MaterialColor.STONE).sound(SoundType.METAL).hardnessAndResistance(3.0F,8.0F)).setRegistryName("browser"),
+                new BrowserBlock(true, Block.Properties.create(Material.IRON, MaterialColor.STONE).sound(SoundType.METAL).hardnessAndResistance(3.0F,8.0F)).setRegistryName("crafting_browser"),
+                new ProxyBlock(Block.Properties.create(Material.IRON, MaterialColor.STONE).sound(SoundType.METAL).hardnessAndResistance(3.0F,8.0F)).setRegistryName("proxy"),
+                new DriverBlock(Block.Properties.create(Material.IRON, MaterialColor.STONE).sound(SoundType.METAL).hardnessAndResistance(3.0F,8.0F)).setRegistryName("driver"),
+                new GeneratorBlock(Block.Properties.create(Material.IRON, MaterialColor.STONE).sound(SoundType.METAL).hardnessAndResistance(3.0F,8.0F)).setRegistryName("generator")
         );
     }
 
@@ -220,11 +225,6 @@ public class EnderRiftMod
         ScreenManager.registerFactory(InterfaceContainer.TYPE, InterfaceScreen::new);
         ScreenManager.registerFactory(BrowserContainer.TYPE, BrowserScreen::new);
         ScreenManager.registerFactory(CraftingBrowserContainer.TYPE, CraftingBrowserScreen::new);
-    }
-
-    public void initLate(FMLLoadCompleteEvent event)
-    {
-        DistExecutor.runWhenOn(Dist.CLIENT, () -> ClientHelper::initLate);
     }
 
     public static ResourceLocation location(String path)

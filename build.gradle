@@ -47,7 +47,7 @@ compileJava {
 }
 
 minecraft {
-    mappings channel: 'snapshot', version: '20190609-1.14.2'
+    mappings channel: 'snapshot', version: '20190720-1.14.3'
 
     accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
 
@@ -77,7 +77,7 @@ minecraft {
 }
 
 dependencies {
-    minecraft 'net.minecraftforge:forge:1.14.2-26.0.16'
+    minecraft 'net.minecraftforge:forge:1.14.4-28.0.27'
 
     //deobfCompile "gigaherz.commons:gigaherz.commons-1.12.1:0.6.4"
     //embed "gigaherz.commons:gigaherz.commons-1.12.1:0.6.4"
@@ -116,7 +116,7 @@ jar {
 jar {
     manifest {
         attributes([
-                "Specification-Title": "signbutton",
+                "Specification-Title": "enderrift",
                 "Specification-Vendor": "gigaherz",
                 "Specification-Version": "1", // We are version 1 of ourselves
                 "Implementation-Title": project.name,

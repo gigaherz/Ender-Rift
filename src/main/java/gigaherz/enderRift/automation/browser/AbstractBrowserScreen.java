@@ -17,7 +17,7 @@ public abstract class AbstractBrowserScreen<T extends BrowserContainer> extends 
 {
     private static final ResourceLocation backgroundTexture = new ResourceLocation(EnderRiftMod.MODID, "textures/gui/browser.png");
     private static final ResourceLocation tabsTexture = new ResourceLocation("minecraft:textures/gui/container/creative_inventory/tabs.png");
-    private static final String textBrowser = "container." + EnderRiftMod.MODID + ".browser";
+    private static final String textBrowser = "container.enderrift.browser";
 
     private boolean isDragging;
     private int scrollY;

@@ -91,15 +91,15 @@ public class TheOneProbeProviders implements Function<ITheOneProbe, Void>
         int powerGen = generator.getGenerationPower();
         if (powerGen > 0)
         {
-            info.text(I18n.format("text." + EnderRiftMod.MODID + ".generator.status.generating", powerGen));
+            info.text(I18n.format("text.enderrift.generator.status.generating", powerGen));
         }
         else if (generator.isBurning())
         {
-            info.text(I18n.format("text." + EnderRiftMod.MODID + ".generator.status.heating"));
+            info.text(I18n.format("text.enderrift.generator.status.heating"));
         }
         else
         {
-            info.text(I18n.format("text." + EnderRiftMod.MODID + ".generator.status.idle"));
+            info.text(I18n.format("text.enderrift.generator.status.idle"));
         }
 
         int heat = generator.getHeatValue();
@@ -139,15 +139,15 @@ public class TheOneProbeProviders implements Function<ITheOneProbe, Void>
 
         if (isFormed)
         {
-            info.text(I18n.format("text." + EnderRiftMod.MODID + ".rift.isFormed", true));
-            info.text(I18n.format("text." + EnderRiftMod.MODID + ".rift.isPowered", rift.isPowered()));
-            info.text(I18n.format("text." + EnderRiftMod.MODID + ".rift.riftId", rift.getRiftId()));
-            info.text(I18n.format("text." + EnderRiftMod.MODID + ".rift.usedSlots", rift.countInventoryStacks()));
+            info.text(I18n.format("text.enderrift.rift.isFormed", true));
+            info.text(I18n.format("text.enderrift.rift.is_powered", rift.isPowered()));
+            info.text(I18n.format("text.enderrift.rift.rift_id", rift.getRiftId()));
+            info.text(I18n.format("text.enderrift.rift.used_slots", rift.countInventoryStacks()));
             info.progress(rift.getEnergyBuffer().getEnergyStored(), TileEnderRift.BUFFER_POWER, RF_STYLE);
         }
         else
         {
-            info.text(I18n.format("text." + EnderRiftMod.MODID + ".rift.waila.isFormed", false));
+            info.text(I18n.format("text.enderrift.rift.waila.isFormed", false));
         }
     }
 }

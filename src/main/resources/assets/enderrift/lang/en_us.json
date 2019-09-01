@@ -19,12 +19,12 @@
 
     "itemGroup.tabEnderRift": "Ender-Rift",
 
-    "text.enderrift.rift.isFormed": "Is Formed? %s",
-    "text.enderrift.rift.isPowered": "Is Powered? %s",
-    "text.enderrift.rift.riftId": "Rift Id: %s",
-    "text.enderrift.rift.usedSlots": "%s slots used.",
-    "text.enderrift.rift.energyUsageInsert": "%s RF used by next insertion.",
-    "text.enderrift.rift.energyUsageExtract": "%s RF used by next extraction.",
+    "text.enderrift.rift.is_formed": "Is Formed? %s",
+    "text.enderrift.rift.is_powered": "Is Powered? %s",
+    "text.enderrift.rift.rift_id": "Rift Id: %s",
+    "text.enderrift.rift.used_slots": "%s slots used.",
+    "text.enderrift.rift.energy_usage_insert": "%s RF used by next insertion.",
+    "text.enderrift.rift.energy_usage_extract": "%s RF used by next extraction.",
     "text.enderrift.rift.rf": "%s / %s RF.",
 
     "text.enderrift.generator.status.generating.label": "Generating:",

@@ -9,7 +9,7 @@ authors="gigaherz"
 
 [[mods]]
 modId="enderrift"
-version="${version}"
+version="${file.jarVersion}"
 displayName="Ender-Rift"
 description='''
 Bottomless Powered Inventory

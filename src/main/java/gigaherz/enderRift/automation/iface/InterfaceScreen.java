@@ -11,8 +11,8 @@ import net.minecraft.util.text.ITextComponent;
 public class InterfaceScreen extends ContainerScreen<InterfaceContainer>
 {
     private static final ResourceLocation guiTextureLocation = new ResourceLocation(EnderRiftMod.MODID, "textures/gui/interface.png");
-    private static final String textFilters = "text." + EnderRiftMod.MODID + ".interface.filters";
-    private static final String textName = "container." + EnderRiftMod.MODID + ".interface";
+    private static final String textFilters = "text.enderrift.interface.filters";
+    private static final String textName = "container.enderrift.interface";
 
     public InterfaceScreen(InterfaceContainer container, PlayerInventory playerInventory, ITextComponent title)
     {

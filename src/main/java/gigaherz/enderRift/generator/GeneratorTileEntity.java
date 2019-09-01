@@ -38,8 +38,8 @@ public class GeneratorTileEntity extends TileEntity implements ITickableTileEnti
     public static final int HEAT_INTERVAL = 20;
     public static final int POWER_TRANSFER_MAX = 800;
 
-    private EnergyBuffer energyBuffer = new EnergyBuffer(POWER_LIMIT);
-    final LazyOptional<EnergyBuffer> energyBufferGetter = LazyOptional.of(() -> energyBuffer);
+    private final EnergyBuffer energyBuffer = new EnergyBuffer(POWER_LIMIT);
+    private final LazyOptional<EnergyBuffer> energyBufferGetter = LazyOptional.of(() -> energyBuffer);
 
     private final ItemStackHandler fuelSlot = new ItemStackHandler(SLOT_COUNT)
     {
@@ -56,6 +56,8 @@ public class GeneratorTileEntity extends TileEntity implements ITickableTileEnti
             if (getBurnTime(stack) <= 0)
                 return stack;
 
+            int[] x = {1,2,3,4};
+
             return super.insertItem(slot, stack, simulate);
         }
     };
@@ -71,7 +73,6 @@ public class GeneratorTileEntity extends TileEntity implements ITickableTileEnti
         super(TYPE);
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public <T> LazyOptional<T> getCapability(Capability<T> cap, @Nullable Direction side)
     {
@@ -229,7 +230,7 @@ public class GeneratorTileEntity extends TileEntity implements ITickableTileEnti
 
     public String getName()
     {
-        return "container." + EnderRiftMod.MODID + ".generator";
+        return "container.enderrift.generator";
     }
 
     @Override

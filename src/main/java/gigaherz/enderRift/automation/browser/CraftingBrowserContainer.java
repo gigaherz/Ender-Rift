@@ -16,6 +16,7 @@ import net.minecraft.item.crafting.IRecipeType;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.play.server.SSetSlotPacket;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.GameRules;
 import net.minecraft.world.World;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemHandlerHelper;
@@ -95,7 +96,7 @@ public class CraftingBrowserContainer extends BrowserContainer
             Optional<ICraftingRecipe> irecipe = this.world.getRecipeManager().getRecipe(IRecipeType.CRAFTING, inventoryCrafting, world);
 
             Optional<ItemStack> stack = irecipe.map((recipe) -> {
-                if (recipe.isDynamic() || !world.getGameRules().getBoolean("doLimitedCrafting") || entityplayermp.getRecipeBook().isUnlocked(recipe))
+                if (recipe.isDynamic() || !world.getGameRules().getBoolean(GameRules.DO_LIMITED_CRAFTING) || entityplayermp.getRecipeBook().isUnlocked(recipe))
                 {
                     craftingResult.setRecipeUsed(recipe);
                     return recipe.getCraftingResult(inventoryCrafting);

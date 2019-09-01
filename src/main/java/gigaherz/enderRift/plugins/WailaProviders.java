@@ -93,21 +93,21 @@ public class WailaProviders implements IWailaPlugin
 
                 if (tag.getInteger("powerGen") > 0)
                 {
-                    currenttip.add(I18n.format("text." + EnderRiftMod.MODID + ".generator.status.generating", tag.getInteger("powerGen")));
+                    currenttip.add(I18n.format("text.enderrift.generator.status.generating", tag.getInteger("powerGen")));
                 }
                 else if (tag.getBoolean("isBurning"))
                 {
-                    currenttip.add(I18n.format("text." + EnderRiftMod.MODID + ".generator.status.heating"));
+                    currenttip.add(I18n.format("text.enderrift.generator.status.heating"));
                 }
                 else
                 {
-                    currenttip.add(I18n.format("text." + EnderRiftMod.MODID + ".generator.status.idle"));
+                    currenttip.add(I18n.format("text.enderrift.generator.status.idle"));
                 }
 
-                currenttip.add(I18n.format("text." + EnderRiftMod.MODID + ".generator.heat", tag.getInteger("heat")));
+                currenttip.add(I18n.format("text.enderrift.generator.heat", tag.getInteger("heat")));
 
                 if (config.getConfig(CONFIG_RF))
-                    currenttip.add(I18n.format("text." + EnderRiftMod.MODID + ".generator.energy", tag.getInteger("energy"), TileGenerator.POWER_LIMIT));
+                    currenttip.add(I18n.format("text.enderrift.generator.energy", tag.getInteger("energy"), TileGenerator.POWER_LIMIT));
             }
 
             return currenttip;
@@ -155,7 +155,7 @@ public class WailaProviders implements IWailaPlugin
                 CompoundNBT tag = accessor.getNBTData();
 
                 if (config.getConfig(CONFIG_RF))
-                    currenttip.add(I18n.format("text." + EnderRiftMod.MODID + ".generator.energy", tag.getInteger("energy"), TileDriver.POWER_LIMIT));
+                    currenttip.add(I18n.format("text.enderrift.generator.energy", tag.getInteger("energy"), TileDriver.POWER_LIMIT));
             }
 
             return currenttip;
@@ -270,19 +270,19 @@ public class WailaProviders implements IWailaPlugin
 
                 if (tag != null && tag.hasKey("isFormed"))
                 {
-                    currenttip.add(I18n.format("text." + EnderRiftMod.MODID + ".rift.isFormed", tag.getBoolean("isFormed")));
-                    currenttip.add(I18n.format("text." + EnderRiftMod.MODID + ".rift.isPowered", tag.getBoolean("isPowered")));
+                    currenttip.add(I18n.format("text.enderrift.rift.isFormed", tag.getBoolean("isFormed")));
+                    currenttip.add(I18n.format("text.enderrift.rift.is_powered", tag.getBoolean("isPowered")));
                     if (tag.getBoolean("isFormed"))
                     {
-                        currenttip.add(I18n.format("text." + EnderRiftMod.MODID + ".rift.riftId", tag.getInteger("riftId")));
+                        currenttip.add(I18n.format("text.enderrift.rift.rift_id", tag.getInteger("riftId")));
                         if (config.getConfig(CONFIG_RF))
-                            currenttip.add(I18n.format("text." + EnderRiftMod.MODID + ".rift.rf", tag.getInteger("energy"), TileEnderRift.BUFFER_POWER));
+                            currenttip.add(I18n.format("text.enderrift.rift.rf", tag.getInteger("energy"), TileEnderRift.BUFFER_POWER));
                     }
-                    currenttip.add(I18n.format("text." + EnderRiftMod.MODID + ".rift.usedSlots", tag.getInteger("usedSlots")));
+                    currenttip.add(I18n.format("text.enderrift.rift.used_slots", tag.getInteger("usedSlots")));
                 }
                 else
                 {
-                    currenttip.add(I18n.format("text." + EnderRiftMod.MODID + ".rift.waila.isFormed", false));
+                    currenttip.add(I18n.format("text.enderrift.rift.waila.isFormed", false));
                 }
             }
 

@@ -19,12 +19,12 @@
 
     "itemGroup.tabEnderRift": "Ender-Rift",
 
-    "text.enderrift.rift.isFormed": "是否形成？ %s",
-    "text.enderrift.rift.isPowered": "是否有能量？ %s",
-    "text.enderrift.rift.riftId": "裂缝Id: %s",
-    "text.enderrift.rift.usedSlots": "使用%s个存储位",
-    "text.enderrift.rift.energyUsageInsert": "%sRF将会在下一次被使用。",
-    "text.enderrift.rift.energyUsageExtract": "%sRF将会在下一次被提取。",
+    "text.enderrift.rift.is_formed": "是否形成？ %s",
+    "text.enderrift.rift.is_powered": "是否有能量？ %s",
+    "text.enderrift.rift.rift_id": "裂缝Id: %s",
+    "text.enderrift.rift.used_slots": "使用%s个存储位",
+    "text.enderrift.rift.energy_usage_insert": "%sRF将会在下一次被使用。",
+    "text.enderrift.rift.energy_usage_extract": "%sRF将会在下一次被提取。",
     "text.enderrift.rift.rf": "%s / %s RF.",
 
     "text.enderrift.generator.status.generating.label": "正在产能：",
