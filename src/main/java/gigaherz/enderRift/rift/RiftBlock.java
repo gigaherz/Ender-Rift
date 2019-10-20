@@ -214,4 +214,10 @@ public class RiftBlock extends Block
             item.setItem(remaining);
         }
     }
+
+    @Override
+    public boolean hasTileEntity()
+    {
+        return super.hasTileEntity();
+    }
 }

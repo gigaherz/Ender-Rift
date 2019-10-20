@@ -1,42 +1,29 @@
 package gigaherz.enderRift.plugins;
-/*
-import gigaherz.enderRift.automation.browser.ContainerCraftingBrowser;
-import mezz.jei.api.IJeiRuntime;
+
+import gigaherz.enderRift.EnderRiftMod;
+import gigaherz.enderRift.automation.browser.CraftingBrowserContainer;
 import mezz.jei.api.IModPlugin;
-import mezz.jei.api.IModRegistry;
-import mezz.jei.api.ISubtypeRegistry;
-import mezz.jei.api.ingredients.IModIngredientRegistration;
-import mezz.jei.api.recipe.VanillaRecipeCategoryUid;
+import mezz.jei.api.JeiPlugin;
+import mezz.jei.api.constants.VanillaRecipeCategoryUid;
+import mezz.jei.api.registration.*;
+import net.minecraft.util.ResourceLocation;
 
-import javax.annotation.Nonnull;
-
-@mezz.jei.api.JEIPlugin
+@JeiPlugin
 public class JEIPlugin implements IModPlugin
 {
-    @Override
-    public void registerItemSubtypes(ISubtypeRegistry subtypeRegistry)
-    {
+    private static final ResourceLocation UID = EnderRiftMod.location("jei_plugin");
 
+    @Override
+    public ResourceLocation getPluginUid()
+    {
+        return UID;
     }
 
     @Override
-    public void registerIngredients(IModIngredientRegistration registry)
+    public void registerRecipeTransferHandlers(IRecipeTransferRegistration registration)
     {
-
-    }
-
-    @Override
-    public void register(@Nonnull IModRegistry registry)
-    {
-        registry.getRecipeTransferRegistry()
-                .addRecipeTransferHandler(ContainerCraftingBrowser.class, VanillaRecipeCategoryUid.CRAFTING,
-                        ContainerCraftingBrowser.CraftingSlotStart, 9,
-                        ContainerCraftingBrowser.InventorySlotStart, 36);
-    }
-
-    @Override
-    public void onRuntimeAvailable(@Nonnull IJeiRuntime jeiRuntime)
-    {
+        registration.addRecipeTransferHandler(CraftingBrowserContainer.class, VanillaRecipeCategoryUid.CRAFTING,
+                        CraftingBrowserContainer.CraftingSlotStart, 9,
+                        CraftingBrowserContainer.InventorySlotStart, 36);
     }
 }
-*/

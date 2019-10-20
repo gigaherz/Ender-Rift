@@ -1,5 +1,6 @@
 package gigaherz.enderRift;
 
+import com.google.common.collect.ImmutableList;
 import com.mojang.datafixers.Dynamic;
 import gigaherz.enderRift.automation.browser.*;
 import gigaherz.enderRift.automation.driver.DriverBlock;
@@ -29,6 +30,7 @@ import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipeSerializer;
 import net.minecraft.tileentity.TileEntityType;
+import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IWorld;
@@ -60,8 +62,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nonnull;
-import java.util.Random;
+import java.util.*;
 import java.util.function.Function;
+import java.util.zip.ZipEntry;
 
 @Mod.EventBusSubscriber
 @Mod(EnderRiftMod.MODID)
@@ -201,9 +204,6 @@ public class EnderRiftMod
 
     public void commonSetup(FMLCommonSetupEvent event)
     {
-        //Configuration config = new Configuration(event.getSuggestedConfigurationFile());
-        //ConfigValues.readConfig(config);
-
         int messageNumber = 0;
         channel.registerMessage(messageNumber++, ClearCraftingGrid.class, ClearCraftingGrid::encode, ClearCraftingGrid::new, ClearCraftingGrid::handle);
         channel.registerMessage(messageNumber++, SendSlotChanges.class, SendSlotChanges::encode, SendSlotChanges::new, SendSlotChanges::handle);
@@ -231,4 +231,7 @@ public class EnderRiftMod
     {
         return new ResourceLocation(MODID, path);
     }
+
+    public static final List<Direction> DIRECTIONS = Collections.unmodifiableList(Arrays.asList(Direction.values()));
+    public static final List<Direction> DIRECTIONS2 = ImmutableList.copyOf(Direction.values());
 }

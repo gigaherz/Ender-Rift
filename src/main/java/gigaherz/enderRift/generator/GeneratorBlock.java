@@ -8,6 +8,7 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.inventory.container.Container;
 import net.minecraft.inventory.container.INamedContainerProvider;
+import net.minecraft.inventory.container.SimpleNamedContainerProvider;
 import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.state.DirectionProperty;
 import net.minecraft.state.StateContainer;
@@ -65,21 +66,10 @@ public class GeneratorBlock extends Block
         if (worldIn.isRemote)
             return true;
 
-        NetworkHooks.openGui((ServerPlayerEntity)player, new INamedContainerProvider()
-        {
-            @Override
-            public ITextComponent getDisplayName()
-            {
-                return new TranslationTextComponent("text.enderrift.browser.title");
-            }
-
-            @Nullable
-            @Override
-            public Container createMenu(int id, PlayerInventory playerInventory, PlayerEntity playerEntity)
-            {
-                return new GeneratorContainer(id, pos, playerInventory);
-            }
-        }, pos);
+        NetworkHooks.openGui((ServerPlayerEntity)player,
+                new SimpleNamedContainerProvider((id, playerInventory, playerEntity) -> new GeneratorContainer(id, pos, playerInventory),
+                        new TranslationTextComponent("text.enderrift.browser.title")
+                        ), pos);
 
         return true;
     }
