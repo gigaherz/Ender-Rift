@@ -53,9 +53,10 @@ public class SendSlotChanges
         }
     }
 
-    public void handle(Supplier<NetworkEvent.Context> context)
+    public boolean handle(Supplier<NetworkEvent.Context> context)
     {
         ClientHelper.handleSendSlotChanges(this);
+        return true;
     }
 
     public static ItemStack readLargeItemStack(PacketBuffer buf)

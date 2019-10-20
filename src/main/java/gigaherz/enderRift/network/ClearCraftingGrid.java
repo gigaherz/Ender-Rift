@@ -26,7 +26,7 @@ public class ClearCraftingGrid
         buf.writeInt(windowId);
     }
 
-    public void handle(Supplier<NetworkEvent.Context> context)
+    public boolean handle(Supplier<NetworkEvent.Context> context)
     {
         context.get().enqueueWork(() ->
         {
@@ -39,5 +39,6 @@ public class ClearCraftingGrid
                 ((CraftingBrowserContainer) player.openContainer).clearCraftingGrid(player);
             }
         });
+        return true;
     }
 }

@@ -29,8 +29,9 @@ public class UpdatePowerStatus
         buf.writeBoolean(status);
     }
 
-    public void handle(Supplier<NetworkEvent.Context> context)
+    public boolean handle(Supplier<NetworkEvent.Context> context)
     {
         ClientHelper.handleUpdatePowerStatus(this);
+        return true;
     }
 }

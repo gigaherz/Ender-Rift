@@ -37,8 +37,9 @@ public class UpdateField
         }
     }
 
-    public void handle(Supplier<NetworkEvent.Context> context)
+    public boolean handle(Supplier<NetworkEvent.Context> context)
     {
         ClientHelper.handleUpdateField(this);
+        return true;
     }
 }

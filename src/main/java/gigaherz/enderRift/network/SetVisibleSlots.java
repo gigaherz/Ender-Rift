@@ -40,7 +40,7 @@ public class SetVisibleSlots
         }
     }
 
-    public void handle(Supplier<NetworkEvent.Context> context)
+    public boolean handle(Supplier<NetworkEvent.Context> context)
     {
         final ServerPlayerEntity player = context.get().getSender();
         final ServerWorld world = (ServerWorld) player.world;
@@ -54,5 +54,6 @@ public class SetVisibleSlots
                 ((BrowserContainer) player.openContainer).setVisibleSlots(this.visible);
             }
         });
+        return true;
     }
 }
