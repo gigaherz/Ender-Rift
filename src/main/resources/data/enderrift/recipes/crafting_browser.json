@@ -12,7 +12,6 @@
     "b": { "item": "enderrift:browser" }
   },
   "result": {
-    "item": "enderrift:browser",
-    "data": 1
+    "item": "enderrift:crafting_browser"
   }
 }

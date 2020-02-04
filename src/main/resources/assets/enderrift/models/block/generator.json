@@ -1,0 +1,5 @@
+{
+  "parent": "block/block",
+  "loader": "forge:obj",
+  "model": "enderrift:models/block/generator.obj"
+}

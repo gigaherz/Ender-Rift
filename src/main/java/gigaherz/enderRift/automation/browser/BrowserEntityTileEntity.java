@@ -30,7 +30,7 @@ public class BrowserEntityTileEntity extends AggregatorTileEntity
         if (facing == null && world != null)
         {
             BlockState state = world.getBlockState(pos);
-            if (state.getBlock() == EnderRiftMod.Blocks.BROWSER)
+            if (state.getBlock() == EnderRiftMod.EnderRiftBlocks.BROWSER)
             {
                 facing = state.get(InterfaceBlock.FACING).getOpposite();
             }

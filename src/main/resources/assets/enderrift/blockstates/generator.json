@@ -1,21 +1,8 @@
 {
-  "forge_marker": 1,
-  "defaults": {
-    "model": "enderrift:block/generator.obj"
-  },
   "variants": {
-    "facing": {
-      "east": {
-        "y": 90
-      },
-      "west": {
-        "y": 270
-      },
-      "north": {
-      },
-      "south": {
-        "y": 180
-      }
-    }
+    "facing=east": { "model": "enderrift:block/generator", "y": 90 },
+    "facing=west": { "model": "enderrift:block/generator", "y": 270 },
+    "facing=north": { "model": "enderrift:block/generator" },
+    "facing=south": { "model": "enderrift:block/generator", "y": 180 }
   }
 }

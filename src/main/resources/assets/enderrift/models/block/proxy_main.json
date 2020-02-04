@@ -1,0 +1,8 @@
+{
+  "parent": "block/block",
+  "loader": "forge:obj",
+  "model": "enderrift:models/block/proxy_main.obj",
+  "textures": {
+    "particle": "minecraft:block/hopper_inside"
+  }
+}

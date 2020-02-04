@@ -1,6 +1,5 @@
 package gigaherz.enderRift.rift.storage;
 
-import net.minecraft.block.Block;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.ListNBT;
 import net.minecraft.world.World;
@@ -15,14 +14,14 @@ import java.util.Map;
 
 public class RiftStorage extends WorldSavedData
 {
-    private static final String StorageKey = "enderRiftStorageManager";
+    private static final String DATA_NAME = "enderRiftStorageManager";
 
     private Map<Integer, RiftInventory> rifts = new HashMap<Integer, RiftInventory>();
     private int lastRiftId;
 
     public RiftStorage()
     {
-        super(StorageKey);
+        super(DATA_NAME);
     }
 
     private static final RiftStorage clientStorageCopy = new RiftStorage();
@@ -36,7 +35,7 @@ public class RiftStorage extends WorldSavedData
         ServerWorld overworld = world.getServer().getWorld(DimensionType.OVERWORLD);
 
         DimensionSavedDataManager storage = overworld.getSavedData();
-        return storage.getOrCreate(RiftStorage::new, StorageKey);
+        return storage.getOrCreate(RiftStorage::new, DATA_NAME);
     }
 
     public RiftInventory getRift(int id)
@@ -47,6 +46,7 @@ public class RiftStorage extends WorldSavedData
         {
             rift = new RiftInventory(this);
             rifts.put(id, rift);
+            markDirty();
         }
 
         return rift;

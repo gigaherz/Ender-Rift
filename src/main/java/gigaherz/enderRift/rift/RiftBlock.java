@@ -12,6 +12,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.state.BooleanProperty;
 import net.minecraft.state.StateContainer;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
@@ -107,26 +108,26 @@ public class RiftBlock extends Block
 
     @Deprecated
     @Override
-    public boolean onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity playerIn, Hand handIn, BlockRayTraceResult hit)
+    public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity playerIn, Hand handIn, BlockRayTraceResult hit)
     {
-        if (playerIn.isSneaking())
-            return false;
+        if (playerIn.isShiftKeyDown())
+            return ActionResultType.PASS;
 
         int slot = playerIn.inventory.currentItem;
         ItemStack stack = playerIn.inventory.getStackInSlot(slot);
 
-        if (stack.getItem() == EnderRiftMod.Items.RIFT_ORB)
-            return false;
-
-        if (worldIn.isRemote)
-            return true;
+        if (stack.getItem() == EnderRiftMod.EnderRiftItems.RIFT_ORB)
+            return ActionResultType.PASS;
 
         if (state.getBlock() != this || !state.get(ASSEMBLED))
-            return false;
+            return ActionResultType.FAIL;
 
         TileEntity te = worldIn.getTileEntity(pos);
         if (!(te instanceof RiftTileEntity))
-            return false;
+            return ActionResultType.FAIL;
+
+        if (worldIn.isRemote)
+            return ActionResultType.SUCCESS;
 
         RiftTileEntity rift = (RiftTileEntity) te;
 
@@ -140,7 +141,7 @@ public class RiftBlock extends Block
 
         playerIn.inventory.setInventorySlotContents(slot, stack);
 
-        return true;
+        return ActionResultType.SUCCESS;
     }
 
     @Deprecated
@@ -162,7 +163,7 @@ public class RiftBlock extends Block
         ItemStack stack = playerIn.getHeldItem(Hand.MAIN_HAND);
         if (stack.getCount() <= 0)
         {
-            if (stack.getItem() == EnderRiftMod.Items.RIFT_ORB)
+            if (stack.getItem() == EnderRiftMod.EnderRiftItems.RIFT_ORB)
                 return;
         }
         else
@@ -172,7 +173,7 @@ public class RiftBlock extends Block
                 return;
         }
 
-        int numberToExtract = playerIn.isSneaking() ? 1 : stack.getMaxStackSize();
+        int numberToExtract = playerIn.isShiftKeyDown() ? 1 : stack.getMaxStackSize();
 
         ItemStack extracted = AutomationHelper.extractItems(rift.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null).orElseThrow(() -> new RuntimeException("WAT")), stack.copy(), numberToExtract, false);
         if (extracted.getCount() > 0)

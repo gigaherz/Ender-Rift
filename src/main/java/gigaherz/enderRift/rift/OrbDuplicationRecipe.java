@@ -28,7 +28,7 @@ public class OrbDuplicationRecipe implements ICraftingRecipe, IShapedRecipe<Craf
             Ingredient.fromItems(Items.ENDER_PEARL),
             Ingredient.fromItems(Items.MAGMA_CREAM),
             Ingredient.fromItems(Items.ENDER_PEARL),
-            Ingredient.fromItems(EnderRiftMod.Items.RIFT_ORB),
+            Ingredient.fromItems(EnderRiftMod.EnderRiftItems.RIFT_ORB),
             Ingredient.fromItems(Items.ENDER_PEARL),
             Ingredient.fromItems(Items.MAGMA_CREAM),
             Ingredient.fromItems(Items.ENDER_PEARL),
@@ -57,7 +57,7 @@ public class OrbDuplicationRecipe implements ICraftingRecipe, IShapedRecipe<Craf
         if (stack.getCount() <= 0)
             return false;
 
-        if (stack.getItem() != EnderRiftMod.Items.RIFT_ORB)
+        if (stack.getItem() != EnderRiftMod.EnderRiftItems.RIFT_ORB)
             return false;
 
         CompoundNBT tag = stack.getTag();
@@ -114,7 +114,7 @@ public class OrbDuplicationRecipe implements ICraftingRecipe, IShapedRecipe<Craf
     @Override
     public ItemStack getRecipeOutput()
     {
-        return new ItemStack(EnderRiftMod.Items.RIFT_ORB,2);
+        return new ItemStack(EnderRiftMod.EnderRiftItems.RIFT_ORB,2);
     }
 
     @Override

@@ -9,13 +9,13 @@ newmtl GeneratorSides
 map_Kd enderrift:block/generator_side
 
 newmtl Base
-map_Kd enderrift:block/block_rift_base
+map_Kd enderrift:block/structure_base
 
 newmtl Generator
-map_Kd enderrift:block/block_rift_base
+map_Kd enderrift:block/structure_base
 
 newmtl Supports
-map_Kd enderrift:block/block_rift_base
+map_Kd enderrift:block/structure_base
 
 newmtl ControlPanel
-map_Kd enderrift:block/block_rift_base
+map_Kd enderrift:block/structure_base

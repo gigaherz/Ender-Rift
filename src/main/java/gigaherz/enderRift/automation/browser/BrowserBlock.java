@@ -9,11 +9,13 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.inventory.container.Container;
 import net.minecraft.inventory.container.INamedContainerProvider;
+import net.minecraft.inventory.container.SimpleNamedContainerProvider;
 import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.state.DirectionProperty;
 import net.minecraft.state.StateContainer;
 import net.minecraft.state.properties.BlockStateProperties;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
@@ -97,34 +99,23 @@ public class BrowserBlock extends AggregatorBlock<BrowserEntityTileEntity>
     }
 
     @Override
-    public boolean onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit)
+    public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit)
     {
         TileEntity tileEntity = worldIn.getTileEntity(pos);
 
-        if (!(tileEntity instanceof BrowserEntityTileEntity) || player.isSneaking())
-            return false;
+        if (!(tileEntity instanceof BrowserEntityTileEntity) || player.isShiftKeyDown())
+            return ActionResultType.FAIL;
 
         if (player.world.isRemote)
-            return true;
+            return ActionResultType.SUCCESS;
 
-        NetworkHooks.openGui((ServerPlayerEntity)player, new INamedContainerProvider()
-        {
-            @Override
-            public ITextComponent getDisplayName()
-            {
-                return crafting ? new TranslationTextComponent("text.enderrift.crafting_browser.title")
-                                : new TranslationTextComponent("text.enderrift.browser.title");
-            }
+        NetworkHooks.openGui((ServerPlayerEntity)player, new SimpleNamedContainerProvider(
+                (id, playerInventory, playerEntity) -> crafting
+                        ? new CraftingBrowserContainer(id, pos, playerInventory)
+                        : new BrowserContainer(id, pos, playerInventory),
+                crafting ? new TranslationTextComponent("text.enderrift.crafting_browser.title")
+                         : new TranslationTextComponent("text.enderrift.browser.title")), pos);
 
-            @Nullable
-            @Override
-            public Container createMenu(int id, PlayerInventory playerInventory, PlayerEntity playerEntity)
-            {
-                return crafting ? new CraftingBrowserContainer(id, pos, playerInventory)
-                                : new BrowserContainer(id, pos, playerInventory);
-            }
-        }, pos);
-
-        return true;
+        return ActionResultType.SUCCESS;
     }
 }

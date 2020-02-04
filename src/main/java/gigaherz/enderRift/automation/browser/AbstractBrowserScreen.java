@@ -167,7 +167,7 @@ public abstract class AbstractBrowserScreen<T extends BrowserContainer> extends 
     @Override
     protected void drawGuiContainerForegroundLayer(int xMouse, int yMouse)
     {
-        RenderHelper.enableGUIStandardItemLighting();
+        RenderHelper.enableStandardItemLighting();
         drawCustomSlotTexts();
         RenderHelper.disableStandardItemLighting();
 
@@ -186,8 +186,7 @@ public abstract class AbstractBrowserScreen<T extends BrowserContainer> extends 
 
     private void drawSlotText(Slot slotIn)
     {
-        blitOffset = 100;
-        minecraft.getItemRenderer().zLevel = 100.0F;
+        itemRenderer.zLevel = 100.0F;
 
         int xPosition = slotIn.xPos;
         int yPosition = slotIn.yPos;
@@ -224,8 +223,7 @@ public abstract class AbstractBrowserScreen<T extends BrowserContainer> extends 
             }
         }
 
-        minecraft.getItemRenderer().zLevel = 0.0F;
-        blitOffset = 0;
+        itemRenderer.zLevel = 0.0F;
     }
 
     private boolean needsScrollBar()

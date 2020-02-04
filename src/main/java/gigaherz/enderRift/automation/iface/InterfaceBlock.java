@@ -12,12 +12,14 @@ import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.inventory.InventoryHelper;
 import net.minecraft.inventory.container.Container;
 import net.minecraft.inventory.container.INamedContainerProvider;
+import net.minecraft.inventory.container.SimpleNamedContainerProvider;
 import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.state.DirectionProperty;
 import net.minecraft.state.StateContainer;
 import net.minecraft.state.properties.BlockStateProperties;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
@@ -71,33 +73,21 @@ public class InterfaceBlock extends AggregatorBlock<InterfaceTileEntity>
     }
 
     @Override
-    public boolean onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit)
+    public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit)
     {
         TileEntity tileEntity = worldIn.getTileEntity(pos);
 
-        if (!(tileEntity instanceof InterfaceTileEntity) || player.isSneaking())
-            return false;
+        if (!(tileEntity instanceof InterfaceTileEntity) || player.isShiftKeyDown())
+            return ActionResultType.FAIL;
 
         if (worldIn.isRemote)
-            return true;
+            return ActionResultType.SUCCESS;
 
-        NetworkHooks.openGui((ServerPlayerEntity)player, new INamedContainerProvider()
-        {
-            @Override
-            public ITextComponent getDisplayName()
-            {
-                return new TranslationTextComponent("text.enderrift.browser.title");
-            }
+        NetworkHooks.openGui((ServerPlayerEntity)player, new SimpleNamedContainerProvider(
+                (id, playerInventory, playerEntity) -> new InterfaceContainer(id, pos, playerInventory),
+                new TranslationTextComponent("text.enderrift.browser.title")), pos);
 
-            @Nullable
-            @Override
-            public Container createMenu(int id, PlayerInventory playerInventory, PlayerEntity playerEntity)
-            {
-                return new InterfaceContainer(id, pos, playerInventory);
-            }
-        }, pos);
-
-        return true;
+        return ActionResultType.SUCCESS;
     }
 
     @Override

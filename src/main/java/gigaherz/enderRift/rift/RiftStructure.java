@@ -29,7 +29,7 @@ public class RiftStructure
 
                 // Middle
                 Blocks.REDSTONE_BLOCK, null, Blocks.REDSTONE_BLOCK,
-                null, EnderRiftMod.Blocks.RIFT, null,
+                null, EnderRiftMod.EnderRiftBlocks.RIFT, null,
                 Blocks.REDSTONE_BLOCK, null, Blocks.REDSTONE_BLOCK,
 
                 // Top
@@ -41,42 +41,42 @@ public class RiftStructure
         StructureStates = new BlockState[]{
 
                 // Bottom
-                EnderRiftMod.Blocks.STRUCTURE.cornerState(StructureBlock.Corner.NW, true),
-                EnderRiftMod.Blocks.STRUCTURE.edgeState(StructureBlock.Type2.SIDE_EW, true),
-                EnderRiftMod.Blocks.STRUCTURE.cornerState(StructureBlock.Corner.NE, true),
+                EnderRiftMod.EnderRiftBlocks.STRUCTURE.cornerState(StructureBlock.Corner.NW, true),
+                EnderRiftMod.EnderRiftBlocks.STRUCTURE.edgeState(StructureBlock.Type2.SIDE_EW, true),
+                EnderRiftMod.EnderRiftBlocks.STRUCTURE.cornerState(StructureBlock.Corner.NE, true),
 
 
-                EnderRiftMod.Blocks.STRUCTURE.edgeState(StructureBlock.Type2.SIDE_NS, true),
+                EnderRiftMod.EnderRiftBlocks.STRUCTURE.edgeState(StructureBlock.Type2.SIDE_NS, true),
                 null,
-                EnderRiftMod.Blocks.STRUCTURE.edgeState(StructureBlock.Type2.SIDE_NS, true),
+                EnderRiftMod.EnderRiftBlocks.STRUCTURE.edgeState(StructureBlock.Type2.SIDE_NS, true),
 
-                EnderRiftMod.Blocks.STRUCTURE.cornerState(StructureBlock.Corner.SW, true),
-                EnderRiftMod.Blocks.STRUCTURE.edgeState(StructureBlock.Type2.SIDE_EW, true),
-                EnderRiftMod.Blocks.STRUCTURE.cornerState(StructureBlock.Corner.SE, true),
+                EnderRiftMod.EnderRiftBlocks.STRUCTURE.cornerState(StructureBlock.Corner.SW, true),
+                EnderRiftMod.EnderRiftBlocks.STRUCTURE.edgeState(StructureBlock.Type2.SIDE_EW, true),
+                EnderRiftMod.EnderRiftBlocks.STRUCTURE.cornerState(StructureBlock.Corner.SE, true),
 
                 // Middle
-                EnderRiftMod.Blocks.STRUCTURE.edgeState(StructureBlock.Type2.VERTICAL, false),
+                EnderRiftMod.EnderRiftBlocks.STRUCTURE.edgeState(StructureBlock.Type2.VERTICAL, false),
                 null,
-                EnderRiftMod.Blocks.STRUCTURE.edgeState(StructureBlock.Type2.VERTICAL, false),
+                EnderRiftMod.EnderRiftBlocks.STRUCTURE.edgeState(StructureBlock.Type2.VERTICAL, false),
 
                 null, null, null,
 
-                EnderRiftMod.Blocks.STRUCTURE.edgeState(StructureBlock.Type2.VERTICAL, false),
+                EnderRiftMod.EnderRiftBlocks.STRUCTURE.edgeState(StructureBlock.Type2.VERTICAL, false),
                 null,
-                EnderRiftMod.Blocks.STRUCTURE.edgeState(StructureBlock.Type2.VERTICAL, false),
+                EnderRiftMod.EnderRiftBlocks.STRUCTURE.edgeState(StructureBlock.Type2.VERTICAL, false),
 
                 // Top
-                EnderRiftMod.Blocks.STRUCTURE.cornerState(StructureBlock.Corner.NW, false),
-                EnderRiftMod.Blocks.STRUCTURE.edgeState(StructureBlock.Type2.SIDE_EW, false),
-                EnderRiftMod.Blocks.STRUCTURE.cornerState(StructureBlock.Corner.NE, false),
+                EnderRiftMod.EnderRiftBlocks.STRUCTURE.cornerState(StructureBlock.Corner.NW, false),
+                EnderRiftMod.EnderRiftBlocks.STRUCTURE.edgeState(StructureBlock.Type2.SIDE_EW, false),
+                EnderRiftMod.EnderRiftBlocks.STRUCTURE.cornerState(StructureBlock.Corner.NE, false),
 
-                EnderRiftMod.Blocks.STRUCTURE.edgeState(StructureBlock.Type2.SIDE_NS, false),
+                EnderRiftMod.EnderRiftBlocks.STRUCTURE.edgeState(StructureBlock.Type2.SIDE_NS, false),
                 null,
-                EnderRiftMod.Blocks.STRUCTURE.edgeState(StructureBlock.Type2.SIDE_NS, false),
+                EnderRiftMod.EnderRiftBlocks.STRUCTURE.edgeState(StructureBlock.Type2.SIDE_NS, false),
 
-                EnderRiftMod.Blocks.STRUCTURE.cornerState(StructureBlock.Corner.SW, false),
-                EnderRiftMod.Blocks.STRUCTURE.edgeState(StructureBlock.Type2.SIDE_EW, false),
-                EnderRiftMod.Blocks.STRUCTURE.cornerState(StructureBlock.Corner.SE, false),
+                EnderRiftMod.EnderRiftBlocks.STRUCTURE.cornerState(StructureBlock.Corner.SW, false),
+                EnderRiftMod.EnderRiftBlocks.STRUCTURE.edgeState(StructureBlock.Type2.SIDE_EW, false),
+                EnderRiftMod.EnderRiftBlocks.STRUCTURE.cornerState(StructureBlock.Corner.SE, false),
         };
     }
 
@@ -89,7 +89,7 @@ public class RiftStructure
 
         ItemStack stack = ((RiftTileEntity) te).getRiftItem();
 
-        InventoryHelper.spawnItemStack(world, player.posX, player.posY + 0.5f, player.posZ, stack);
+        InventoryHelper.spawnItemStack(world, player.getPosX(), player.getPosY() + 0.5f, player.getPosZ(), stack);
 
         return true;
     }
@@ -103,7 +103,7 @@ public class RiftStructure
                 for (int zz = -1; zz <= 1; zz++)
                 {
                     BlockPos pos2 = pos.add(xx, yy, zz);
-                    if (world.getBlockState(pos2).getBlock() == EnderRiftMod.Blocks.RIFT)
+                    if (world.getBlockState(pos2).getBlock() == EnderRiftMod.EnderRiftBlocks.RIFT)
                     {
                         RiftStructure.dismantle(world, pos2);
                         return;
@@ -117,7 +117,7 @@ public class RiftStructure
     {
         BlockState state = world.getBlockState(pos);
 
-        if (state.getBlock() != EnderRiftMod.Blocks.RIFT)
+        if (state.getBlock() != EnderRiftMod.EnderRiftBlocks.RIFT)
             return false;
 
         if (state.get(RiftBlock.ASSEMBLED))
@@ -140,7 +140,7 @@ public class RiftStructure
                             if (!w.isAir(st, world, bp))
                                 return false;
                         }
-                        else if (b != EnderRiftMod.Blocks.RIFT)
+                        else if (b != EnderRiftMod.EnderRiftBlocks.RIFT)
                         {
                             if (b != w)
                                 return false;
@@ -198,10 +198,10 @@ public class RiftStructure
                 for (int xx = 0; xx <= 2; xx++)
                 {
                     Block b = StructurePattern[yy * 9 + zz * 3 + xx];
-                    if (b != null && b != Blocks.AIR && b != EnderRiftMod.Blocks.RIFT)
+                    if (b != null && b != Blocks.AIR && b != EnderRiftMod.EnderRiftBlocks.RIFT)
                     {
                         BlockPos bp = pos.add(xx - 1, yy - 1, zz - 1);
-                        if (world.getBlockState(bp).getBlock() == EnderRiftMod.Blocks.STRUCTURE)
+                        if (world.getBlockState(bp).getBlock() == EnderRiftMod.EnderRiftBlocks.STRUCTURE)
                             world.setBlockState(bp, b.getDefaultState());
                     }
                 }
@@ -210,7 +210,7 @@ public class RiftStructure
 
         BlockState state = world.getBlockState(pos);
 
-        if (state.getBlock() == EnderRiftMod.Blocks.RIFT && state.get(RiftBlock.ASSEMBLED))
+        if (state.getBlock() == EnderRiftMod.EnderRiftBlocks.RIFT && state.get(RiftBlock.ASSEMBLED))
         {
             world.setBlockState(pos, state.with(RiftBlock.ASSEMBLED, false));
 
@@ -225,7 +225,7 @@ public class RiftStructure
 
     public static Block getOriginalBlock(BlockState state)
     {
-        if (state.getBlock() == EnderRiftMod.Blocks.STRUCTURE)
+        if (state.getBlock() == EnderRiftMod.EnderRiftBlocks.STRUCTURE)
         {
             if (state.get(StructureBlock.TYPE1) ==StructureBlock.Type1.CORNER)
             {
@@ -251,7 +251,7 @@ public class RiftStructure
                 for (int xx = 0; xx <= 2; xx++)
                 {
                     BlockPos pos2 = pos.add(1 - xx, 1 - yy, 1 - zz);
-                    if (worldIn.getBlockState(pos2).getBlock() == EnderRiftMod.Blocks.RIFT)
+                    if (worldIn.getBlockState(pos2).getBlock() == EnderRiftMod.EnderRiftBlocks.RIFT)
                     {
                         return StructurePattern[yy * 9 + zz * 3 + xx];
                     }

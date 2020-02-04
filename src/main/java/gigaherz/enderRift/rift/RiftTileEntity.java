@@ -30,7 +30,7 @@ import java.util.Random;
 public class RiftTileEntity extends TileEntity implements ITickableTileEntity
 {
     @ObjectHolder("enderrift:rift")
-    public static TileEntityType<?> TYPE;
+    public static TileEntityType<RiftTileEntity> TYPE;
 
     private static final int STARTUP_POWER = 10000;
     public static final int BUFFER_POWER = 1000000;
@@ -167,7 +167,7 @@ public class RiftTileEntity extends TileEntity implements ITickableTileEntity
 
     public ItemStack getRiftItem()
     {
-        ItemStack stack = new ItemStack(EnderRiftMod.Items.RIFT_ORB);
+        ItemStack stack = new ItemStack(EnderRiftMod.EnderRiftItems.RIFT_ORB);
 
         CompoundNBT tag = new CompoundNBT();
 

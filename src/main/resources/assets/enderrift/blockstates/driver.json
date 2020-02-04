@@ -1,89 +1,31 @@
 {
-  "forge_marker": 1,
-  "defaults": {
-    "model": "enderrift:block/driver_main.obj",
-    "textures": {
-      "particle": "minecraft:block/hopper_inside"
+  "multipart": [
+    {
+      "apply": { "model": "enderrift:block/driver_main" }
+    },
+    {
+      "when": {"up": true},
+      "apply":  { "model": "enderrift:block/proxy_connection", "x": 90 }
+    },
+    {
+      "when": {"down": true},
+      "apply":  { "model": "enderrift:block/proxy_connection", "x": 270 }
+    },
+    {
+      "when": {"east": true},
+      "apply":  { "model": "enderrift:block/proxy_connection", "y": 270 }
+    },
+    {
+      "when": {"west": true},
+      "apply":  { "model": "enderrift:block/proxy_connection", "y": 90 }
+    },
+    {
+      "when": {"north": true},
+      "apply":  { "model": "enderrift:block/proxy_connection", "y": 180 }
+    },
+    {
+      "when":  {"south": true},
+      "apply":  { "model": "enderrift:block/proxy_connection", "y": 0 }
     }
-  },
-  "variants": {
-    "inventory": [{ "transform": "forge:default-block" }],
-    "up": {
-      "false": {
-      },
-      "true": {
-        "submodel": {
-          "up": {
-            "model": "enderrift:block/proxy_connection.obj",
-            "textures": { "#Front": "enderrift:block/items_front" },
-            "x": 90
-          }
-        }
-      }
-    },
-    "down": {
-      "false": {
-      },
-      "true": {
-        "submodel": {
-          "down": {
-            "model": "enderrift:block/proxy_connection.obj",
-            "textures": { "#Front": "enderrift:block/items_front" },
-            "x": 270
-          }
-        }
-      }
-    },
-    "east": {
-      "false": {
-      },
-      "true": {
-        "submodel": {
-          "east": {
-            "model": "enderrift:block/proxy_connection.obj",
-            "textures": { "#Front": "enderrift:block/items_front" },
-            "y": 270
-          }
-        }
-      }
-    },
-    "west": {
-      "false": {
-      },
-      "true": {
-        "submodel": {
-          "west": {
-            "model": "enderrift:block/proxy_connection.obj",
-            "textures": { "#Front": "enderrift:block/items_front" },
-            "y": 90
-          }
-        }
-      }
-    },
-    "north": {
-      "false": {
-      },
-      "true": {
-        "submodel": {
-          "north": {
-            "model": "enderrift:block/proxy_connection.obj",
-            "textures": { "#Front": "enderrift:block/items_front" },
-            "y": 180
-          }
-        }
-      }
-    },
-    "south": {
-      "false": {
-      },
-      "true": {
-        "submodel": {
-          "south": {
-            "model": "enderrift:proxy_connection.obj",
-            "textures": { "#Front": "enderrift:blocks/items_front" }
-          }
-        }
-      }
-    }
-  }
+  ]
 }

@@ -1,22 +1,38 @@
 package gigaherz.enderRift.rift;
 
-import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.IVertexBuilder;
 import gigaherz.enderRift.EnderRiftMod;
-import gigaherz.enderRift.client.ModelHandle;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.IRenderTypeBuffer;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.Vector3f;
+import net.minecraft.client.renderer.model.BakedQuad;
+import net.minecraft.client.renderer.model.IBakedModel;
 import net.minecraft.client.renderer.texture.AtlasTexture;
 import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
+import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
-import org.lwjgl.opengl.GL11;
+import net.minecraftforge.client.model.data.EmptyModelData;
+
+import java.util.Random;
 
 public class RiftTileEntityRenderer extends TileEntityRenderer<RiftTileEntity>
 {
-    private ModelHandle modelHandle = ModelHandle.of(EnderRiftMod.location("block/sphere.obj"));
+    private final RenderType renderType = RenderType.translucent();
+    private final Random random = new Random();
+
+    public RiftTileEntityRenderer(TileEntityRendererDispatcher dispatcher)
+    {
+        super(dispatcher);
+    }
 
     @Override
-    public void render(RiftTileEntity te, double x, double y, double z, float partialTicks, int destroyStage)
+    public void render(RiftTileEntity te, float partialTicks, MatrixStack matrixStack, IRenderTypeBuffer iRenderTypeBuffer, int num1, int num2)
     {
         if (!te.getBlockState().get(RiftBlock.ASSEMBLED))
             return;
@@ -36,20 +52,11 @@ public class RiftTileEntityRenderer extends TileEntityRenderer<RiftTileEntity>
         float xz = (float) Math.sqrt(tx * tx + tz * tz);
         float pitch = (float) Math.atan2(ty, xz);
 
-        bindTexture(AtlasTexture.LOCATION_BLOCKS_TEXTURE);
-
-        GlStateManager.disableLighting();
-        GlStateManager.disableAlphaTest();
-        GlStateManager.disableRescaleNormal();
-        GlStateManager.enableBlend();
-        GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-
-        GlStateManager.pushMatrix();
-        GlStateManager.translated(x, y, z);
-        GlStateManager.translated(0.5, 0.5, 0.5);
-        GlStateManager.rotatef((float) Math.toDegrees(-yaw), 0.0F, 1.0F, 0.0F);
-        GlStateManager.rotatef((float) Math.toDegrees(pitch), 0.0F, 0.0F, 1.0F);
-        GlStateManager.translated(-0.5, -0.5, -0.5);
+        matrixStack.push();
+        matrixStack.translate(0.5, 0.5, 0.5);
+        matrixStack.rotate(Vector3f.YP.rotation(-yaw));
+        matrixStack.rotate(Vector3f.ZP.rotation(pitch));
+        matrixStack.translate(-0.5, -0.5, -0.5);
 
         int step_time = 20;
         int steps = 5;
@@ -68,23 +75,35 @@ public class RiftTileEntityRenderer extends TileEntityRenderer<RiftTileEntity>
 
             float scale = (1.0f + poweringState) + (0.6f + poweringState) * progress0;
 
-            GlStateManager.pushMatrix();
-            GlStateManager.translated(0.5, 0.5, 0.5);
-            GlStateManager.scalef(scale, scale, scale);
-            GlStateManager.translated(-0.5, -0.5, -0.5);
+            matrixStack.push();
+            matrixStack.translate(0.5, 0.5, 0.5);
+            matrixStack.scale(scale, scale, scale);
+            matrixStack.translate(-0.5, -0.5, -0.5);
 
-            int a = Math.round(Math.min(255, Math.max(0, (1 - progress1) * 255)));
-            int b = Math.round(Math.min(255, Math.max(0, progress1 * 255)));
-            int g = Math.round(Math.min(255, Math.max(0, progress1 * 255)));
-            int r = Math.round(Math.min(255, Math.max(0, progress1 * 255)));
-            int color = (a << 24) | (b << 16) | (g << 8) | (r);
+            float a = MathHelper.clamp(1 - progress1, 0, 1);
+            float b = MathHelper.clamp(progress1, 0, 1);
+            float g = MathHelper.clamp(progress1, 0, 1);
+            float r = MathHelper.clamp(progress1, 0, 1);
 
-            modelHandle.render(color);
+            IBakedModel model = Minecraft.getInstance().getModelManager().getModel(EnderRiftMod.location("block/sphere"));
 
-            GlStateManager.popMatrix();
+            IVertexBuilder buffer = iRenderTypeBuffer.getBuffer(renderType);
+            for(BakedQuad quad : model.getQuads(null, null, random, EmptyModelData.INSTANCE))
+            {
+                buffer.addVertexData(matrixStack.getLast(), quad, r, g, b, a, 0x00F000F0, 0, true);
+            }
+            for(Direction d : Direction.values())
+            {
+                for(BakedQuad quad : model.getQuads(null, d, random, EmptyModelData.INSTANCE))
+                {
+                    buffer.addVertexData(matrixStack.getLast(), quad, r, g, b, a, 0x00F000F0, 0, true);
+                }
+            }
+
+            matrixStack.pop();
         }
 
-        GlStateManager.popMatrix();
+        matrixStack.pop();
     }
 
     private float lerp(float a, float b, float p)

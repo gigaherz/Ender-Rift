@@ -52,7 +52,7 @@ public class InterfaceTileEntity extends AggregatorTileEntity implements IPowere
         if (facing == null && world != null)
         {
             BlockState state = world.getBlockState(pos);
-            if (state.getBlock() == EnderRiftMod.Blocks.INTERFACE)
+            if (state.getBlock() == EnderRiftMod.EnderRiftBlocks.INTERFACE)
             {
                 facing = state.get(InterfaceBlock.FACING).getOpposite();
             }

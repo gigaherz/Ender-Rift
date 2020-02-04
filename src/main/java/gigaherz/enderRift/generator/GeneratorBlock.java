@@ -14,6 +14,7 @@ import net.minecraft.state.DirectionProperty;
 import net.minecraft.state.StateContainer;
 import net.minecraft.state.properties.BlockStateProperties;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
@@ -28,7 +29,7 @@ import javax.annotation.Nullable;
 
 public class GeneratorBlock extends Block
 {
-    public static final DirectionProperty FACING = BlockStateProperties.FACING;
+    public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
 
     public GeneratorBlock(Properties properties)
     {
@@ -56,22 +57,22 @@ public class GeneratorBlock extends Block
     }
 
     @Override
-    public boolean onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit)
+    public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit)
     {
         TileEntity tileEntity = worldIn.getTileEntity(pos);
 
-        if (!(tileEntity instanceof GeneratorTileEntity) || player.isSneaking())
-            return false;
+        if (!(tileEntity instanceof GeneratorTileEntity) || player.isShiftKeyDown())
+            return ActionResultType.FAIL;
 
         if (worldIn.isRemote)
-            return true;
+            return ActionResultType.SUCCESS;
 
         NetworkHooks.openGui((ServerPlayerEntity)player,
                 new SimpleNamedContainerProvider((id, playerInventory, playerEntity) -> new GeneratorContainer(id, pos, playerInventory),
                         new TranslationTextComponent("text.enderrift.browser.title")
                         ), pos);
 
-        return true;
+        return ActionResultType.SUCCESS;
     }
 
     @Nullable

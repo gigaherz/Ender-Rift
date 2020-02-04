@@ -1,46 +1,10 @@
 {
   "parent": "block/block",
+  "loader": "forge:obj",
+  "model": "enderrift:models/block/interface.obj",
   "textures": {
     "face": "minecraft:block/hopper_inside",
     "all": "minecraft:block/hopper_outside",
     "particle": "#all"
-  },
-  "elements": [
-    {
-      "from": [ 0, 0, 0 ],
-      "to": [ 16, 16, 4 ],
-      "faces": {
-        "down":  { "texture": "#all" },
-        "up":    { "texture": "#all"  },
-        "north": { "texture": "#face"  },
-        "south": { "texture": "#all"  },
-        "west":  { "texture": "#all"  },
-        "east":  { "texture": "#all"  }
-      }
-    },
-    {
-      "from": [ 4, 4, 4 ],
-      "to": [ 12, 12, 12 ],
-      "faces": {
-        "down":  { "texture": "#all" },
-        "up":    { "texture": "#all"  },
-        "north": { "texture": "#all"  },
-        "south": { "texture": "#all"  },
-        "west":  { "texture": "#all"  },
-        "east":  { "texture": "#all"  }
-      }
-    },
-    {
-      "from": [ 6, 6, 12 ],
-      "to": [ 10, 10, 16 ],
-      "faces": {
-        "down":  { "texture": "#all" },
-        "up":    { "texture": "#all"  },
-        "north": { "texture": "#all"  },
-        "south": { "texture": "#all"  },
-        "west":  { "texture": "#all"  },
-        "east":  { "texture": "#all"  }
-      }
-    }
-  ]
+  }
 }
