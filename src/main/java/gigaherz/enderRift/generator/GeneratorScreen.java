@@ -1,9 +1,8 @@
 package gigaherz.enderRift.generator;
 
 import com.google.common.collect.Lists;
-import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.systems.RenderSystem;
 import gigaherz.enderRift.EnderRiftMod;
-import net.minecraft.client.gui.IHasContainer;
 import net.minecraft.client.gui.screen.inventory.ContainerScreen;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.PlayerInventory;
@@ -41,34 +40,34 @@ public class GeneratorScreen extends ContainerScreen<GeneratorContainer>
     @Override
     protected void drawGuiContainerForegroundLayer(int i, int j)
     {
-        String name = I18n.format(container.tile.getName());
-        minecraft.fontRenderer.drawString(name, (xSize - minecraft.fontRenderer.getStringWidth(name)) / 2, 6, 0x404040);
-        minecraft.fontRenderer.drawString(playerInventory.getName().getFormattedText(), 8, ySize - 96 + 2, 0x404040);
+        String name = title.getFormattedText();
+        font.drawString(name, (xSize - font.getStringWidth(name)) / 2, 6, 0x404040);
+        font.drawString(playerInventory.getName().getFormattedText(), 8, ySize - 96 + 2, 0x404040);
 
         String label;
         if (container.tile.getGenerationPower() > 0)
         {
             label = I18n.format("text.enderrift.generator.status.generating.label");
-            minecraft.fontRenderer.drawString(label, 8, 22, 0x404040);
-            minecraft.fontRenderer.drawString(String.format("%d RF/t", container.tile.getGenerationPower()), 12, 32, 0x404040);
+            font.drawString(label, 8, 22, 0x404040);
+            font.drawString(String.format("%d RF/t", container.tile.getGenerationPower()), 12, 32, 0x404040);
         }
         else if (container.tile.isBurning())
         {
             label = I18n.format("text.enderrift.generator.status.heating");
-            minecraft.fontRenderer.drawString(label, 8, 22, 0x404040);
+            font.drawString(label, 8, 22, 0x404040);
         }
         else
         {
             label = I18n.format("text.enderrift.generator.status.idle");
-            minecraft.fontRenderer.drawString(label, 8, 22, 0x404040);
+            font.drawString(label, 8, 22, 0x404040);
         }
 
         label = I18n.format("text.enderrift.generator.heat.label");
-        minecraft.fontRenderer.drawString(label, 8, 46, 0x404040);
-        minecraft.fontRenderer.drawString(String.format("%d C", container.tile.getHeatValue()), 12, 56, getHeatColor());
+        font.drawString(label, 8, 46, 0x404040);
+        font.drawString(String.format("%d C", container.tile.getHeatValue()), 12, 56, getHeatColor());
 
         String str = String.format("%d RF", container.tile.getContainedEnergy());
-        minecraft.fontRenderer.drawString(str, xSize - 8 - minecraft.fontRenderer.getStringWidth(str), 64, 0x404040);
+        font.drawString(str, xSize - 8 - font.getStringWidth(str), 64, 0x404040);
 
         drawBarTooltip(i, j, xSize - 14 - 8, 20);
     }
@@ -91,7 +90,7 @@ public class GeneratorScreen extends ContainerScreen<GeneratorContainer>
     @Override
     protected void drawGuiContainerBackgroundLayer(float f, int i, int j)
     {
-        GlStateManager.color4f(1.0f, 1.0f, 1.0f, 1.0f);
+        RenderSystem.color4f(1.0f, 1.0f, 1.0f, 1.0f);
 
         minecraft.getTextureManager().bindTexture(guiTextureLocation);
         blit(guiLeft, guiTop, 0, 0, xSize, ySize);

@@ -1,12 +1,15 @@
 package gigaherz.enderRift.plugins;
-/*
+
 import gigaherz.enderRift.EnderRiftMod;
-import gigaherz.enderRift.automation.TileAggregator;
-import gigaherz.enderRift.automation.driver.TileDriver;
-import gigaherz.enderRift.generator.TileGenerator;
-import gigaherz.enderRift.rift.BlockStructure;
-import gigaherz.enderRift.rift.TileEnderRift;
-import gigaherz.enderRift.rift.TileEnderRiftCorner;
+import gigaherz.enderRift.automation.AggregatorTileEntity;
+import gigaherz.enderRift.automation.driver.DriverBlock;
+import gigaherz.enderRift.automation.driver.DriverTileEntity;
+import gigaherz.enderRift.generator.GeneratorBlock;
+import gigaherz.enderRift.generator.GeneratorTileEntity;
+import gigaherz.enderRift.rift.RiftBlock;
+import gigaherz.enderRift.rift.RiftTileEntity;
+import gigaherz.enderRift.rift.StructureBlock;
+import gigaherz.enderRift.rift.StructureTileEntity;
 import gigaherz.graph2.Graph;
 import gigaherz.graph2.GraphObject;
 import mcp.mobius.waila.api.*;
@@ -15,310 +18,206 @@ import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.common.Optional;
+import net.minecraftforge.energy.IEnergyStorage;
 
 import java.util.List;
+import java.util.Optional;
 
 @WailaPlugin
 public class WailaProviders implements IWailaPlugin
 {
-    private static final String CONFIG_GENERATOR = EnderRiftMod.MODID + ".generator";
-    private static final String CONFIG_RIFT = EnderRiftMod.MODID + ".rift";
-    private static final String CONFIG_DRIVER = EnderRiftMod.MODID + ".driver";
-    private static final String CONFIG_RF = EnderRiftMod.MODID + ".rf";
+    private static final ResourceLocation CONFIG_GENERATOR = EnderRiftMod.location("generator");
+    private static final ResourceLocation CONFIG_RIFT = EnderRiftMod.location("rift");
+    private static final ResourceLocation CONFIG_DRIVER = EnderRiftMod.location("driver");
+    private static final ResourceLocation CONFIG_RF = EnderRiftMod.location("rf");
 
 
     @Override
-    public void register(IWailaRegistrar registrar)
+    public void register(IRegistrar registrar)
     {
-        registrar.addConfig("Ender-Rift", CONFIG_GENERATOR);
-        registrar.addConfig("Ender-Rift", CONFIG_RIFT);
-        registrar.addConfig("Ender-Rift", CONFIG_DRIVER);
-        registrar.addConfig("Ender-Rift", CONFIG_RF);
+        registrar.addConfig(CONFIG_GENERATOR, true);
+        registrar.addConfig(CONFIG_RIFT, true);
+        registrar.addConfig(CONFIG_DRIVER, true);
+        registrar.addConfig(CONFIG_RF, true);
 
         {
             RiftTooltipProvider instance = new RiftTooltipProvider();
-            registrar.registerBodyProvider(instance, TileEnderRift.class);
-            registrar.registerNBTProvider(instance, TileEnderRift.class);
-            registrar.registerStackProvider(instance, TileEnderRiftCorner.class);
-            registrar.registerBodyProvider(instance, TileEnderRiftCorner.class);
-            registrar.registerNBTProvider(instance, TileEnderRiftCorner.class);
+            registrar.registerStackProvider(instance, StructureTileEntity.class);
+            registrar.registerBlockDataProvider(instance, StructureTileEntity.class);
+            registrar.registerComponentProvider(instance, TooltipPosition.BODY, StructureBlock.class);
+            registrar.registerBlockDataProvider(instance, RiftTileEntity.class);
+            registrar.registerComponentProvider(instance, TooltipPosition.BODY, RiftBlock.class);
         }
 
         {
             StructureTooltipProvider instance = new StructureTooltipProvider();
-            registrar.registerStackProvider(instance, BlockStructure.class);
+            registrar.registerStackProvider(instance, StructureBlock.class);
         }
 
         {
             NetworkTooltipProvider instance = new NetworkTooltipProvider();
-            registrar.registerBodyProvider(instance, TileAggregator.class);
+            registrar.registerComponentProvider(instance, TooltipPosition.BODY, AggregatorTileEntity.class);
         }
 
         {
             DriverTooltipProvider instance = new DriverTooltipProvider();
-            registrar.registerBodyProvider(instance, TileDriver.class);
-            registrar.registerNBTProvider(instance, TileDriver.class);
+            registrar.registerBlockDataProvider(instance, DriverTileEntity.class);
+            registrar.registerComponentProvider(instance, TooltipPosition.BODY, DriverBlock.class);
         }
 
         {
             GeneratorTooltipProvider instance = new GeneratorTooltipProvider();
-            registrar.registerBodyProvider(instance, TileGenerator.class);
-            registrar.registerNBTProvider(instance, TileGenerator.class);
+            registrar.registerBlockDataProvider(instance, GeneratorTileEntity.class);
+            registrar.registerComponentProvider(instance, TooltipPosition.BODY, GeneratorBlock.class);
         }
     }
 
-    public static class GeneratorTooltipProvider implements IWailaDataProvider
+    public static class GeneratorTooltipProvider implements IComponentProvider, IServerDataProvider<TileEntity>
     {
         @Override
-        public ItemStack getWailaStack(IWailaDataAccessor accessor, IWailaConfigHandler config)
+        public void appendBody(List<ITextComponent> tooltip, IDataAccessor accessor, IPluginConfig config)
         {
-            return ItemStack.EMPTY;
-        }
-
-        @Override
-        public List<String> getWailaHead(ItemStack itemStack, List<String> currenttip, IWailaDataAccessor accessor, IWailaConfigHandler config)
-        {
-            return currenttip;
-        }
-
-        @Override
-        public List<String> getWailaBody(ItemStack itemStack, List<String> currenttip, IWailaDataAccessor accessor, IWailaConfigHandler config)
-        {
-            if (config.getConfig(CONFIG_GENERATOR))
+            if (config.get(CONFIG_GENERATOR))
             {
-                CompoundNBT tag = accessor.getNBTData();
+                CompoundNBT tag = accessor.getServerData();
 
-                if (tag.getInteger("powerGen") > 0)
+                if (tag.getInt("powerGen") > 0)
                 {
-                    currenttip.add(I18n.format("text.enderrift.generator.status.generating", tag.getInteger("powerGen")));
+                    tooltip.add(new TranslationTextComponent("text.enderrift.generator.status.generating", tag.getInt("powerGen")));
                 }
                 else if (tag.getBoolean("isBurning"))
                 {
-                    currenttip.add(I18n.format("text.enderrift.generator.status.heating"));
+                    tooltip.add(new TranslationTextComponent("text.enderrift.generator.status.heating"));
                 }
                 else
                 {
-                    currenttip.add(I18n.format("text.enderrift.generator.status.idle"));
+                    tooltip.add(new TranslationTextComponent("text.enderrift.generator.status.idle"));
                 }
 
-                currenttip.add(I18n.format("text.enderrift.generator.heat", tag.getInteger("heat")));
+                tooltip.add(new TranslationTextComponent("text.enderrift.generator.heat", tag.getInt("heat")));
 
-                if (config.getConfig(CONFIG_RF))
-                    currenttip.add(I18n.format("text.enderrift.generator.energy", tag.getInteger("energy"), TileGenerator.POWER_LIMIT));
+                if (config.get(CONFIG_RF))
+                    tooltip.add(new TranslationTextComponent("text.enderrift.generator.energy", tag.getInt("energy"), GeneratorTileEntity.POWER_LIMIT));
             }
-
-            return currenttip;
         }
 
         @Override
-        public List<String> getWailaTail(ItemStack itemStack, List<String> currenttip, IWailaDataAccessor accessor, IWailaConfigHandler config)
+        public void appendServerData(CompoundNBT tag, ServerPlayerEntity serverPlayerEntity, World world, TileEntity tileEntity)
         {
-            return currenttip;
-        }
+            GeneratorTileEntity rift = (GeneratorTileEntity) tileEntity;
 
-        @Override
-        public CompoundNBT getNBTData(ServerPlayerEntity player, TileEntity te, CompoundNBT tag, World world, BlockPos pos)
-        {
-            TileGenerator rift = (TileGenerator) te;
-
-            tag.setBoolean("isBurning", rift.isBurning());
-            tag.setInteger("powerGen", rift.getGenerationPower());
-            tag.setInteger("energy", rift.getContainedEnergy());
-            tag.setInteger("heat", rift.getHeatValue());
-
-            return tag;
+            tag.putBoolean("isBurning", rift.isBurning());
+            tag.putInt("powerGen", rift.getGenerationPower());
+            tag.putInt("energy", rift.getContainedEnergy());
+            tag.putInt("heat", rift.getHeatValue());
         }
     }
 
-    public static class DriverTooltipProvider implements IWailaDataProvider
+    public static class DriverTooltipProvider implements IComponentProvider, IServerDataProvider<TileEntity>
     {
         @Override
-        public ItemStack getWailaStack(IWailaDataAccessor accessor, IWailaConfigHandler config)
+        public void appendBody(List<ITextComponent> tooltip, IDataAccessor accessor, IPluginConfig config)
         {
-            return ItemStack.EMPTY;
-        }
-
-        @Override
-        public List<String> getWailaHead(ItemStack itemStack, List<String> currenttip, IWailaDataAccessor accessor, IWailaConfigHandler config)
-        {
-            return currenttip;
-        }
-
-        @Override
-        public List<String> getWailaBody(ItemStack itemStack, List<String> currenttip, IWailaDataAccessor accessor, IWailaConfigHandler config)
-        {
-            if (config.getConfig(CONFIG_DRIVER))
+            if (config.get(CONFIG_DRIVER))
             {
-                CompoundNBT tag = accessor.getNBTData();
+                CompoundNBT tag = accessor.getServerData();
 
-                if (config.getConfig(CONFIG_RF))
-                    currenttip.add(I18n.format("text.enderrift.generator.energy", tag.getInteger("energy"), TileDriver.POWER_LIMIT));
+                if (config.get(CONFIG_RF))
+                    tooltip.add(new TranslationTextComponent("text.enderrift.generator.energy", tag.getInt("energy"), DriverTileEntity.POWER_LIMIT));
             }
-
-            return currenttip;
         }
 
         @Override
-        public List<String> getWailaTail(ItemStack itemStack, List<String> currenttip, IWailaDataAccessor accessor, IWailaConfigHandler config)
+        public void appendServerData(CompoundNBT tag, ServerPlayerEntity serverPlayerEntity, World world, TileEntity tileEntity)
         {
-            return currenttip;
-        }
+            DriverTileEntity rift = (DriverTileEntity) tileEntity;
 
-        @Override
-        public CompoundNBT getNBTData(ServerPlayerEntity player, TileEntity te, CompoundNBT tag, World world, BlockPos pos)
-        {
-            TileDriver rift = (TileDriver) te;
-
-            tag.setInteger("energy", rift.getInternalBuffer().getEnergyStored());
-
-            return tag;
+            tag.putInt("energy", rift.getInternalBuffer().map(IEnergyStorage::getEnergyStored).orElse(0));
         }
     }
 
-    public static class NetworkTooltipProvider implements IWailaDataProvider
+    public static class NetworkTooltipProvider implements IComponentProvider
     {
         @Override
-        public ItemStack getWailaStack(IWailaDataAccessor accessor, IWailaConfigHandler config)
-        {
-            return ItemStack.EMPTY;
-        }
-
-        @Override
-        public List<String> getWailaHead(ItemStack itemStack, List<String> currenttip, IWailaDataAccessor accessor, IWailaConfigHandler config)
-        {
-            return currenttip;
-        }
-
-        @Override
-        public List<String> getWailaBody(ItemStack itemStack, List<String> currenttip, IWailaDataAccessor accessor, IWailaConfigHandler config)
+        public void appendBody(List<ITextComponent> tooltip, IDataAccessor accessor, IPluginConfig config)
         {
             Graph network = ((GraphObject) accessor.getTileEntity()).getGraph();
-            currenttip.add(String.format("Network size: %d", network.getObjects().size()));
-
-            return currenttip;
-        }
-
-        @Override
-        public List<String> getWailaTail(ItemStack itemStack, List<String> currenttip, IWailaDataAccessor accessor, IWailaConfigHandler config)
-        {
-            return currenttip;
-        }
-
-        @Override
-        public CompoundNBT getNBTData(ServerPlayerEntity player, TileEntity te, CompoundNBT tag, World world, BlockPos pos)
-        {
-            return tag;
+            tooltip.add(new TranslationTextComponent("text.enderrift.network.size", network.getObjects().size()));
         }
     }
 
-    public static class StructureTooltipProvider implements IWailaDataProvider
+    public static class StructureTooltipProvider implements IComponentProvider
     {
         @Override
-        public ItemStack getWailaStack(IWailaDataAccessor accessor, IWailaConfigHandler config)
+        public ItemStack getStack(IDataAccessor accessor, IPluginConfig config)
         {
-            return new ItemStack(EnderRiftMod.structure);
-        }
-
-        @Override
-        public List<String> getWailaHead(ItemStack itemStack, List<String> currenttip, IWailaDataAccessor accessor, IWailaConfigHandler config)
-        {
-            return currenttip;
-        }
-
-        @Override
-        public List<String> getWailaBody(ItemStack itemStack, List<String> currenttip, IWailaDataAccessor accessor, IWailaConfigHandler config)
-        {
-            return currenttip;
-        }
-
-        @Override
-        public List<String> getWailaTail(ItemStack itemStack, List<String> currenttip, IWailaDataAccessor accessor, IWailaConfigHandler config)
-        {
-            return currenttip;
-        }
-
-        @Override
-        public CompoundNBT getNBTData(ServerPlayerEntity player, TileEntity te, CompoundNBT tag, World world, BlockPos pos)
-        {
-            return tag;
+            return new ItemStack(EnderRiftMod.EnderRiftBlocks.STRUCTURE);
         }
     }
 
-    public static class RiftTooltipProvider implements IWailaDataProvider
+    public static class RiftTooltipProvider
+            implements IComponentProvider, IServerDataProvider<TileEntity>
     {
+
         @Override
-        public ItemStack getWailaStack(IWailaDataAccessor accessor, IWailaConfigHandler config)
+        public ItemStack getStack(IDataAccessor accessor, IPluginConfig config)
         {
-            return new ItemStack(EnderRiftMod.rift);
+            return new ItemStack(EnderRiftMod.EnderRiftBlocks.RIFT);
         }
 
         @Override
-        public List<String> getWailaHead(ItemStack itemStack, List<String> currenttip, IWailaDataAccessor accessor, IWailaConfigHandler config)
+        public void appendBody(List<ITextComponent> tooltip, IDataAccessor accessor, IPluginConfig config)
         {
-            return currenttip;
-        }
-
-        @Override
-        public List<String> getWailaBody(ItemStack itemStack, List<String> currenttip, IWailaDataAccessor accessor, IWailaConfigHandler config)
-        {
-            if (config.getConfig(CONFIG_RIFT))
+            if (config.get(CONFIG_RIFT) && (accessor.getBlock() != EnderRiftMod.EnderRiftBlocks.STRUCTURE || accessor.getBlockState().get(StructureBlock.TYPE1) == StructureBlock.Type1.CORNER))
             {
-                CompoundNBT tag = accessor.getNBTData();
+                CompoundNBT tag = accessor.getServerData();
 
-                if (tag != null && tag.hasKey("isFormed"))
+                if (tag != null && tag.contains("isFormed"))
                 {
-                    currenttip.add(I18n.format("text.enderrift.rift.isFormed", tag.getBoolean("isFormed")));
-                    currenttip.add(I18n.format("text.enderrift.rift.is_powered", tag.getBoolean("isPowered")));
+                    tooltip.add(new TranslationTextComponent("text.enderrift.rift.is_formed", tag.getBoolean("isFormed")));
+                    tooltip.add(new TranslationTextComponent("text.enderrift.rift.is_powered", tag.getBoolean("isPowered")));
                     if (tag.getBoolean("isFormed"))
                     {
-                        currenttip.add(I18n.format("text.enderrift.rift.rift_id", tag.getInteger("riftId")));
-                        if (config.getConfig(CONFIG_RF))
-                            currenttip.add(I18n.format("text.enderrift.rift.rf", tag.getInteger("energy"), TileEnderRift.BUFFER_POWER));
+                        tooltip.add(new TranslationTextComponent("text.enderrift.rift.rift_id", tag.getInt("riftId")));
+                        if (config.get(CONFIG_RF))
+                            tooltip.add(new TranslationTextComponent("text.enderrift.rift.rf", tag.getInt("energy"), RiftTileEntity.BUFFER_POWER));
                     }
-                    currenttip.add(I18n.format("text.enderrift.rift.used_slots", tag.getInteger("usedSlots")));
+                    tooltip.add(new TranslationTextComponent("text.enderrift.rift.used_slots", tag.getInt("usedSlots")));
                 }
                 else
                 {
-                    currenttip.add(I18n.format("text.enderrift.rift.waila.isFormed", false));
+                    tooltip.add(new TranslationTextComponent("text.enderrift.rift.is_formed", false));
                 }
             }
-
-            return currenttip;
         }
 
         @Override
-        public List<String> getWailaTail(ItemStack itemStack, List<String> currenttip, IWailaDataAccessor accessor, IWailaConfigHandler config)
+        public void appendServerData(CompoundNBT tag, ServerPlayerEntity serverPlayerEntity, World world, TileEntity tileEntity)
         {
-            return currenttip;
-        }
+            Optional<RiftTileEntity> riftMaybe;
 
-        @Override
-        public CompoundNBT getNBTData(ServerPlayerEntity player, TileEntity te, CompoundNBT tag, World world, BlockPos pos)
-        {
-            TileEnderRift rift;
-
-            if (te instanceof TileEnderRiftCorner)
+            if (tileEntity instanceof StructureTileEntity)
             {
-                rift = ((TileEnderRiftCorner) te).getParent();
+                riftMaybe = ((StructureTileEntity) tileEntity).getParent();
             }
             else
             {
-                rift = (TileEnderRift) te;
+                riftMaybe = Optional.of((RiftTileEntity) tileEntity);
             }
 
-            assert rift != null;
+            riftMaybe.ifPresent(rift -> {
+                tag.putInt("usedSlots", rift.countInventoryStacks());
+                tag.putBoolean("isFormed", rift.getBlockState().get(RiftBlock.ASSEMBLED));
+                tag.putBoolean("isPowered", rift.isPowered());
+                tag.putInt("riftId", rift.getRiftId());
+                tag.putInt("energy", rift.getEnergyBuffer().map(IEnergyStorage::getEnergyStored).orElse(0));
+            });
 
-            tag.setInteger("usedSlots", rift.countInventoryStacks());
-            tag.setBoolean("isFormed", rift.getBlockMetadata() != 0);
-            tag.setBoolean("isPowered", rift.isPowered());
-            tag.setInteger("riftId", rift.getRiftId());
-            tag.setInteger("energy", rift.getEnergyBuffer().getEnergyStored());
-
-            return tag;
         }
     }
 }
-*/

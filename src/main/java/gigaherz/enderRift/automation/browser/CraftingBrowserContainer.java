@@ -4,9 +4,11 @@ import gigaherz.enderRift.EnderRiftMod;
 import gigaherz.enderRift.automation.AutomationHelper;
 import gigaherz.enderRift.network.ClearCraftingGrid;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.*;
+import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.inventory.CraftResultInventory;
+import net.minecraft.inventory.CraftingInventory;
+import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.container.ContainerType;
 import net.minecraft.inventory.container.CraftingResultSlot;
 import net.minecraft.inventory.container.Slot;
@@ -24,7 +26,7 @@ import net.minecraftforge.registries.ObjectHolder;
 
 import java.util.Optional;
 
-public class CraftingBrowserContainer extends BrowserContainer
+public class CraftingBrowserContainer extends AbstractBrowserContainer
 {
     @ObjectHolder("enderrift:crafting_browser")
     public static ContainerType<CraftingBrowserContainer> TYPE;
@@ -92,7 +94,7 @@ public class CraftingBrowserContainer extends BrowserContainer
     {
         if (!world.isRemote)
         {
-            ServerPlayerEntity entityplayermp = (ServerPlayerEntity)player;
+            ServerPlayerEntity entityplayermp = (ServerPlayerEntity) player;
             Optional<ICraftingRecipe> irecipe = this.world.getRecipeManager().getRecipe(IRecipeType.CRAFTING, inventoryCrafting, world);
 
             Optional<ItemStack> stack = irecipe.map((recipe) -> {

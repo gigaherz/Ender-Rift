@@ -25,6 +25,9 @@ repositories {
     maven {
         url 'https://maven.mcmoddev.com/'
     }
+    maven {
+        url "http://tehnut.info/maven"
+    }
 /*
     maven {
         url "https://maven.tterrag.com/"
@@ -33,7 +36,6 @@ repositories {
         name = "CoFH Maven"
         url = "http://maven.covers1624.net"
     }
-    maven {url "http://tehnut.info/maven"}
  */
 }
 
@@ -98,7 +100,7 @@ dependencies {
     compileOnly fg.deobf("mezz.jei:jei-1.15.2:6.0.0.2:api")
     runtimeOnly fg.deobf("mezz.jei:jei-1.15.2:6.0.0.2")
 
-    //deobfCompile "mcp.mobius.waila:Hwyla:1.8.26-B41_1.12.2"
+    compile fg.deobf("mcp.mobius.waila:Hwyla:1.10.7-B71_1.15.1")
 
     //compile fileTree(dir: 'libs', include: '*.jar')
 }

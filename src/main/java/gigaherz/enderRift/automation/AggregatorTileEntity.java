@@ -20,7 +20,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-public abstract class AggregatorTileEntity extends TileEntity implements ITickableTileEntity, GraphObject, IPoweredAutomation
+public abstract class AggregatorTileEntity extends TileEntity
+        implements ITickableTileEntity, GraphObject, IPoweredAutomation
 {
     private Graph graph;
     private boolean firstUpdate = true;

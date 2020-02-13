@@ -1,9 +1,8 @@
 package gigaherz.enderRift;
 
-import com.google.common.collect.ImmutableList;
 import gigaherz.enderRift.automation.browser.*;
 import gigaherz.enderRift.automation.driver.DriverBlock;
-import gigaherz.enderRift.automation.driver.DriverEntityTileEntity;
+import gigaherz.enderRift.automation.driver.DriverTileEntity;
 import gigaherz.enderRift.automation.iface.InterfaceBlock;
 import gigaherz.enderRift.automation.iface.InterfaceContainer;
 import gigaherz.enderRift.automation.iface.InterfaceScreen;
@@ -28,7 +27,6 @@ import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipeSerializer;
 import net.minecraft.tileentity.TileEntityType;
-import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.extensions.IForgeContainerType;
 import net.minecraftforge.event.RegistryEvent;
@@ -47,7 +45,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nonnull;
-import java.util.*;
 
 @Mod.EventBusSubscriber
 @Mod(EnderRiftMod.MODID)
@@ -57,12 +54,13 @@ public class EnderRiftMod
         dependencies = "after:Waila;after:gbook",
         updateJSON =
      */
-    
+
     public static final String MODID = "enderrift";
 
     @SuppressWarnings("ConstantConditions")
     @Nonnull
-    private static <T> T toBeInitializedLater() {
+    private static <T> T toBeInitializedLater()
+    {
         return null;
     }
 
@@ -129,14 +127,14 @@ public class EnderRiftMod
     public void registerBlocks(RegistryEvent.Register<Block> event)
     {
         event.getRegistry().registerAll(
-                new RiftBlock(Block.Properties.create(Material.ROCK).sound(SoundType.METAL).hardnessAndResistance(3.0F,8.0F).variableOpacity()).setRegistryName("rift"),
-                new StructureBlock(Block.Properties.create(Material.ROCK).sound(SoundType.METAL).hardnessAndResistance(3.0F,8.0F)).setRegistryName("structure"),
-                new InterfaceBlock(Block.Properties.create(Material.IRON, MaterialColor.STONE).sound(SoundType.METAL).hardnessAndResistance(3.0F,8.0F)).setRegistryName("interface"),
-                new BrowserBlock(false, Block.Properties.create(Material.IRON, MaterialColor.STONE).sound(SoundType.METAL).hardnessAndResistance(3.0F,8.0F)).setRegistryName("browser"),
-                new BrowserBlock(true, Block.Properties.create(Material.IRON, MaterialColor.STONE).sound(SoundType.METAL).hardnessAndResistance(3.0F,8.0F)).setRegistryName("crafting_browser"),
-                new ProxyBlock(Block.Properties.create(Material.IRON, MaterialColor.STONE).sound(SoundType.METAL).hardnessAndResistance(3.0F,8.0F)).setRegistryName("proxy"),
-                new DriverBlock(Block.Properties.create(Material.IRON, MaterialColor.STONE).sound(SoundType.METAL).hardnessAndResistance(3.0F,8.0F)).setRegistryName("driver"),
-                new GeneratorBlock(Block.Properties.create(Material.IRON, MaterialColor.STONE).sound(SoundType.METAL).hardnessAndResistance(3.0F,8.0F)).setRegistryName("generator")
+                new RiftBlock(Block.Properties.create(Material.ROCK).sound(SoundType.METAL).hardnessAndResistance(3.0F, 8.0F).variableOpacity()).setRegistryName("rift"),
+                new StructureBlock(Block.Properties.create(Material.ROCK).sound(SoundType.METAL).hardnessAndResistance(3.0F, 8.0F)).setRegistryName("structure"),
+                new InterfaceBlock(Block.Properties.create(Material.IRON, MaterialColor.STONE).sound(SoundType.METAL).hardnessAndResistance(3.0F, 8.0F)).setRegistryName("interface"),
+                new BrowserBlock(false, Block.Properties.create(Material.IRON, MaterialColor.STONE).sound(SoundType.METAL).hardnessAndResistance(3.0F, 8.0F)).setRegistryName("browser"),
+                new BrowserBlock(true, Block.Properties.create(Material.IRON, MaterialColor.STONE).sound(SoundType.METAL).hardnessAndResistance(3.0F, 8.0F)).setRegistryName("crafting_browser"),
+                new ProxyBlock(Block.Properties.create(Material.IRON, MaterialColor.STONE).sound(SoundType.METAL).hardnessAndResistance(3.0F, 8.0F)).setRegistryName("proxy"),
+                new DriverBlock(Block.Properties.create(Material.IRON, MaterialColor.STONE).sound(SoundType.METAL).hardnessAndResistance(3.0F, 8.0F)).setRegistryName("driver"),
+                new GeneratorBlock(Block.Properties.create(Material.IRON, MaterialColor.STONE).sound(SoundType.METAL).hardnessAndResistance(3.0F, 8.0F)).setRegistryName("generator")
         );
     }
 
@@ -163,7 +161,7 @@ public class EnderRiftMod
                 TileEntityType.Builder.create(InterfaceTileEntity::new, EnderRiftBlocks.INTERFACE).build(null).setRegistryName("interface"),
                 TileEntityType.Builder.create(BrowserEntityTileEntity::new, EnderRiftBlocks.BROWSER).build(null).setRegistryName("browser"),
                 TileEntityType.Builder.create(ProxyTileEntity::new, EnderRiftBlocks.PROXY).build(null).setRegistryName("proxy"),
-                TileEntityType.Builder.create(DriverEntityTileEntity::new, EnderRiftBlocks.DRIVER).build(null).setRegistryName("driver"),
+                TileEntityType.Builder.create(DriverTileEntity::new, EnderRiftBlocks.DRIVER).build(null).setRegistryName("driver"),
                 TileEntityType.Builder.create(GeneratorTileEntity::new, EnderRiftBlocks.GENERATOR).build(null).setRegistryName("generator")
         );
     }
@@ -209,8 +207,6 @@ public class EnderRiftMod
     public void interComms(InterModEnqueueEvent event)
     {
         InterModComms.sendTo("gbook", "registerBook", () -> EnderRiftMod.location("xml/book.xml"));
-
-        //FMLInterModComms.sendMessage("waila", "register", "gigaherz.enderRift.plugins.WailaProviders.callbackRegister");
 
         //FMLInterModComms.sendFunctionMessage("theoneprobe", "getTheOneProbe", "gigaherz.enderRift.plugins.TheOneProbeProviders");
     }

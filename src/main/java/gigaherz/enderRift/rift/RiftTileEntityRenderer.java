@@ -9,7 +9,6 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.Vector3f;
 import net.minecraft.client.renderer.model.BakedQuad;
 import net.minecraft.client.renderer.model.IBakedModel;
-import net.minecraft.client.renderer.texture.AtlasTexture;
 import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
 import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.entity.player.PlayerEntity;
@@ -88,13 +87,13 @@ public class RiftTileEntityRenderer extends TileEntityRenderer<RiftTileEntity>
             IBakedModel model = Minecraft.getInstance().getModelManager().getModel(EnderRiftMod.location("block/sphere"));
 
             IVertexBuilder buffer = iRenderTypeBuffer.getBuffer(renderType);
-            for(BakedQuad quad : model.getQuads(null, null, random, EmptyModelData.INSTANCE))
+            for (BakedQuad quad : model.getQuads(null, null, random, EmptyModelData.INSTANCE))
             {
                 buffer.addVertexData(matrixStack.getLast(), quad, r, g, b, a, 0x00F000F0, 0, true);
             }
-            for(Direction d : Direction.values())
+            for (Direction d : Direction.values())
             {
-                for(BakedQuad quad : model.getQuads(null, d, random, EmptyModelData.INSTANCE))
+                for (BakedQuad quad : model.getQuads(null, d, random, EmptyModelData.INSTANCE))
                 {
                     buffer.addVertexData(matrixStack.getLast(), quad, r, g, b, a, 0x00F000F0, 0, true);
                 }

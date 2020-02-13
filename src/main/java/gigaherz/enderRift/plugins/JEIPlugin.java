@@ -5,7 +5,7 @@ import gigaherz.enderRift.automation.browser.CraftingBrowserContainer;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
 import mezz.jei.api.constants.VanillaRecipeCategoryUid;
-import mezz.jei.api.registration.*;
+import mezz.jei.api.registration.IRecipeTransferRegistration;
 import net.minecraft.util.ResourceLocation;
 
 @JeiPlugin
@@ -23,7 +23,7 @@ public class JEIPlugin implements IModPlugin
     public void registerRecipeTransferHandlers(IRecipeTransferRegistration registration)
     {
         registration.addRecipeTransferHandler(CraftingBrowserContainer.class, VanillaRecipeCategoryUid.CRAFTING,
-                        CraftingBrowserContainer.CraftingSlotStart, 9,
-                        CraftingBrowserContainer.InventorySlotStart, 36);
+                CraftingBrowserContainer.CraftingSlotStart, 9,
+                CraftingBrowserContainer.InventorySlotStart, 36);
     }
 }

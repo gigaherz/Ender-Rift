@@ -1,19 +1,18 @@
 package gigaherz.enderRift.generator;
 
-import gigaherz.enderRift.EnderRiftMod;
 import gigaherz.enderRift.common.EnergyBuffer;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.ListNBT;
-import net.minecraft.tileentity.*;
+import net.minecraft.tileentity.AbstractFurnaceTileEntity;
+import net.minecraft.tileentity.ITickableTileEntity;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.IEnergyStorage;
@@ -56,7 +55,7 @@ public class GeneratorTileEntity extends TileEntity implements ITickableTileEnti
             if (getBurnTime(stack) <= 0)
                 return stack;
 
-            int[] x = {1,2,3,4};
+            int[] x = {1, 2, 3, 4};
 
             return super.insertItem(slot, stack, simulate);
         }
@@ -228,11 +227,6 @@ public class GeneratorTileEntity extends TileEntity implements ITickableTileEnti
         return anyChanged;
     }
 
-    public String getName()
-    {
-        return "container.enderrift.generator";
-    }
-
     @Override
     public void read(CompoundNBT compound)
     {
@@ -324,13 +318,8 @@ public class GeneratorTileEntity extends TileEntity implements ITickableTileEnti
         return burnTimeRemaining;
     }
 
-    public int getBurnTime(ItemStack p_213997_1_) {
-        if (p_213997_1_.isEmpty()) {
-            return 0;
-        } else {
-            Item item = p_213997_1_.getItem();
-            int ret = p_213997_1_.getBurnTime();
-            return net.minecraftforge.event.ForgeEventFactory.getItemBurnTime(p_213997_1_, ret == -1 ? AbstractFurnaceTileEntity.getBurnTimes().getOrDefault(item, 0) : ret);
-        }
+    public int getBurnTime(ItemStack itemStack)
+    {
+        return ForgeHooks.getBurnTime(itemStack);
     }
 }

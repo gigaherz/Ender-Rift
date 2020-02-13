@@ -25,6 +25,7 @@ public class RiftStorage extends WorldSavedData
     }
 
     private static final RiftStorage clientStorageCopy = new RiftStorage();
+
     public static RiftStorage get(World world)
     {
         if (!(world instanceof ServerWorld))
@@ -100,5 +101,4 @@ public class RiftStorage extends WorldSavedData
 
         return nbtTagCompound;
     }
-
 }

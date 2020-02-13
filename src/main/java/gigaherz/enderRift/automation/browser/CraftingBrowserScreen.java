@@ -1,6 +1,6 @@
 package gigaherz.enderRift.automation.browser;
 
-import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.systems.RenderSystem;
 import gigaherz.enderRift.EnderRiftMod;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
@@ -55,15 +55,15 @@ public class CraftingBrowserScreen extends AbstractBrowserScreen<CraftingBrowser
             FontRenderer fontrenderer = minecraft.fontRenderer;
             minecraft.getTextureManager().bindTexture(WIDGETS_LOCATION);
 
-            GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1.0F);
+            RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
 
             isHovered = mouseX >= x && mouseY >= y && mouseX < x + width && mouseY < y + height;
 
             int i = getYImage(isHovered);
 
-            GlStateManager.enableBlend();
-            GlStateManager.blendFuncSeparate(770, 771, 1, 0);
-            GlStateManager.blendFunc(770, 771);
+            RenderSystem.enableBlend();
+            RenderSystem.blendFuncSeparate(770, 771, 1, 0);
+            RenderSystem.blendFunc(770, 771);
 
             int halfwidth1 = this.width / 2;
             int halfwidth2 = this.width - halfwidth1;

@@ -1,11 +1,11 @@
 package gigaherz.enderRift.automation.browser;
 
-import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.systems.RenderSystem;
 import gigaherz.enderRift.EnderRiftMod;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.inventory.ContainerScreen;
-import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.client.gui.widget.TextFieldWidget;
+import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.container.Slot;
@@ -13,11 +13,10 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.ITextComponent;
 
-public abstract class AbstractBrowserScreen<T extends BrowserContainer> extends ContainerScreen<T>
+public abstract class AbstractBrowserScreen<T extends AbstractBrowserContainer> extends ContainerScreen<T>
 {
     private static final ResourceLocation backgroundTexture = new ResourceLocation(EnderRiftMod.MODID, "textures/gui/browser.png");
     private static final ResourceLocation tabsTexture = new ResourceLocation("minecraft:textures/gui/container/creative_inventory/tabs.png");
-    private static final String textBrowser = "container.enderrift.browser";
 
     private boolean isDragging;
     private int scrollY;
@@ -50,15 +49,15 @@ public abstract class AbstractBrowserScreen<T extends BrowserContainer> extends 
             int t = guiTop + 17;
             int w = 162;
             int h = 54;
-            GlStateManager.disableDepthTest();
-            GlStateManager.color4f(1,1,1,1);
-            fill(l,t,l+w,t+h, 0x7f000000);
+            RenderSystem.disableDepthTest();
+            RenderSystem.color4f(1, 1, 1, 1);
+            fill(l, t, l + w, t + h, 0x7f000000);
             long tm = Minecraft.getInstance().world.getGameTime() % 30;
             if (tm < 15)
             {
                 drawCenteredString(font, "NO POWER", l + w / 2, t + h / 2 - font.FONT_HEIGHT / 2, 0xFFFFFF);
             }
-            GlStateManager.enableDepthTest();
+            RenderSystem.enableDepthTest();
         }
     }
 
@@ -88,7 +87,8 @@ public abstract class AbstractBrowserScreen<T extends BrowserContainer> extends 
         }));
 
         //Keyboard.enableRepeatEvents(true);
-        addButton(this.searchField = new TextFieldWidget(this.font, guiLeft + 114, guiTop + 6, 71, this.font.FONT_HEIGHT, ""){
+        addButton(this.searchField = new TextFieldWidget(this.font, guiLeft + 114, guiTop + 6, 71, this.font.FONT_HEIGHT, "")
+        {
             @Override
             public boolean mouseClicked(double p_mouseClicked_1_, double p_mouseClicked_3_, int mouseButton)
             {
@@ -149,7 +149,7 @@ public abstract class AbstractBrowserScreen<T extends BrowserContainer> extends 
     {
         minecraft.getTextureManager().bindTexture(getBackgroundTexture());
 
-        GlStateManager.color4f(1.0f, 1.0f, 1.0f, 1.0f);
+        RenderSystem.color4f(1.0f, 1.0f, 1.0f, 1.0f);
         blit(guiLeft, guiTop, 0, 0, xSize, ySize);
         blit(guiLeft - 27, guiTop + 8, 194, 0, 27, 28);
 
@@ -171,7 +171,8 @@ public abstract class AbstractBrowserScreen<T extends BrowserContainer> extends 
         drawCustomSlotTexts();
         RenderHelper.disableStandardItemLighting();
 
-        minecraft.fontRenderer.drawString(this.title.getFormattedText(), 8, 6, 0x404040);
+        String name = title.getFormattedText();
+        font.drawString(name, 8, 6, 0x404040);
         minecraft.fontRenderer.drawString(this.playerInventory.getDisplayName().getFormattedText(), 8, ySize - 96 + 2, 0x404040);
     }
 
@@ -214,12 +215,12 @@ public abstract class AbstractBrowserScreen<T extends BrowserContainer> extends 
                 else
                     s = String.valueOf(count);
 
-                GlStateManager.disableLighting();
-                GlStateManager.disableDepthTest();
-                GlStateManager.disableBlend();
+                RenderSystem.disableLighting();
+                RenderSystem.disableDepthTest();
+                RenderSystem.disableBlend();
                 font.drawStringWithShadow(s, (float) (xPosition + 19 - 2 - font.getStringWidth(s)), (float) (yPosition + 6 + 3), 16777215);
-                GlStateManager.enableLighting();
-                GlStateManager.enableDepthTest();
+                RenderSystem.enableLighting();
+                RenderSystem.enableDepthTest();
             }
         }
 
@@ -236,12 +237,12 @@ public abstract class AbstractBrowserScreen<T extends BrowserContainer> extends 
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double wheelDelta)
     {
-        if(super.mouseScrolled(mouseX, mouseY, wheelDelta))
+        if (super.mouseScrolled(mouseX, mouseY, wheelDelta))
             return true;
 
         scrollAcc += wheelDelta;
 
-        final BrowserContainer container = getContainer();
+        final AbstractBrowserContainer container = getContainer();
         final int h = 62;
         final int bitHeight = 15;
         final int actualSlotCount = container.getActualSlotCount();
@@ -328,7 +329,7 @@ public abstract class AbstractBrowserScreen<T extends BrowserContainer> extends 
 
             scrollY = row * (h - bitHeight) / scrollRows;
 
-            final BrowserContainer container = getContainer();
+            final AbstractBrowserContainer container = getContainer();
             container.setScrollPos(row * 9);
         }
     }

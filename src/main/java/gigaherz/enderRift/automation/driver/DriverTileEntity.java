@@ -15,7 +15,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Optional;
 
-public class DriverEntityTileEntity extends AggregatorTileEntity
+public class DriverTileEntity extends AggregatorTileEntity
 {
     @ObjectHolder("enderrift:driver")
     public static TileEntityType<?> TYPE;
@@ -25,7 +25,7 @@ public class DriverEntityTileEntity extends AggregatorTileEntity
     final EnergyBuffer energyBuffer = new EnergyBuffer(POWER_LIMIT);
     final LazyOptional<EnergyBuffer> energyBufferGetter = LazyOptional.of(() -> energyBuffer);
 
-    public DriverEntityTileEntity()
+    public DriverTileEntity()
     {
         super(TYPE);
     }
@@ -62,7 +62,7 @@ public class DriverEntityTileEntity extends AggregatorTileEntity
     {
         super.read(compound);
 
-        CapabilityEnergy.ENERGY.readNBT(energyBuffer, null, compound.getCompound("storedEnergy"));
+        CapabilityEnergy.ENERGY.readNBT(energyBuffer, null, compound.get("storedEnergy"));
     }
 
     @Override

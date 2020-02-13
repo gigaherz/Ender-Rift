@@ -227,7 +227,7 @@ public class RiftStructure
     {
         if (state.getBlock() == EnderRiftMod.EnderRiftBlocks.STRUCTURE)
         {
-            if (state.get(StructureBlock.TYPE1) ==StructureBlock.Type1.CORNER)
+            if (state.get(StructureBlock.TYPE1) == StructureBlock.Type1.CORNER)
             {
                 return StructurePattern[0];
             }

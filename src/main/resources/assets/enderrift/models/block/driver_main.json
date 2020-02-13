@@ -3,6 +3,7 @@
   "loader": "forge:obj",
   "model": "enderrift:models/block/driver_main.obj",
   "textures": {
-    "particle": "minecraft:block/hopper_inside"
+    "all": "enderrift:block/driver_side",
+    "particle": "#all"
   }
 }

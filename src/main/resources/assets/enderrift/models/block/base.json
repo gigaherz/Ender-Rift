@@ -1,9 +1,21 @@
 {
   "parent": "block/block",
-  "loader": "forge:obj",
-  "model": "enderrift:models/block/base.obj",
   "textures": {
     "all": "enderrift:block/structure_base",
     "particle": "#all"
-  }
+  },
+  "elements": [
+    {
+      "from": [ 0.001, 0.001, 0.001 ],
+      "to": [ 15.999, 4, 15.999 ],
+      "faces": {
+        "down":  { "texture": "#all", "cullface": "down" },
+        "up":    { "texture": "#all"  },
+        "north": { "texture": "#all"  },
+        "south": { "texture": "#all"  },
+        "west":  { "texture": "#all"  },
+        "east":  { "texture": "#all"  }
+      }
+    }
+  ]
 }
