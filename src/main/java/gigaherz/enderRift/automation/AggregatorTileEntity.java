@@ -57,8 +57,8 @@ public abstract class AggregatorTileEntity extends TileEntity
     {
         super.validate();
 
-        if (!firstUpdate)
-            init();
+        /*if (!firstUpdate)
+            init();*/
     }
 
     @Override

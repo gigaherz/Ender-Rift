@@ -24,13 +24,11 @@ public class RiftStorage extends WorldSavedData
         super(DATA_NAME);
     }
 
-    private static final RiftStorage clientStorageCopy = new RiftStorage();
-
     public static RiftStorage get(World world)
     {
         if (!(world instanceof ServerWorld))
         {
-            return clientStorageCopy;
+            throw new RuntimeException("Attempted to get the data from a client world. This is wrong.");
         }
 
         ServerWorld overworld = world.getServer().getWorld(DimensionType.OVERWORLD);

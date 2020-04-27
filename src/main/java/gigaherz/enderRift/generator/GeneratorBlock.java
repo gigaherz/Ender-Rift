@@ -38,12 +38,6 @@ public class GeneratorBlock extends Block
     public static final VoxelShape SHAPE_SUPPORTS_NS = Block.makeCuboidShape(1, 4, 5, 15, 11, 11);
     public static final VoxelShape SHAPE_SUPPORTS_WE = Block.makeCuboidShape(5, 4, 1, 11, 11, 15);
 
-    public GeneratorBlock(Properties properties)
-    {
-        super(properties);
-        setDefaultState(getStateContainer().getBaseState().with(FACING, Direction.NORTH));
-    }
-
     @Deprecated
     @Override
     public VoxelShape getShape(BlockState state, IBlockReader world, BlockPos pos, ISelectionContext ctx)
@@ -53,6 +47,12 @@ public class GeneratorBlock extends Block
 
         return ns ? VoxelShapes.or(SHAPE_BASE, SHAPE_CORE1_NS, SHAPE_CORE2_NS, SHAPE_SUPPORTS_NS)
                 : VoxelShapes.or(SHAPE_BASE, SHAPE_CORE1_WE, SHAPE_CORE2_WE, SHAPE_SUPPORTS_WE);
+    }
+
+    public GeneratorBlock(Properties properties)
+    {
+        super(properties);
+        setDefaultState(getStateContainer().getBaseState().with(FACING, Direction.NORTH));
     }
 
     @Override

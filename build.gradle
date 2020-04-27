@@ -81,9 +81,6 @@ minecraft {
 dependencies {
     minecraft 'net.minecraftforge:forge:1.15.2-31.1.0'
 
-    //deobfCompile "gigaherz.commons:gigaherz.commons-1.12.1:0.6.4"
-    //embed "gigaherz.commons:gigaherz.commons-1.12.1:0.6.4"
-
     compile fg.deobf("gigaherz.graph:GraphLib2:2.0.0")
 
     //deobfCompile "net.darkhax.gamestages:GameStages-1.12.2:2.0.91"
@@ -95,17 +92,15 @@ dependencies {
 
     //deobfCompile "net.darkhax.tesla:Tesla-1.12.2:1.0.63"
 
-    //deobfCompile "mezz.jei:jei_1.12.2:4.15.0.278:api"
-    //runtime "mezz.jei:jei_1.12.2:4.15.0.278"
-    compileOnly fg.deobf("mezz.jei:jei-1.15.2:6.0.0.2:api")
-    runtimeOnly fg.deobf("mezz.jei:jei-1.15.2:6.0.0.2")
+    compileOnly fg.deobf("mezz.jei:jei-1.15.2:6.0.0.3:api")
+    runtimeOnly fg.deobf("mezz.jei:jei-1.15.2:6.0.0.3")
 
     compile fg.deobf("mcp.mobius.waila:Hwyla:1.10.7-B71_1.15.1")
 
     //compile fileTree(dir: 'libs', include: '*.jar')
 }
 
-/*
+/*E
 jar {
     into('/') {
         from configurations.embed

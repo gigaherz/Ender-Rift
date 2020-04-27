@@ -9,6 +9,7 @@ import gigaherz.enderRift.automation.iface.InterfaceScreen;
 import gigaherz.enderRift.automation.iface.InterfaceTileEntity;
 import gigaherz.enderRift.automation.proxy.ProxyBlock;
 import gigaherz.enderRift.automation.proxy.ProxyTileEntity;
+import gigaherz.enderRift.common.Requirements;
 import gigaherz.enderRift.generator.GeneratorBlock;
 import gigaherz.enderRift.generator.GeneratorContainer;
 import gigaherz.enderRift.generator.GeneratorScreen;
