@@ -145,7 +145,10 @@ public class WailaProviders implements IWailaPlugin
         public void appendBody(List<ITextComponent> tooltip, IDataAccessor accessor, IPluginConfig config)
         {
             Graph network = ((GraphObject) accessor.getTileEntity()).getGraph();
-            tooltip.add(new TranslationTextComponent("text.enderrift.network.size", network.getObjects().size()));
+            if (network != null)
+            {
+                tooltip.add(new TranslationTextComponent("text.enderrift.network.size", network.getObjects().size()));
+            }
         }
     }
 

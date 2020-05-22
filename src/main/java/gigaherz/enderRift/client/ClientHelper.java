@@ -1,6 +1,7 @@
 package gigaherz.enderRift.client;
 
 import gigaherz.enderRift.EnderRiftMod;
+import gigaherz.enderRift.automation.browser.AbstractBrowserContainer;
 import gigaherz.enderRift.automation.browser.BrowserContainer;
 import gigaherz.enderRift.generator.GeneratorContainer;
 import gigaherz.enderRift.network.SendSlotChanges;
@@ -43,7 +44,7 @@ public class ClientHelper
 
             if (entityplayer.openContainer != null && entityplayer.openContainer.windowId == message.windowId)
             {
-                ((BrowserContainer) entityplayer.openContainer).slotsChanged(message.slotCount, message.indices, message.stacks);
+                ((AbstractBrowserContainer) entityplayer.openContainer).slotsChanged(message.slotCount, message.indices, message.stacks);
             }
         });
     }
