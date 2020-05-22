@@ -123,18 +123,6 @@ dependencies {
     //compile fileTree(dir: 'libs', include: '*.jar')
 }
 
-/*E
-jar {
-    into('/') {
-        from configurations.embed
-    }
-
-    manifest {
-        attributes("ContainedDeps": configurations.embed.collect { it.getName() }.join(' '))
-    }
-}
-*/
-
 jar {
     manifest {
         attributes([

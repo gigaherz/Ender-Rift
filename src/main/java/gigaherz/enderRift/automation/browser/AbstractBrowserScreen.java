@@ -93,8 +93,8 @@ public abstract class AbstractBrowserScreen<T extends AbstractBrowserContainer> 
             @Override
             public boolean mouseClicked(double mouseX, double mouseY, int mouseButton)
             {
-                if (mouseX >= (double)this.x  && mouseX < (double)(this.x + this.width)
-                        && mouseY >= (double)this.y && mouseY < (double)(this.y + this.height))
+                if (mouseX >= (double) this.x && mouseX < (double) (this.x + this.width)
+                        && mouseY >= (double) this.y && mouseY < (double) (this.y + this.height))
                 {
                     if (mouseButton == 1 && !Strings.isNullOrEmpty(getText()) && getText().length() > 0)
                     {
@@ -175,9 +175,8 @@ public abstract class AbstractBrowserScreen<T extends AbstractBrowserContainer> 
         drawCustomSlotTexts();
         RenderHelper.disableStandardItemLighting();
 
-        String name = title.getFormattedText();
-        font.drawString(name, 8, 6, 0x404040);
-        minecraft.fontRenderer.drawString(this.playerInventory.getDisplayName().getFormattedText(), 8, ySize - 96 + 2, 0x404040);
+        font.drawString(title.getFormattedText(), 8, 6, 0x404040);
+        font.drawString(this.playerInventory.getDisplayName().getFormattedText(), 8, ySize - 96 + 2, 0x404040);
     }
 
     private void drawCustomSlotTexts()

@@ -290,13 +290,13 @@ public class EnderRiftMod
                 @Override
                 protected void addTables()
                 {
-                    this.registerLootTable(EnderRiftBlocks.GENERATOR, dropping(EnderRiftBlocks.GENERATOR));
-                    this.registerLootTable(EnderRiftBlocks.DRIVER, dropping(EnderRiftBlocks.DRIVER));
-                    this.registerLootTable(EnderRiftBlocks.PROXY, dropping(EnderRiftBlocks.PROXY));
-                    this.registerLootTable(EnderRiftBlocks.INTERFACE, dropping(EnderRiftBlocks.INTERFACE));
-                    this.registerLootTable(EnderRiftBlocks.BROWSER, dropping(EnderRiftBlocks.BROWSER));
-                    this.registerLootTable(EnderRiftBlocks.CRAFTING_BROWSER, dropping(EnderRiftBlocks.CRAFTING_BROWSER));
-                    this.registerLootTable(EnderRiftBlocks.RIFT, dropping(EnderRiftBlocks.RIFT));
+                    this.registerDropSelfLootTable(EnderRiftBlocks.GENERATOR);
+                    this.registerDropSelfLootTable(EnderRiftBlocks.DRIVER);
+                    this.registerDropSelfLootTable(EnderRiftBlocks.PROXY);
+                    this.registerDropSelfLootTable(EnderRiftBlocks.INTERFACE);
+                    this.registerDropSelfLootTable(EnderRiftBlocks.BROWSER);
+                    this.registerDropSelfLootTable(EnderRiftBlocks.CRAFTING_BROWSER);
+                    this.registerDropSelfLootTable(EnderRiftBlocks.RIFT);
                 }
 
                 @Override
@@ -308,6 +308,5 @@ public class EnderRiftMod
                 }
             }
         }
-
     }
 }

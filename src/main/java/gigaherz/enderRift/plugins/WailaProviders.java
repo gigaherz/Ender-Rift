@@ -13,13 +13,11 @@ import gigaherz.enderRift.rift.StructureTileEntity;
 import gigaherz.graph2.Graph;
 import gigaherz.graph2.GraphObject;
 import mcp.mobius.waila.api.*;
-import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
@@ -217,7 +215,6 @@ public class WailaProviders implements IWailaPlugin
                 tag.putInt("riftId", rift.getRiftId());
                 tag.putInt("energy", rift.getEnergyBuffer().map(IEnergyStorage::getEnergyStored).orElse(0));
             });
-
         }
     }
 }
