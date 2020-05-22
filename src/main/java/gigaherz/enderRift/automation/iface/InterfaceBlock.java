@@ -1,17 +1,13 @@
 package gigaherz.enderRift.automation.iface;
 
-import com.google.common.collect.ImmutableMap;
 import gigaherz.enderRift.automation.AggregatorBlock;
 import gigaherz.enderRift.automation.browser.BrowserBlock;
-import gigaherz.enderRift.generator.GeneratorContainer;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.inventory.InventoryHelper;
-import net.minecraft.inventory.container.Container;
-import net.minecraft.inventory.container.INamedContainerProvider;
+import net.minecraft.inventory.container.SimpleNamedContainerProvider;
 import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.state.DirectionProperty;
@@ -24,8 +20,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.shapes.ISelectionContext;
 import net.minecraft.util.math.shapes.VoxelShape;
-import net.minecraft.util.math.shapes.VoxelShapes;
-import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
@@ -57,6 +51,7 @@ public class InterfaceBlock extends AggregatorBlock<InterfaceTileEntity>
         return new InterfaceTileEntity();
     }
 
+    @Deprecated
     @Override
     public VoxelShape getShape(BlockState state, IBlockReader p_220053_2_, BlockPos p_220053_3_, ISelectionContext p_220053_4_)
     {
@@ -70,6 +65,7 @@ public class InterfaceBlock extends AggregatorBlock<InterfaceTileEntity>
         return getDefaultState().with(InterfaceBlock.FACING, context.getFace().getOpposite());
     }
 
+    @Deprecated
     @Override
     public boolean onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit)
     {
@@ -81,25 +77,14 @@ public class InterfaceBlock extends AggregatorBlock<InterfaceTileEntity>
         if (worldIn.isRemote)
             return true;
 
-        NetworkHooks.openGui((ServerPlayerEntity)player, new INamedContainerProvider()
-        {
-            @Override
-            public ITextComponent getDisplayName()
-            {
-                return new TranslationTextComponent("text.enderrift.browser.title");
-            }
-
-            @Nullable
-            @Override
-            public Container createMenu(int id, PlayerInventory playerInventory, PlayerEntity playerEntity)
-            {
-                return new InterfaceContainer(id, pos, playerInventory);
-            }
-        }, pos);
+        NetworkHooks.openGui((ServerPlayerEntity) player, new SimpleNamedContainerProvider(
+                (id, playerInventory, playerEntity) -> new InterfaceContainer(id, pos, playerInventory),
+                new TranslationTextComponent("container.enderrift.interface")), pos);
 
         return true;
     }
 
+    @Deprecated
     @Override
     public void onReplaced(BlockState state, World worldIn, BlockPos pos, BlockState newState, boolean isMoving)
     {

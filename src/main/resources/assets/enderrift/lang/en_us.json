@@ -8,16 +8,19 @@
     "block.enderrift.proxy": "Automation Proxy",
     "block.enderrift.driver": "Automation Driver",
 
+    "itemGroup.tabEnderRift": "Ender-Rift",
+
     "item.enderrift.rift_orb.empty": "Ender-Rift Orb (Unbound)",
     "item.enderrift.rift_orb.bound": "Ender-Rift Orb (Bound)",
 
     "container.enderrift.interface": "Automation Interface",
     "container.enderrift.browser": "Automation Browser",
+    "container.enderrift.crafting_browser": "Crafting Browser",
     "container.enderrift.generator": "Rudimentary Generator",
 
     "text.enderrift.interface.filters": "Filters",
 
-    "itemGroup.tabEnderRift": "Ender-Rift",
+    "text.enderrift.tooltip.riftid": "Rift ID: %d",
 
     "text.enderrift.rift.is_formed": "Is Formed? %s",
     "text.enderrift.rift.is_powered": "Is Powered? %s",
@@ -36,9 +39,9 @@
     "text.enderrift.generator.energy.label": "Energy:",
     "text.enderrift.generator.energy": "Energy: %d / %d RF",
 
+    "text.enderrift.network.size": "Network size: %d",
+
     "option.enderrift.generator": "Generator",
     "option.enderrift.rift": "Rift",
-    "option.enderrift.rf": "Show RF",
-
-    "text.enderrift.tooltip.riftid": "Rift ID: %d"
+    "option.enderrift.rf": "Show RF"
 }

@@ -3,9 +3,9 @@ package gigaherz.enderRift.rift;
 import com.google.gson.JsonObject;
 import gigaherz.enderRift.EnderRiftMod;
 import net.minecraft.inventory.CraftingInventory;
-import net.minecraft.item.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.item.crafting.ICraftingRecipe;
 import net.minecraft.item.crafting.IRecipeSerializer;
 import net.minecraft.item.crafting.Ingredient;
@@ -114,7 +114,7 @@ public class OrbDuplicationRecipe implements ICraftingRecipe, IShapedRecipe<Craf
     @Override
     public ItemStack getRecipeOutput()
     {
-        return new ItemStack(EnderRiftMod.EnderRiftItems.RIFT_ORB,2);
+        return new ItemStack(EnderRiftMod.EnderRiftItems.RIFT_ORB, 2);
     }
 
     @Override
@@ -153,7 +153,8 @@ public class OrbDuplicationRecipe implements ICraftingRecipe, IShapedRecipe<Craf
         return 3;
     }
 
-    public static class Serializer extends ForgeRegistryEntry<IRecipeSerializer<?>> implements IRecipeSerializer<OrbDuplicationRecipe>
+    public static class Serializer extends ForgeRegistryEntry<IRecipeSerializer<?>>
+            implements IRecipeSerializer<OrbDuplicationRecipe>
     {
         @Override
         public OrbDuplicationRecipe read(ResourceLocation recipeId, JsonObject json)

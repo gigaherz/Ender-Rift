@@ -1,80 +1,31 @@
 {
-  "forge_marker": 1,
-  "defaults": {
-    "model": "enderrift:block/proxy_main.obj"
-  },
-  "variants": {
-    "inventory": [{ "transform": "forge:default-block" }],
-    "up": {
-      "false": {
-      },
-      "true": {
-        "submodel": {
-          "up": {
-            "model": "enderrift:block/proxy_connection.obj",
-            "x": 90
-          }
-        }
-      }
+  "multipart": [
+    {
+      "apply": { "model": "enderrift:block/proxy_main" }
     },
-    "down": {
-      "false": {
-      },
-      "true": {
-        "submodel": {
-          "down": {
-            "model": "enderrift:block/proxy_connection.obj",
-            "x": 270
-          }
-        }
-      }
+    {
+      "when": {"up": true},
+      "apply":  { "model": "enderrift:block/proxy_connection", "x": 90 }
     },
-    "east": {
-      "false": {
-      },
-      "true": {
-        "submodel": {
-          "east": {
-            "model": "enderrift:block/proxy_connection.obj",
-            "y": 270
-          }
-        }
-      }
+    {
+      "when": {"down": true},
+      "apply":  { "model": "enderrift:block/proxy_connection", "x": 270 }
     },
-    "west": {
-      "false": {
-      },
-      "true": {
-        "submodel": {
-          "west": {
-            "model": "enderrift:block/proxy_connection.obj",
-            "y": 90
-          }
-        }
-      }
+    {
+      "when": {"east": true},
+      "apply":  { "model": "enderrift:block/proxy_connection", "y": 270 }
     },
-    "north": {
-      "false": {
-      },
-      "true": {
-        "submodel": {
-          "north": {
-            "model": "enderrift:block/proxy_connection.obj",
-            "y": 180
-          }
-        }
-      }
+    {
+      "when": {"west": true},
+      "apply":  { "model": "enderrift:block/proxy_connection", "y": 90 }
     },
-    "south": {
-      "false": {
-      },
-      "true": {
-        "submodel": {
-          "south": {
-            "model": "enderrift:block/proxy_connection.obj"
-          }
-        }
-      }
+    {
+      "when": {"north": true},
+      "apply":  { "model": "enderrift:block/proxy_connection", "y": 180 }
+    },
+    {
+      "when":  {"south": true},
+      "apply":  { "model": "enderrift:block/proxy_connection", "y": 0 }
     }
-  }
+  ]
 }

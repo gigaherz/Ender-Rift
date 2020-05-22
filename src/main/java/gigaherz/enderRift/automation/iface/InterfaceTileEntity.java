@@ -1,8 +1,7 @@
 package gigaherz.enderRift.automation.iface;
 
-import gigaherz.enderRift.EnderRiftMod;
-import gigaherz.enderRift.automation.AutomationHelper;
 import gigaherz.enderRift.automation.AggregatorTileEntity;
+import gigaherz.enderRift.automation.AutomationHelper;
 import gigaherz.enderRift.common.IPoweredAutomation;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
@@ -52,7 +51,7 @@ public class InterfaceTileEntity extends AggregatorTileEntity implements IPowere
         if (facing == null && world != null)
         {
             BlockState state = world.getBlockState(pos);
-            if (state.getBlock() == EnderRiftMod.EnderRiftBlocks.INTERFACE)
+            if (state.getProperties().contains(InterfaceBlock.FACING))
             {
                 facing = state.get(InterfaceBlock.FACING).getOpposite();
             }

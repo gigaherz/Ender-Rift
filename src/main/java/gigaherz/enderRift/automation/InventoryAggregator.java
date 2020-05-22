@@ -55,6 +55,7 @@ public class InventoryAggregator implements IItemHandler
     public ItemStack insertItem(int index, ItemStack stack, boolean simulate)
     {
         // KEEP indexed!
+        //noinspection ForLoopReplaceableByForEach
         for (int i = 0; i < aggregated.size(); i++)
         {
             IItemHandler inv = aggregated.get(i);
@@ -73,6 +74,7 @@ public class InventoryAggregator implements IItemHandler
     public ItemStack extractItem(int index, int amount, boolean simulate)
     {
         // KEEP indexed!
+        //noinspection ForLoopReplaceableByForEach
         for (int i = 0; i < aggregated.size(); i++)
         {
             IItemHandler inv = aggregated.get(i);

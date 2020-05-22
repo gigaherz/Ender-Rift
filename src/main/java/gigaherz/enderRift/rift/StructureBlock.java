@@ -11,7 +11,6 @@ import net.minecraft.state.EnumProperty;
 import net.minecraft.state.StateContainer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.IStringSerializable;
-import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.shapes.ISelectionContext;
@@ -30,6 +29,21 @@ public class StructureBlock extends AggregatorBlock<StructureTileEntity>
     public static final EnumProperty<Type2> TYPE2 = EnumProperty.create("type2", Type2.class);
     public static final EnumProperty<Corner> CORNER = EnumProperty.create("corner", Corner.class);
     public static final BooleanProperty BASE = BooleanProperty.create("base");
+
+    public static final VoxelShape SHAPE_BASE = Block.makeCuboidShape(0, 0, 0, 16, 4, 16);
+    public static final VoxelShape SHAPE_EW = Block.makeCuboidShape(0, 4, 4, 16, 12, 12);
+    public static final VoxelShape SHAPE_NS = Block.makeCuboidShape(4, 4, 0, 12, 12, 16);
+    public static final VoxelShape SHAPE_UD = Block.makeCuboidShape(4, 0, 4, 12, 16, 12);
+    public static final VoxelShape SHAPE_EWB = VoxelShapes.or(SHAPE_EW, SHAPE_BASE);
+    public static final VoxelShape SHAPE_NSB = VoxelShapes.or(SHAPE_NS, SHAPE_BASE);
+
+
+    public static final VoxelShape SHAPE_CORNER = VoxelShapes.or(
+            Block.makeCuboidShape(0, 3, 3, 16, 13, 13),
+            Block.makeCuboidShape(3, 0, 3, 13, 16, 13),
+            Block.makeCuboidShape(3, 3, 0, 13, 13, 16)
+    );
+    public static final VoxelShape CORNER_WITH_BASE = VoxelShapes.or(SHAPE_CORNER, SHAPE_BASE);
 
     public StructureBlock(Block.Properties properties)
     {
@@ -58,27 +72,7 @@ public class StructureBlock extends AggregatorBlock<StructureTileEntity>
         builder.add(TYPE1, TYPE2, CORNER, BASE);
     }
 
-
-    public static final VoxelShape SHAPE_BASE = Block.makeCuboidShape(0,0,0,16,4,16);
-    public static final VoxelShape SHAPE_EW = Block.makeCuboidShape(0,4,4,16,12,12);
-    public static final VoxelShape SHAPE_NS = Block.makeCuboidShape(4,4,0,12,12,16);
-    public static final VoxelShape SHAPE_UD = Block.makeCuboidShape(4,0,4,12,16,12);
-    public static final VoxelShape SHAPE_EWB = VoxelShapes.or(SHAPE_EW, SHAPE_BASE);
-    public static final VoxelShape SHAPE_NSB = VoxelShapes.or(SHAPE_NS, SHAPE_BASE);
-
-
-    public static final VoxelShape SHAPE_CORNER = VoxelShapes.or(
-            VoxelShapes.or(
-                Block.makeCuboidShape(1.5,1.5,1.5,14.5,14.5,14.5),
-                Block.makeCuboidShape(3,0,3,13,16,13)
-            ),
-            VoxelShapes.or(
-                Block.makeCuboidShape(3,0,3,13,16,13),
-                Block.makeCuboidShape(3,0,3,13,16,13)
-            )
-    );
-    public static final VoxelShape CORNER_WITH_BASE = VoxelShapes.or(SHAPE_CORNER, SHAPE_BASE);
-
+    @Deprecated
     @Override
     public VoxelShape getShape(BlockState state, IBlockReader world, BlockPos pos, ISelectionContext context)
     {
@@ -100,6 +94,7 @@ public class StructureBlock extends AggregatorBlock<StructureTileEntity>
         return state.get(BASE) ? CORNER_WITH_BASE : SHAPE_CORNER;
     }
 
+    @Deprecated
     @Override
     public void onReplaced(BlockState state, World worldIn, BlockPos pos, BlockState newState, boolean isMoving)
     {
@@ -113,6 +108,7 @@ public class StructureBlock extends AggregatorBlock<StructureTileEntity>
         RiftStructure.breakStructure(worldIn, pos);
     }
 
+    @Deprecated
     @Override
     public List<ItemStack> getDrops(BlockState state, LootContext.Builder builder)
     {

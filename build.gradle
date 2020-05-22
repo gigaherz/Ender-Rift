@@ -25,6 +25,9 @@ repositories {
     maven {
         url 'https://maven.mcmoddev.com/'
     }
+    maven {
+        url "http://tehnut.info/maven"
+    }
 /*
     maven {
         url "https://maven.tterrag.com/"
@@ -33,21 +36,24 @@ repositories {
         name = "CoFH Maven"
         url = "http://maven.covers1624.net"
     }
-    maven {url "http://tehnut.info/maven"}
  */
 }
 
-version = "2.1.9"
+version = "2.2.0"
 group= "gigaherz.enderRift"
-//archivesBaseName = "EnderRift-1.14.x"
+archivesBaseName = "EnderRift-1.14.4"
 
 //sourceCompatibility = targetCompatibility = '1.8' // Need this here so eclipse task generates correctly.
 compileJava {
     sourceCompatibility = targetCompatibility = '1.8'
 }
 
+sourceSets {
+    main.resources.srcDirs += 'src/main/generated_resources'
+}
+
 minecraft {
-    mappings channel: 'snapshot', version: '20190928-1.14.3'
+    mappings channel: 'stable', version: '56-1.14.3'
 
     accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
 
@@ -55,32 +61,48 @@ minecraft {
         client {
             workingDirectory project.file('run')
 
-            property 'forge.logging.markers', 'CONFIG'
+            property 'forge.logging.markers', ''
             property 'forge.logging.console.level', 'debug'
 
-            ideaModule "${project.name}.main"
-
-            environment 'MOD_CLASSES', "${project.file("out/production/resources").canonicalPath};${project.file("out/production/classes").canonicalPath}"
+            mods {
+                thismod {
+                    source sourceSets.main
+                }
+            }
         }
 
         server {
             workingDirectory project.file('run')
 
-            property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
+            property 'forge.logging.markers', ''
             property 'forge.logging.console.level', 'debug'
 
-            ideaModule "${project.name}.main"
+            mods {
+                thismod {
+                    source sourceSets.main
+                }
+            }
+        }
 
-            environment 'MOD_CLASSES', "${project.file("out/production/resources").canonicalPath};${project.file("out/production/classes").canonicalPath}"
+        data {
+            workingDirectory project.file('run')
+
+            property 'forge.logging.markers', ''
+            property 'forge.logging.console.level', 'debug'
+
+            args '--mod', 'enderrift', '--all', '--output', file('src/main/generated_resources/'), '--existing', file('src/main/resources/')
+
+            mods {
+                thismod {
+                    source sourceSets.main
+                }
+            }
         }
     }
 }
 
 dependencies {
-    minecraft 'net.minecraftforge:forge:1.14.4-28.1.1'
-
-    //deobfCompile "gigaherz.commons:gigaherz.commons-1.12.1:0.6.4"
-    //embed "gigaherz.commons:gigaherz.commons-1.12.1:0.6.4"
+    minecraft 'net.minecraftforge:forge:1.14.4-28.2.16'
 
     compile fg.deobf("gigaherz.graph:GraphLib2:2.0.0")
 
@@ -93,27 +115,13 @@ dependencies {
 
     //deobfCompile "net.darkhax.tesla:Tesla-1.12.2:1.0.63"
 
-    //deobfCompile "mezz.jei:jei_1.12.2:4.15.0.278:api"
-    //runtime "mezz.jei:jei_1.12.2:4.15.0.278"
-    compileOnly fg.deobf("mezz.jei:jei-1.14.4:6.0.0.13:api")
-    runtimeOnly fg.deobf("mezz.jei:jei-1.14.4:6.0.0.13")
+    compileOnly fg.deobf("mezz.jei:jei-1.14.4:6.0.0.27:api")
+    runtimeOnly fg.deobf("mezz.jei:jei-1.14.4:6.0.0.27")
 
-    //deobfCompile "mcp.mobius.waila:Hwyla:1.8.26-B41_1.12.2"
+    compile fg.deobf("mcp.mobius.waila:Hwyla:1.10.6-B67_1.14.4")
 
     //compile fileTree(dir: 'libs', include: '*.jar')
 }
-
-/*
-jar {
-    into('/') {
-        from configurations.embed
-    }
-
-    manifest {
-        attributes("ContainedDeps": configurations.embed.collect { it.getName() }.join(' '))
-    }
-}
-*/
 
 jar {
     manifest {

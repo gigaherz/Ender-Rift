@@ -1,9 +1,10 @@
 package gigaherz.enderRift;
 
 import com.google.common.collect.ImmutableList;
+import com.mojang.datafixers.util.Pair;
 import gigaherz.enderRift.automation.browser.*;
 import gigaherz.enderRift.automation.driver.DriverBlock;
-import gigaherz.enderRift.automation.driver.DriverEntityTileEntity;
+import gigaherz.enderRift.automation.driver.DriverTileEntity;
 import gigaherz.enderRift.automation.iface.InterfaceBlock;
 import gigaherz.enderRift.automation.iface.InterfaceContainer;
 import gigaherz.enderRift.automation.iface.InterfaceScreen;
@@ -21,6 +22,10 @@ import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.material.MaterialColor;
 import net.minecraft.client.gui.ScreenManager;
+import net.minecraft.data.DataGenerator;
+import net.minecraft.data.IDataProvider;
+import net.minecraft.data.LootTableProvider;
+import net.minecraft.data.loot.BlockLootTables;
 import net.minecraft.inventory.container.ContainerType;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
@@ -28,24 +33,33 @@ import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipeSerializer;
 import net.minecraft.tileentity.TileEntityType;
-import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.storage.loot.*;
 import net.minecraftforge.common.extensions.IForgeContainerType;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.fml.InterModComms;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.minecraftforge.fml.event.lifecycle.GatherDataEvent;
+import net.minecraftforge.fml.event.lifecycle.InterModEnqueueEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.network.NetworkRegistry;
 import net.minecraftforge.fml.network.simple.SimpleChannel;
+import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.ObjectHolder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nonnull;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 @Mod.EventBusSubscriber
 @Mod(EnderRiftMod.MODID)
@@ -55,12 +69,13 @@ public class EnderRiftMod
         dependencies = "after:Waila;after:gbook",
         updateJSON =
      */
-    
+
     public static final String MODID = "enderrift";
 
     @SuppressWarnings("ConstantConditions")
     @Nonnull
-    private static <T> T toBeInitializedLater() {
+    private static <T> T toBeInitializedLater()
+    {
         return null;
     }
 
@@ -119,6 +134,7 @@ public class EnderRiftMod
         modEventBus.addGenericListener(IRecipeSerializer.class, this::registerRecipeSerializers);
         modEventBus.addListener(this::commonSetup);
         modEventBus.addListener(this::clientSetup);
+        modEventBus.addListener(this::gatherData);
 
         //modLoadingContext.registerConfig(ModConfig.Type.SERVER, ConfigData.SERVER_SPEC);
         //modLoadingContext.registerConfig(ModConfig.Type.CLIENT, ConfigData.CLIENT_SPEC);
@@ -127,14 +143,14 @@ public class EnderRiftMod
     public void registerBlocks(RegistryEvent.Register<Block> event)
     {
         event.getRegistry().registerAll(
-                new RiftBlock(Block.Properties.create(Material.ROCK).sound(SoundType.METAL).hardnessAndResistance(3.0F,8.0F).variableOpacity()).setRegistryName("rift"),
-                new StructureBlock(Block.Properties.create(Material.ROCK).sound(SoundType.METAL).hardnessAndResistance(3.0F,8.0F)).setRegistryName("structure"),
-                new InterfaceBlock(Block.Properties.create(Material.IRON, MaterialColor.STONE).sound(SoundType.METAL).hardnessAndResistance(3.0F,8.0F)).setRegistryName("interface"),
-                new BrowserBlock(false, Block.Properties.create(Material.IRON, MaterialColor.STONE).sound(SoundType.METAL).hardnessAndResistance(3.0F,8.0F)).setRegistryName("browser"),
-                new BrowserBlock(true, Block.Properties.create(Material.IRON, MaterialColor.STONE).sound(SoundType.METAL).hardnessAndResistance(3.0F,8.0F)).setRegistryName("crafting_browser"),
-                new ProxyBlock(Block.Properties.create(Material.IRON, MaterialColor.STONE).sound(SoundType.METAL).hardnessAndResistance(3.0F,8.0F)).setRegistryName("proxy"),
-                new DriverBlock(Block.Properties.create(Material.IRON, MaterialColor.STONE).sound(SoundType.METAL).hardnessAndResistance(3.0F,8.0F)).setRegistryName("driver"),
-                new GeneratorBlock(Block.Properties.create(Material.IRON, MaterialColor.STONE).sound(SoundType.METAL).hardnessAndResistance(3.0F,8.0F)).setRegistryName("generator")
+                new RiftBlock(Block.Properties.create(Material.ROCK).sound(SoundType.METAL).hardnessAndResistance(3.0F, 8.0F).variableOpacity()).setRegistryName("rift"),
+                new StructureBlock(Block.Properties.create(Material.ROCK).sound(SoundType.METAL).hardnessAndResistance(3.0F, 8.0F).noDrops()).setRegistryName("structure"),
+                new InterfaceBlock(Block.Properties.create(Material.IRON, MaterialColor.STONE).sound(SoundType.METAL).hardnessAndResistance(3.0F, 8.0F)).setRegistryName("interface"),
+                new BrowserBlock(false, Block.Properties.create(Material.IRON, MaterialColor.STONE).sound(SoundType.METAL).hardnessAndResistance(3.0F, 8.0F)).setRegistryName("browser"),
+                new BrowserBlock(true, Block.Properties.create(Material.IRON, MaterialColor.STONE).sound(SoundType.METAL).hardnessAndResistance(3.0F, 8.0F)).setRegistryName("crafting_browser"),
+                new ProxyBlock(Block.Properties.create(Material.IRON, MaterialColor.STONE).sound(SoundType.METAL).hardnessAndResistance(3.0F, 8.0F)).setRegistryName("proxy"),
+                new DriverBlock(Block.Properties.create(Material.IRON, MaterialColor.STONE).sound(SoundType.METAL).hardnessAndResistance(3.0F, 8.0F)).setRegistryName("driver"),
+                new GeneratorBlock(Block.Properties.create(Material.IRON, MaterialColor.STONE).sound(SoundType.METAL).hardnessAndResistance(3.0F, 8.0F)).setRegistryName("generator")
         );
     }
 
@@ -161,7 +177,7 @@ public class EnderRiftMod
                 TileEntityType.Builder.create(InterfaceTileEntity::new, EnderRiftBlocks.INTERFACE).build(null).setRegistryName("interface"),
                 TileEntityType.Builder.create(BrowserEntityTileEntity::new, EnderRiftBlocks.BROWSER).build(null).setRegistryName("browser"),
                 TileEntityType.Builder.create(ProxyTileEntity::new, EnderRiftBlocks.PROXY).build(null).setRegistryName("proxy"),
-                TileEntityType.Builder.create(DriverEntityTileEntity::new, EnderRiftBlocks.DRIVER).build(null).setRegistryName("driver"),
+                TileEntityType.Builder.create(DriverTileEntity::new, EnderRiftBlocks.DRIVER).build(null).setRegistryName("driver"),
                 TileEntityType.Builder.create(GeneratorTileEntity::new, EnderRiftBlocks.GENERATOR).build(null).setRegistryName("generator")
         );
     }
@@ -194,10 +210,6 @@ public class EnderRiftMod
         logger.debug("Final message number: " + messageNumber);
 
         RiftStructure.init();
-
-        //FMLInterModComms.sendMessage("waila", "register", "gigaherz.enderRift.plugins.WailaProviders.callbackRegister");
-
-        //FMLInterModComms.sendFunctionMessage("theoneprobe", "getTheOneProbe", "gigaherz.enderRift.plugins.TheOneProbeProviders");
     }
 
     public void clientSetup(FMLClientSetupEvent event)
@@ -208,11 +220,93 @@ public class EnderRiftMod
         ScreenManager.registerFactory(CraftingBrowserContainer.TYPE, CraftingBrowserScreen::new);
     }
 
+    public void interComms(InterModEnqueueEvent event)
+    {
+        InterModComms.sendTo("gbook", "registerBook", () -> EnderRiftMod.location("xml/book.xml"));
+
+        //FMLInterModComms.sendFunctionMessage("theoneprobe", "getTheOneProbe", "gigaherz.enderRift.plugins.TheOneProbeProviders");
+    }
+
+    public void gatherData(GatherDataEvent event)
+    {
+        Data.gatherData(event);
+    }
+
     public static ResourceLocation location(String path)
     {
         return new ResourceLocation(MODID, path);
     }
 
-    public static final List<Direction> DIRECTIONS = Collections.unmodifiableList(Arrays.asList(Direction.values()));
-    public static final List<Direction> DIRECTIONS2 = ImmutableList.copyOf(Direction.values());
+    public static class Data
+    {
+        public static void gatherData(GatherDataEvent event)
+        {
+            DataGenerator gen = event.getGenerator();
+
+            if (event.includeServer())
+            {
+                //gen.addProvider(new Recipes(gen));
+                gen.addProvider(new LootTables(gen));
+                //gen.addProvider(new ItemTagGens(gen));
+                //gen.addProvider(new BlockTagGens(gen));
+            }
+            if (event.includeClient())
+            {
+                //gen.addProvider(new BlockStates(gen, event));
+            }
+        }
+
+        private static class LootTables extends LootTableProvider implements IDataProvider
+        {
+            public LootTables(DataGenerator gen)
+            {
+                super(gen);
+            }
+
+            private final List<Pair<Supplier<Consumer<BiConsumer<ResourceLocation, LootTable.Builder>>>, LootParameterSet>> tables = ImmutableList.of(
+                    Pair.of(BlockTables::new, LootParameterSets.BLOCK)
+                    //Pair.of(FishingLootTables::new, LootParameterSets.FISHING),
+                    //Pair.of(ChestLootTables::new, LootParameterSets.CHEST),
+                    //Pair.of(EntityLootTables::new, LootParameterSets.ENTITY),
+                    //Pair.of(GiftLootTables::new, LootParameterSets.GIFT)
+            );
+
+            @Override
+            protected List<Pair<Supplier<Consumer<BiConsumer<ResourceLocation, LootTable.Builder>>>, LootParameterSet>> getTables()
+            {
+                return tables;
+            }
+
+            @Override
+            protected void validate(Map<ResourceLocation, LootTable> map, ValidationResults validationresults)
+            {
+                map.forEach((p_218436_2_, p_218436_3_) -> {
+                    LootTableManager.func_215302_a(validationresults, p_218436_2_, p_218436_3_, map::get);
+                });
+            }
+
+            public static class BlockTables extends BlockLootTables
+            {
+                @Override
+                protected void addTables()
+                {
+                    this.registerDropSelfLootTable(EnderRiftBlocks.GENERATOR);
+                    this.registerDropSelfLootTable(EnderRiftBlocks.DRIVER);
+                    this.registerDropSelfLootTable(EnderRiftBlocks.PROXY);
+                    this.registerDropSelfLootTable(EnderRiftBlocks.INTERFACE);
+                    this.registerDropSelfLootTable(EnderRiftBlocks.BROWSER);
+                    this.registerDropSelfLootTable(EnderRiftBlocks.CRAFTING_BROWSER);
+                    this.registerDropSelfLootTable(EnderRiftBlocks.RIFT);
+                }
+
+                @Override
+                protected Iterable<Block> getKnownBlocks()
+                {
+                    return ForgeRegistries.BLOCKS.getValues().stream()
+                            .filter(b -> b.getRegistryName().getNamespace().equals(MODID))
+                            .collect(Collectors.toList());
+                }
+            }
+        }
+    }
 }

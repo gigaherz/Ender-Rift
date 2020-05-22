@@ -29,8 +29,8 @@ public class RiftBlock extends Block
 {
     public static final BooleanProperty ASSEMBLED = BooleanProperty.create("assembled");
 
-    private static final VoxelShape SHAPE = Block.makeCuboidShape(5,5,5,11,11,11);
-    private static final VoxelShape SHAPE_ACTIVE = Block.makeCuboidShape(2,2,2,14,14,14);
+    private static final VoxelShape SHAPE = Block.makeCuboidShape(5, 5, 5, 11, 11, 11);
+    private static final VoxelShape SHAPE_ACTIVE = Block.makeCuboidShape(2, 2, 2, 14, 14, 14);
 
     public RiftBlock(Properties properties)
     {
@@ -76,18 +76,21 @@ public class RiftBlock extends Block
         return new RiftTileEntity();
     }
 
+    @Deprecated
     @Override
     public VoxelShape getShape(BlockState state, IBlockReader p_220053_2_, BlockPos p_220053_3_, ISelectionContext p_220053_4_)
     {
         return state.get(ASSEMBLED) ? SHAPE_ACTIVE : SHAPE;
     }
 
+    @Deprecated
     @Override
     public List<ItemStack> getDrops(BlockState state, LootContext.Builder builder)
     {
         return Lists.newArrayList(new ItemStack(this));
     }
 
+    @Deprecated
     @Override
     public void onReplaced(BlockState state, World worldIn, BlockPos pos, BlockState newState, boolean isMoving)
     {
@@ -100,7 +103,7 @@ public class RiftBlock extends Block
         TileEntity te = worldIn.getTileEntity(pos);
 
         if (te instanceof RiftTileEntity)
-            spawnAsEntity (worldIn, pos, ((RiftTileEntity) te).getRiftItem());
+            spawnAsEntity(worldIn, pos, ((RiftTileEntity) te).getRiftItem());
 
         RiftStructure.dismantle(worldIn, pos);
     }
@@ -118,15 +121,15 @@ public class RiftBlock extends Block
         if (stack.getItem() == EnderRiftMod.EnderRiftItems.RIFT_ORB)
             return false;
 
-        if (worldIn.isRemote)
-            return true;
-
         if (state.getBlock() != this || !state.get(ASSEMBLED))
             return false;
 
         TileEntity te = worldIn.getTileEntity(pos);
         if (!(te instanceof RiftTileEntity))
             return false;
+
+        if (worldIn.isRemote)
+            return true;
 
         RiftTileEntity rift = (RiftTileEntity) te;
 
@@ -213,11 +216,5 @@ public class RiftBlock extends Block
         {
             item.setItem(remaining);
         }
-    }
-
-    @Override
-    public boolean hasTileEntity()
-    {
-        return super.hasTileEntity();
     }
 }

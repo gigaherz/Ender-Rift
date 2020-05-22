@@ -1,19 +1,24 @@
 package gigaherz.enderRift.automation.proxy;
 
+import com.google.common.collect.ImmutableMap;
 import gigaherz.enderRift.automation.AggregatorBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.state.BooleanProperty;
 import net.minecraft.state.StateContainer;
 import net.minecraft.state.properties.BlockStateProperties;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
-import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.shapes.ISelectionContext;
+import net.minecraft.util.math.shapes.VoxelShape;
+import net.minecraft.util.math.shapes.VoxelShapes;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.IWorld;
 
 import javax.annotation.Nullable;
+import java.util.Map;
 
 public class ProxyBlock extends AggregatorBlock<ProxyTileEntity>
 {
@@ -24,13 +29,22 @@ public class ProxyBlock extends AggregatorBlock<ProxyTileEntity>
     public static final BooleanProperty UP = BlockStateProperties.UP;
     public static final BooleanProperty DOWN = BlockStateProperties.DOWN;
 
-    private static final AxisAlignedBB BOUNDS = new AxisAlignedBB(4 / 16f, 4 / 16f, 4 / 16f, 12 / 16f, 12 / 16f, 12 / 16f);
-    private static final AxisAlignedBB BOUNDS_NORTH = new AxisAlignedBB(6 / 16f, 6 / 16f, 0 / 16f, 10 / 16f, 10 / 16f, 10 / 16f);
-    private static final AxisAlignedBB BOUNDS_SOUTH = new AxisAlignedBB(6 / 16f, 6 / 16f, 6 / 16f, 10 / 16f, 10 / 16f, 16 / 16f);
-    private static final AxisAlignedBB BOUNDS_EAST = new AxisAlignedBB(6 / 16f, 6 / 16f, 6 / 16f, 16 / 16f, 10 / 16f, 10 / 16f);
-    private static final AxisAlignedBB BOUNDS_WEST = new AxisAlignedBB(0 / 16f, 6 / 16f, 6 / 16f, 10 / 16f, 10 / 16f, 10 / 16f);
-    private static final AxisAlignedBB BOUNDS_UP = new AxisAlignedBB(6 / 16f, 6 / 16f, 6 / 16f, 10 / 16f, 16 / 16f, 10 / 16f);
-    private static final AxisAlignedBB BOUNDS_DOWN = new AxisAlignedBB(6 / 16f, 0 / 16f, 6 / 16f, 10 / 16f, 10 / 16f, 10 / 16f);
+    private static final VoxelShape BOUNDS = Block.makeCuboidShape(4, 4, 4, 12, 12, 12);
+    private static final VoxelShape BOUNDS_NORTH = Block.makeCuboidShape(6, 6, 0, 10, 10, 10);
+    private static final VoxelShape BOUNDS_SOUTH = Block.makeCuboidShape(6, 6, 6, 10, 10, 16);
+    private static final VoxelShape BOUNDS_EAST = Block.makeCuboidShape(6, 6, 6, 16, 10, 10);
+    private static final VoxelShape BOUNDS_WEST = Block.makeCuboidShape(0, 6, 6, 10, 10, 10);
+    private static final VoxelShape BOUNDS_UP = Block.makeCuboidShape(6, 6, 6, 10, 16, 10);
+    private static final VoxelShape BOUNDS_DOWN = Block.makeCuboidShape(6, 0, 6, 10, 10, 10);
+
+    private static final Map<BooleanProperty, VoxelShape> SIDES = ImmutableMap.<BooleanProperty, VoxelShape>builder()
+            .put(NORTH, BOUNDS_NORTH)
+            .put(SOUTH, BOUNDS_SOUTH)
+            .put(WEST, BOUNDS_WEST)
+            .put(EAST, BOUNDS_EAST)
+            .put(UP, BOUNDS_UP)
+            .put(DOWN, BOUNDS_DOWN)
+            .build();
 
     public ProxyBlock(Properties properties)
     {
@@ -57,31 +71,40 @@ public class ProxyBlock extends AggregatorBlock<ProxyTileEntity>
         return new ProxyTileEntity();
     }
 
-    /*@Deprecated
+    @Deprecated
     @Override
-    public AxisAlignedBB getBoundingBox(BlockState state, IBlockReader source, BlockPos pos)
+    public VoxelShape getShape(BlockState state, IBlockReader world, BlockPos pos, ISelectionContext ctx)
     {
-        state = state.getActualState(source, pos);
+        return VoxelShapes.or(BOUNDS,
+                SIDES.entrySet().stream()
+                        .filter(kv -> state.get(kv.getKey()))
+                        .map(Map.Entry::getValue)
+                        .toArray(VoxelShape[]::new)
+        );
+    }
 
-        AxisAlignedBB bb = BOUNDS;
-        if (state.getValue(NORTH)) bb = bb.union(BOUNDS_NORTH);
-        if (state.getValue(SOUTH)) bb = bb.union(BOUNDS_SOUTH);
-        if (state.getValue(EAST)) bb = bb.union(BOUNDS_EAST);
-        if (state.getValue(WEST)) bb = bb.union(BOUNDS_WEST);
-        if (state.getValue(UP)) bb = bb.union(BOUNDS_UP);
-        if (state.getValue(DOWN)) bb = bb.union(BOUNDS_DOWN);
-        return bb;
-    }*/
+    @Nullable
+    @Override
+    public BlockState getStateForPlacement(BlockItemUseContext ctx)
+    {
+        return getStateForConnections(getDefaultState(), ctx.getWorld(), ctx.getPos());
+    }
 
+    @Deprecated
     @Override
     public BlockState updatePostPlacement(BlockState stateIn, Direction facing, BlockState facingState, IWorld worldIn, BlockPos currentPos, BlockPos facingPos)
     {
-        return stateIn
-                .with(NORTH, isConnectableAutomation(worldIn, currentPos, Direction.NORTH))
-                .with(SOUTH, isConnectableAutomation(worldIn, currentPos, Direction.SOUTH))
-                .with(WEST, isConnectableAutomation(worldIn, currentPos, Direction.WEST))
-                .with(EAST, isConnectableAutomation(worldIn, currentPos, Direction.EAST))
-                .with(UP, isConnectableAutomation(worldIn, currentPos, Direction.UP))
-                .with(DOWN, isConnectableAutomation(worldIn, currentPos, Direction.DOWN));
+        return getStateForConnections(stateIn, worldIn, currentPos);
+    }
+
+    private BlockState getStateForConnections(BlockState state, IWorld world, BlockPos pos)
+    {
+        return state
+                .with(NORTH, isConnectableAutomation(world, pos, Direction.NORTH))
+                .with(SOUTH, isConnectableAutomation(world, pos, Direction.SOUTH))
+                .with(WEST, isConnectableAutomation(world, pos, Direction.WEST))
+                .with(EAST, isConnectableAutomation(world, pos, Direction.EAST))
+                .with(UP, isConnectableAutomation(world, pos, Direction.UP))
+                .with(DOWN, isConnectableAutomation(world, pos, Direction.DOWN));
     }
 }

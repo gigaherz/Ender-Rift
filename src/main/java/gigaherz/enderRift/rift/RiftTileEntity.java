@@ -17,6 +17,7 @@ import net.minecraft.util.Direction;
 import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
+import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.IEnergyStorage;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
@@ -30,7 +31,7 @@ import java.util.Random;
 public class RiftTileEntity extends TileEntity implements ITickableTileEntity
 {
     @ObjectHolder("enderrift:rift")
-    public static TileEntityType<?> TYPE;
+    public static TileEntityType<RiftTileEntity> TYPE;
 
     private static final int STARTUP_POWER = 10000;
     public static final int BUFFER_POWER = 1000000;
@@ -162,7 +163,8 @@ public class RiftTileEntity extends TileEntity implements ITickableTileEntity
 
     public int countInventoryStacks()
     {
-        return getInventory().getSlots();
+        IItemHandler handler = getInventory();
+        return handler == null ? 0 : handler.getSlots();
     }
 
     public ItemStack getRiftItem()
@@ -181,7 +183,7 @@ public class RiftTileEntity extends TileEntity implements ITickableTileEntity
     public void read(CompoundNBT compound)
     {
         super.read(compound);
-        energyBuffer.setEnergy(compound.getInt("Energy"));
+        CapabilityEnergy.ENERGY.readNBT(energyBuffer, null, compound.get("Energy"));
         powered = compound.getBoolean("Powered");
         riftId = compound.getInt("RiftId");
     }
@@ -189,7 +191,7 @@ public class RiftTileEntity extends TileEntity implements ITickableTileEntity
     public CompoundNBT write(CompoundNBT compound)
     {
         compound = super.write(compound);
-        compound.putInt("Energy", energyBuffer.getEnergyStored());
+        compound.put("Energy", CapabilityEnergy.ENERGY.writeNBT(energyBuffer, null));
         compound.putBoolean("Powered", powered);
         compound.putInt("RiftId", riftId);
         return compound;
@@ -233,10 +235,11 @@ public class RiftTileEntity extends TileEntity implements ITickableTileEntity
 
     public ItemStack chooseRandomStack()
     {
-        if (getInventory() == null)
+        IItemHandler handler = getInventory();
+        if (handler == null)
             return ItemStack.EMPTY;
 
-        int max = getInventory().getSlots();
+        int max = handler.getSlots();
 
         if (max <= 0)
             return ItemStack.EMPTY;

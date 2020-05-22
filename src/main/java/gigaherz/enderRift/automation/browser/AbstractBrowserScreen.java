@@ -2,10 +2,11 @@ package gigaherz.enderRift.automation.browser;
 
 import com.mojang.blaze3d.platform.GlStateManager;
 import gigaherz.enderRift.EnderRiftMod;
+import joptsimple.internal.Strings;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.inventory.ContainerScreen;
-import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.client.gui.widget.TextFieldWidget;
+import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.container.Slot;
@@ -13,11 +14,10 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.ITextComponent;
 
-public abstract class AbstractBrowserScreen<T extends BrowserContainer> extends ContainerScreen<T>
+public abstract class AbstractBrowserScreen<T extends AbstractBrowserContainer> extends ContainerScreen<T>
 {
     private static final ResourceLocation backgroundTexture = new ResourceLocation(EnderRiftMod.MODID, "textures/gui/browser.png");
     private static final ResourceLocation tabsTexture = new ResourceLocation("minecraft:textures/gui/container/creative_inventory/tabs.png");
-    private static final String textBrowser = "container.enderrift.browser";
 
     private boolean isDragging;
     private int scrollY;
@@ -51,8 +51,8 @@ public abstract class AbstractBrowserScreen<T extends BrowserContainer> extends 
             int w = 162;
             int h = 54;
             GlStateManager.disableDepthTest();
-            GlStateManager.color4f(1,1,1,1);
-            fill(l,t,l+w,t+h, 0x7f000000);
+            GlStateManager.color4f(1, 1, 1, 1);
+            fill(l, t, l + w, t + h, 0x7f000000);
             long tm = Minecraft.getInstance().world.getGameTime() % 30;
             if (tm < 15)
             {
@@ -88,19 +88,23 @@ public abstract class AbstractBrowserScreen<T extends BrowserContainer> extends 
         }));
 
         //Keyboard.enableRepeatEvents(true);
-        addButton(this.searchField = new TextFieldWidget(this.font, guiLeft + 114, guiTop + 6, 71, this.font.FONT_HEIGHT, ""){
+        addButton(this.searchField = new TextFieldWidget(this.font, guiLeft + 114, guiTop + 6, 71, this.font.FONT_HEIGHT, "")
+        {
             @Override
-            public boolean mouseClicked(double p_mouseClicked_1_, double p_mouseClicked_3_, int mouseButton)
+            public boolean mouseClicked(double mouseX, double mouseY, int mouseButton)
             {
-                if (mouseButton == 1 && getText() != null && getText().length() > 0)
+                if (mouseX >= (double) this.x && mouseX < (double) (this.x + this.width)
+                        && mouseY >= (double) this.y && mouseY < (double) (this.y + this.height))
                 {
-                    setText("");
-                    updateSearchFilter();
+                    if (mouseButton == 1 && !Strings.isNullOrEmpty(getText()) && getText().length() > 0)
+                    {
+                        setText("");
+                        updateSearchFilter();
+                        return true;
+                    }
                 }
 
-                super.mouseClicked(p_mouseClicked_1_, p_mouseClicked_3_, mouseButton);
-
-                return true;
+                return super.mouseClicked(mouseX, mouseY, mouseButton);
             }
         });
 
@@ -171,8 +175,8 @@ public abstract class AbstractBrowserScreen<T extends BrowserContainer> extends 
         drawCustomSlotTexts();
         RenderHelper.disableStandardItemLighting();
 
-        minecraft.fontRenderer.drawString(this.title.getFormattedText(), 8, 6, 0x404040);
-        minecraft.fontRenderer.drawString(this.playerInventory.getDisplayName().getFormattedText(), 8, ySize - 96 + 2, 0x404040);
+        font.drawString(title.getFormattedText(), 8, 6, 0x404040);
+        font.drawString(this.playerInventory.getDisplayName().getFormattedText(), 8, ySize - 96 + 2, 0x404040);
     }
 
     private void drawCustomSlotTexts()
@@ -238,12 +242,12 @@ public abstract class AbstractBrowserScreen<T extends BrowserContainer> extends 
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double wheelDelta)
     {
-        if(super.mouseScrolled(mouseX, mouseY, wheelDelta))
+        if (super.mouseScrolled(mouseX, mouseY, wheelDelta))
             return true;
 
-        scrollAcc += wheelDelta;
+        scrollAcc += wheelDelta * 120;
 
-        final BrowserContainer container = getContainer();
+        final AbstractBrowserContainer container = getContainer();
         final int h = 62;
         final int bitHeight = 15;
         final int actualSlotCount = container.getActualSlotCount();
@@ -283,9 +287,7 @@ public abstract class AbstractBrowserScreen<T extends BrowserContainer> extends 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int mouseButton)
     {
-        if (super.mouseClicked(mouseX, mouseY, mouseButton))
-            return true;
-
+        // scroll
         {
             final int w = 12;
             final int h = 62;
@@ -299,19 +301,7 @@ public abstract class AbstractBrowserScreen<T extends BrowserContainer> extends 
             }
         }
 
-        {
-            final int w = searchField.getWidth();
-            final int h = searchField.getHeight();
-            double mx = mouseX - searchField.x;
-            double my = mouseY - searchField.y;
-            if (mx >= 0 && mx < w && my >= 0 && my < h)
-            {
-                searchField.mouseClicked(mx, my, mouseButton);
-                return true;
-            }
-        }
-
-        return false;
+        return super.mouseClicked(mouseX, mouseY, mouseButton);
     }
 
     private void updateScrollPos(int my)
@@ -330,7 +320,7 @@ public abstract class AbstractBrowserScreen<T extends BrowserContainer> extends 
 
             scrollY = row * (h - bitHeight) / scrollRows;
 
-            final BrowserContainer container = getContainer();
+            final AbstractBrowserContainer container = getContainer();
             container.setScrollPos(row * 9);
         }
     }

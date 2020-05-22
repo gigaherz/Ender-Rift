@@ -28,6 +28,7 @@ public abstract class AggregatorBlock<T extends AggregatorTileEntity> extends Bl
     @Override
     public abstract TileEntity createTileEntity(BlockState state, IBlockReader world);
 
+    @Deprecated
     @Override
     public void neighborChanged(BlockState state, World world, BlockPos pos, Block otherBlock, BlockPos otherPos, boolean p_220069_6_)
     {

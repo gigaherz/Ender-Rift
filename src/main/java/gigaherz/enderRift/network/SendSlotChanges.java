@@ -85,7 +85,8 @@ public class SendSlotChanges
             buf.writeVarInt(Item.getIdFromItem(stack.getItem()));
             buf.writeVarInt(stack.getCount());
             CompoundNBT nbttagcompound = null;
-            if (stack.isDamageable() || stack.getItem().shouldSyncTag()) {
+            if (stack.isDamageable() || stack.getItem().shouldSyncTag())
+            {
                 nbttagcompound = stack.getShareTag();
             }
             buf.writeCompoundTag(nbttagcompound);

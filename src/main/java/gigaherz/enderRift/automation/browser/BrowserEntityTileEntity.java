@@ -1,8 +1,6 @@
 package gigaherz.enderRift.automation.browser;
 
-import gigaherz.enderRift.EnderRiftMod;
 import gigaherz.enderRift.automation.AggregatorTileEntity;
-import gigaherz.enderRift.automation.iface.InterfaceBlock;
 import net.minecraft.block.BlockState;
 import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.Direction;
@@ -30,9 +28,9 @@ public class BrowserEntityTileEntity extends AggregatorTileEntity
         if (facing == null && world != null)
         {
             BlockState state = world.getBlockState(pos);
-            if (state.getBlock() == EnderRiftMod.EnderRiftBlocks.BROWSER)
+            if (state.getProperties().contains(BrowserBlock.FACING))
             {
-                facing = state.get(InterfaceBlock.FACING).getOpposite();
+                facing = state.get(BrowserBlock.FACING).getOpposite();
             }
         }
         return facing;

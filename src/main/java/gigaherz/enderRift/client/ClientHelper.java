@@ -6,22 +6,17 @@ import gigaherz.enderRift.generator.GeneratorContainer;
 import gigaherz.enderRift.network.SendSlotChanges;
 import gigaherz.enderRift.network.UpdateField;
 import gigaherz.enderRift.network.UpdatePowerStatus;
-import gigaherz.enderRift.rift.RiftTileEntityRenderer;
 import gigaherz.enderRift.rift.RiftTileEntity;
+import gigaherz.enderRift.rift.RiftTileEntityRenderer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.resources.IResource;
-import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.client.event.ModelBakeEvent;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.model.ModelLoader;
-import net.minecraftforge.client.model.ModelLoaderRegistry;
-import net.minecraftforge.client.model.obj.OBJLoader;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.InterModComms;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 
 @Mod.EventBusSubscriber(value = Dist.CLIENT, modid = EnderRiftMod.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class ClientHelper
@@ -29,21 +24,13 @@ public class ClientHelper
     @SubscribeEvent
     public static void registerModels(ModelRegistryEvent event)
     {
-        OBJLoader.INSTANCE.addDomain(EnderRiftMod.MODID);
-        OBJLoader.INSTANCE.onResourceManagerReload(Minecraft.getInstance().getResourceManager());
         ClientRegistry.bindTileEntitySpecialRenderer(RiftTileEntity.class, new RiftTileEntityRenderer());
-        ModelHandle.init();
     }
 
     @SubscribeEvent
-    public static void modelBake(ModelBakeEvent event)
+    public static void clientSetup(FMLClientSetupEvent event)
     {
-        ModelHandle.initLoader(event.getModelLoader());
-    }
-
-    public static void registerBooks()
-    {
-        InterModComms.sendTo("gbook", "registerBook", () -> EnderRiftMod.location("xml/book.xml"));
+        ModelLoader.addSpecialModel(EnderRiftMod.location("block/sphere"));
     }
 
     public static void handleSendSlotChanges(final SendSlotChanges message)

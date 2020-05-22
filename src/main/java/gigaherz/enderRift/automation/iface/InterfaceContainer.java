@@ -3,10 +3,10 @@ package gigaherz.enderRift.automation.iface;
 import gigaherz.enderRift.common.slots.SlotFilter;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.container.ContainerType;
-import net.minecraft.inventory.container.Slot;
 import net.minecraft.inventory.container.ClickType;
 import net.minecraft.inventory.container.Container;
+import net.minecraft.inventory.container.ContainerType;
+import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.math.BlockPos;
@@ -30,7 +30,7 @@ public class InterfaceContainer extends Container
     {
         super(TYPE, id);
 
-        this.tile = (InterfaceTileEntity)playerInventory.player.world.getTileEntity(pos);
+        this.tile = (InterfaceTileEntity) playerInventory.player.world.getTileEntity(pos);
 
         IItemHandler filters = tile.inventoryFilter();
         for (int x = 0; x < 9; x++)
