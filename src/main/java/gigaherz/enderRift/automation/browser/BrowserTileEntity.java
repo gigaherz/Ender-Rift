@@ -8,7 +8,7 @@ import net.minecraftforge.registries.ObjectHolder;
 
 import javax.annotation.Nullable;
 
-public class BrowserEntityTileEntity extends AggregatorTileEntity
+public class BrowserTileEntity extends AggregatorTileEntity
 {
     @ObjectHolder("enderrift:browser")
     public static TileEntityType<?> TYPE;
@@ -17,7 +17,7 @@ public class BrowserEntityTileEntity extends AggregatorTileEntity
 
     Direction facing = null;
 
-    public BrowserEntityTileEntity()
+    public BrowserTileEntity()
     {
         super(TYPE);
     }

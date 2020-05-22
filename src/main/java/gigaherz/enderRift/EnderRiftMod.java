@@ -175,7 +175,7 @@ public class EnderRiftMod
                 TileEntityType.Builder.create(RiftTileEntity::new, EnderRiftBlocks.RIFT).build(null).setRegistryName("rift"),
                 TileEntityType.Builder.create(StructureTileEntity::new, EnderRiftBlocks.STRUCTURE).build(null).setRegistryName("structure"),
                 TileEntityType.Builder.create(InterfaceTileEntity::new, EnderRiftBlocks.INTERFACE).build(null).setRegistryName("interface"),
-                TileEntityType.Builder.create(BrowserEntityTileEntity::new, EnderRiftBlocks.BROWSER, EnderRiftBlocks.CRAFTING_BROWSER).build(null).setRegistryName("browser"),
+                TileEntityType.Builder.create(BrowserTileEntity::new, EnderRiftBlocks.BROWSER, EnderRiftBlocks.CRAFTING_BROWSER).build(null).setRegistryName("browser"),
                 TileEntityType.Builder.create(ProxyTileEntity::new, EnderRiftBlocks.PROXY).build(null).setRegistryName("proxy"),
                 TileEntityType.Builder.create(DriverTileEntity::new, EnderRiftBlocks.DRIVER).build(null).setRegistryName("driver"),
                 TileEntityType.Builder.create(GeneratorTileEntity::new, EnderRiftBlocks.GENERATOR).build(null).setRegistryName("generator")
@@ -185,8 +185,8 @@ public class EnderRiftMod
     public void registerContainers(RegistryEvent.Register<ContainerType<?>> event)
     {
         event.getRegistry().registerAll(
-                IForgeContainerType.create(BrowserContainer::new).setRegistryName("browser"),
-                IForgeContainerType.create(CraftingBrowserContainer::new).setRegistryName("crafting_browser"),
+                new ContainerType<>(BrowserContainer::new).setRegistryName("browser"),
+                new ContainerType<>(CraftingBrowserContainer::new).setRegistryName("crafting_browser"),
                 IForgeContainerType.create(InterfaceContainer::new).setRegistryName("interface"),
                 IForgeContainerType.create(GeneratorContainer::new).setRegistryName("generator")
         );

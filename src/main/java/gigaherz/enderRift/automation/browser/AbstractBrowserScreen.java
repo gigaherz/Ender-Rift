@@ -99,7 +99,6 @@ public abstract class AbstractBrowserScreen<T extends AbstractBrowserContainer> 
                     if (mouseButton == 1 && !Strings.isNullOrEmpty(getText()) && getText().length() > 0)
                     {
                         setText("");
-                        updateSearchFilter();
                         return true;
                     }
                 }
@@ -114,7 +113,8 @@ public abstract class AbstractBrowserScreen<T extends AbstractBrowserContainer> 
         searchField.setTextColor(16777215);
         searchField.setCanLoseFocus(false);
         searchField.setFocused2(true);
-        searchField.setText("");
+        searchField.setText(getContainer().filterText);
+        searchField.setResponder(this::updateSearchFilter);
 
         changeSorting(SortMode.StackSize);
     }
@@ -128,9 +128,9 @@ public abstract class AbstractBrowserScreen<T extends AbstractBrowserContainer> 
         return searchField.keyPressed(key, scanCode, modifiers);
     }
 
-    private void updateSearchFilter()
+    private void updateSearchFilter(String text)
     {
-        getContainer().setFilterText(searchField.getText());
+        getContainer().setFilterText(text);
     }
 
     private void changeSorting(SortMode mode)
@@ -181,7 +181,7 @@ public abstract class AbstractBrowserScreen<T extends AbstractBrowserContainer> 
 
     private void drawCustomSlotTexts()
     {
-        for (int i = 0; i < BrowserContainer.FakeSlots; ++i)
+        for (int i = 0; i < AbstractBrowserContainer.ScrollSlots; ++i)
         {
             Slot slot = getContainer().inventorySlots.get(i);
             drawSlotText(slot);
@@ -198,7 +198,7 @@ public abstract class AbstractBrowserScreen<T extends AbstractBrowserContainer> 
 
         if (stack.getCount() > 0)
         {
-            int count = getContainer().fakeInventoryClient.getStackSizeForSlot(slotIn.slotNumber);
+            int count = getContainer().getClient().getStackSizeForSlot(slotIn.slotNumber);
 
             if (count != 1)
             {
@@ -234,7 +234,7 @@ public abstract class AbstractBrowserScreen<T extends AbstractBrowserContainer> 
     {
         int actualSlotCount = getContainer().getActualSlotCount();
 
-        return actualSlotCount > BrowserContainer.FakeSlots;
+        return actualSlotCount > AbstractBrowserContainer.ScrollSlots;
     }
 
     @Override
@@ -245,17 +245,16 @@ public abstract class AbstractBrowserScreen<T extends AbstractBrowserContainer> 
 
         scrollAcc += wheelDelta * 120;
 
-        final AbstractBrowserContainer container = getContainer();
         final int h = 62;
         final int bitHeight = 15;
-        final int actualSlotCount = container.getActualSlotCount();
+        final int actualSlotCount = getContainer().getActualSlotCount();
         final int rows = (int) Math.ceil(actualSlotCount / 9.0);
 
-        if (rows > BrowserContainer.FakeRows)
+        if (rows > AbstractBrowserContainer.ScrollRows)
         {
-            int scrollRows = rows - BrowserContainer.FakeRows;
+            int scrollRows = rows - AbstractBrowserContainer.ScrollRows;
 
-            int row = container.scroll / 9;
+            int row = getContainer().scroll / 9;
 
             while (scrollAcc >= 120)
             {
@@ -272,7 +271,7 @@ public abstract class AbstractBrowserScreen<T extends AbstractBrowserContainer> 
 
             scrollY = row * (h - bitHeight) / scrollRows;
 
-            container.setScrollPos(row * 9);
+            getContainer().setScrollPos(row * 9);
         }
         else
         {
@@ -308,7 +307,7 @@ public abstract class AbstractBrowserScreen<T extends AbstractBrowserContainer> 
         final int bitHeight = 15;
         final int actualSlotCount = getContainer().getActualSlotCount();
         final int rows = (int) Math.ceil(actualSlotCount / 9.0);
-        final int scrollRows = rows - BrowserContainer.FakeRows;
+        final int scrollRows = rows - AbstractBrowserContainer.ScrollRows;
 
         boolean isEnabled = scrollRows > 0;
         if (isEnabled)
@@ -319,7 +318,7 @@ public abstract class AbstractBrowserScreen<T extends AbstractBrowserContainer> 
             scrollY = row * (h - bitHeight) / scrollRows;
 
             final AbstractBrowserContainer container = getContainer();
-            container.setScrollPos(row * 9);
+            getContainer().setScrollPos(row * 9);
         }
     }
 

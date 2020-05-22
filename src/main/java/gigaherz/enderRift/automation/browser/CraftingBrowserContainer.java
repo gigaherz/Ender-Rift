@@ -15,21 +15,23 @@ import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.ICraftingRecipe;
 import net.minecraft.item.crafting.IRecipeType;
-import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.play.server.SSetSlotPacket;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.GameRules;
 import net.minecraft.world.World;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemHandlerHelper;
 import net.minecraftforge.registries.ObjectHolder;
 
+import javax.annotation.Nullable;
 import java.util.Optional;
 
 public class CraftingBrowserContainer extends AbstractBrowserContainer
 {
     @ObjectHolder("enderrift:crafting_browser")
     public static ContainerType<CraftingBrowserContainer> TYPE;
+
+    public static int InventorySlotStart = ScrollSlots;
+    public static int CraftingSlotStart = ScrollSlots + PlayerSlots + 1;
 
     private final static int HeightCrafter = 58;
     private final static int CraftingOffset = 59;
@@ -40,19 +42,16 @@ public class CraftingBrowserContainer extends AbstractBrowserContainer
     private final World world;
     private final PlayerEntity player;
 
-    public static int InventorySlotStart = FakeSlots;
-    public static int CraftingSlotStart = FakeSlots + PlayerSlots + 1;
-
     Slot slotCraftResult;
 
-    public CraftingBrowserContainer(int id, PlayerInventory playerInventory, PacketBuffer extraData)
+    public CraftingBrowserContainer(int id, PlayerInventory playerInventory)
     {
-        this(id, extraData.readBlockPos(), playerInventory);
+        this(id, null, playerInventory);
     }
 
-    public CraftingBrowserContainer(int id, BlockPos pos, PlayerInventory playerInventory)
+    public CraftingBrowserContainer(int id, @Nullable BrowserTileEntity te, PlayerInventory playerInventory)
     {
-        super(id, pos, playerInventory, TYPE);
+        super(TYPE, id, te, playerInventory);
 
         this.world = playerInventory.player.world;
         this.player = playerInventory.player;
@@ -78,7 +77,7 @@ public class CraftingBrowserContainer extends AbstractBrowserContainer
     @Override
     protected void bindPlayerInventory(PlayerInventory playerInventory)
     {
-        bindPlayerInventory(playerInventory, Top + FakeRows * SlotHeight + 14 + HeightCrafter);
+        bindPlayerInventory(playerInventory, Top + ScrollRows * SlotHeight + 14 + HeightCrafter);
     }
 
     @Override
@@ -134,7 +133,7 @@ public class CraftingBrowserContainer extends AbstractBrowserContainer
     @Override
     public ItemStack transferStackInSlot(PlayerEntity player, int slotIndex)
     {
-        if (slotIndex < FakeSlots + PlayerSlots)
+        if (slotIndex < ScrollSlots + PlayerSlots)
         {
             return super.transferStackInSlot(player, slotIndex);
         }
@@ -149,15 +148,12 @@ public class CraftingBrowserContainer extends AbstractBrowserContainer
         ItemStack stack = slot.getStack();
         ItemStack stackCopy = stack.copy();
 
-        int firstSlot = FakeSlots;
-        int lastSlot = FakeSlots + PlayerSlots;
-
-        if (!this.mergeItemStack(stack, firstSlot, lastSlot, false))
+        if (!this.mergeItemStack(stack, InventorySlotStart, CraftingSlotStart, false))
         {
             return ItemStack.EMPTY;
         }
 
-        if (slotIndex == 0)
+        if (slotIndex == CraftingSlotStart)
             slot.onSlotChange(stack, stackCopy);
 
         if (stack.getCount() == 0)

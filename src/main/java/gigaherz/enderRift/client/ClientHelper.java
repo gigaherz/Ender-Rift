@@ -15,6 +15,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.DeferredWorkQueue;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
@@ -31,7 +32,10 @@ public class ClientHelper
     @SubscribeEvent
     public static void clientSetup(FMLClientSetupEvent event)
     {
-        ModelLoader.addSpecialModel(EnderRiftMod.location("block/sphere"));
+        //noinspection deprecation
+        DeferredWorkQueue.runLater(() -> {
+            ModelLoader.addSpecialModel(EnderRiftMod.location("block/sphere"));
+        });
     }
 
     public static void handleSendSlotChanges(final SendSlotChanges message)

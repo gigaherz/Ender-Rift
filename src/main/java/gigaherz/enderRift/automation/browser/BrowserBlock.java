@@ -23,11 +23,10 @@ import net.minecraft.util.math.shapes.VoxelShapes;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.network.NetworkHooks;
 
 import javax.annotation.Nullable;
 
-public class BrowserBlock extends AggregatorBlock<BrowserEntityTileEntity>
+public class BrowserBlock extends AggregatorBlock<BrowserTileEntity>
 {
     public static final DirectionProperty FACING = BlockStateProperties.FACING;
     public final boolean crafting;
@@ -88,7 +87,7 @@ public class BrowserBlock extends AggregatorBlock<BrowserEntityTileEntity>
     @Override
     public TileEntity createTileEntity(BlockState state, IBlockReader world)
     {
-        return new BrowserEntityTileEntity();
+        return new BrowserTileEntity();
     }
 
     @Deprecated
@@ -111,19 +110,31 @@ public class BrowserBlock extends AggregatorBlock<BrowserEntityTileEntity>
     {
         TileEntity tileEntity = worldIn.getTileEntity(pos);
 
-        if (!(tileEntity instanceof BrowserEntityTileEntity) || player.isSneaking())
+        if (!(tileEntity instanceof BrowserTileEntity) || player.isSneaking())
             return ActionResultType.FAIL;
 
         if (player.world.isRemote)
             return ActionResultType.SUCCESS;
 
-        NetworkHooks.openGui((ServerPlayerEntity) player, new SimpleNamedContainerProvider(
-                (id, playerInventory, playerEntity) -> crafting
-                        ? new CraftingBrowserContainer(id, pos, playerInventory)
-                        : new BrowserContainer(id, pos, playerInventory),
-                crafting ? new TranslationTextComponent("container.enderrift.crafting_browser")
-                        : new TranslationTextComponent("container.enderrift.browser")), pos);
+        if (crafting)
+            openCraftingBrowser(player, (BrowserTileEntity) tileEntity);
+        else
+            openBrowser(player, (BrowserTileEntity) tileEntity);
 
         return ActionResultType.SUCCESS;
+    }
+
+    private void openBrowser(PlayerEntity player, BrowserTileEntity tileEntity)
+    {
+        player.openContainer(new SimpleNamedContainerProvider(
+                (id, playerInventory, playerEntity) -> new BrowserContainer(id, tileEntity, playerInventory),
+                new TranslationTextComponent("container.enderrift.browser")));
+    }
+
+    private void openCraftingBrowser(PlayerEntity player, BrowserTileEntity tileEntity)
+    {
+        player.openContainer(new SimpleNamedContainerProvider(
+                (id, playerInventory, playerEntity) -> new CraftingBrowserContainer(id, tileEntity, playerInventory),
+                new TranslationTextComponent("container.enderrift.crafting_browser")));
     }
 }
