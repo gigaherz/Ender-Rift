@@ -1,19 +1,35 @@
 package gigaherz.enderRift.rift;
 
+import com.google.common.collect.Lists;
 import com.mojang.blaze3d.platform.GlStateManager;
 import gigaherz.enderRift.EnderRiftMod;
-import gigaherz.enderRift.client.ModelHandle;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.BufferBuilder;
+import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.model.BakedQuad;
+import net.minecraft.client.renderer.model.IBakedModel;
 import net.minecraft.client.renderer.texture.AtlasTexture;
 import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
+import net.minecraftforge.client.model.data.EmptyModelData;
+import net.minecraftforge.client.model.pipeline.LightUtil;
 import org.lwjgl.opengl.GL11;
+
+import java.util.List;
+import java.util.Random;
 
 public class RiftTileEntityRenderer extends TileEntityRenderer<RiftTileEntity>
 {
-    private ModelHandle modelHandle = ModelHandle.of(EnderRiftMod.location("block/sphere.obj"));
+    private final Random random = new Random();
+
+    private static final List<Direction> DIRECTIONS_AND_NULL = Lists.newArrayList(Direction.values());
+    {
+        DIRECTIONS_AND_NULL.add(null);
+    }
 
     @Override
     public void render(RiftTileEntity te, double x, double y, double z, float partialTicks, int destroyStage)
@@ -61,6 +77,11 @@ public class RiftTileEntityRenderer extends TileEntityRenderer<RiftTileEntity>
         float c0 = 1.0f / steps;
         float c1 = 1.0f / (1 - c0);
 
+        GlStateManager.color4f(1,1,1,1);
+        Tessellator tessellator = Tessellator.getInstance();
+        BufferBuilder buffer = tessellator.getBuffer();
+        IBakedModel model = Minecraft.getInstance().getModelManager().getModel(EnderRiftMod.location("block/sphere"));
+
         for (int i = 0; i < steps; i++)
         {
             float progress0 = ((tm + i * step_time) % time_loop + partialTicks) / time_loop;
@@ -74,12 +95,19 @@ public class RiftTileEntityRenderer extends TileEntityRenderer<RiftTileEntity>
             GlStateManager.translated(-0.5, -0.5, -0.5);
 
             int a = Math.round(Math.min(255, Math.max(0, (1 - progress1) * 255)));
-            int b = Math.round(Math.min(255, Math.max(0, progress1 * 255)));
-            int g = Math.round(Math.min(255, Math.max(0, progress1 * 255)));
-            int r = Math.round(Math.min(255, Math.max(0, progress1 * 255)));
-            int color = (a << 24) | (b << 16) | (g << 8) | (r);
+            int rgb = Math.round(Math.min(255, Math.max(0, progress1 * 255)));
+            int color = (a << 24) | (rgb << 16) | (rgb << 8) | (rgb);
 
-            modelHandle.render(color);
+            buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.ITEM);
+            for (Direction d : DIRECTIONS_AND_NULL)
+            {
+                for (BakedQuad bakedquad : model.getQuads(null, d, random, EmptyModelData.INSTANCE))
+                {
+                    //buffer.addVertexData(bakedquad.getVertexData());
+                    LightUtil.renderQuadColor(buffer, bakedquad, color);
+                }
+            }
+            tessellator.draw();
 
             GlStateManager.popMatrix();
         }

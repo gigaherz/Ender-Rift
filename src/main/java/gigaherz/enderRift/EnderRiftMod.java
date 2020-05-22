@@ -175,7 +175,7 @@ public class EnderRiftMod
                 TileEntityType.Builder.create(RiftTileEntity::new, EnderRiftBlocks.RIFT).build(null).setRegistryName("rift"),
                 TileEntityType.Builder.create(StructureTileEntity::new, EnderRiftBlocks.STRUCTURE).build(null).setRegistryName("structure"),
                 TileEntityType.Builder.create(InterfaceTileEntity::new, EnderRiftBlocks.INTERFACE).build(null).setRegistryName("interface"),
-                TileEntityType.Builder.create(BrowserEntityTileEntity::new, EnderRiftBlocks.BROWSER).build(null).setRegistryName("browser"),
+                TileEntityType.Builder.create(BrowserEntityTileEntity::new, EnderRiftBlocks.BROWSER, EnderRiftBlocks.CRAFTING_BROWSER).build(null).setRegistryName("browser"),
                 TileEntityType.Builder.create(ProxyTileEntity::new, EnderRiftBlocks.PROXY).build(null).setRegistryName("proxy"),
                 TileEntityType.Builder.create(DriverTileEntity::new, EnderRiftBlocks.DRIVER).build(null).setRegistryName("driver"),
                 TileEntityType.Builder.create(GeneratorTileEntity::new, EnderRiftBlocks.GENERATOR).build(null).setRegistryName("generator")
@@ -202,11 +202,11 @@ public class EnderRiftMod
     public void commonSetup(FMLCommonSetupEvent event)
     {
         int messageNumber = 0;
-        channel.registerMessage(messageNumber++, ClearCraftingGrid.class, ClearCraftingGrid::encode, ClearCraftingGrid::new, ClearCraftingGrid::handle);
-        channel.registerMessage(messageNumber++, SendSlotChanges.class, SendSlotChanges::encode, SendSlotChanges::new, SendSlotChanges::handle);
-        channel.registerMessage(messageNumber++, SetVisibleSlots.class, SetVisibleSlots::encode, SetVisibleSlots::new, SetVisibleSlots::handle);
-        channel.registerMessage(messageNumber++, UpdateField.class, UpdateField::encode, UpdateField::new, UpdateField::handle);
-        channel.registerMessage(messageNumber++, UpdatePowerStatus.class, UpdatePowerStatus::encode, UpdatePowerStatus::new, UpdatePowerStatus::handle);
+        channel.messageBuilder(ClearCraftingGrid.class, messageNumber++).encoder(ClearCraftingGrid::encode).decoder(ClearCraftingGrid::new).consumer(ClearCraftingGrid::handle).add();
+        channel.messageBuilder(SendSlotChanges.class, messageNumber++).encoder(SendSlotChanges::encode).decoder(SendSlotChanges::new).consumer(SendSlotChanges::handle).add();
+        channel.messageBuilder(SetVisibleSlots.class, messageNumber++).encoder(SetVisibleSlots::encode).decoder(SetVisibleSlots::new).consumer(SetVisibleSlots::handle).add();
+        channel.messageBuilder(UpdateField.class, messageNumber++).encoder(UpdateField::encode).decoder(UpdateField::new).consumer(UpdateField::handle).add();
+        channel.messageBuilder(UpdatePowerStatus.class, messageNumber++).encoder(UpdatePowerStatus::encode).decoder(UpdatePowerStatus::new).consumer(UpdatePowerStatus::handle).add();
         logger.debug("Final message number: " + messageNumber);
 
         RiftStructure.init();

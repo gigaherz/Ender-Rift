@@ -1,6 +1,7 @@
 package gigaherz.enderRift.client;
 
 import gigaherz.enderRift.EnderRiftMod;
+import gigaherz.enderRift.automation.browser.AbstractBrowserContainer;
 import gigaherz.enderRift.automation.browser.BrowserContainer;
 import gigaherz.enderRift.generator.GeneratorContainer;
 import gigaherz.enderRift.network.SendSlotChanges;
@@ -14,6 +15,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.DeferredWorkQueue;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
@@ -30,7 +32,9 @@ public class ClientHelper
     @SubscribeEvent
     public static void clientSetup(FMLClientSetupEvent event)
     {
-        ModelLoader.addSpecialModel(EnderRiftMod.location("block/sphere"));
+        DeferredWorkQueue.runLater(() -> {
+            ModelLoader.addSpecialModel(EnderRiftMod.location("block/sphere"));
+        });
     }
 
     public static void handleSendSlotChanges(final SendSlotChanges message)
@@ -43,7 +47,7 @@ public class ClientHelper
 
             if (entityplayer.openContainer != null && entityplayer.openContainer.windowId == message.windowId)
             {
-                ((BrowserContainer) entityplayer.openContainer).slotsChanged(message.slotCount, message.indices, message.stacks);
+                ((AbstractBrowserContainer) entityplayer.openContainer).slotsChanged(message.slotCount, message.indices, message.stacks);
             }
         });
     }
