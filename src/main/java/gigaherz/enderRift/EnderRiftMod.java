@@ -1,5 +1,7 @@
 package gigaherz.enderRift;
 
+import com.google.common.collect.ImmutableList;
+import com.mojang.datafixers.util.Pair;
 import gigaherz.enderRift.automation.browser.*;
 import gigaherz.enderRift.automation.driver.DriverBlock;
 import gigaherz.enderRift.automation.driver.DriverTileEntity;
@@ -21,6 +23,10 @@ import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.material.MaterialColor;
 import net.minecraft.client.gui.ScreenManager;
+import net.minecraft.data.DataGenerator;
+import net.minecraft.data.IDataProvider;
+import net.minecraft.data.LootTableProvider;
+import net.minecraft.data.loot.BlockLootTables;
 import net.minecraft.inventory.container.ContainerType;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
@@ -29,6 +35,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipeSerializer;
 import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.storage.loot.*;
 import net.minecraftforge.common.extensions.IForgeContainerType;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -37,15 +44,23 @@ import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.minecraftforge.fml.event.lifecycle.GatherDataEvent;
 import net.minecraftforge.fml.event.lifecycle.InterModEnqueueEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.network.NetworkRegistry;
 import net.minecraftforge.fml.network.simple.SimpleChannel;
+import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.ObjectHolder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nonnull;
+import java.util.List;
+import java.util.Map;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 @Mod.EventBusSubscriber
 @Mod(EnderRiftMod.MODID)
@@ -120,6 +135,7 @@ public class EnderRiftMod
         modEventBus.addGenericListener(IRecipeSerializer.class, this::registerRecipeSerializers);
         modEventBus.addListener(this::commonSetup);
         modEventBus.addListener(this::clientSetup);
+        modEventBus.addListener(this::gatherData);
 
         //modLoadingContext.registerConfig(ModConfig.Type.SERVER, ConfigData.SERVER_SPEC);
         //modLoadingContext.registerConfig(ModConfig.Type.CLIENT, ConfigData.CLIENT_SPEC);
@@ -129,7 +145,7 @@ public class EnderRiftMod
     {
         event.getRegistry().registerAll(
                 new RiftBlock(Block.Properties.create(Material.ROCK).sound(SoundType.METAL).hardnessAndResistance(3.0F, 8.0F).variableOpacity()).setRegistryName("rift"),
-                new StructureBlock(Block.Properties.create(Material.ROCK).sound(SoundType.METAL).hardnessAndResistance(3.0F, 8.0F)).setRegistryName("structure"),
+                new StructureBlock(Block.Properties.create(Material.ROCK).sound(SoundType.METAL).hardnessAndResistance(3.0F, 8.0F).noDrops()).setRegistryName("structure"),
                 new InterfaceBlock(Block.Properties.create(Material.IRON, MaterialColor.STONE).sound(SoundType.METAL).hardnessAndResistance(3.0F, 8.0F)).setRegistryName("interface"),
                 new BrowserBlock(false, Block.Properties.create(Material.IRON, MaterialColor.STONE).sound(SoundType.METAL).hardnessAndResistance(3.0F, 8.0F)).setRegistryName("browser"),
                 new BrowserBlock(true, Block.Properties.create(Material.IRON, MaterialColor.STONE).sound(SoundType.METAL).hardnessAndResistance(3.0F, 8.0F)).setRegistryName("crafting_browser"),
@@ -212,8 +228,87 @@ public class EnderRiftMod
         //FMLInterModComms.sendFunctionMessage("theoneprobe", "getTheOneProbe", "gigaherz.enderRift.plugins.TheOneProbeProviders");
     }
 
+    public void gatherData(GatherDataEvent event)
+    {
+        Data.gatherData(event);
+    }
+
     public static ResourceLocation location(String path)
     {
         return new ResourceLocation(MODID, path);
+    }
+
+    public static class Data
+    {
+        public static void gatherData(GatherDataEvent event)
+        {
+            DataGenerator gen = event.getGenerator();
+
+            if (event.includeServer())
+            {
+                //gen.addProvider(new Recipes(gen));
+                gen.addProvider(new LootTables(gen));
+                //gen.addProvider(new ItemTagGens(gen));
+                //gen.addProvider(new BlockTagGens(gen));
+            }
+            if (event.includeClient())
+            {
+                //gen.addProvider(new BlockStates(gen, event));
+            }
+        }
+
+        private static class LootTables extends LootTableProvider implements IDataProvider
+        {
+            public LootTables(DataGenerator gen)
+            {
+                super(gen);
+            }
+
+            private final List<Pair<Supplier<Consumer<BiConsumer<ResourceLocation, LootTable.Builder>>>, LootParameterSet>> tables = ImmutableList.of(
+                    Pair.of(BlockTables::new, LootParameterSets.BLOCK)
+                    //Pair.of(FishingLootTables::new, LootParameterSets.FISHING),
+                    //Pair.of(ChestLootTables::new, LootParameterSets.CHEST),
+                    //Pair.of(EntityLootTables::new, LootParameterSets.ENTITY),
+                    //Pair.of(GiftLootTables::new, LootParameterSets.GIFT)
+            );
+
+            @Override
+            protected List<Pair<Supplier<Consumer<BiConsumer<ResourceLocation, LootTable.Builder>>>, LootParameterSet>> getTables()
+            {
+                return tables;
+            }
+
+            @Override
+            protected void validate(Map<ResourceLocation, LootTable> map, ValidationTracker validationtracker)
+            {
+                map.forEach((p_218436_2_, p_218436_3_) -> {
+                    LootTableManager.func_227508_a_(validationtracker, p_218436_2_, p_218436_3_);
+                });
+            }
+
+            public static class BlockTables extends BlockLootTables
+            {
+                @Override
+                protected void addTables()
+                {
+                    this.registerLootTable(EnderRiftBlocks.GENERATOR, dropping(EnderRiftBlocks.GENERATOR));
+                    this.registerLootTable(EnderRiftBlocks.DRIVER, dropping(EnderRiftBlocks.DRIVER));
+                    this.registerLootTable(EnderRiftBlocks.PROXY, dropping(EnderRiftBlocks.PROXY));
+                    this.registerLootTable(EnderRiftBlocks.INTERFACE, dropping(EnderRiftBlocks.INTERFACE));
+                    this.registerLootTable(EnderRiftBlocks.BROWSER, dropping(EnderRiftBlocks.BROWSER));
+                    this.registerLootTable(EnderRiftBlocks.CRAFTING_BROWSER, dropping(EnderRiftBlocks.CRAFTING_BROWSER));
+                    this.registerLootTable(EnderRiftBlocks.RIFT, dropping(EnderRiftBlocks.RIFT));
+                }
+
+                @Override
+                protected Iterable<Block> getKnownBlocks()
+                {
+                    return ForgeRegistries.BLOCKS.getValues().stream()
+                            .filter(b -> b.getRegistryName().getNamespace().equals(MODID))
+                            .collect(Collectors.toList());
+                }
+            }
+        }
+
     }
 }

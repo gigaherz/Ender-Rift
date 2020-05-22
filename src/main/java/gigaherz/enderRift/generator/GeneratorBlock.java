@@ -80,7 +80,7 @@ public class GeneratorBlock extends Block
     {
         TileEntity tileEntity = worldIn.getTileEntity(pos);
 
-        if (!(tileEntity instanceof GeneratorTileEntity) || player.isShiftKeyDown())
+        if (!(tileEntity instanceof GeneratorTileEntity) || player.isSneaking())
             return ActionResultType.FAIL;
 
         if (worldIn.isRemote)

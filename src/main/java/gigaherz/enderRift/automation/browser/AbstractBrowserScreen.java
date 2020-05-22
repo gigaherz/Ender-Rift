@@ -2,6 +2,7 @@ package gigaherz.enderRift.automation.browser;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import gigaherz.enderRift.EnderRiftMod;
+import joptsimple.internal.Strings;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.inventory.ContainerScreen;
 import net.minecraft.client.gui.widget.TextFieldWidget;
@@ -90,17 +91,20 @@ public abstract class AbstractBrowserScreen<T extends AbstractBrowserContainer> 
         addButton(this.searchField = new TextFieldWidget(this.font, guiLeft + 114, guiTop + 6, 71, this.font.FONT_HEIGHT, "")
         {
             @Override
-            public boolean mouseClicked(double p_mouseClicked_1_, double p_mouseClicked_3_, int mouseButton)
+            public boolean mouseClicked(double mouseX, double mouseY, int mouseButton)
             {
-                if (mouseButton == 1 && getText() != null && getText().length() > 0)
+                if (mouseX >= (double)this.x  && mouseX < (double)(this.x + this.width)
+                        && mouseY >= (double)this.y && mouseY < (double)(this.y + this.height))
                 {
-                    setText("");
-                    updateSearchFilter();
+                    if (mouseButton == 1 && !Strings.isNullOrEmpty(getText()) && getText().length() > 0)
+                    {
+                        setText("");
+                        updateSearchFilter();
+                        return true;
+                    }
                 }
 
-                super.mouseClicked(p_mouseClicked_1_, p_mouseClicked_3_, mouseButton);
-
-                return true;
+                return super.mouseClicked(mouseX, mouseY, mouseButton);
             }
         });
 
@@ -240,7 +244,7 @@ public abstract class AbstractBrowserScreen<T extends AbstractBrowserContainer> 
         if (super.mouseScrolled(mouseX, mouseY, wheelDelta))
             return true;
 
-        scrollAcc += wheelDelta;
+        scrollAcc += wheelDelta * 120;
 
         final AbstractBrowserContainer container = getContainer();
         final int h = 62;
@@ -282,9 +286,7 @@ public abstract class AbstractBrowserScreen<T extends AbstractBrowserContainer> 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int mouseButton)
     {
-        if (super.mouseClicked(mouseX, mouseY, mouseButton))
-            return true;
-
+        // scroll
         {
             final int w = 12;
             final int h = 62;
@@ -298,19 +300,7 @@ public abstract class AbstractBrowserScreen<T extends AbstractBrowserContainer> 
             }
         }
 
-        {
-            final int w = searchField.getWidth();
-            final int h = searchField.getHeight();
-            double mx = mouseX - searchField.x;
-            double my = mouseY - searchField.y;
-            if (mx >= 0 && mx < w && my >= 0 && my < h)
-            {
-                searchField.mouseClicked(mx, my, mouseButton);
-                return true;
-            }
-        }
-
-        return false;
+        return super.mouseClicked(mouseX, mouseY, mouseButton);
     }
 
     private void updateScrollPos(int my)

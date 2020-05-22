@@ -582,7 +582,7 @@ public class AbstractBrowserContainer extends Container
             ItemStack stack = slot.getStack();
             ItemStack stackCopy = stack.copy();
 
-            ItemStack remaining = AutomationHelper.insertItems(parent, stack);
+            ItemStack remaining = isClient ? ItemStack.EMPTY : AutomationHelper.insertItems(parent, stack);
             if (remaining.getCount() > 0)
             {
                 if (player instanceof IContainerListener)

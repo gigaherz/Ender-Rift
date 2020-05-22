@@ -164,7 +164,8 @@ public class RiftTileEntity extends TileEntity implements ITickableTileEntity
 
     public int countInventoryStacks()
     {
-        return getInventory().getSlots();
+        IItemHandler handler = getInventory();
+        return handler == null ? 0 : handler.getSlots();
     }
 
     public ItemStack getRiftItem()
@@ -235,10 +236,11 @@ public class RiftTileEntity extends TileEntity implements ITickableTileEntity
 
     public ItemStack chooseRandomStack()
     {
-        if (getInventory() == null)
+        IItemHandler handler = getInventory();
+        if (handler == null)
             return ItemStack.EMPTY;
 
-        int max = getInventory().getSlots();
+        int max = handler.getSlots();
 
         if (max <= 0)
             return ItemStack.EMPTY;

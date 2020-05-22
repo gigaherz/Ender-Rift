@@ -113,7 +113,7 @@ public class RiftBlock extends Block
     @Override
     public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity playerIn, Hand handIn, BlockRayTraceResult hit)
     {
-        if (playerIn.isShiftKeyDown())
+        if (playerIn.isSneaking())
             return ActionResultType.PASS;
 
         int slot = playerIn.inventory.currentItem;
@@ -176,7 +176,7 @@ public class RiftBlock extends Block
                 return;
         }
 
-        int numberToExtract = playerIn.isShiftKeyDown() ? 1 : stack.getMaxStackSize();
+        int numberToExtract = playerIn.isSneaking() ? 1 : stack.getMaxStackSize();
 
         ItemStack extracted = AutomationHelper.extractItems(rift.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null).orElseThrow(() -> new RuntimeException("WAT")), stack.copy(), numberToExtract, false);
         if (extracted.getCount() > 0)

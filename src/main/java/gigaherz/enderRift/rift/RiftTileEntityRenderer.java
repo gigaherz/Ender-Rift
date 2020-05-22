@@ -22,7 +22,7 @@ import java.util.Random;
 
 public class RiftTileEntityRenderer extends TileEntityRenderer<RiftTileEntity>
 {
-    private final RenderType renderType = RenderType.translucent();
+    private final RenderType renderType = RenderType.getTranslucent();
     private final Random random = new Random();
 
     public RiftTileEntityRenderer(TileEntityRendererDispatcher dispatcher)

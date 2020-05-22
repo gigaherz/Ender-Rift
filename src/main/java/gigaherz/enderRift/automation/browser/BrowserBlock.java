@@ -111,7 +111,7 @@ public class BrowserBlock extends AggregatorBlock<BrowserEntityTileEntity>
     {
         TileEntity tileEntity = worldIn.getTileEntity(pos);
 
-        if (!(tileEntity instanceof BrowserEntityTileEntity) || player.isShiftKeyDown())
+        if (!(tileEntity instanceof BrowserEntityTileEntity) || player.isSneaking())
             return ActionResultType.FAIL;
 
         if (player.world.isRemote)

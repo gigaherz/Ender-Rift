@@ -72,7 +72,7 @@ public class InterfaceBlock extends AggregatorBlock<InterfaceTileEntity>
     {
         TileEntity tileEntity = worldIn.getTileEntity(pos);
 
-        if (!(tileEntity instanceof InterfaceTileEntity) || player.isShiftKeyDown())
+        if (!(tileEntity instanceof InterfaceTileEntity) || player.isSneaking())
             return ActionResultType.FAIL;
 
         if (worldIn.isRemote)
