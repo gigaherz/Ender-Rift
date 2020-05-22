@@ -38,6 +38,11 @@ public abstract class AbstractBrowserScreen<T extends AbstractBrowserContainer> 
     {
         this.renderBackground();
         super.render(mouseX, mouseY, partialTicks);
+
+        RenderHelper.enableStandardItemLighting();
+        drawCustomSlotTexts();
+        RenderHelper.disableStandardItemLighting();
+
         this.renderLowPowerOverlay(mouseX, mouseY);
         this.renderHoveredToolTip(mouseX, mouseY);
     }
@@ -171,26 +176,25 @@ public abstract class AbstractBrowserScreen<T extends AbstractBrowserContainer> 
     @Override
     protected void drawGuiContainerForegroundLayer(int xMouse, int yMouse)
     {
-        RenderHelper.enableStandardItemLighting();
-        drawCustomSlotTexts();
-        RenderHelper.disableStandardItemLighting();
-
         font.drawString(title.getFormattedText(), 8, 6, 0x404040);
         font.drawString(this.playerInventory.getDisplayName().getFormattedText(), 8, ySize - 96 + 2, 0x404040);
     }
 
     private void drawCustomSlotTexts()
     {
+        RenderSystem.pushMatrix();
+        RenderSystem.translated(this.guiLeft,this.guiTop,300);
         for (int i = 0; i < AbstractBrowserContainer.ScrollSlots; ++i)
         {
             Slot slot = getContainer().inventorySlots.get(i);
             drawSlotText(slot);
         }
+        RenderSystem.popMatrix();
     }
 
     private void drawSlotText(Slot slotIn)
     {
-        itemRenderer.zLevel = 100.0F;
+        setBlitOffset(100);
 
         int xPosition = slotIn.xPos;
         int yPosition = slotIn.yPos;
@@ -202,32 +206,38 @@ public abstract class AbstractBrowserScreen<T extends AbstractBrowserContainer> 
 
             if (count != 1)
             {
-                String s;
-                if (count >= 1000000000)
-                    s = (count / 1000000000) + "B";
-                else if (count >= 900000000)
-                    s = ".9B";
-                else if (count >= 1000000)
-                    s = (count / 1000000) + "M";
-                else if (count >= 900000)
-                    s = ".9M";
-                else if (count >= 1000)
-                    s = (count / 1000) + "k";
-                else if (count >= 900)
-                    s = ".9k";
-                else
-                    s = String.valueOf(count);
+                String s = getSizeString(count);
 
                 RenderSystem.disableLighting();
-                RenderSystem.disableDepthTest();
+                RenderSystem.enableDepthTest();
                 RenderSystem.disableBlend();
                 font.drawStringWithShadow(s, (float) (xPosition + 19 - 2 - font.getStringWidth(s)), (float) (yPosition + 6 + 3), 16777215);
                 RenderSystem.enableLighting();
-                RenderSystem.enableDepthTest();
+                //RenderSystem.enableDepthTest();
             }
         }
 
-        itemRenderer.zLevel = 0.0F;
+        setBlitOffset(0);
+    }
+
+    private String getSizeString(int count)
+    {
+        String s;
+        if (count >= 1000000000)
+            s = (count / 1000000000) + "B";
+        else if (count >= 900000000)
+            s = ".9B";
+        else if (count >= 1000000)
+            s = (count / 1000000) + "M";
+        else if (count >= 900000)
+            s = ".9M";
+        else if (count >= 1000)
+            s = (count / 1000) + "k";
+        else if (count >= 900)
+            s = ".9k";
+        else
+            s = String.valueOf(count);
+        return s;
     }
 
     private boolean needsScrollBar()

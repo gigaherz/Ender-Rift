@@ -43,7 +43,6 @@ public class ClientHelper
         Minecraft minecraft = Minecraft.getInstance();
         minecraft.execute(() ->
         {
-
             PlayerEntity entityplayer = minecraft.player;
 
             if (entityplayer.openContainer != null && entityplayer.openContainer.windowId == message.windowId)
