@@ -16,9 +16,7 @@ import net.minecraft.inventory.container.*;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.play.server.SSetSlotPacket;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.NonNullList;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraftforge.fml.network.NetworkDirection;
@@ -28,21 +26,23 @@ import net.minecraftforge.registries.ForgeRegistries;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 public class AbstractBrowserContainer extends Container
 {
-    public final FakeInventoryClient fakeInventoryClient;
-    public final FakeInventoryServer fakeInventoryServer;
-    protected BrowserEntityTileEntity tile;
+    public final IItemHandlerModifiable scrollInventory;
+    public final boolean isClient;
+    protected BrowserTileEntity tile;
     private int prevChangeCount;
     public int scroll;
     public SortMode sortMode = SortMode.StackSize;
-    private String filterText = "";
+    public String filterText = "";
     private ItemStack stackInCursor = ItemStack.EMPTY;
 
-    private PlayerEntity player;
+    private final PlayerEntity player;
 
     private NonNullList<ItemStack> currentStacks = NonNullList.create();
 
@@ -51,46 +51,48 @@ public class AbstractBrowserContainer extends Container
     protected final static int SlotWidth = 18;
     protected final static int SlotHeight = 18;
 
-    protected final static int FakeRows = 3;
-    protected final static int FakeColumns = 9;
-    protected final static int FakeSlots = FakeRows * FakeColumns;
+    protected final static int ScrollRows = 3;
+    protected final static int ScrollColumns = 9;
+    protected final static int ScrollSlots = ScrollRows * ScrollColumns;
 
     protected final static int PlayerRows = 4;
     protected final static int PlayerColumns = 9;
     protected final static int PlayerSlots = PlayerRows * PlayerColumns;
 
-    private boolean isClient = false;
+    public ClientScrollInventory getClient() {
+        if (!isClient)
+            throw new IllegalStateException("Attempted to get client inventory on the server");
+        return (ClientScrollInventory)scrollInventory;
+    }
 
-    protected AbstractBrowserContainer(int id, BlockPos pos, PlayerInventory playerInventory, ContainerType<? extends AbstractBrowserContainer> type)
+    public ServerScrollInventory getServer() {
+        if (isClient)
+            throw new IllegalStateException("Attempted to get server inventory on the client");
+        return (ServerScrollInventory)scrollInventory;
+    }
+
+    protected AbstractBrowserContainer(ContainerType<? extends AbstractBrowserContainer> type, int id, @Nullable BrowserTileEntity tileEntity, PlayerInventory playerInventory)
     {
         super(type, id);
 
-        TileEntity tileEntity = playerInventory.player.world.getTileEntity(pos);
-
-        this.tile = (BrowserEntityTileEntity) tileEntity;
+        this.tile = tileEntity;
         this.player = playerInventory.player;
         this.isClient = player.world.isRemote;
 
-        IItemHandlerModifiable fake;
         if (isClient)
         {
-            fakeInventoryClient = new FakeInventoryClient();
-            fakeInventoryServer = null;
-            fake = fakeInventoryClient;
+            scrollInventory = new ClientScrollInventory();
         }
         else
         {
-            fakeInventoryClient = null;
-            fakeInventoryServer = new FakeInventoryServer(tile);
-            fake = fakeInventoryServer;
+            scrollInventory = new ServerScrollInventory(Objects.requireNonNull(tile));
         }
 
-        for (int y = 0; y < FakeRows; y++)
+        for (int y = 0; y < ScrollRows; y++)
         {
-            for (int x = 0; x < FakeColumns; x++)
+            for (int x = 0; x < ScrollColumns; x++)
             {
-                addSlot(new SlotFake(fake,
-                        x + y * FakeColumns,
+                addSlot(new SlotFake(scrollInventory, x + y * ScrollColumns,
                         Left + x * SlotWidth, Top + y * SlotHeight));
             }
         }
@@ -100,7 +102,7 @@ public class AbstractBrowserContainer extends Container
 
     protected void bindPlayerInventory(PlayerInventory playerInventory)
     {
-        bindPlayerInventory(playerInventory, Top + FakeRows * SlotHeight + 14);
+        bindPlayerInventory(playerInventory, Top + ScrollRows * SlotHeight + 14);
     }
 
     protected void bindPlayerInventory(PlayerInventory playerInventory, int top)
@@ -134,7 +136,7 @@ public class AbstractBrowserContainer extends Container
     @Override
     public void detectAndSendChanges()
     {
-        if (tile.getWorld().isRemote)
+        if (isClient)
             return;
 
         boolean isLowOnPowerNew = tile.isLowOnPower();
@@ -151,9 +153,10 @@ public class AbstractBrowserContainer extends Container
             isLowOnPowerPrev = isLowOnPowerNew;
         }
 
+        ServerScrollInventory serverInv = getServer();
         if (prevChangeCount != tile.getChangeCount())
         {
-            fakeInventoryServer.refresh();
+            serverInv.refresh();
             prevChangeCount = tile.getChangeCount();
         }
 
@@ -162,7 +165,6 @@ public class AbstractBrowserContainer extends Container
         List<Integer> indicesChanged = Lists.newArrayList();
         List<ItemStack> stacksChanged = Lists.newArrayList();
 
-        FakeInventoryServer serverInv = fakeInventoryServer;
 
         newLength = serverInv.getRealSizeInventory();
         if (newLength != oldLength)
@@ -185,7 +187,7 @@ public class AbstractBrowserContainer extends Container
             }
         }
 
-        for (int i = FakeSlots; i < this.inventorySlots.size(); ++i)
+        for (int i = ScrollSlots; i < this.inventorySlots.size(); ++i)
         {
             ItemStack inSlot = inventorySlots.get(i).getStack();
             ItemStack inCache = inventoryItemStacks.get(i);
@@ -223,7 +225,7 @@ public class AbstractBrowserContainer extends Container
 
         if (newLength != oldLength || indicesChanged.size() > 0)
         {
-            fakeInventoryServer.resetVisible();
+            serverInv.resetVisible();
         }
     }
 
@@ -257,9 +259,10 @@ public class AbstractBrowserContainer extends Container
             currentStacks.set(slot, stack);
         }
 
-        fakeInventoryClient.setArray(currentStacks);
+        ClientScrollInventory clientInv = getClient();
+        clientInv.setArray(currentStacks);
 
-        setVisibleSlots(fakeInventoryClient.getIndices());
+        setVisibleSlots(clientInv.getIndices());
     }
 
     @Override
@@ -270,13 +273,13 @@ public class AbstractBrowserContainer extends Container
 
     public void setVisibleSlots(int[] visible)
     {
-        if (tile.getWorld().isRemote)
+        if (isClient)
         {
             EnderRiftMod.channel.sendToServer(new SetVisibleSlots(windowId, visible));
         }
         else
         {
-            fakeInventoryServer.setVisible(visible);
+            getServer().setVisible(visible);
         }
     }
 
@@ -284,7 +287,7 @@ public class AbstractBrowserContainer extends Container
     {
         this.scroll = scroll;
 
-        setVisibleSlots(fakeInventoryClient.getIndices());
+        setVisibleSlots(getClient().getIndices());
     }
 
     public void setSortMode(SortMode sortMode)
@@ -292,9 +295,10 @@ public class AbstractBrowserContainer extends Container
         this.sortMode = sortMode;
         this.scroll = 0;
 
-        fakeInventoryClient.setArray(currentStacks);
+        ClientScrollInventory clientInv = getClient();
+        clientInv.setArray(currentStacks);
 
-        setVisibleSlots(fakeInventoryClient.getIndices());
+        setVisibleSlots(clientInv.getIndices());
     }
 
     public void setFilterText(String text)
@@ -302,9 +306,10 @@ public class AbstractBrowserContainer extends Container
         this.filterText = text.toLowerCase();
         this.scroll = 0;
 
-        fakeInventoryClient.setArray(currentStacks);
+        ClientScrollInventory clientInv = getClient();
+        clientInv.setArray(currentStacks);
 
-        setVisibleSlots(fakeInventoryClient.getIndices());
+        setVisibleSlots(clientInv.getIndices());
     }
 
     @Override
@@ -318,9 +323,9 @@ public class AbstractBrowserContainer extends Container
     {
         PlayerInventory inventoryPlayer = playerIn.inventory;
 
-        if (slotId >= 0 && slotId < FakeSlots)
+        if (slotId >= 0 && slotId < ScrollSlots)
         {
-            IItemHandler parent = tile.getCombinedInventory();
+            IItemHandler parent = getTileInventory();
 
             Slot slot = this.inventorySlots.get(slotId);
             ItemStack existing = slot.getStack();
@@ -337,7 +342,7 @@ public class AbstractBrowserContainer extends Container
                         if (remaining.getCount() > 0)
                         {
                             if (dropping.getCount() != remaining.getCount())
-                                tile.markDirty();
+                                markTileDirty();
 
                             for (IContainerListener crafter : this.listeners)
                             {
@@ -349,7 +354,7 @@ public class AbstractBrowserContainer extends Container
                         }
                         else
                         {
-                            tile.markDirty();
+                            markTileDirty();
                         }
                         inventoryPlayer.setItemStack(remaining);
                     }
@@ -366,7 +371,7 @@ public class AbstractBrowserContainer extends Container
                         if (remaining.getCount() > 0)
                         {
                             if (push.getCount() != remaining.getCount())
-                                tile.markDirty();
+                                markTileDirty();
                             dropping.grow(remaining.getCount());
 
                             for (IContainerListener crafter : this.listeners)
@@ -379,7 +384,7 @@ public class AbstractBrowserContainer extends Container
                         }
                         else
                         {
-                            tile.markDirty();
+                            markTileDirty();
                         }
 
                         if (dropping.getCount() <= 0)
@@ -397,7 +402,7 @@ public class AbstractBrowserContainer extends Container
                     ItemStack extracted = extractItemsSided(parent, existing, amount, false);
                     if (extracted.getCount() > 0)
                     {
-                        tile.markDirty();
+                        markTileDirty();
                     }
                     else
                     {
@@ -438,7 +443,7 @@ public class AbstractBrowserContainer extends Container
                     {
                         addToPlayer(finalExtract);
 
-                        tile.markDirty();
+                        markTileDirty();
                         detectAndSendChanges();
                     }
                 }
@@ -451,25 +456,37 @@ public class AbstractBrowserContainer extends Container
         return super.slotClick(slotId, clickedButton, mode, playerIn);
     }
 
-    private ItemStack extractItemsSided(IItemHandler parent, ItemStack existing, int amount, boolean simulate)
+    @Nullable
+    private IItemHandler getTileInventory()
     {
-        if (fakeInventoryClient != null)
+        return isClient || tile == null ? null : tile.getCombinedInventory();
+    }
+
+    private void markTileDirty()
+    {
+        if (!isClient && tile != null)
+            tile.markDirty();
+    }
+
+    private ItemStack extractItemsSided(@Nullable IItemHandler parent, ItemStack existing, int amount, boolean simulate)
+    {
+        if (isClient || parent == null)
         {
             return existing.copy();
         }
         return AutomationHelper.extractItems(parent, existing, amount, simulate);
     }
 
-    private ItemStack insertItemsSided(IItemHandler parent, ItemStack dropping)
+    private ItemStack insertItemsSided(@Nullable IItemHandler parent, ItemStack dropping)
     {
-        if (fakeInventoryClient != null)
+        if (isClient || parent == null)
             return ItemStack.EMPTY;
         return AutomationHelper.insertItems(parent, dropping);
     }
 
     private ItemStack simulateAddToPlayer(ItemStack stack, int amount)
     {
-        int startIndex = FakeSlots;
+        int startIndex = ScrollSlots;
         int endIndex = startIndex + PlayerSlots;
 
         ItemStack stackCopy = stack.copy();
@@ -540,7 +557,7 @@ public class AbstractBrowserContainer extends Container
 
     public ItemStack addToPlayer(ItemStack stack)
     {
-        int startIndex = FakeSlots;
+        int startIndex = ScrollSlots;
         int endIndex = startIndex + PlayerSlots;
 
         ItemStack stackCopy = stack.copy();
@@ -568,21 +585,17 @@ public class AbstractBrowserContainer extends Container
             return ItemStack.EMPTY;
         }
 
-        if (slotIndex < FakeSlots)
+        if (slotIndex < ScrollSlots)
         {
             // Shouldn't even happen, handled above.
             return ItemStack.EMPTY;
         }
         else
         {
-            IItemHandler parent = tile.getCombinedInventory();
-            if (parent == null)
-                return ItemStack.EMPTY;
-
             ItemStack stack = slot.getStack();
             ItemStack stackCopy = stack.copy();
 
-            ItemStack remaining = isClient ? ItemStack.EMPTY : AutomationHelper.insertItems(parent, stack);
+            ItemStack remaining = insertItemsSided(getTileInventory(), stack);
             if (remaining.getCount() > 0)
             {
                 if (player instanceof IContainerListener)
@@ -595,13 +608,13 @@ public class AbstractBrowserContainer extends Container
                     return ItemStack.EMPTY;
                 }
 
-                tile.markDirty();
+                markTileDirty();
                 stack.setCount(remaining.getCount());
                 slot.onSlotChanged();
             }
             else
             {
-                tile.markDirty();
+                markTileDirty();
                 stack.setCount(0);
                 slot.putStack(ItemStack.EMPTY);
             }
@@ -613,7 +626,7 @@ public class AbstractBrowserContainer extends Container
 
     public int getActualSlotCount()
     {
-        return fakeInventoryClient.getSlots();
+        return scrollInventory.getSlots();
     }
 
     public boolean isLowOnPower()
@@ -626,13 +639,13 @@ public class AbstractBrowserContainer extends Container
         isLowOnPowerPrev = status;
     }
 
-    public static class FakeInventoryServer implements IItemHandlerModifiable
+    public static class ServerScrollInventory implements IItemHandlerModifiable
     {
-        final BrowserEntityTileEntity tile;
+        final BrowserTileEntity tile;
         final List<ItemStack> slots = Lists.newArrayList();
         private int[] visible = new int[0];
 
-        public FakeInventoryServer(BrowserEntityTileEntity tile)
+        public ServerScrollInventory(BrowserTileEntity tile)
         {
             this.tile = tile;
         }
@@ -744,12 +757,12 @@ public class AbstractBrowserContainer extends Container
         }
     }
 
-    public class FakeInventoryClient implements IItemHandlerModifiable
+    public class ClientScrollInventory implements IItemHandlerModifiable
     {
         private int[] indices;
         private NonNullList<ItemStack> stacks;
 
-        public FakeInventoryClient()
+        public ClientScrollInventory()
         {
         }
 
@@ -883,7 +896,7 @@ public class AbstractBrowserContainer extends Container
         public int[] getIndices()
         {
             int from = Math.max(0, Math.min(scroll, indices.length - 1));
-            int to = Math.min(from + FakeSlots, indices.length);
+            int to = Math.min(from + ScrollSlots, indices.length);
             return Arrays.copyOfRange(indices, from, to);
         }
     }

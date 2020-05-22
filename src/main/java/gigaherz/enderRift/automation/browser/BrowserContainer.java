@@ -2,23 +2,23 @@ package gigaherz.enderRift.automation.browser;
 
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.container.ContainerType;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.registries.ObjectHolder;
+
+import javax.annotation.Nullable;
 
 public class BrowserContainer extends AbstractBrowserContainer
 {
     @ObjectHolder("enderrift:browser")
     public static ContainerType<BrowserContainer> TYPE;
 
-    public BrowserContainer(int id, PlayerInventory playerInventory, PacketBuffer extraData)
+    public BrowserContainer(int id, PlayerInventory playerInventory)
     {
-        this(id, extraData.readBlockPos(), playerInventory);
+        this(id, null, playerInventory);
     }
 
-    public BrowserContainer(int id, BlockPos pos, PlayerInventory playerInventory)
+    public BrowserContainer(int id, @Nullable BrowserTileEntity te, PlayerInventory playerInventory)
     {
-        super(id, pos, playerInventory, TYPE);
+        super(TYPE, id, te, playerInventory);
     }
 }
 

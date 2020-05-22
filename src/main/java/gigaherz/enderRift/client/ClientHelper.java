@@ -32,6 +32,7 @@ public class ClientHelper
     @SubscribeEvent
     public static void clientSetup(FMLClientSetupEvent event)
     {
+        //noinspection deprecation
         DeferredWorkQueue.runLater(() -> {
             ModelLoader.addSpecialModel(EnderRiftMod.location("block/sphere"));
         });

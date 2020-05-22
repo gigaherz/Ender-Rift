@@ -32,9 +32,8 @@ public class ClearCraftingGrid
         {
             final ServerPlayerEntity player = context.get().getSender();
 
-            if (player.openContainer != null
-                    && player.openContainer.windowId == this.windowId
-                    && player.openContainer instanceof CraftingBrowserContainer)
+            if (player.openContainer instanceof CraftingBrowserContainer
+                    && player.openContainer.windowId == this.windowId)
             {
                 ((CraftingBrowserContainer) player.openContainer).clearCraftingGrid(player);
             }

@@ -1,6 +1,8 @@
 package gigaherz.enderRift.network;
 
+import gigaherz.enderRift.automation.browser.AbstractBrowserContainer;
 import gigaherz.enderRift.automation.browser.BrowserContainer;
+import gigaherz.enderRift.automation.browser.CraftingBrowserContainer;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.world.server.ServerWorld;
@@ -43,15 +45,15 @@ public class SetVisibleSlots
     public boolean handle(Supplier<NetworkEvent.Context> context)
     {
         final ServerPlayerEntity player = context.get().getSender();
-        final ServerWorld world = (ServerWorld) player.world;
 
         context.get().enqueueWork(() ->
         {
-            if (player.openContainer != null
-                    && player.openContainer.windowId == this.windowId
-                    && player.openContainer instanceof BrowserContainer)
+            if (player != null)
             {
-                ((BrowserContainer) player.openContainer).setVisibleSlots(this.visible);
+                if (player.openContainer instanceof AbstractBrowserContainer && player.openContainer.windowId == this.windowId)
+                {
+                    ((AbstractBrowserContainer) player.openContainer).setVisibleSlots(this.visible);
+                }
             }
         });
         return true;
