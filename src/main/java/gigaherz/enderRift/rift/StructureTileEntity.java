@@ -68,7 +68,7 @@ public class StructureTileEntity extends AggregatorTileEntity
         if (energyParent == null)
         {
             BlockState state = world.getBlockState(pos);
-            if (state.getBlock() != EnderRiftMod.Blocks.STRUCTURE)
+            if (state.getBlock() != EnderRiftMod.EnderRiftBlocks.STRUCTURE)
                 return Optional.empty();
 
             TileEntity te = world.getTileEntity(getRiftFromCorner(state, pos));

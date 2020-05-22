@@ -115,7 +115,7 @@ public class RiftBlock extends Block
         int slot = playerIn.inventory.currentItem;
         ItemStack stack = playerIn.inventory.getStackInSlot(slot);
 
-        if (stack.getItem() == EnderRiftMod.Items.RIFT_ORB)
+        if (stack.getItem() == EnderRiftMod.EnderRiftItems.RIFT_ORB)
             return false;
 
         if (worldIn.isRemote)
@@ -162,7 +162,7 @@ public class RiftBlock extends Block
         ItemStack stack = playerIn.getHeldItem(Hand.MAIN_HAND);
         if (stack.getCount() <= 0)
         {
-            if (stack.getItem() == EnderRiftMod.Items.RIFT_ORB)
+            if (stack.getItem() == EnderRiftMod.EnderRiftItems.RIFT_ORB)
                 return;
         }
         else

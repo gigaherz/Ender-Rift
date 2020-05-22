@@ -39,7 +39,7 @@ public class EnergyAggregator implements IEnergyStorage
         int total = 0;
         for (IEnergyStorage st : buffers)
         {
-            total = st.getEnergyStored();
+            total += st.getEnergyStored();
         }
         return total;
     }
@@ -50,7 +50,7 @@ public class EnergyAggregator implements IEnergyStorage
         int total = 0;
         for (IEnergyStorage st : buffers)
         {
-            total = st.getMaxEnergyStored();
+            total += st.getMaxEnergyStored();
         }
         return total;
     }

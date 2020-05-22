@@ -1,7 +1,6 @@
 package gigaherz.enderRift;
 
 import com.google.common.collect.ImmutableList;
-import com.mojang.datafixers.Dynamic;
 import gigaherz.enderRift.automation.browser.*;
 import gigaherz.enderRift.automation.driver.DriverBlock;
 import gigaherz.enderRift.automation.driver.DriverEntityTileEntity;
@@ -11,7 +10,6 @@ import gigaherz.enderRift.automation.iface.InterfaceScreen;
 import gigaherz.enderRift.automation.iface.InterfaceTileEntity;
 import gigaherz.enderRift.automation.proxy.ProxyBlock;
 import gigaherz.enderRift.automation.proxy.ProxyTileEntity;
-import gigaherz.enderRift.client.ClientHelper;
 import gigaherz.enderRift.generator.GeneratorBlock;
 import gigaherz.enderRift.generator.GeneratorContainer;
 import gigaherz.enderRift.generator.GeneratorScreen;
@@ -32,28 +30,13 @@ import net.minecraft.item.crafting.IRecipeSerializer;
 import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IWorld;
-import net.minecraft.world.biome.Biome;
-import net.minecraft.world.biome.Biomes;
-import net.minecraft.world.gen.ChunkGenerator;
-import net.minecraft.world.gen.GenerationSettings;
-import net.minecraft.world.gen.GenerationStage;
-import net.minecraft.world.gen.feature.ConfiguredFeature;
-import net.minecraft.world.gen.feature.Feature;
-import net.minecraft.world.gen.feature.IFeatureConfig;
-import net.minecraft.world.gen.feature.NoFeatureConfig;
-import net.minecraft.world.gen.placement.IPlacementConfig;
-import net.minecraft.world.gen.placement.Placement;
 import net.minecraftforge.common.extensions.IForgeContainerType;
-import net.minecraftforge.common.util.NonNullSupplier;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.minecraftforge.fml.event.lifecycle.FMLLoadCompleteEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.network.NetworkRegistry;
 import net.minecraftforge.fml.network.simple.SimpleChannel;
@@ -63,8 +46,6 @@ import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nonnull;
 import java.util.*;
-import java.util.function.Function;
-import java.util.zip.ZipEntry;
 
 @Mod.EventBusSubscriber
 @Mod(EnderRiftMod.MODID)
@@ -79,27 +60,27 @@ public class EnderRiftMod
 
     @SuppressWarnings("ConstantConditions")
     @Nonnull
-    private static <T> T sneakyNull() {
+    private static <T> T toBeInitializedLater() {
         return null;
     }
 
     @ObjectHolder("enderrift")
-    public static class Blocks
+    public static class EnderRiftBlocks
     {
-        public static final Block RIFT = sneakyNull();
-        public static final StructureBlock STRUCTURE = sneakyNull();
-        public static final Block INTERFACE = sneakyNull();
-        public static final Block GENERATOR = sneakyNull();
-        public static final Block BROWSER = sneakyNull();
-        public static final Block CRAFTING_BROWSER = sneakyNull();
-        public static final Block PROXY = sneakyNull();
-        public static final Block DRIVER = sneakyNull();
+        public static final Block RIFT = toBeInitializedLater();
+        public static final StructureBlock STRUCTURE = toBeInitializedLater();
+        public static final Block INTERFACE = toBeInitializedLater();
+        public static final Block GENERATOR = toBeInitializedLater();
+        public static final Block BROWSER = toBeInitializedLater();
+        public static final Block CRAFTING_BROWSER = toBeInitializedLater();
+        public static final Block PROXY = toBeInitializedLater();
+        public static final Block DRIVER = toBeInitializedLater();
     }
 
     @ObjectHolder("enderrift")
-    public static class Items
+    public static class EnderRiftItems
     {
-        public static final Item RIFT_ORB = sneakyNull();
+        public static final Item RIFT_ORB = toBeInitializedLater();
     }
 
     public static ItemGroup tabEnderRift = new ItemGroup("tabEnderRift")
@@ -107,7 +88,7 @@ public class EnderRiftMod
         @Override
         public ItemStack createIcon()
         {
-            return new ItemStack(Items.RIFT_ORB);
+            return new ItemStack(EnderRiftItems.RIFT_ORB);
         }
     };
 
@@ -160,13 +141,13 @@ public class EnderRiftMod
     public void registerItems(RegistryEvent.Register<Item> event)
     {
         event.getRegistry().registerAll(
-                new BlockItem(Blocks.RIFT, new Item.Properties().group(tabEnderRift)).setRegistryName(Blocks.RIFT.getRegistryName()),
-                new BlockItem(Blocks.INTERFACE, new Item.Properties().group(tabEnderRift)).setRegistryName(Blocks.INTERFACE.getRegistryName()),
-                new BlockItem(Blocks.BROWSER, new Item.Properties().group(tabEnderRift)).setRegistryName(Blocks.BROWSER.getRegistryName()),
-                new BlockItem(Blocks.CRAFTING_BROWSER, new Item.Properties().group(tabEnderRift)).setRegistryName(Blocks.CRAFTING_BROWSER.getRegistryName()),
-                new BlockItem(Blocks.PROXY, new Item.Properties().group(tabEnderRift)).setRegistryName(Blocks.PROXY.getRegistryName()),
-                new BlockItem(Blocks.DRIVER, new Item.Properties().group(tabEnderRift)).setRegistryName(Blocks.DRIVER.getRegistryName()),
-                new BlockItem(Blocks.GENERATOR, new Item.Properties().group(tabEnderRift)).setRegistryName(Blocks.GENERATOR.getRegistryName()),
+                new BlockItem(EnderRiftBlocks.RIFT, new Item.Properties().group(tabEnderRift)).setRegistryName(EnderRiftBlocks.RIFT.getRegistryName()),
+                new BlockItem(EnderRiftBlocks.INTERFACE, new Item.Properties().group(tabEnderRift)).setRegistryName(EnderRiftBlocks.INTERFACE.getRegistryName()),
+                new BlockItem(EnderRiftBlocks.BROWSER, new Item.Properties().group(tabEnderRift)).setRegistryName(EnderRiftBlocks.BROWSER.getRegistryName()),
+                new BlockItem(EnderRiftBlocks.CRAFTING_BROWSER, new Item.Properties().group(tabEnderRift)).setRegistryName(EnderRiftBlocks.CRAFTING_BROWSER.getRegistryName()),
+                new BlockItem(EnderRiftBlocks.PROXY, new Item.Properties().group(tabEnderRift)).setRegistryName(EnderRiftBlocks.PROXY.getRegistryName()),
+                new BlockItem(EnderRiftBlocks.DRIVER, new Item.Properties().group(tabEnderRift)).setRegistryName(EnderRiftBlocks.DRIVER.getRegistryName()),
+                new BlockItem(EnderRiftBlocks.GENERATOR, new Item.Properties().group(tabEnderRift)).setRegistryName(EnderRiftBlocks.GENERATOR.getRegistryName()),
 
                 new RiftItem(new Item.Properties().maxStackSize(16).group(tabEnderRift)).setRegistryName("rift_orb")
         );
@@ -175,13 +156,13 @@ public class EnderRiftMod
     public void registerTEs(RegistryEvent.Register<TileEntityType<?>> event)
     {
         event.getRegistry().registerAll(
-                TileEntityType.Builder.create(RiftTileEntity::new, Blocks.RIFT).build(null).setRegistryName("rift"),
-                TileEntityType.Builder.create(StructureTileEntity::new, Blocks.STRUCTURE).build(null).setRegistryName("structure"),
-                TileEntityType.Builder.create(InterfaceTileEntity::new, Blocks.INTERFACE).build(null).setRegistryName("interface"),
-                TileEntityType.Builder.create(BrowserEntityTileEntity::new, Blocks.BROWSER).build(null).setRegistryName("browser"),
-                TileEntityType.Builder.create(ProxyTileEntity::new, Blocks.PROXY).build(null).setRegistryName("proxy"),
-                TileEntityType.Builder.create(DriverEntityTileEntity::new, Blocks.DRIVER).build(null).setRegistryName("driver"),
-                TileEntityType.Builder.create(GeneratorTileEntity::new, Blocks.GENERATOR).build(null).setRegistryName("generator")
+                TileEntityType.Builder.create(RiftTileEntity::new, EnderRiftBlocks.RIFT).build(null).setRegistryName("rift"),
+                TileEntityType.Builder.create(StructureTileEntity::new, EnderRiftBlocks.STRUCTURE).build(null).setRegistryName("structure"),
+                TileEntityType.Builder.create(InterfaceTileEntity::new, EnderRiftBlocks.INTERFACE).build(null).setRegistryName("interface"),
+                TileEntityType.Builder.create(BrowserEntityTileEntity::new, EnderRiftBlocks.BROWSER).build(null).setRegistryName("browser"),
+                TileEntityType.Builder.create(ProxyTileEntity::new, EnderRiftBlocks.PROXY).build(null).setRegistryName("proxy"),
+                TileEntityType.Builder.create(DriverEntityTileEntity::new, EnderRiftBlocks.DRIVER).build(null).setRegistryName("driver"),
+                TileEntityType.Builder.create(GeneratorTileEntity::new, EnderRiftBlocks.GENERATOR).build(null).setRegistryName("generator")
         );
     }
 

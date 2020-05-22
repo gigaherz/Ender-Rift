@@ -167,7 +167,7 @@ public class RiftTileEntity extends TileEntity implements ITickableTileEntity
 
     public ItemStack getRiftItem()
     {
-        ItemStack stack = new ItemStack(EnderRiftMod.Items.RIFT_ORB);
+        ItemStack stack = new ItemStack(EnderRiftMod.EnderRiftItems.RIFT_ORB);
 
         CompoundNBT tag = new CompoundNBT();
 

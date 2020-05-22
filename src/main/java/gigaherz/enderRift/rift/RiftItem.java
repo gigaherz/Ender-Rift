@@ -62,7 +62,7 @@ public class RiftItem extends Item
 
         BlockState state = world.getBlockState(pos);
 
-        if (state.getBlock() != EnderRiftMod.Blocks.RIFT)
+        if (state.getBlock() != EnderRiftMod.EnderRiftBlocks.RIFT)
             return ActionResultType.PASS;
 
         if (state.get(RiftBlock.ASSEMBLED))
