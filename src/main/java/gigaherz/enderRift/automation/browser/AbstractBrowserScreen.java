@@ -191,7 +191,6 @@ public abstract class AbstractBrowserScreen<T extends AbstractBrowserContainer> 
     private void drawSlotText(Slot slotIn)
     {
         blitOffset = 100;
-        minecraft.getItemRenderer().zLevel = 100.0F;
 
         int xPosition = slotIn.xPos;
         int yPosition = slotIn.yPos;
@@ -203,21 +202,7 @@ public abstract class AbstractBrowserScreen<T extends AbstractBrowserContainer> 
 
             if (count != 1)
             {
-                String s;
-                if (count >= 1000000000)
-                    s = (count / 1000000000) + "B";
-                else if (count >= 900000000)
-                    s = ".9B";
-                else if (count >= 1000000)
-                    s = (count / 1000000) + "M";
-                else if (count >= 900000)
-                    s = ".9M";
-                else if (count >= 1000)
-                    s = (count / 1000) + "k";
-                else if (count >= 900)
-                    s = ".9k";
-                else
-                    s = String.valueOf(count);
+                String s = getSizeString(count);
 
                 GlStateManager.disableLighting();
                 GlStateManager.disableDepthTest();
@@ -228,8 +213,27 @@ public abstract class AbstractBrowserScreen<T extends AbstractBrowserContainer> 
             }
         }
 
-        minecraft.getItemRenderer().zLevel = 0.0F;
         blitOffset = 0;
+    }
+
+    private String getSizeString(int count)
+    {
+        String s;
+        if (count >= 1000000000)
+            s = (count / 1000000000) + "B";
+        else if (count >= 900000000)
+            s = ".9B";
+        else if (count >= 1000000)
+            s = (count / 1000000) + "M";
+        else if (count >= 900000)
+            s = ".9M";
+        else if (count >= 1000)
+            s = (count / 1000) + "k";
+        else if (count >= 900)
+            s = ".9k";
+        else
+            s = String.valueOf(count);
+        return s;
     }
 
     private boolean needsScrollBar()
