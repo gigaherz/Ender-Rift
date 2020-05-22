@@ -11,7 +11,6 @@ import gigaherz.enderRift.automation.iface.InterfaceScreen;
 import gigaherz.enderRift.automation.iface.InterfaceTileEntity;
 import gigaherz.enderRift.automation.proxy.ProxyBlock;
 import gigaherz.enderRift.automation.proxy.ProxyTileEntity;
-import gigaherz.enderRift.common.Requirements;
 import gigaherz.enderRift.generator.GeneratorBlock;
 import gigaherz.enderRift.generator.GeneratorContainer;
 import gigaherz.enderRift.generator.GeneratorScreen;
@@ -196,7 +195,7 @@ public class EnderRiftMod
     public void registerRecipeSerializers(RegistryEvent.Register<IRecipeSerializer<?>> event)
     {
         event.getRegistry().registerAll(
-                new OrbDuplicationRecipe.Serializer().setRegistryName("rift_duplication")
+                new OrbDuplicationRecipe.Serializer().setRegistryName("orb_duplication")
         );
     }
 
