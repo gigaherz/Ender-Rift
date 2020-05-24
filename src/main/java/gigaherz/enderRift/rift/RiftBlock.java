@@ -116,8 +116,7 @@ public class RiftBlock extends Block
         if (playerIn.isSneaking())
             return ActionResultType.PASS;
 
-        int slot = playerIn.inventory.currentItem;
-        ItemStack stack = playerIn.inventory.getStackInSlot(slot);
+        ItemStack stack = playerIn.getHeldItem(handIn);
 
         if (stack.getItem() == EnderRiftMod.EnderRiftItems.RIFT_ORB)
             return ActionResultType.PASS;
@@ -142,7 +141,7 @@ public class RiftBlock extends Block
         if (stack.getCount() <= 0)
             stack = ItemStack.EMPTY;
 
-        playerIn.inventory.setInventorySlotContents(slot, stack);
+        playerIn.setHeldItem(handIn, stack);
 
         return ActionResultType.SUCCESS;
     }
