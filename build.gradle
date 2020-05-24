@@ -10,6 +10,10 @@ buildscript {
     }
 }
 
+plugins {
+    id 'com.github.johnrengelman.shadow' version '4.0.4'
+}
+
 apply plugin: 'java'
 apply plugin: 'net.minecraftforge.gradle'
 //apply plugin: 'maven-publish'
@@ -39,7 +43,7 @@ repositories {
  */
 }
 
-version = "2.2.0"
+version = "2.2.1"
 group= "gigaherz.enderRift"
 archivesBaseName = "EnderRift-1.14.4"
 
@@ -101,10 +105,15 @@ minecraft {
     }
 }
 
+configurations {
+    shade
+}
+
 dependencies {
     minecraft 'net.minecraftforge:forge:1.14.4-28.2.16'
 
-    compile fg.deobf("gigaherz.graph:GraphLib2:2.0.0")
+    compile "gigaherz.graph:GraphLib2:2.0.0"
+    shade "gigaherz.graph:GraphLib2:2.0.0"
 
     //deobfCompile "net.darkhax.gamestages:GameStages-1.12.2:2.0.91"
     //deobfCompile "net.darkhax.bookshelf:Bookshelf-1.12.2:2.3.552"
@@ -124,6 +133,22 @@ dependencies {
 }
 
 jar {
+    classifier = 'slim'
+}
+
+shadowJar {
+    classifier = ''
+    configurations = [project.configurations.shade]
+    relocate 'gigaherz.graph2', "${project.group}.shadow.graphlib2"
+}
+
+reobf {
+    shadowJar { }
+}
+
+tasks.build.dependsOn reobfShadowJar
+
+jar {
     manifest {
         attributes([
                 "Specification-Title": "enderrift",
@@ -135,4 +160,8 @@ jar {
                 "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
         ])
     }
+}
+
+artifacts {
+    archives shadowJar
 }
