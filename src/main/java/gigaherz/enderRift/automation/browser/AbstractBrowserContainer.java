@@ -33,40 +33,44 @@ import java.util.Objects;
 
 public class AbstractBrowserContainer extends Container
 {
-    public final IItemHandlerModifiable scrollInventory;
-    public final boolean isClient;
-    protected BrowserTileEntity tile;
-    private int prevChangeCount;
-    public int scroll;
-    public SortMode sortMode = SortMode.StackSize;
-    public String filterText = "";
-    private ItemStack stackInCursor = ItemStack.EMPTY;
+    protected final static int LEFT = 8;
+    protected final static int TOP = 18;
+    protected final static int SLOT_WIDTH = 18;
+    protected final static int SLOT_HEIGHT = 18;
 
-    private final PlayerEntity player;
+    protected final static int SCROLL_ROWS = 3;
+    protected final static int SCROLL_COLUMNS = 9;
+    protected final static int SCROLL_SLOTS = SCROLL_ROWS * SCROLL_COLUMNS;
+
+    protected final static int PLAYER_ROWS = 4;
+    protected final static int PLAYER_COLUMNS = 9;
+    protected final static int PLAYER_SLOTS = PLAYER_ROWS * PLAYER_COLUMNS;
 
     private NonNullList<ItemStack> currentStacks = NonNullList.create();
+    private final PlayerEntity player;
+    private int prevChangeCount;
+    private ItemStack stackInCursor = ItemStack.EMPTY;
 
-    protected final static int Left = 8;
-    protected final static int Top = 18;
-    protected final static int SlotWidth = 18;
-    protected final static int SlotHeight = 18;
+    @Nullable
+    protected BrowserTileEntity tile;
 
-    protected final static int ScrollRows = 3;
-    protected final static int ScrollColumns = 9;
-    protected final static int ScrollSlots = ScrollRows * ScrollColumns;
+    public final IItemHandlerModifiable scrollInventory;
+    public int scroll;
+    public SortMode sortMode = SortMode.STACK_SIZE;
+    public String filterText = "";
 
-    protected final static int PlayerRows = 4;
-    protected final static int PlayerColumns = 9;
-    protected final static int PlayerSlots = PlayerRows * PlayerColumns;
+    public final boolean isClient() {
+        return tile == null;
+    }
 
     public ClientScrollInventory getClient() {
-        if (!isClient)
+        if (!isClient())
             throw new IllegalStateException("Attempted to get client inventory on the server");
         return (ClientScrollInventory)scrollInventory;
     }
 
     public ServerScrollInventory getServer() {
-        if (isClient)
+        if (isClient())
             throw new IllegalStateException("Attempted to get server inventory on the client");
         return (ServerScrollInventory)scrollInventory;
     }
@@ -75,25 +79,26 @@ public class AbstractBrowserContainer extends Container
     {
         super(type, id);
 
-        this.tile = tileEntity;
         this.player = playerInventory.player;
-        this.isClient = player.world.isRemote;
+        boolean isClient = player.world.isRemote;
 
         if (isClient)
         {
+            this.tile = null;
             scrollInventory = new ClientScrollInventory();
         }
         else
         {
-            scrollInventory = new ServerScrollInventory(Objects.requireNonNull(tile));
+            this.tile = Objects.requireNonNull(tileEntity);
+            scrollInventory = new ServerScrollInventory(tile);
         }
 
-        for (int y = 0; y < ScrollRows; y++)
+        for (int y = 0; y < SCROLL_ROWS; y++)
         {
-            for (int x = 0; x < ScrollColumns; x++)
+            for (int x = 0; x < SCROLL_COLUMNS; x++)
             {
-                addSlot(new SlotFake(scrollInventory, x + y * ScrollColumns,
-                        Left + x * SlotWidth, Top + y * SlotHeight));
+                addSlot(new SlotFake(scrollInventory, x + y * SCROLL_COLUMNS,
+                        LEFT + x * SLOT_WIDTH, TOP + y * SLOT_HEIGHT));
             }
         }
 
@@ -102,7 +107,7 @@ public class AbstractBrowserContainer extends Container
 
     protected void bindPlayerInventory(PlayerInventory playerInventory)
     {
-        bindPlayerInventory(playerInventory, Top + ScrollRows * SlotHeight + 14);
+        bindPlayerInventory(playerInventory, TOP + SCROLL_ROWS * SLOT_HEIGHT + 14);
     }
 
     protected void bindPlayerInventory(PlayerInventory playerInventory, int top)
@@ -113,14 +118,14 @@ public class AbstractBrowserContainer extends Container
             {
                 addSlot(new Slot(playerInventory,
                         x + y * 9 + 9,
-                        Left + x * SlotWidth, top + y * SlotHeight));
+                        LEFT + x * SLOT_WIDTH, top + y * SLOT_HEIGHT));
             }
         }
 
-        top += 3 * SlotHeight + 4;
+        top += 3 * SLOT_HEIGHT + 4;
         for (int x = 0; x < 9; x++)
         {
-            addSlot(new Slot(playerInventory, x, Left + x * SlotWidth, top));
+            addSlot(new Slot(playerInventory, x, LEFT + x * SLOT_WIDTH, top));
         }
     }
 
@@ -136,7 +141,7 @@ public class AbstractBrowserContainer extends Container
     @Override
     public void detectAndSendChanges()
     {
-        if (isClient)
+        if (isClient())
             return;
 
         boolean isLowOnPowerNew = tile.isLowOnPower();
@@ -187,7 +192,7 @@ public class AbstractBrowserContainer extends Container
             }
         }
 
-        for (int i = ScrollSlots; i < this.inventorySlots.size(); ++i)
+        for (int i = SCROLL_SLOTS; i < this.inventorySlots.size(); ++i)
         {
             ItemStack inSlot = inventorySlots.get(i).getStack();
             ItemStack inCache = inventoryItemStacks.get(i);
@@ -273,7 +278,7 @@ public class AbstractBrowserContainer extends Container
 
     public void setVisibleSlots(int[] visible)
     {
-        if (isClient)
+        if (isClient())
         {
             EnderRiftMod.channel.sendToServer(new SetVisibleSlots(windowId, visible));
         }
@@ -323,7 +328,7 @@ public class AbstractBrowserContainer extends Container
     {
         PlayerInventory inventoryPlayer = playerIn.inventory;
 
-        if (slotId >= 0 && slotId < ScrollSlots)
+        if (slotId >= 0 && slotId < SCROLL_SLOTS)
         {
             IItemHandler parent = getTileInventory();
 
@@ -459,18 +464,18 @@ public class AbstractBrowserContainer extends Container
     @Nullable
     private IItemHandler getTileInventory()
     {
-        return isClient || tile == null ? null : tile.getCombinedInventory();
+        return isClient() ? null : tile.getCombinedInventory();
     }
 
     private void markTileDirty()
     {
-        if (!isClient && tile != null)
+        if (!isClient())
             tile.markDirty();
     }
 
     private ItemStack extractItemsSided(@Nullable IItemHandler parent, ItemStack existing, int amount, boolean simulate)
     {
-        if (isClient || parent == null)
+        if (isClient() || parent == null)
         {
             return existing.copy();
         }
@@ -479,15 +484,15 @@ public class AbstractBrowserContainer extends Container
 
     private ItemStack insertItemsSided(@Nullable IItemHandler parent, ItemStack dropping)
     {
-        if (isClient || parent == null)
+        if (isClient() || parent == null)
             return ItemStack.EMPTY;
         return AutomationHelper.insertItems(parent, dropping);
     }
 
     private ItemStack simulateAddToPlayer(ItemStack stack, int amount)
     {
-        int startIndex = ScrollSlots;
-        int endIndex = startIndex + PlayerSlots;
+        int startIndex = SCROLL_SLOTS;
+        int endIndex = startIndex + PLAYER_SLOTS;
 
         ItemStack stackCopy = stack.copy();
         stackCopy.setCount(amount);
@@ -557,8 +562,8 @@ public class AbstractBrowserContainer extends Container
 
     public ItemStack addToPlayer(ItemStack stack)
     {
-        int startIndex = ScrollSlots;
-        int endIndex = startIndex + PlayerSlots;
+        int startIndex = SCROLL_SLOTS;
+        int endIndex = startIndex + PLAYER_SLOTS;
 
         ItemStack stackCopy = stack.copy();
 
@@ -585,7 +590,7 @@ public class AbstractBrowserContainer extends Container
             return ItemStack.EMPTY;
         }
 
-        if (slotIndex < ScrollSlots)
+        if (slotIndex < SCROLL_SLOTS)
         {
             // Shouldn't even happen, handled above.
             return ItemStack.EMPTY;
@@ -809,7 +814,7 @@ public class AbstractBrowserContainer extends Container
             {
                 switch (sortMode)
                 {
-                    case Alphabetic:
+                    case ALPHABETIC:
                         indices.sort((ia, ib) ->
                         {
                             ItemStack a = stacks.get(ia);
@@ -817,7 +822,7 @@ public class AbstractBrowserContainer extends Container
                             return a.getDisplayName().getString().compareToIgnoreCase(b.getDisplayName().getString());
                         });
                         break;
-                    case StackSize:
+                    case STACK_SIZE:
                         indices.sort((ia, ib) ->
                         {
                             ItemStack a = stacks.get(ia);
@@ -896,7 +901,7 @@ public class AbstractBrowserContainer extends Container
         public int[] getIndices()
         {
             int from = Math.max(0, Math.min(scroll, indices.length - 1));
-            int to = Math.min(from + ScrollSlots, indices.length);
+            int to = Math.min(from + SCROLL_SLOTS, indices.length);
             return Arrays.copyOfRange(indices, from, to);
         }
     }

@@ -1,7 +1,7 @@
 package gigaherz.enderRift.rift.storage;
 
 import com.google.common.collect.Lists;
-import gigaherz.enderRift.rift.RiftTileEntity;
+import gigaherz.enderRift.rift.IRiftChangeListener;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.ListNBT;
@@ -20,8 +20,8 @@ public class RiftInventory implements IItemHandler
 {
     private final RiftStorage manager;
 
-    final List<Reference<? extends RiftTileEntity>> listeners = Lists.newArrayList();
-    final ReferenceQueue<RiftTileEntity> deadListeners = new ReferenceQueue<>();
+    final List<Reference<? extends IRiftChangeListener>> listeners = Lists.newArrayList();
+    final ReferenceQueue<IRiftChangeListener> pendingRemovals = new ReferenceQueue<>();
     private final List<ItemStack> inventorySlots = Lists.newArrayList();
 
     RiftInventory(RiftStorage manager)
@@ -29,32 +29,29 @@ public class RiftInventory implements IItemHandler
         this.manager = manager;
     }
 
-    public void addWeakListener(RiftTileEntity e)
+    public void addWeakListener(IRiftChangeListener e)
     {
-        listeners.add(new WeakReference<>(e, deadListeners));
+        listeners.add(new WeakReference<>(e, pendingRemovals));
     }
 
-    private void onContentsChanged()
+    protected void onContentsChanged()
     {
-        for (Reference<? extends RiftTileEntity>
-             ref = deadListeners.poll();
+        for (Reference<? extends IRiftChangeListener>
+             ref = pendingRemovals.poll();
              ref != null;
-             ref = deadListeners.poll())
+             ref = pendingRemovals.poll())
         {
             listeners.remove(ref);
         }
 
-        for (Iterator<Reference<? extends RiftTileEntity>> it = listeners.iterator(); it.hasNext(); )
+        for (Iterator<Reference<? extends IRiftChangeListener>> iterator = listeners.iterator(); iterator.hasNext(); )
         {
-            RiftTileEntity rift = it.next().get();
-            if (rift == null || rift.isRemoved())
-            {
-                it.remove();
-            }
+            Reference<? extends IRiftChangeListener> reference = iterator.next();
+            IRiftChangeListener listener = reference.get();
+            if (listener == null || listener.isInvalid())
+                iterator.remove();
             else
-            {
-                rift.markDirty();
-            }
+                listener.onRiftChanged();
         }
 
         manager.markDirty();

@@ -15,7 +15,7 @@ public class BrowserTileEntity extends AggregatorTileEntity
 
     private int changeCount = 1;
 
-    Direction facing = null;
+    private Direction facing = null;
 
     public BrowserTileEntity()
     {

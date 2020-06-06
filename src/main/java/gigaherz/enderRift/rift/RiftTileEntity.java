@@ -5,6 +5,7 @@ import gigaherz.enderRift.common.EnergyBuffer;
 import gigaherz.enderRift.rift.storage.RiftInventory;
 import gigaherz.enderRift.rift.storage.RiftStorage;
 import net.minecraft.block.BlockState;
+import net.minecraft.inventory.IInventoryChangedListener;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.NetworkManager;
@@ -28,7 +29,7 @@ import javax.annotation.Nullable;
 import java.util.Optional;
 import java.util.Random;
 
-public class RiftTileEntity extends TileEntity implements ITickableTileEntity
+public class RiftTileEntity extends TileEntity implements ITickableTileEntity, IRiftChangeListener
 {
     @ObjectHolder("enderrift:rift")
     public static TileEntityType<RiftTileEntity> TYPE;
@@ -146,20 +147,13 @@ public class RiftTileEntity extends TileEntity implements ITickableTileEntity
         if (riftId < 0)
             return null;
 
-        if (inventory == null)
+        if (inventory == null && world != null && !world.isRemote)
         {
             inventory = RiftStorage.get(world).getRift(riftId);
             inventory.addWeakListener(this);
         }
         return inventory;
     }
-
-
-    //@Override
-    //public boolean shouldRenderInPass(int pass)
-    //{
-    //    return pass == 1;
-    //}
 
     public int countInventoryStacks()
     {
@@ -275,6 +269,18 @@ public class RiftTileEntity extends TileEntity implements ITickableTileEntity
     public float getLastPoweringState()
     {
         return lastPoweringState;
+    }
+
+    @Override
+    public boolean isInvalid()
+    {
+        return isRemoved();
+    }
+
+    @Override
+    public void onRiftChanged()
+    {
+        markDirty();
     }
 
     public class PoweredInventory implements IItemHandler

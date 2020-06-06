@@ -30,7 +30,10 @@ repositories {
         url 'https://maven.mcmoddev.com/'
     }
     maven {
-        url "http://tehnut.info/maven"
+        url "https://tehnut.info/maven"
+    }
+    maven {
+        url "https://github.com/TehNut/temporary-maven-thing/tree/master/maven"
     }
 /*
     maven {
@@ -43,7 +46,7 @@ repositories {
  */
 }
 
-version = "2.2.1"
+version = "2.2.2"
 group= "gigaherz.enderRift"
 archivesBaseName = "EnderRift-1.14.4"
 
@@ -165,3 +168,6 @@ jar {
 artifacts {
     archives shadowJar
 }
+
+System.out.println("Java version: " + System.getProperty("java.version"));
+System.out.println("Java arch: " + System.getProperty("os.arch"));

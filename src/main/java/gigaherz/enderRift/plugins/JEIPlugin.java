@@ -23,7 +23,7 @@ public class JEIPlugin implements IModPlugin
     public void registerRecipeTransferHandlers(IRecipeTransferRegistration registration)
     {
         registration.addRecipeTransferHandler(CraftingBrowserContainer.class, VanillaRecipeCategoryUid.CRAFTING,
-                CraftingBrowserContainer.CraftingSlotStart, 9,
-                CraftingBrowserContainer.InventorySlotStart, 36);
+                CraftingBrowserContainer.CRAFTING_SLOT_START, 9,
+                CraftingBrowserContainer.INVENTORY_SLOT_START, 36);
     }
 }
