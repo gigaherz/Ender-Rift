@@ -30,11 +30,11 @@ public class CraftingBrowserContainer extends AbstractBrowserContainer
     @ObjectHolder("enderrift:crafting_browser")
     public static ContainerType<CraftingBrowserContainer> TYPE;
 
-    public static int InventorySlotStart = ScrollSlots;
-    public static int CraftingSlotStart = ScrollSlots + PlayerSlots + 1;
+    public static final int INVENTORY_SLOT_START = SCROLL_SLOTS;
+    public static final int CRAFTING_SLOT_START = SCROLL_SLOTS + PLAYER_SLOTS + 1;
 
-    private final static int HeightCrafter = 58;
-    private final static int CraftingOffset = 59;
+    private final static int CRAFTER_HEIGHT = 58;
+    private final static int CRAFTING_OFFSET = 59;
 
     public CraftingInventory craftMatrix = new CraftingInventory(this, 3, 3);
     public CraftResultInventory craftResult = new CraftResultInventory();
@@ -56,7 +56,7 @@ public class CraftingBrowserContainer extends AbstractBrowserContainer
         this.world = playerInventory.player.world;
         this.player = playerInventory.player;
 
-        bindCraftingGrid(player.inventory, CraftingOffset);
+        bindCraftingGrid(player.inventory, CRAFTING_OFFSET);
     }
 
     protected void bindCraftingGrid(PlayerInventory playerInventory, int top)
@@ -77,7 +77,7 @@ public class CraftingBrowserContainer extends AbstractBrowserContainer
     @Override
     protected void bindPlayerInventory(PlayerInventory playerInventory)
     {
-        bindPlayerInventory(playerInventory, Top + ScrollRows * SlotHeight + 14 + HeightCrafter);
+        bindPlayerInventory(playerInventory, TOP + SCROLL_ROWS * SLOT_HEIGHT + 14 + CRAFTER_HEIGHT);
     }
 
     @Override
@@ -133,7 +133,7 @@ public class CraftingBrowserContainer extends AbstractBrowserContainer
     @Override
     public ItemStack transferStackInSlot(PlayerEntity player, int slotIndex)
     {
-        if (slotIndex < ScrollSlots + PlayerSlots)
+        if (slotIndex < SCROLL_SLOTS + PLAYER_SLOTS)
         {
             return super.transferStackInSlot(player, slotIndex);
         }
@@ -148,12 +148,12 @@ public class CraftingBrowserContainer extends AbstractBrowserContainer
         ItemStack stack = slot.getStack();
         ItemStack stackCopy = stack.copy();
 
-        if (!this.mergeItemStack(stack, InventorySlotStart, CraftingSlotStart, false))
+        if (!this.mergeItemStack(stack, INVENTORY_SLOT_START, CRAFTING_SLOT_START, false))
         {
             return ItemStack.EMPTY;
         }
 
-        if (slotIndex == CraftingSlotStart)
+        if (slotIndex == CRAFTING_SLOT_START)
             slot.onSlotChange(stack, stackCopy);
 
         if (stack.getCount() == 0)
@@ -183,7 +183,7 @@ public class CraftingBrowserContainer extends AbstractBrowserContainer
 
     public void clearCraftingGrid(PlayerEntity playerIn)
     {
-        boolean isRemote = tile.getWorld().isRemote;
+        boolean isRemote = tile == null ? true : tile.getWorld().isRemote;
 
         if (!this.world.isRemote)
         {

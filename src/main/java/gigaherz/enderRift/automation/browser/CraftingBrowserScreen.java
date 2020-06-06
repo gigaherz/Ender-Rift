@@ -11,7 +11,7 @@ import net.minecraft.util.text.ITextComponent;
 
 public class CraftingBrowserScreen extends AbstractBrowserScreen<CraftingBrowserContainer>
 {
-    private static final ResourceLocation backgroundTexture = new ResourceLocation(EnderRiftMod.MODID, "textures/gui/crafting_browser.png");
+    private static final ResourceLocation BACKGROUND_TEXTURE = new ResourceLocation(EnderRiftMod.MODID, "textures/gui/crafting_browser.png");
 
     public CraftingBrowserScreen(CraftingBrowserContainer container, PlayerInventory playerInventory, ITextComponent title)
     {
@@ -23,7 +23,7 @@ public class CraftingBrowserScreen extends AbstractBrowserScreen<CraftingBrowser
     @Override
     protected ResourceLocation getBackgroundTexture()
     {
-        return backgroundTexture;
+        return BACKGROUND_TEXTURE;
     }
 
     @Override

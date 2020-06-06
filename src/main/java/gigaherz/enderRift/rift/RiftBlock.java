@@ -104,7 +104,10 @@ public class RiftBlock extends Block
         TileEntity te = worldIn.getTileEntity(pos);
 
         if (te instanceof RiftTileEntity)
+        {
             spawnAsEntity(worldIn, pos, ((RiftTileEntity) te).getRiftItem());
+            te.remove();
+        }
 
         RiftStructure.dismantle(worldIn, pos);
     }

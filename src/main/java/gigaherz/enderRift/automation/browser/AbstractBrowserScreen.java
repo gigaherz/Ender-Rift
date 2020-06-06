@@ -13,11 +13,14 @@ import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.ITextComponent;
+import org.lwjgl.glfw.GLFW;
+
+import javax.annotation.Nonnull;
 
 public abstract class AbstractBrowserScreen<T extends AbstractBrowserContainer> extends ContainerScreen<T>
 {
-    private static final ResourceLocation backgroundTexture = new ResourceLocation(EnderRiftMod.MODID, "textures/gui/browser.png");
-    private static final ResourceLocation tabsTexture = new ResourceLocation("minecraft:textures/gui/container/creative_inventory/tabs.png");
+    private static final ResourceLocation BACKGROUND_TEXTURE = new ResourceLocation(EnderRiftMod.MODID, "textures/gui/browser.png");
+    private static final ResourceLocation TABS_TEXTURE = new ResourceLocation("minecraft:textures/gui/container/creative_inventory/tabs.png");
 
     private boolean isDragging;
     private int scrollY;
@@ -69,7 +72,7 @@ public abstract class AbstractBrowserScreen<T extends AbstractBrowserContainer> 
 
     protected ResourceLocation getBackgroundTexture()
     {
-        return backgroundTexture;
+        return BACKGROUND_TEXTURE;
     }
 
     @Override
@@ -81,11 +84,11 @@ public abstract class AbstractBrowserScreen<T extends AbstractBrowserContainer> 
             SortMode mode = getContainer().sortMode;
             switch (mode)
             {
-                case Alphabetic:
-                    mode = SortMode.StackSize;
+                case ALPHABETIC:
+                    mode = SortMode.STACK_SIZE;
                     break;
-                case StackSize:
-                    mode = SortMode.Alphabetic;
+                case STACK_SIZE:
+                    mode = SortMode.ALPHABETIC;
                     break;
             }
 
@@ -121,16 +124,37 @@ public abstract class AbstractBrowserScreen<T extends AbstractBrowserContainer> 
         searchField.setText(getContainer().filterText);
         searchField.setResponder(this::updateSearchFilter);
 
-        changeSorting(SortMode.StackSize);
+        changeSorting(SortMode.STACK_SIZE);
+    }
+
+    @Override
+    public boolean charTyped(char p_charTyped_1_, int p_charTyped_2_)
+    {
+        if (searchField.isFocused() && searchField.charTyped(p_charTyped_1_, p_charTyped_2_))
+            return true;
+
+        return this.getFocused() != null && this.getFocused().charTyped(p_charTyped_1_, p_charTyped_2_);
     }
 
     @Override
     public boolean keyPressed(int key, int scanCode, int modifiers)
     {
-        if (super.keyPressed(key, scanCode, modifiers))
-            return true;
+        if (searchField.isFocused())
+        {
+            if (searchField.keyPressed(key, scanCode, modifiers))
+                return true;
+            if (key != GLFW.GLFW_KEY_ESCAPE && key != GLFW.GLFW_KEY_TAB && key != GLFW.GLFW_KEY_ENTER)
+                return false;
+        }
 
-        return searchField.keyPressed(key, scanCode, modifiers);
+        return super.keyPressed(key, scanCode, modifiers);
+    }
+
+    @Override
+    public void resize(@Nonnull Minecraft minecraft, int scaledWidth, int scaledHeight) {
+        String s = searchField.getText();
+        super.resize(minecraft, scaledWidth, scaledHeight);
+        searchField.setText(s);
     }
 
     private void updateSearchFilter(String text)
@@ -142,10 +166,10 @@ public abstract class AbstractBrowserScreen<T extends AbstractBrowserContainer> 
     {
         switch (mode)
         {
-            case Alphabetic:
+            case ALPHABETIC:
                 sortModeButton.setMessage("Az");
                 break;
-            case StackSize:
+            case STACK_SIZE:
                 sortModeButton.setMessage("#");
                 break;
         }
@@ -162,7 +186,7 @@ public abstract class AbstractBrowserScreen<T extends AbstractBrowserContainer> 
         blit(guiLeft, guiTop, 0, 0, xSize, ySize);
         blit(guiLeft - 27, guiTop + 8, 194, 0, 27, 28);
 
-        minecraft.getTextureManager().bindTexture(tabsTexture);
+        minecraft.getTextureManager().bindTexture(TABS_TEXTURE);
 
         boolean isEnabled = needsScrollBar();
         if (isEnabled)
@@ -184,7 +208,7 @@ public abstract class AbstractBrowserScreen<T extends AbstractBrowserContainer> 
     {
         RenderSystem.pushMatrix();
         RenderSystem.translated(this.guiLeft,this.guiTop,300);
-        for (int i = 0; i < AbstractBrowserContainer.ScrollSlots; ++i)
+        for (int i = 0; i < AbstractBrowserContainer.SCROLL_SLOTS; ++i)
         {
             Slot slot = getContainer().inventorySlots.get(i);
             drawSlotText(slot);
@@ -244,7 +268,7 @@ public abstract class AbstractBrowserScreen<T extends AbstractBrowserContainer> 
     {
         int actualSlotCount = getContainer().getActualSlotCount();
 
-        return actualSlotCount > AbstractBrowserContainer.ScrollSlots;
+        return actualSlotCount > AbstractBrowserContainer.SCROLL_SLOTS;
     }
 
     @Override
@@ -260,9 +284,9 @@ public abstract class AbstractBrowserScreen<T extends AbstractBrowserContainer> 
         final int actualSlotCount = getContainer().getActualSlotCount();
         final int rows = (int) Math.ceil(actualSlotCount / 9.0);
 
-        if (rows > AbstractBrowserContainer.ScrollRows)
+        if (rows > AbstractBrowserContainer.SCROLL_ROWS)
         {
-            int scrollRows = rows - AbstractBrowserContainer.ScrollRows;
+            int scrollRows = rows - AbstractBrowserContainer.SCROLL_ROWS;
 
             int row = getContainer().scroll / 9;
 
@@ -317,7 +341,7 @@ public abstract class AbstractBrowserScreen<T extends AbstractBrowserContainer> 
         final int bitHeight = 15;
         final int actualSlotCount = getContainer().getActualSlotCount();
         final int rows = (int) Math.ceil(actualSlotCount / 9.0);
-        final int scrollRows = rows - AbstractBrowserContainer.ScrollRows;
+        final int scrollRows = rows - AbstractBrowserContainer.SCROLL_ROWS;
 
         boolean isEnabled = scrollRows > 0;
         if (isEnabled)

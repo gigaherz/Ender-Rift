@@ -30,7 +30,10 @@ repositories {
         url 'https://maven.mcmoddev.com/'
     }
     maven {
-        url "http://tehnut.info/maven"
+        url "https://tehnut.info/maven"
+    }
+    maven {
+        url "https://github.com/TehNut/temporary-maven-thing/tree/master/maven"
     }
 /*
     maven {
@@ -43,7 +46,7 @@ repositories {
  */
 }
 
-version = "2.2.1"
+version = "2.2.2"
 group= "gigaherz.enderRift"
 archivesBaseName = "EnderRift-UNKNOWN"
 
@@ -114,7 +117,7 @@ configurations {
 }
 
 dependencies {
-    minecraft 'net.minecraftforge:forge:1.15.2-31.2.0'
+    minecraft 'net.minecraftforge:forge:1.15.2-31.2.5'
 
     compile "gigaherz.graph:GraphLib2:2.0.0"
     shade "gigaherz.graph:GraphLib2:2.0.0"
@@ -131,7 +134,7 @@ dependencies {
     compileOnly fg.deobf("mezz.jei:jei-1.15.2:6.0.0.3:api")
     runtimeOnly fg.deobf("mezz.jei:jei-1.15.2:6.0.0.3")
 
-    compile fg.deobf("mcp.mobius.waila:Hwyla:1.10.7-B71_1.15.1")
+    compile fg.deobf("mcp.mobius.waila:Hwyla:1.10.8-B72_1.15.2")
 
     //compile fileTree(dir: 'libs', include: '*.jar')
 }
@@ -169,3 +172,6 @@ jar {
 artifacts {
     archives shadowJar
 }
+
+System.out.println("Java version: " + System.getProperty("java.version"));
+System.out.println("Java arch: " + System.getProperty("os.arch"));
