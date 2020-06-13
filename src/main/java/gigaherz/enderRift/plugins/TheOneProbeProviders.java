@@ -32,7 +32,7 @@ public class TheOneProbeProviders implements Function<ITheOneProbe, Void>
     public Void apply(@Nullable ITheOneProbe top)
     {
         if (top == null)
-             return null;
+            return null;
 
         top.registerBlockDisplayOverride((probeMode, probeInfo, playerEntity, world, blockState, data) -> {
             if (blockState.getBlock() == EnderRiftMod.EnderRiftBlocks.STRUCTURE
@@ -60,19 +60,19 @@ public class TheOneProbeProviders implements Function<ITheOneProbe, Void>
                 TileEntity te = world.getTileEntity(data.getPos());
 
                 if (te instanceof RiftTileEntity)
-                    handleRiftTooltip(probeInfo,  (RiftTileEntity) te);
+                    handleRiftTooltip(probeInfo, (RiftTileEntity) te);
 
                 if (te instanceof StructureTileEntity)
-                    handleStructureTooltip(probeInfo, (StructureTileEntity)te);
+                    handleStructureTooltip(probeInfo, (StructureTileEntity) te);
 
                 if (te instanceof DriverTileEntity)
-                    handleDriver(probeInfo, (DriverTileEntity)te);
+                    handleDriver(probeInfo, (DriverTileEntity) te);
 
                 if (te instanceof GeneratorTileEntity)
-                    handleGenerator(probeInfo, (GeneratorTileEntity)te);
+                    handleGenerator(probeInfo, (GeneratorTileEntity) te);
 
                 if (te instanceof GraphObject)
-                    handleGraphObject(probeInfo, (GraphObject)te);
+                    handleGraphObject(probeInfo, (GraphObject) te);
             }
         });
 

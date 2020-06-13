@@ -13,7 +13,6 @@ import gigaherz.enderRift.rift.StructureTileEntity;
 import gigaherz.graph2.Graph;
 import gigaherz.graph2.GraphObject;
 import mcp.mobius.waila.api.*;
-import net.minecraft.block.Blocks;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;

@@ -1,11 +1,8 @@
 package gigaherz.enderRift.network;
 
 import gigaherz.enderRift.automation.browser.AbstractBrowserContainer;
-import gigaherz.enderRift.automation.browser.BrowserContainer;
-import gigaherz.enderRift.automation.browser.CraftingBrowserContainer;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.network.PacketBuffer;
-import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.fml.network.NetworkEvent;
 
 import java.util.function.Supplier;

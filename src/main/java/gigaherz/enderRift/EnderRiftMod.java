@@ -20,7 +20,6 @@ import gigaherz.enderRift.plugins.TheOneProbeProviders;
 import gigaherz.enderRift.rift.*;
 import mcjty.theoneprobe.api.ITheOneProbe;
 import net.minecraft.block.Block;
-import net.minecraft.block.Blocks;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.material.MaterialColor;
@@ -170,7 +169,8 @@ public class EnderRiftMod
                 new BlockItem(EnderRiftBlocks.PROXY, new Item.Properties().group(tabEnderRift)).setRegistryName(EnderRiftBlocks.PROXY.getRegistryName()),
                 new BlockItem(EnderRiftBlocks.DRIVER, new Item.Properties().group(tabEnderRift)).setRegistryName(EnderRiftBlocks.DRIVER.getRegistryName()),
                 new BlockItem(EnderRiftBlocks.GENERATOR, new Item.Properties().group(tabEnderRift)).setRegistryName(EnderRiftBlocks.GENERATOR.getRegistryName()),
-                new BlockItem(EnderRiftBlocks.STRUCTURE, new Item.Properties().group(tabEnderRift)){
+                new BlockItem(EnderRiftBlocks.STRUCTURE, new Item.Properties().group(tabEnderRift))
+                {
                     @Override
                     public void fillItemGroup(ItemGroup group, NonNullList<ItemStack> items)
                     {
@@ -237,7 +237,7 @@ public class EnderRiftMod
     {
         InterModComms.sendTo("gbook", "registerBook", () -> EnderRiftMod.location("xml/book.xml"));
 
-        InterModComms.sendTo("theoneprobe", "getTheOneProbe", (Supplier<Function<ITheOneProbe, Void>>)(TheOneProbeProviders::new));
+        InterModComms.sendTo("theoneprobe", "getTheOneProbe", (Supplier<Function<ITheOneProbe, Void>>) (TheOneProbeProviders::new));
     }
 
     public void gatherData(GatherDataEvent event)
@@ -322,6 +322,4 @@ public class EnderRiftMod
             }
         }
     }
-
-
 }
