@@ -27,7 +27,9 @@ public class RiftTileEntityRenderer extends TileEntityRenderer<RiftTileEntity>
     private final Random random = new Random();
 
     private static final List<Direction> DIRECTIONS_AND_NULL = Lists.newArrayList(Direction.values());
-    static {
+
+    static
+    {
         DIRECTIONS_AND_NULL.add(null);
     }
 
@@ -77,7 +79,7 @@ public class RiftTileEntityRenderer extends TileEntityRenderer<RiftTileEntity>
         float c0 = 1.0f / steps;
         float c1 = 1.0f / (1 - c0);
 
-        GlStateManager.color4f(1,1,1,1);
+        GlStateManager.color4f(1, 1, 1, 1);
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder buffer = tessellator.getBuffer();
         IBakedModel model = Minecraft.getInstance().getModelManager().getModel(EnderRiftMod.location("block/sphere"));

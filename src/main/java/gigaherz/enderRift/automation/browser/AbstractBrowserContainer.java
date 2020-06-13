@@ -59,20 +59,23 @@ public class AbstractBrowserContainer extends Container
     public SortMode sortMode = SortMode.STACK_SIZE;
     public String filterText = "";
 
-    public final boolean isClient() {
+    public final boolean isClient()
+    {
         return tile == null;
     }
 
-    public ClientScrollInventory getClient() {
+    public ClientScrollInventory getClient()
+    {
         if (!isClient())
             throw new IllegalStateException("Attempted to get client inventory on the server");
-        return (ClientScrollInventory)scrollInventory;
+        return (ClientScrollInventory) scrollInventory;
     }
 
-    public ServerScrollInventory getServer() {
+    public ServerScrollInventory getServer()
+    {
         if (isClient())
             throw new IllegalStateException("Attempted to get server inventory on the client");
-        return (ServerScrollInventory)scrollInventory;
+        return (ServerScrollInventory) scrollInventory;
     }
 
     protected AbstractBrowserContainer(ContainerType<? extends AbstractBrowserContainer> type, int id, @Nullable BrowserTileEntity tileEntity, PlayerInventory playerInventory)

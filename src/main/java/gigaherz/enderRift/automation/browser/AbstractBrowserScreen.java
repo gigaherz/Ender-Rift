@@ -8,8 +8,6 @@ import net.minecraft.client.gui.screen.inventory.ContainerScreen;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.client.renderer.RenderHelper;
-import net.minecraft.client.renderer.texture.AtlasTexture;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.ItemStack;
@@ -45,9 +43,6 @@ public abstract class AbstractBrowserScreen<T extends AbstractBrowserContainer> 
         super.render(mouseX, mouseY, partialTicks);
         this.renderLowPowerOverlay(mouseX, mouseY);
         this.renderHoveredToolTip(mouseX, mouseY);
-
-
-
     }
 
     private void renderLowPowerOverlay(int mouseX, int mouseY)
@@ -151,7 +146,8 @@ public abstract class AbstractBrowserScreen<T extends AbstractBrowserContainer> 
     }
 
     @Override
-    public void resize(@Nonnull Minecraft minecraft, int scaledWidth, int scaledHeight) {
+    public void resize(@Nonnull Minecraft minecraft, int scaledWidth, int scaledHeight)
+    {
         String s = searchField.getText();
         super.resize(minecraft, scaledWidth, scaledHeight);
         searchField.setText(s);
