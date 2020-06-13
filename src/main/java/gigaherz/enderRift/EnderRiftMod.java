@@ -16,7 +16,9 @@ import gigaherz.enderRift.generator.GeneratorContainer;
 import gigaherz.enderRift.generator.GeneratorScreen;
 import gigaherz.enderRift.generator.GeneratorTileEntity;
 import gigaherz.enderRift.network.*;
+import gigaherz.enderRift.plugins.TheOneProbeProviders;
 import gigaherz.enderRift.rift.*;
+import mcjty.theoneprobe.api.ITheOneProbe;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.SoundType;
@@ -34,6 +36,7 @@ import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipeSerializer;
 import net.minecraft.tileentity.TileEntityType;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.storage.loot.*;
 import net.minecraftforge.common.extensions.IForgeContainerType;
@@ -59,6 +62,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -135,6 +139,7 @@ public class EnderRiftMod
         modEventBus.addGenericListener(IRecipeSerializer.class, this::registerRecipeSerializers);
         modEventBus.addListener(this::commonSetup);
         modEventBus.addListener(this::clientSetup);
+        modEventBus.addListener(this::interComms);
         modEventBus.addListener(this::gatherData);
 
         //modLoadingContext.registerConfig(ModConfig.Type.SERVER, ConfigData.SERVER_SPEC);
@@ -165,6 +170,13 @@ public class EnderRiftMod
                 new BlockItem(EnderRiftBlocks.PROXY, new Item.Properties().group(tabEnderRift)).setRegistryName(EnderRiftBlocks.PROXY.getRegistryName()),
                 new BlockItem(EnderRiftBlocks.DRIVER, new Item.Properties().group(tabEnderRift)).setRegistryName(EnderRiftBlocks.DRIVER.getRegistryName()),
                 new BlockItem(EnderRiftBlocks.GENERATOR, new Item.Properties().group(tabEnderRift)).setRegistryName(EnderRiftBlocks.GENERATOR.getRegistryName()),
+                new BlockItem(EnderRiftBlocks.STRUCTURE, new Item.Properties().group(tabEnderRift)){
+                    @Override
+                    public void fillItemGroup(ItemGroup group, NonNullList<ItemStack> items)
+                    {
+                        // Do not offer in creative menu!
+                    }
+                }.setRegistryName(EnderRiftBlocks.STRUCTURE.getRegistryName()),
 
                 new RiftItem(new Item.Properties().maxStackSize(16).group(tabEnderRift)).setRegistryName("rift_orb")
         );
@@ -225,7 +237,7 @@ public class EnderRiftMod
     {
         InterModComms.sendTo("gbook", "registerBook", () -> EnderRiftMod.location("xml/book.xml"));
 
-        //FMLInterModComms.sendFunctionMessage("theoneprobe", "getTheOneProbe", "gigaherz.enderRift.plugins.TheOneProbeProviders");
+        InterModComms.sendTo("theoneprobe", "getTheOneProbe", (Supplier<Function<ITheOneProbe, Void>>)(TheOneProbeProviders::new));
     }
 
     public void gatherData(GatherDataEvent event)

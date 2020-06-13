@@ -29,7 +29,7 @@ public class RiftTileEntityRenderer extends TileEntityRenderer<RiftTileEntity>
     private final Random random = new Random();
 
     private static final List<Direction> DIRECTIONS_AND_NULL = Lists.newArrayList(Direction.values());
-    {
+    static {
         DIRECTIONS_AND_NULL.add(null);
     }
 

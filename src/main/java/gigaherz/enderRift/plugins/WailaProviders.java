@@ -13,6 +13,7 @@ import gigaherz.enderRift.rift.StructureTileEntity;
 import gigaherz.graph2.Graph;
 import gigaherz.graph2.GraphObject;
 import mcp.mobius.waila.api.*;
+import net.minecraft.block.Blocks;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
@@ -50,11 +51,6 @@ public class WailaProviders implements IWailaPlugin
             registrar.registerComponentProvider(instance, TooltipPosition.BODY, StructureBlock.class);
             registrar.registerBlockDataProvider(instance, RiftTileEntity.class);
             registrar.registerComponentProvider(instance, TooltipPosition.BODY, RiftBlock.class);
-        }
-
-        {
-            StructureTooltipProvider instance = new StructureTooltipProvider();
-            registrar.registerStackProvider(instance, StructureBlock.class);
         }
 
         {
@@ -152,23 +148,13 @@ public class WailaProviders implements IWailaPlugin
         }
     }
 
-    public static class StructureTooltipProvider implements IComponentProvider
-    {
-        @Override
-        public ItemStack getStack(IDataAccessor accessor, IPluginConfig config)
-        {
-            return new ItemStack(EnderRiftMod.EnderRiftBlocks.STRUCTURE);
-        }
-    }
-
     public static class RiftTooltipProvider
             implements IComponentProvider, IServerDataProvider<TileEntity>
     {
-
         @Override
         public ItemStack getStack(IDataAccessor accessor, IPluginConfig config)
         {
-            return new ItemStack(EnderRiftMod.EnderRiftBlocks.RIFT);
+            return new ItemStack(accessor.getBlock());
         }
 
         @Override
