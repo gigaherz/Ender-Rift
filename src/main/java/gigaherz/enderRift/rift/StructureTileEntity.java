@@ -21,9 +21,9 @@ public class StructureTileEntity extends AggregatorTileEntity
     @ObjectHolder("enderrift:structure")
     public static TileEntityType<?> TYPE;
 
-    RiftTileEntity energyParent;
+    private RiftTileEntity energyParent;
 
-    LazyOptional<IEnergyStorage> bufferProvider = LazyOptional.of(() -> getEnergyBuffer().orElse(null));
+    private final LazyOptional<IEnergyStorage> bufferProvider = LazyOptional.of(() -> getEnergyBuffer().orElse(null));
 
     public StructureTileEntity()
     {

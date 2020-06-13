@@ -1,6 +1,6 @@
 {
     "block.enderrift.rift": "Ender-Rift Core",
-    "block.enderrift.rift_structure": "Ender-Rift Structure",
+    "block.enderrift.structure": "Ender-Rift Structure",
     "block.enderrift.interface": "Automation Interface",
     "block.enderrift.browser": "Automation Browser",
     "block.enderrift.crafting_browser": "Crafting Browser",

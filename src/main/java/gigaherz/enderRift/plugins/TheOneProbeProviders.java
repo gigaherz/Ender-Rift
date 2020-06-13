@@ -1,19 +1,25 @@
 package gigaherz.enderRift.plugins;
 
-/*
+
 import com.google.common.base.Function;
 import gigaherz.enderRift.EnderRiftMod;
-import gigaherz.enderRift.automation.driver.TileDriver;
-import gigaherz.enderRift.generator.TileGenerator;
-import gigaherz.enderRift.rift.TileEnderRift;
-import gigaherz.enderRift.rift.TileEnderRiftCorner;
+import gigaherz.enderRift.automation.driver.DriverTileEntity;
+import gigaherz.enderRift.generator.GeneratorTileEntity;
+import gigaherz.enderRift.rift.RiftBlock;
+import gigaherz.enderRift.rift.RiftTileEntity;
+import gigaherz.enderRift.rift.StructureBlock;
+import gigaherz.enderRift.rift.StructureTileEntity;
 import gigaherz.graph2.Graph;
 import gigaherz.graph2.GraphObject;
 import mcjty.theoneprobe.api.*;
+import mcjty.theoneprobe.apiimpl.ProbeHitData;
+import mcjty.theoneprobe.apiimpl.providers.DefaultProbeInfoProvider;
 import mcjty.theoneprobe.apiimpl.styles.ProgressStyle;
+import mcjty.theoneprobe.config.Config;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 
@@ -21,17 +27,31 @@ import javax.annotation.Nullable;
 
 public class TheOneProbeProviders implements Function<ITheOneProbe, Void>
 {
+
     @Override
     public Void apply(@Nullable ITheOneProbe top)
     {
-        assert top != null;
+        if (top == null)
+             return null;
+
+        top.registerBlockDisplayOverride((probeMode, probeInfo, playerEntity, world, blockState, data) -> {
+            if (blockState.getBlock() == EnderRiftMod.EnderRiftBlocks.STRUCTURE
+                    && blockState.get(StructureBlock.TYPE1) == StructureBlock.Type1.CORNER)
+            {
+                IProbeConfig config = Config.getRealConfig();
+                data = new ProbeHitData(data.getPos(), data.getHitVec(), data.getSideHit(), new ItemStack(EnderRiftMod.EnderRiftBlocks.STRUCTURE));
+                DefaultProbeInfoProvider.showStandardBlockInfo(config, probeMode, probeInfo, blockState, blockState.getBlock(), world, data.getPos(), playerEntity, data);
+                return true;
+            }
+            return false;
+        });
 
         top.registerProvider(new IProbeInfoProvider()
         {
             @Override
             public String getID()
             {
-                return EnderRiftMod.MODID + "_Probes";
+                return EnderRiftMod.MODID + "_probes";
             }
 
             @Override
@@ -39,28 +59,31 @@ public class TheOneProbeProviders implements Function<ITheOneProbe, Void>
             {
                 TileEntity te = world.getTileEntity(data.getPos());
 
-                if (te instanceof TileEnderRift || te instanceof TileEnderRiftCorner)
-                    handleRiftTooltip(mode, probeInfo, te);
+                if (te instanceof RiftTileEntity)
+                    handleRiftTooltip(probeInfo,  (RiftTileEntity) te);
 
-                if (te instanceof TileDriver)
-                    handleDriver(mode, probeInfo, te);
+                if (te instanceof StructureTileEntity)
+                    handleStructureTooltip(probeInfo, (StructureTileEntity)te);
 
-                if (te instanceof TileGenerator)
-                    handleGenerator(mode, probeInfo, te);
+                if (te instanceof DriverTileEntity)
+                    handleDriver(probeInfo, (DriverTileEntity)te);
+
+                if (te instanceof GeneratorTileEntity)
+                    handleGenerator(probeInfo, (GeneratorTileEntity)te);
 
                 if (te instanceof GraphObject)
-                    handleGraphObject(mode, probeInfo, te);
+                    handleGraphObject(probeInfo, (GraphObject)te);
             }
         });
 
         return null;
     }
 
-    private static final int RF_COLOR_B = 0xFF2F0000;
-    private static final int RF_COLOR_F1 = 0xFF8F0000;
-    private static final int RF_COLOR_F2 = 0xFF6F0000;
+    //private static final int RF_COLOR_B = 0xFF2F0000;
+    //private static final int RF_COLOR_F1 = 0xFF8F0000;
+    //private static final int RF_COLOR_F2 = 0xFF6F0000;
     private static final int HEAT_LOW = 0xFF6F0000;
-    private static final IProgressStyle RF_STYLE = new ProgressStyle().suffix(" RF").backgroundColor(RF_COLOR_B).filledColor(RF_COLOR_F1).alternateFilledColor(RF_COLOR_F2);
+    //private static final IProgressStyle RF_STYLE = new ProgressStyle().suffix(" RF").backgroundColor(RF_COLOR_B).filledColor(RF_COLOR_F1).alternateFilledColor(RF_COLOR_F2);
 
     private static int ilerp(int a, int b, int p, int m)
     {
@@ -84,10 +107,8 @@ public class TheOneProbeProviders implements Function<ITheOneProbe, Void>
         return new ProgressStyle().suffix("°C").filledColor(c).alternateFilledColor(c);
     }
 
-    private static void handleGenerator(ProbeMode mode, IProbeInfo info, TileEntity te)
+    private static void handleGenerator(IProbeInfo info, GeneratorTileEntity generator)
     {
-        TileGenerator generator = (TileGenerator) te;
-
         int powerGen = generator.getGenerationPower();
         if (powerGen > 0)
         {
@@ -103,47 +124,39 @@ public class TheOneProbeProviders implements Function<ITheOneProbe, Void>
         }
 
         int heat = generator.getHeatValue();
-        info.progress(heat, TileGenerator.MAX_HEAT, getTemperatureColor(heat, TileGenerator.MIN_HEAT, TileGenerator.MAX_HEAT));
+        info.progress(heat, GeneratorTileEntity.MAX_HEAT, getTemperatureColor(heat, GeneratorTileEntity.MIN_HEAT, GeneratorTileEntity.MAX_HEAT));
 
-        info.progress(generator.getContainedEnergy(), TileGenerator.POWER_LIMIT, RF_STYLE);
+        //info.progress(generator.getContainedEnergy(), GeneratorTileEntity.POWER_LIMIT, RF_STYLE);
     }
 
-    private static void handleDriver(ProbeMode mode, IProbeInfo info, TileEntity te)
+    private static void handleDriver(IProbeInfo info, DriverTileEntity driver)
     {
-        TileDriver driver = (TileDriver) te;
-        info.progress(driver.getInternalBuffer().getEnergyStored(), TileDriver.POWER_LIMIT, RF_STYLE);
+        //info.progress(driver.getInternalBuffer().map(IEnergyStorage::getEnergyStored).orElse(0), DriverTileEntity.POWER_LIMIT, RF_STYLE);
     }
 
-    private static void handleGraphObject(ProbeMode mode, IProbeInfo info, TileEntity te)
+    private static void handleGraphObject(IProbeInfo info, GraphObject go)
     {
-        Graph network = ((GraphObject) te).getGraph();
-        info.text(String.format("Network size: %d", network.getObjects().size()));
+        Graph network = go.getGraph();
+        if (network != null)
+            info.text(String.format("Network size: %d", network.getObjects().size()));
     }
 
-    private static void handleRiftTooltip(ProbeMode mode, IProbeInfo info, TileEntity te)
+    private static void handleStructureTooltip(IProbeInfo info, StructureTileEntity structure)
     {
-        TileEnderRift rift;
+        //info.item(new ItemStack(EnderRiftMod.EnderRiftBlocks.STRUCTURE));
+        structure.getParent().ifPresent(rift -> handleRiftTooltip(info, rift));
+    }
 
-        if (te instanceof TileEnderRiftCorner)
-        {
-            rift = ((TileEnderRiftCorner) te).getParent();
-        }
-        else
-        {
-            rift = (TileEnderRift) te;
-        }
-
-        assert rift != null;
-
-        boolean isFormed = rift.getBlockMetadata() != 0;
-
+    private static void handleRiftTooltip(IProbeInfo info, RiftTileEntity rift)
+    {
+        boolean isFormed = rift.getBlockState().get(RiftBlock.ASSEMBLED);
         if (isFormed)
         {
-            info.text(I18n.format("text.enderrift.rift.isFormed", true));
+            info.text(I18n.format("text.enderrift.rift.is_formed", true));
             info.text(I18n.format("text.enderrift.rift.is_powered", rift.isPowered()));
             info.text(I18n.format("text.enderrift.rift.rift_id", rift.getRiftId()));
             info.text(I18n.format("text.enderrift.rift.used_slots", rift.countInventoryStacks()));
-            info.progress(rift.getEnergyBuffer().getEnergyStored(), TileEnderRift.BUFFER_POWER, RF_STYLE);
+            //info.progress(rift.getEnergyBuffer().map(IEnergyStorage::getEnergyStored).orElse(0), RiftTileEntity.BUFFER_POWER, RF_STYLE);
         }
         else
         {
@@ -151,4 +164,3 @@ public class TheOneProbeProviders implements Function<ITheOneProbe, Void>
         }
     }
 }
-*/

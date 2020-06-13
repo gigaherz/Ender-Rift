@@ -35,10 +35,11 @@ repositories {
     maven {
         url "https://github.com/TehNut/temporary-maven-thing/tree/master/maven"
     }
-/*
-    maven {
+    maven { // TOP
+        name 'tterrag maven'
         url "https://maven.tterrag.com/"
     }
+/*
     maven {
         name = "CoFH Maven"
         url = "http://maven.covers1624.net"
@@ -46,7 +47,7 @@ repositories {
  */
 }
 
-version = "2.2.2"
+version = "2.2.3"
 group= "gigaherz.enderRift"
 archivesBaseName = "EnderRift-1.14.4"
 
@@ -131,6 +132,9 @@ dependencies {
     runtimeOnly fg.deobf("mezz.jei:jei-1.14.4:6.0.0.27")
 
     compile fg.deobf("mcp.mobius.waila:Hwyla:1.10.6-B67_1.14.4")
+
+
+    compile fg.deobf("mcjty.theoneprobe:TheOneProbe-1.14:1.14-1.4.37-16")
 
     //compile fileTree(dir: 'libs', include: '*.jar')
 }

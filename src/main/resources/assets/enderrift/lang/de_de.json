@@ -1,6 +1,6 @@
 {
     "block.enderrift.rift": "Ender-Rift-Kern",
-    "block.enderrift.rift_structure": "Ender-Rift-Struktur",
+    "block.enderrift.structure": "Ender-Rift-Struktur",
     "block.enderrift.interface": "Riftinterface",
     "block.enderrift.browser": "Riftbrowser",
     "block.enderrift.crafting_browser": "Handwerksbrowser",
