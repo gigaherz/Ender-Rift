@@ -1,10 +1,10 @@
 {
   "homepage": "https://github.com/gigaherz/Ender-Rift",
   "promos": {
-    "1.15-latest": "2.2.3",
-    "1.15-recommended": "2.2.3",
-    "1.14-latest": "2.2.3",
-    "1.14-recommended": "2.2.3",
+    "1.15-latest": "2.2.4",
+    "1.15-recommended": "2.2.4",
+    "1.14-latest": "2.2.4",
+    "1.14-recommended": "2.2.4",
     "1.12-latest": "2.1.5",
     "1.12-recommended": "2.1.5",
     "1.11.2-latest": "2.1.4",
@@ -23,12 +23,14 @@
     "1.8.9-recommended": "0.16.3"
   },
   "1.15": {
+    "2.2.4": "Fix crash on dedicated servers.",
     "2.2.3": "Reintroduce The One Probe integration.",
     "2.2.2": "Fix broken searchbox, and crash when clearing the crafting grid.",
     "2.2.1": "Fix missing library code.",
     "2.2.0": "Ported to 1.14."
   },
   "1.14": {
+    "2.2.4": "Fix crash on dedicated servers.",
     "2.2.3": "Reintroduce The One Probe integration.",
     "2.2.2": "Fix broken searchbox, and crash when clearing the crafting grid.",
     "2.2.1": "Fix missing library code.",
