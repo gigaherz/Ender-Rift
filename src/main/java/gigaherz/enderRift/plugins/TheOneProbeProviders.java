@@ -17,10 +17,10 @@ import mcjty.theoneprobe.apiimpl.providers.DefaultProbeInfoProvider;
 import mcjty.theoneprobe.apiimpl.styles.ProgressStyle;
 import mcjty.theoneprobe.config.Config;
 import net.minecraft.block.BlockState;
-import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 
 import javax.annotation.Nullable;
@@ -112,15 +112,15 @@ public class TheOneProbeProviders implements Function<ITheOneProbe, Void>
         int powerGen = generator.getGenerationPower();
         if (powerGen > 0)
         {
-            info.text(I18n.format("text.enderrift.generator.status.generating", powerGen));
+            info.text(new TranslationTextComponent("text.enderrift.generator.status.generating", powerGen).getFormattedText());
         }
         else if (generator.isBurning())
         {
-            info.text(I18n.format("text.enderrift.generator.status.heating"));
+            info.text(new TranslationTextComponent("text.enderrift.generator.status.heating").getFormattedText());
         }
         else
         {
-            info.text(I18n.format("text.enderrift.generator.status.idle"));
+            info.text(new TranslationTextComponent("text.enderrift.generator.status.idle").getFormattedText());
         }
 
         int heat = generator.getHeatValue();
@@ -152,15 +152,15 @@ public class TheOneProbeProviders implements Function<ITheOneProbe, Void>
         boolean isFormed = rift.getBlockState().get(RiftBlock.ASSEMBLED);
         if (isFormed)
         {
-            info.text(I18n.format("text.enderrift.rift.is_formed", true));
-            info.text(I18n.format("text.enderrift.rift.is_powered", rift.isPowered()));
-            info.text(I18n.format("text.enderrift.rift.rift_id", rift.getRiftId()));
-            info.text(I18n.format("text.enderrift.rift.used_slots", rift.countInventoryStacks()));
+            info.text(new TranslationTextComponent("text.enderrift.rift.is_formed", true).getFormattedText());
+            info.text(new TranslationTextComponent("text.enderrift.rift.is_powered", rift.isPowered()).getFormattedText());
+            info.text(new TranslationTextComponent("text.enderrift.rift.rift_id", rift.getRiftId()).getFormattedText());
+            info.text(new TranslationTextComponent("text.enderrift.rift.used_slots", rift.countInventoryStacks()).getFormattedText());
             //info.progress(rift.getEnergyBuffer().map(IEnergyStorage::getEnergyStored).orElse(0), RiftTileEntity.BUFFER_POWER, RF_STYLE);
         }
         else
         {
-            info.text(I18n.format("text.enderrift.rift.waila.isFormed", false));
+            info.text(new TranslationTextComponent("text.enderrift.rift.waila.isFormed", false).getFormattedText());
         }
     }
 }
