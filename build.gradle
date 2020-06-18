@@ -47,7 +47,7 @@ repositories {
  */
 }
 
-version = "2.2.4"
+version = "2.2.5"
 group= "gigaherz.enderRift"
 archivesBaseName = "EnderRift-UNKNOWN"
 
@@ -123,14 +123,7 @@ dependencies {
     compile "gigaherz.graph:GraphLib2:2.0.0"
     shade "gigaherz.graph:GraphLib2:2.0.0"
 
-    //deobfCompile "net.darkhax.gamestages:GameStages-1.12.2:2.0.91"
-    //deobfCompile "net.darkhax.bookshelf:Bookshelf-1.12.2:2.3.552"
-
     //deobfCompile "gigaherz.guidebook:Guidebook-1.12.2:2.9.0"
-
-    //deobfCompile "mcjty.theoneprobe:TheOneProbe-1.12:1.12-1.4.28-17"
-
-    //deobfCompile "net.darkhax.tesla:Tesla-1.12.2:1.0.63"
 
     compileOnly fg.deobf("mezz.jei:jei-1.15.2:6.0.0.3:api")
     runtimeOnly fg.deobf("mezz.jei:jei-1.15.2:6.0.0.3")
@@ -177,5 +170,4 @@ artifacts {
     archives shadowJar
 }
 
-System.out.println("Java version: " + System.getProperty("java.version"));
-System.out.println("Java arch: " + System.getProperty("os.arch"));
+System.out.println("Running with java ${System.getProperty("java.version")} (${System.getProperty("os.arch")})")
