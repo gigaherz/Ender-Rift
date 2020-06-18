@@ -113,10 +113,9 @@ public class EnderRiftMod
 
     public static EnderRiftMod instance;
 
-    public static final String CHANNEL = MODID;
-    private static final String PROTOCOL_VERSION = "1.0";
-    public static SimpleChannel channel = NetworkRegistry.ChannelBuilder
-            .named(new ResourceLocation(MODID, CHANNEL))
+    private static final String PROTOCOL_VERSION = "1.01";
+    public static SimpleChannel CHANNEL = NetworkRegistry.ChannelBuilder
+            .named(new ResourceLocation(MODID, "main"))
             .clientAcceptedVersions(PROTOCOL_VERSION::equals)
             .serverAcceptedVersions(PROTOCOL_VERSION::equals)
             .networkProtocolVersion(() -> PROTOCOL_VERSION)
@@ -215,11 +214,11 @@ public class EnderRiftMod
     public void commonSetup(FMLCommonSetupEvent event)
     {
         int messageNumber = 0;
-        channel.messageBuilder(ClearCraftingGrid.class, messageNumber++).encoder(ClearCraftingGrid::encode).decoder(ClearCraftingGrid::new).consumer(ClearCraftingGrid::handle).add();
-        channel.messageBuilder(SendSlotChanges.class, messageNumber++).encoder(SendSlotChanges::encode).decoder(SendSlotChanges::new).consumer(SendSlotChanges::handle).add();
-        channel.messageBuilder(SetVisibleSlots.class, messageNumber++).encoder(SetVisibleSlots::encode).decoder(SetVisibleSlots::new).consumer(SetVisibleSlots::handle).add();
-        channel.messageBuilder(UpdateField.class, messageNumber++).encoder(UpdateField::encode).decoder(UpdateField::new).consumer(UpdateField::handle).add();
-        channel.messageBuilder(UpdatePowerStatus.class, messageNumber++).encoder(UpdatePowerStatus::encode).decoder(UpdatePowerStatus::new).consumer(UpdatePowerStatus::handle).add();
+        CHANNEL.messageBuilder(ClearCraftingGrid.class, messageNumber++).encoder(ClearCraftingGrid::encode).decoder(ClearCraftingGrid::new).consumer(ClearCraftingGrid::handle).add();
+        CHANNEL.messageBuilder(SendSlotChanges.class, messageNumber++).encoder(SendSlotChanges::encode).decoder(SendSlotChanges::new).consumer(SendSlotChanges::handle).add();
+        CHANNEL.messageBuilder(SetVisibleSlots.class, messageNumber++).encoder(SetVisibleSlots::encode).decoder(SetVisibleSlots::new).consumer(SetVisibleSlots::handle).add();
+        CHANNEL.messageBuilder(UpdateField.class, messageNumber++).encoder(UpdateField::encode).decoder(UpdateField::new).consumer(UpdateField::handle).add();
+        CHANNEL.messageBuilder(UpdatePowerStatus.class, messageNumber++).encoder(UpdatePowerStatus::encode).decoder(UpdatePowerStatus::new).consumer(UpdatePowerStatus::handle).add();
         logger.debug("Final message number: " + messageNumber);
 
         RiftStructure.init();

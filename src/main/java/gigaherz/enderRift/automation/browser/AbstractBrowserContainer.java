@@ -155,7 +155,7 @@ public class AbstractBrowserContainer extends Container
                 if (!(crafter instanceof ServerPlayerEntity))
                     continue;
 
-                EnderRiftMod.channel.sendTo(new UpdatePowerStatus(windowId, isLowOnPowerNew), ((ServerPlayerEntity) crafter).connection.getNetworkManager(), NetworkDirection.PLAY_TO_CLIENT);
+                EnderRiftMod.CHANNEL.sendTo(new UpdatePowerStatus(windowId, isLowOnPowerNew), ((ServerPlayerEntity) crafter).connection.getNetworkManager(), NetworkDirection.PLAY_TO_CLIENT);
             }
 
             isLowOnPowerPrev = isLowOnPowerNew;
@@ -219,7 +219,7 @@ public class AbstractBrowserContainer extends Container
 
             if (newLength != oldLength || indicesChanged.size() > 0)
             {
-                EnderRiftMod.channel.sendTo(new SendSlotChanges(windowId, newLength, indicesChanged, stacksChanged), ((ServerPlayerEntity) crafter).connection.getNetworkManager(), NetworkDirection.PLAY_TO_CLIENT);
+                EnderRiftMod.CHANNEL.sendTo(new SendSlotChanges(windowId, newLength, indicesChanged, stacksChanged), ((ServerPlayerEntity) crafter).connection.getNetworkManager(), NetworkDirection.PLAY_TO_CLIENT);
             }
 
             ServerPlayerEntity player = (ServerPlayerEntity) crafter;
@@ -283,7 +283,7 @@ public class AbstractBrowserContainer extends Container
     {
         if (isClient())
         {
-            EnderRiftMod.channel.sendToServer(new SetVisibleSlots(windowId, visible));
+            EnderRiftMod.CHANNEL.sendToServer(new SetVisibleSlots(windowId, visible));
         }
         else
         {
