@@ -216,7 +216,7 @@ public class CraftingBrowserContainer extends AbstractBrowserContainer
 
         if (isRemote)
         {
-            EnderRiftMod.channel.sendToServer(new ClearCraftingGrid(windowId));
+            EnderRiftMod.CHANNEL.sendToServer(new ClearCraftingGrid(windowId));
         }
 
         this.onCraftMatrixChanged(craftMatrix);

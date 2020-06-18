@@ -79,7 +79,7 @@ public class GeneratorContainer extends Container
         if (needUpdate)
         {
             this.listeners.stream().filter(watcher -> watcher instanceof ServerPlayerEntity).forEach(watcher ->
-                    EnderRiftMod.channel.sendTo(new UpdateField(this.windowId, prevFields), ((ServerPlayerEntity) watcher).connection.getNetworkManager(), NetworkDirection.PLAY_TO_CLIENT));
+                    EnderRiftMod.CHANNEL.sendTo(new UpdateField(this.windowId, prevFields), ((ServerPlayerEntity) watcher).connection.getNetworkManager(), NetworkDirection.PLAY_TO_CLIENT));
         }
     }
 
