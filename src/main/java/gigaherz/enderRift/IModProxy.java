@@ -6,13 +6,23 @@ import gigaherz.enderRift.network.UpdatePowerStatus;
 
 public interface IModProxy
 {
-    default void preInit() {}
+    default void preInit()
+    {
+    }
 
-    default void init() {}
+    default void init()
+    {
+    }
 
-    default void handleSendSlotChanges(SendSlotChanges message) {}
+    default void handleSendSlotChanges(SendSlotChanges message)
+    {
+    }
 
-    default void handleUpdateField(UpdateField message) {}
+    default void handleUpdateField(UpdateField message)
+    {
+    }
 
-    default void handleUpdatePowerStatus(UpdatePowerStatus message) {}
+    default void handleUpdatePowerStatus(UpdatePowerStatus message)
+    {
+    }
 }

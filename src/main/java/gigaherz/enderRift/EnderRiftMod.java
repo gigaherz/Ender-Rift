@@ -16,11 +16,8 @@ import gigaherz.enderRift.network.*;
 import gigaherz.enderRift.rift.*;
 import net.minecraft.block.Block;
 import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.init.Blocks;
-import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.event.RegistryEvent;
@@ -63,6 +60,7 @@ public class EnderRiftMod
     public static BlockRegistered extension;
     @GameRegistry.ObjectHolder("enderrift:driver")
     public static BlockRegistered driver;
+
     @GameRegistry.ObjectHolder("enderrift:rift_orb")
     public static Item riftOrb;
 

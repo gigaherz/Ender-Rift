@@ -34,12 +34,12 @@ repositories {
 
 apply plugin: 'net.minecraftforge.gradle.forge'
 
-version = "2.1.9"
+version = "2.1.10"
 group= "gigaherz.enderRift"
 archivesBaseName = "EnderRift-1.12.2"
 
 minecraft {
-    version = "1.12.2-14.23.5.2838"
+    version = "1.12.2-14.23.5.2847"
     runDir = "run"
     mappings = "stable_39"
 

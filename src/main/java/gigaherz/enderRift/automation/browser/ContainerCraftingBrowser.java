@@ -76,7 +76,7 @@ public class ContainerCraftingBrowser extends ContainerBrowser
     {
         if (!world.isRemote)
         {
-            EntityPlayerMP entityplayermp = (EntityPlayerMP)player;
+            EntityPlayerMP entityplayermp = (EntityPlayerMP) player;
             ItemStack itemstack = ItemStack.EMPTY;
             IRecipe irecipe = CraftingManager.findMatchingRecipe(inventoryCrafting, world);
 

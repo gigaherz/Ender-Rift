@@ -10,7 +10,6 @@ import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.inventory.Container;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
@@ -67,8 +66,8 @@ public class GuiBrowser extends GuiContainer
             int w = 162;
             int h = 54;
             GlStateManager.disableDepth();
-            GlStateManager.color(1,1,1,1);
-            drawRect(l,t,l+w,t+h, 0x7f000000);
+            GlStateManager.color(1, 1, 1, 1);
+            drawRect(l, t, l + w, t + h, 0x7f000000);
             long tm = Minecraft.getMinecraft().world.getTotalWorldTime() % 30;
             if (tm < 15)
             {
@@ -92,7 +91,7 @@ public class GuiBrowser extends GuiContainer
         buttonList.add(btn);
 
         Keyboard.enableRepeatEvents(true);
-        this.searchField = new GuiTextField(2, this.fontRenderer , guiLeft + 114, guiTop + 6, 71, this.fontRenderer.FONT_HEIGHT)
+        this.searchField = new GuiTextField(2, this.fontRenderer, guiLeft + 114, guiTop + 6, 71, this.fontRenderer.FONT_HEIGHT)
         {
             @Override
             public boolean mouseClicked(int mouseX, int mouseY, int mouseButton)

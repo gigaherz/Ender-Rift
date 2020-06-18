@@ -18,8 +18,6 @@ import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
-import java.util.List;
-
 public class BlockStructure
         extends BlockAggregator<TileEnderRiftCorner>
 {

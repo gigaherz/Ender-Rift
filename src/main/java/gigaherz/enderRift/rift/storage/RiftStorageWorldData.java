@@ -12,14 +12,14 @@ import java.util.Map;
 
 public class RiftStorageWorldData extends WorldSavedData
 {
-    private static final String StorageKey = "enderRiftStorageManager";
+    private static final String ID = "enderRiftStorageManager";
 
     private Map<Integer, RiftInventory> rifts = new HashMap<Integer, RiftInventory>();
     private int lastRiftId;
 
     public RiftStorageWorldData()
     {
-        super(StorageKey);
+        super(ID);
     }
 
     public RiftStorageWorldData(String s)
@@ -30,11 +30,11 @@ public class RiftStorageWorldData extends WorldSavedData
     public static RiftStorageWorldData get(World world)
     {
         MapStorage storage = world.getMapStorage();
-        RiftStorageWorldData instance = (RiftStorageWorldData) storage.getOrLoadData(RiftStorageWorldData.class, StorageKey);
+        RiftStorageWorldData instance = (RiftStorageWorldData) storage.getOrLoadData(RiftStorageWorldData.class, ID);
         if (instance == null)
         {
             instance = new RiftStorageWorldData();
-            storage.setData(StorageKey, instance);
+            storage.setData(ID, instance);
         }
 
         return instance;

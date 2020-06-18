@@ -19,7 +19,6 @@ import net.minecraftforge.items.IItemHandler;
 
 import javax.annotation.Nullable;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 
 public abstract class TileAggregator extends TileEntity implements ITickable, GraphObject, IPoweredAutomation

@@ -5,7 +5,6 @@ import gigaherz.enderRift.EnderRiftMod;
 import gigaherz.enderRift.IModProxy;
 import gigaherz.enderRift.automation.browser.ContainerBrowser;
 import gigaherz.enderRift.generator.ContainerGenerator;
-import gigaherz.enderRift.misc.SeparateGuiModelLoader;
 import gigaherz.enderRift.network.SendSlotChanges;
 import gigaherz.enderRift.network.UpdateField;
 import gigaherz.enderRift.network.UpdatePowerStatus;
@@ -33,7 +32,6 @@ public class ClientProxy implements IModProxy
     public static void registerModels(ModelRegistryEvent event)
     {
         OBJLoader.INSTANCE.addDomain(EnderRiftMod.MODID);
-        SeparateGuiModelLoader.init();
 
         registerItemModel(EnderRiftMod.riftOrb);
         registerBlockModelAsItem(EnderRiftMod.rift);

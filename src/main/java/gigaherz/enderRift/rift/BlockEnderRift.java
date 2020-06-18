@@ -1,6 +1,5 @@
 package gigaherz.enderRift.rift;
 
-import com.google.common.collect.Lists;
 import gigaherz.common.BlockRegistered;
 import gigaherz.enderRift.EnderRiftMod;
 import gigaherz.enderRift.automation.AutomationHelper;
@@ -24,8 +23,6 @@ import net.minecraft.world.World;
 import net.minecraftforge.items.CapabilityItemHandler;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.List;
 
 public class BlockEnderRift
         extends BlockRegistered

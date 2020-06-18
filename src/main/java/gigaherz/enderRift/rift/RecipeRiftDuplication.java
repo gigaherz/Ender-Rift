@@ -99,7 +99,7 @@ public class RecipeRiftDuplication extends IForgeRegistryEntry.Impl<IRecipe> imp
     @Override
     public ItemStack getRecipeOutput()
     {
-        return new ItemStack(EnderRiftMod.riftOrb,2);
+        return new ItemStack(EnderRiftMod.riftOrb, 2);
     }
 
     @Override
