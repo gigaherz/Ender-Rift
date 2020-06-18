@@ -60,8 +60,8 @@ dependencies {
     deobfCompile "gigaherz.graph:GraphLib2:2.0.0"
     embed "gigaherz.graph:GraphLib2:2.0.0"
 
-    deobfCompile "net.darkhax.gamestages:GameStages-1.12.2:2.0.113"
-    deobfCompile "net.darkhax.bookshelf:Bookshelf-1.12.2:2.3.584"
+    //deobfCompile "net.darkhax.gamestages:GameStages-1.12.2:2.0.113"
+    //deobfCompile "net.darkhax.bookshelf:Bookshelf-1.12.2:2.3.584"
 
     deobfCompile "gigaherz.guidebook:Guidebook-1.12.2:2.9.0"
 

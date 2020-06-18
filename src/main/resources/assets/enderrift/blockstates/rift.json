@@ -2,13 +2,9 @@
   "forge_marker": 1,
   "variants": {
     "inventory": [{
-      "model": "enderrift:custom/separate_gui",
-      "custom": {
-        "gui_model": "minecraft:cube_all",
-        "gui_textures": {
-          "all": "enderrift:blocks/block_casing"
-        },
-        "base_model": "enderrift:sphere.obj"
+      "model": "minecraft:cube_all",
+      "textures": {
+        "all": "enderrift:blocks/block_casing"
       },
       "transform": "forge:default-block"
     }],

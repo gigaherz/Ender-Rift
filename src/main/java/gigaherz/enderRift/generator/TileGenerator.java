@@ -188,9 +188,10 @@ public class TileGenerator extends TileEntity
             {
                 currentItemBurnTime = burnTimeRemaining = TileEntityFurnace.getItemBurnTime(fuelSlot.getStackInSlot(0));
                 timeInterval = 0;
-                stack.shrink(1);
-                if (stack.getCount() <= 0)
+                if (stack.getCount() == 1)
                     fuelSlot.setStackInSlot(0, stack.getItem().getContainerItem(stack));
+                else
+                    stack.shrink(1);
                 anyChanged = true;
             }
         }
