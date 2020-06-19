@@ -27,14 +27,16 @@
     "1.8.9-recommended": "0.16.3"
   },
   "1.15.2": {
+    "2.2.6": "Fix version checker support.",
     "2.2.5": "Fix generator not returning bucket when consuming lava.",
     "2.2.4": "Fix crash on dedicated servers.",
     "2.2.3": "Reintroduce The One Probe integration.",
     "2.2.2": "Fix broken searchbox, and crash when clearing the crafting grid.",
     "2.2.1": "Fix missing library code.",
-    "2.2.0": "Ported to 1.14."
+    "2.2.0": "Ported to 1.15."
   },
   "1.14.4": {
+    "2.2.6": "Fix version checker support.",
     "2.2.5": "Fix generator not returning bucket when consuming lava.",
     "2.2.4": "Fix crash on dedicated servers.",
     "2.2.3": "Reintroduce The One Probe integration.",
