@@ -1,6 +1,5 @@
 modLoader="javafml"
 loaderVersion="[28,)"
-updateJSONURL="https://raw.githubusercontent.com/gigaherz/Ender-Rift/master/update.json"
 issueTrackerURL="https://github.com/gigaherz/Ender-Rift/issues"
 displayURL="https://github.com/gigaherz/Ender-Rift"
 logoFile="logo.png"
@@ -10,6 +9,7 @@ authors="gigaherz"
 [[mods]]
 modId="enderrift"
 version="${file.jarVersion}"
+updateJSONURL="https://raw.githubusercontent.com/gigaherz/Ender-Rift/master/update.json"
 displayName="Ender-Rift"
 description='''
 Bottomless Powered Inventory
