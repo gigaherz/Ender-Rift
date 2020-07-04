@@ -18,7 +18,7 @@ import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.math.shapes.VoxelShapes;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
-import net.minecraft.world.storage.loot.LootContext;
+import net.minecraft.loot.LootContext;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -156,7 +156,7 @@ public class StructureBlock extends AggregatorBlock<StructureTileEntity>
         }
 
         @Override
-        public String getName()
+        public String func_176610_l()
         {
             return name;
         }
@@ -185,7 +185,7 @@ public class StructureBlock extends AggregatorBlock<StructureTileEntity>
         }
 
         @Override
-        public String getName()
+        public String func_176610_l()
         {
             return name;
         }
@@ -214,7 +214,7 @@ public class StructureBlock extends AggregatorBlock<StructureTileEntity>
         }
 
         @Override
-        public String getName()
+        public String func_176610_l()
         {
             return name;
         }

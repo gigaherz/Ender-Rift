@@ -1,5 +1,6 @@
 package gigaherz.enderRift.automation.browser;
 
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import gigaherz.enderRift.EnderRiftMod;
 import joptsimple.internal.Strings;
@@ -13,6 +14,7 @@ import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.StringTextComponent;
 import org.lwjgl.glfw.GLFW;
 
 import javax.annotation.Nonnull;
@@ -34,23 +36,24 @@ public abstract class AbstractBrowserScreen<T extends AbstractBrowserContainer> 
         super(container, playerInventory, title);
         xSize = 194;
         ySize = 168;
+        this.field_238745_s_ = this.ySize - 94;
     }
 
     @Override
-    public void render(int mouseX, int mouseY, float partialTicks)
+    public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks)
     {
-        this.renderBackground();
-        super.render(mouseX, mouseY, partialTicks);
+        this.renderBackground(matrixStack);
+        super.render(matrixStack, mouseX, mouseY, partialTicks);
 
         RenderHelper.enableStandardItemLighting();
-        drawCustomSlotTexts();
+        drawCustomSlotTexts(matrixStack);
         RenderHelper.disableStandardItemLighting();
 
-        this.renderLowPowerOverlay(mouseX, mouseY);
-        this.renderHoveredToolTip(mouseX, mouseY);
+        this.renderLowPowerOverlay(matrixStack, mouseX, mouseY);
+        this.func_230459_a_(matrixStack, mouseX, mouseY);
     }
 
-    private void renderLowPowerOverlay(int mouseX, int mouseY)
+    private void renderLowPowerOverlay(MatrixStack matrixStack, int mouseX, int mouseY)
     {
         if (getContainer().isLowOnPower())
         {
@@ -60,11 +63,11 @@ public abstract class AbstractBrowserScreen<T extends AbstractBrowserContainer> 
             int h = 54;
             RenderSystem.disableDepthTest();
             RenderSystem.color4f(1, 1, 1, 1);
-            fill(l, t, l + w, t + h, 0x7f000000);
+            fill(matrixStack, l, t, l + w, t + h, 0x7f000000);
             long tm = Minecraft.getInstance().world.getGameTime() % 30;
             if (tm < 15)
             {
-                drawCenteredString(font, "NO POWER", l + w / 2, t + h / 2 - font.FONT_HEIGHT / 2, 0xFFFFFF);
+                drawCenteredString(matrixStack, font, "NO POWER", l + w / 2, t + h / 2 - font.FONT_HEIGHT / 2, 0xFFFFFF);
             }
             RenderSystem.enableDepthTest();
         }
@@ -80,7 +83,7 @@ public abstract class AbstractBrowserScreen<T extends AbstractBrowserContainer> 
     {
         super.init();
 
-        addButton(this.sortModeButton = new Button(guiLeft - 22, guiTop + 12, 20, 20, "", (btn) -> {
+        addButton(this.sortModeButton = new Button(guiLeft - 22, guiTop + 12, 20, 20, new StringTextComponent(""), (btn) -> {
             SortMode mode = getContainer().sortMode;
             switch (mode)
             {
@@ -96,7 +99,7 @@ public abstract class AbstractBrowserScreen<T extends AbstractBrowserContainer> 
         }));
 
         //Keyboard.enableRepeatEvents(true);
-        addButton(this.searchField = new TextFieldWidget(this.font, guiLeft + 114, guiTop + 6, 71, this.font.FONT_HEIGHT, "")
+        addButton(this.searchField = new TextFieldWidget(this.font, guiLeft + 114, guiTop + 6, 71, this.font.FONT_HEIGHT, new StringTextComponent(""))
         {
             @Override
             public boolean mouseClicked(double mouseX, double mouseY, int mouseButton)
@@ -168,10 +171,10 @@ public abstract class AbstractBrowserScreen<T extends AbstractBrowserContainer> 
         switch (mode)
         {
             case ALPHABETIC:
-                sortModeButton.setMessage("Az");
+                sortModeButton.setMessage(new StringTextComponent("Az"));
                 break;
             case STACK_SIZE:
-                sortModeButton.setMessage("#");
+                sortModeButton.setMessage(new StringTextComponent("#"));
                 break;
         }
 
@@ -179,45 +182,38 @@ public abstract class AbstractBrowserScreen<T extends AbstractBrowserContainer> 
     }
 
     @Override
-    protected void drawGuiContainerBackgroundLayer(float partialTicks, int xMouse, int yMouse)
+    protected void func_230450_a_(MatrixStack matrixStack, float partialTicks, int xMouse, int yMouse)
     {
         minecraft.getTextureManager().bindTexture(getBackgroundTexture());
 
         RenderSystem.color4f(1.0f, 1.0f, 1.0f, 1.0f);
-        blit(guiLeft, guiTop, 0, 0, xSize, ySize);
-        blit(guiLeft - 27, guiTop + 8, 194, 0, 27, 28);
+        blit(matrixStack, guiLeft, guiTop, 0, 0, xSize, ySize);
+        blit(matrixStack, guiLeft - 27, guiTop + 8, 194, 0, 27, 28);
 
         minecraft.getTextureManager().bindTexture(TABS_TEXTURE);
 
         boolean isEnabled = needsScrollBar();
         if (isEnabled)
-            blit(guiLeft + 174, guiTop + 18 + scrollY, 232, 0, 12, 15);
+            blit(matrixStack, guiLeft + 174, guiTop + 18 + scrollY, 232, 0, 12, 15);
         else
-            blit(guiLeft + 174, guiTop + 18, 244, 0, 12, 15);
+            blit(matrixStack, guiLeft + 174, guiTop + 18, 244, 0, 12, 15);
 
-        searchField.render(xMouse, yMouse, partialTicks);
+        searchField.render(matrixStack, xMouse, yMouse, partialTicks);
     }
 
-    @Override
-    protected void drawGuiContainerForegroundLayer(int xMouse, int yMouse)
-    {
-        font.drawString(title.getFormattedText(), 8, 6, 0x404040);
-        font.drawString(this.playerInventory.getDisplayName().getFormattedText(), 8, ySize - 96 + 2, 0x404040);
-    }
-
-    private void drawCustomSlotTexts()
+    private void drawCustomSlotTexts(MatrixStack matrixStack)
     {
         RenderSystem.pushMatrix();
         RenderSystem.translated(this.guiLeft, this.guiTop, 300);
         for (int i = 0; i < AbstractBrowserContainer.SCROLL_SLOTS; ++i)
         {
             Slot slot = getContainer().inventorySlots.get(i);
-            drawSlotText(slot);
+            drawSlotText(matrixStack, slot);
         }
         RenderSystem.popMatrix();
     }
 
-    private void drawSlotText(Slot slotIn)
+    private void drawSlotText(MatrixStack matrixStack, Slot slotIn)
     {
         setBlitOffset(100);
 
@@ -236,7 +232,7 @@ public abstract class AbstractBrowserScreen<T extends AbstractBrowserContainer> 
                 RenderSystem.disableLighting();
                 RenderSystem.enableDepthTest();
                 RenderSystem.disableBlend();
-                font.drawStringWithShadow(s, (float) (xPosition + 19 - 2 - font.getStringWidth(s)), (float) (yPosition + 6 + 3), 16777215);
+                font.drawStringWithShadow(matrixStack, s, (float) (xPosition + 19 - 2 - font.getStringWidth(s)), (float) (yPosition + 6 + 3), 16777215);
                 RenderSystem.enableLighting();
                 //RenderSystem.enableDepthTest();
             }

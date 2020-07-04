@@ -1,5 +1,6 @@
 package gigaherz.enderRift.automation.browser;
 
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import gigaherz.enderRift.EnderRiftMod;
 import net.minecraft.client.Minecraft;
@@ -8,6 +9,7 @@ import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.StringTextComponent;
 
 public class CraftingBrowserScreen extends AbstractBrowserScreen<CraftingBrowserContainer>
 {
@@ -18,6 +20,7 @@ public class CraftingBrowserScreen extends AbstractBrowserScreen<CraftingBrowser
         super(container, playerInventory, title);
         xSize = 194;
         ySize = 226;
+        this.field_238745_s_ = this.ySize - 94;
     }
 
     @Override
@@ -31,7 +34,7 @@ public class CraftingBrowserScreen extends AbstractBrowserScreen<CraftingBrowser
     {
         super.init();
 
-        addButton(new GuiButtonFlexible(guiLeft + 85, guiTop + 75, 9, 9, "x", (btn) -> {
+        addButton(new GuiButtonFlexible(guiLeft + 85, guiTop + 75, 9, 9, new StringTextComponent("x"), (btn) -> {
             clearCraftingGrid();
         }));
     }
@@ -43,13 +46,13 @@ public class CraftingBrowserScreen extends AbstractBrowserScreen<CraftingBrowser
 
     private static class GuiButtonFlexible extends Button
     {
-        public GuiButtonFlexible(int x, int y, int widthIn, int heightIn, String buttonText, IPressable callback)
+        public GuiButtonFlexible(int x, int y, int widthIn, int heightIn, ITextComponent buttonText, IPressable callback)
         {
             super(x, y, widthIn, heightIn, buttonText, callback);
         }
 
         @Override
-        public void renderButton(int mouseX, int mouseY, float partialTicks)
+        public void renderButton(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks)
         {
             Minecraft minecraft = Minecraft.getInstance();
             FontRenderer fontrenderer = minecraft.fontRenderer;
@@ -69,14 +72,14 @@ public class CraftingBrowserScreen extends AbstractBrowserScreen<CraftingBrowser
             int halfwidth2 = this.width - halfwidth1;
             int halfheight1 = this.height / 2;
             int halfheight2 = this.height - halfheight1;
-            blit(x, y, 0,
+            blit(matrixStack, x, y, 0,
                     46 + i * 20, halfwidth1, halfheight1);
-            blit(x + halfwidth1, y, 200 - halfwidth2,
+            blit(matrixStack, x + halfwidth1, y, 200 - halfwidth2,
                     46 + i * 20, halfwidth2, halfheight1);
 
-            blit(x, y + halfheight1,
+            blit(matrixStack, x, y + halfheight1,
                     0, 46 + i * 20 + 20 - halfheight2, halfwidth1, halfheight2);
-            blit(x + halfwidth1, y + halfheight1,
+            blit(matrixStack, x + halfwidth1, y + halfheight1,
                     200 - halfwidth2, 46 + i * 20 + 20 - halfheight2, halfwidth2, halfheight2);
 
             int textColor = 14737632;
@@ -94,7 +97,7 @@ public class CraftingBrowserScreen extends AbstractBrowserScreen<CraftingBrowser
                 textColor = 16777120;
             }
 
-            this.drawCenteredString(fontrenderer, getMessage(), x + halfwidth2, y + (this.height - 8) / 2, textColor);
+            this.drawCenteredString(matrixStack, fontrenderer, getMessage(), x + halfwidth2, y + (this.height - 8) / 2, textColor);
         }
     }
 }

@@ -6,6 +6,7 @@ import gigaherz.enderRift.common.AutomationEnergyWrapper;
 import gigaherz.enderRift.common.IPoweredAutomation;
 import gigaherz.graph2.Graph;
 import gigaherz.graph2.GraphObject;
+import net.minecraft.block.BlockState;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.ITickableTileEntity;
 import net.minecraft.tileentity.TileEntity;
@@ -245,7 +246,7 @@ public abstract class AggregatorTileEntity extends TileEntity
     }
 
     @Override
-    public void handleUpdateTag(CompoundNBT tag)
+    public void handleUpdateTag(BlockState blockState, CompoundNBT tag)
     {
     }
 

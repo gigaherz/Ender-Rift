@@ -1,5 +1,5 @@
 modLoader="javafml"
-loaderVersion="[31,)"
+loaderVersion="[32,)"
 issueTrackerURL="https://github.com/gigaherz/Ender-Rift/issues"
 displayURL="https://github.com/gigaherz/Ender-Rift"
 logoFile="logo.png"
@@ -18,13 +18,13 @@ Bottomless Powered Inventory
 [[dependencies.enderrift]]
    modId="forge"
    mandatory=true
-   versionRange="[31.2.0,)"
+   versionRange="[32.0.47,)"
    ordering="NONE"
    side="BOTH"
 [[dependencies.enderrift]]
    modId="minecraft"
    mandatory=true
-   versionRange="[1.15.2,1.16)"
+   versionRange="[1.16.1,1.17)"
    ordering="NONE"
    side="BOTH"
 [[dependencies.enderrift]]

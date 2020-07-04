@@ -173,14 +173,17 @@ public class RiftTileEntity extends TileEntity implements ITickableTileEntity, I
         return stack;
     }
 
-    public void read(CompoundNBT compound)
+    @Override
+    public void func_230337_a_(BlockState state, CompoundNBT compound)
     {
-        super.read(compound);
+        super.func_230337_a_(state, compound);
+
         CapabilityEnergy.ENERGY.readNBT(energyBuffer, null, compound.get("Energy"));
         powered = compound.getBoolean("Powered");
         riftId = compound.getInt("RiftId");
     }
 
+    @Override
     public CompoundNBT write(CompoundNBT compound)
     {
         compound = super.write(compound);
@@ -199,7 +202,7 @@ public class RiftTileEntity extends TileEntity implements ITickableTileEntity, I
     }
 
     @Override
-    public void handleUpdateTag(CompoundNBT tag)
+    public void handleUpdateTag(BlockState state, CompoundNBT tag)
     {
         powered = tag.getBoolean("Powered");
     }
@@ -214,7 +217,7 @@ public class RiftTileEntity extends TileEntity implements ITickableTileEntity, I
     @Override
     public void onDataPacket(NetworkManager net, SUpdateTileEntityPacket pkt)
     {
-        handleUpdateTag(pkt.getNbtCompound());
+        handleUpdateTag(getBlockState(), pkt.getNbtCompound());
     }
 
     @Nonnull

@@ -20,7 +20,7 @@ import net.minecraft.util.math.shapes.ISelectionContext;
 import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
-import net.minecraft.world.storage.loot.LootContext;
+import net.minecraft.loot.LootContext;
 import net.minecraftforge.items.CapabilityItemHandler;
 
 import javax.annotation.Nullable;
@@ -48,10 +48,10 @@ public class RiftBlock extends Block
 
     @Deprecated
     @Override
-    public int getLightValue(BlockState state)
+    public int getLightValue(BlockState state, IBlockReader world, BlockPos pos)
     {
         if (state.getBlock() != this)
-            return super.getLightValue(state);
+            return super.getLightValue(state, world, pos);
         return state.get(ASSEMBLED) ? 15 : 0;
     }
 

@@ -1,6 +1,7 @@
 package gigaherz.enderRift.automation.driver;
 
 import gigaherz.enderRift.automation.AggregatorTileEntity;
+import net.minecraft.block.BlockState;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.Direction;
@@ -58,9 +59,9 @@ public class DriverTileEntity extends AggregatorTileEntity
     }
 
     @Override
-    public void read(CompoundNBT compound)
+    public void func_230337_a_(BlockState state, CompoundNBT compound)
     {
-        super.read(compound);
+        super.func_230337_a_(state, compound);
 
         CapabilityEnergy.ENERGY.readNBT(energyBuffer, null, compound.get("storedEnergy"));
     }

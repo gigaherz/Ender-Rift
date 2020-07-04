@@ -28,7 +28,7 @@ public class BrowserTileEntity extends AggregatorTileEntity
         if (facing == null && world != null)
         {
             BlockState state = world.getBlockState(pos);
-            if (state.getProperties().contains(BrowserBlock.FACING))
+            if (state.func_235904_r_().contains(BrowserBlock.FACING))
             {
                 facing = state.get(BrowserBlock.FACING).getOpposite();
             }

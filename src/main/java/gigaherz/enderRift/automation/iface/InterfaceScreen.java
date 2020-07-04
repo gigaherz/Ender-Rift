@@ -1,5 +1,6 @@
 package gigaherz.enderRift.automation.iface;
 
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import gigaherz.enderRift.EnderRiftMod;
 import net.minecraft.client.gui.screen.inventory.ContainerScreen;
@@ -17,30 +18,29 @@ public class InterfaceScreen extends ContainerScreen<InterfaceContainer>
     {
         super(container, playerInventory, title);
         ySize = 176;
+        this.field_238745_s_ = this.ySize - 94;
     }
 
     @Override
-    public void render(int mouseX, int mouseY, float partialTicks)
+    public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks)
     {
-        this.renderBackground();
-        super.render(mouseX, mouseY, partialTicks);
-        this.renderHoveredToolTip(mouseX, mouseY);
+        this.renderBackground(matrixStack);
+        super.render(matrixStack, mouseX, mouseY, partialTicks);
+        this.func_230459_a_(matrixStack, mouseX, mouseY);
     }
 
     @Override
-    protected void drawGuiContainerForegroundLayer(int i, int j)
+    protected void func_230451_b_(MatrixStack matrixStack, int mouseX, int mouseY)
     {
-        String name = title.getFormattedText();
-        font.drawString(name, (xSize - font.getStringWidth(name)) / 2, 6, 0x404040);
-        font.drawString(playerInventory.getName().getFormattedText(), 8, ySize - 96 + 2, 0x404040);
-        font.drawString(I18n.format(textFilters), 8, 20, 0x404040);
+        super.func_230451_b_(matrixStack, mouseX, mouseY);
+        font.drawString(matrixStack, I18n.format(textFilters), 8, 20, 0x404040);
     }
 
     @Override
-    protected void drawGuiContainerBackgroundLayer(float f, int i, int j)
+    protected void func_230450_a_(MatrixStack matrixStack, float partialTicks, int mouseX, int mouseY)
     {
         minecraft.textureManager.bindTexture(guiTextureLocation);
         RenderSystem.color4f(1.0f, 1.0f, 1.0f, 1.0f);
-        blit(guiLeft, guiTop, 0, 0, xSize, ySize);
+        blit(matrixStack, guiLeft, guiTop, 0, 0, xSize, ySize);
     }
 }

@@ -1,6 +1,7 @@
 package gigaherz.enderRift.generator;
 
 import gigaherz.enderRift.common.EnergyBuffer;
+import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
@@ -227,9 +228,9 @@ public class GeneratorTileEntity extends TileEntity implements ITickableTileEnti
     }
 
     @Override
-    public void read(CompoundNBT compound)
+    public void func_230337_a_(BlockState state, CompoundNBT compound)
     {
-        super.read(compound);
+        super.func_230337_a_(state, compound);
 
         heatLevel = compound.getInt("heatLevel");
         burnTimeRemaining = compound.getInt("burnTimeRemaining");
@@ -255,9 +256,9 @@ public class GeneratorTileEntity extends TileEntity implements ITickableTileEnti
     }
 
     @Override
-    public void handleUpdateTag(CompoundNBT tag)
+    public void handleUpdateTag(BlockState state, CompoundNBT tag)
     {
-        super.read(tag);
+        super.func_230337_a_(state, tag);
     }
 
     public boolean isUseableByPlayer(PlayerEntity player)

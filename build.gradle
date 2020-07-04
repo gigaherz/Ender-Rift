@@ -65,7 +65,7 @@ sourceSets {
 }
 
 minecraft {
-    mappings channel: 'snapshot', version: '20200521-1.15.1'
+    mappings channel: 'snapshot', version: '20200703-unofficial-1.16.1'
 
     accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
 
@@ -118,19 +118,20 @@ configurations {
 }
 
 dependencies {
-    minecraft 'net.minecraftforge:forge:1.15.2-31.2.5'
+    minecraft 'net.minecraftforge:forge:1.16.1-32.0.47'
+
 
     compile "gigaherz.graph:GraphLib2:2.0.0"
     shade "gigaherz.graph:GraphLib2:2.0.0"
 
     //deobfCompile "gigaherz.guidebook:Guidebook-1.12.2:2.9.0"
 
-    compileOnly fg.deobf("mezz.jei:jei-1.15.2:6.0.0.3:api")
-    runtimeOnly fg.deobf("mezz.jei:jei-1.15.2:6.0.0.3")
+    compileOnly fg.deobf("mezz.jei:jei-1.16.1:7.0.0.6:api")
+    runtimeOnly fg.deobf("mezz.jei:jei-1.16.1:7.0.0.6")
 
-    compileOnly fg.deobf("mcp.mobius.waila:Hwyla:1.10.8-B72_1.15.2")
+    //compileOnly fg.deobf("mcp.mobius.waila:Hwyla:1.10.8-B72_1.15.2")
 
-    compileOnly fg.deobf("mcjty.theoneprobe:TheOneProbe-1.15:1.15-2.0.2-4")
+    //compileOnly fg.deobf("mcjty.theoneprobe:TheOneProbe-1.15:1.15-2.0.2-4")
 
     //compile fileTree(dir: 'libs', include: '*.jar')
 }

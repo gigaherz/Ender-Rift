@@ -1,5 +1,5 @@
 package gigaherz.enderRift.plugins;
-
+/*
 import gigaherz.enderRift.EnderRiftMod;
 import gigaherz.enderRift.automation.AggregatorTileEntity;
 import gigaherz.enderRift.automation.driver.DriverBlock;
@@ -206,3 +206,4 @@ public class WailaProviders implements IWailaPlugin
         }
     }
 }
+*/
