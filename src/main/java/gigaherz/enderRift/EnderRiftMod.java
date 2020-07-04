@@ -236,7 +236,7 @@ public class EnderRiftMod
     {
         InterModComms.sendTo("gbook", "registerBook", () -> EnderRiftMod.location("xml/book.xml"));
 
-        InterModComms.sendTo("theoneprobe", "getTheOneProbe", (Supplier<Function<ITheOneProbe, Void>>) (TheOneProbeProviders::new));
+        InterModComms.sendTo("theoneprobe", "getTheOneProbe", () -> TheOneProbeProviders.create());
     }
 
     public void gatherData(GatherDataEvent event)

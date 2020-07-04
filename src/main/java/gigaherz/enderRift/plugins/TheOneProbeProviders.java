@@ -1,7 +1,5 @@
 package gigaherz.enderRift.plugins;
 
-
-import com.google.common.base.Function;
 import gigaherz.enderRift.EnderRiftMod;
 import gigaherz.enderRift.automation.driver.DriverTileEntity;
 import gigaherz.enderRift.generator.GeneratorTileEntity;
@@ -24,9 +22,14 @@ import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 
 import javax.annotation.Nullable;
+import java.util.function.Function;
 
 public class TheOneProbeProviders implements Function<ITheOneProbe, Void>
 {
+    public static Function<ITheOneProbe, Void> create()
+    {
+        return new TheOneProbeProviders();
+    }
 
     @Override
     public Void apply(@Nullable ITheOneProbe top)

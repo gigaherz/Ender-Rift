@@ -128,10 +128,9 @@ dependencies {
     compileOnly fg.deobf("mezz.jei:jei-1.15.2:6.0.0.3:api")
     runtimeOnly fg.deobf("mezz.jei:jei-1.15.2:6.0.0.3")
 
-    compile fg.deobf("mcp.mobius.waila:Hwyla:1.10.8-B72_1.15.2")
+    compileOnly fg.deobf("mcp.mobius.waila:Hwyla:1.10.8-B72_1.15.2")
 
-
-    compile fg.deobf("mcjty.theoneprobe:TheOneProbe-1.15:1.15-2.0.2-4")
+    compileOnly fg.deobf("mcjty.theoneprobe:TheOneProbe-1.15:1.15-2.0.2-4")
 
     //compile fileTree(dir: 'libs', include: '*.jar')
 }
