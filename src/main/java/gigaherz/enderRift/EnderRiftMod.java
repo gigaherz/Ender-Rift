@@ -32,6 +32,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipeSerializer;
+import net.minecraft.item.crafting.SpecialRecipeSerializer;
 import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
@@ -204,7 +205,7 @@ public class EnderRiftMod
     public void registerRecipeSerializers(RegistryEvent.Register<IRecipeSerializer<?>> event)
     {
         event.getRegistry().registerAll(
-                new OrbDuplicationRecipe.Serializer().setRegistryName("orb_duplication")
+                new SpecialRecipeSerializer<>(OrbDuplicationRecipe::new).setRegistryName("orb_duplication")
         );
     }
 

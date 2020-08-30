@@ -1,27 +1,24 @@
 package gigaherz.enderRift.rift;
 
-import com.google.gson.JsonObject;
 import gigaherz.enderRift.EnderRiftMod;
 import net.minecraft.inventory.CraftingInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.item.crafting.ICraftingRecipe;
-import net.minecraft.item.crafting.IRecipeSerializer;
-import net.minecraft.item.crafting.Ingredient;
+import net.minecraft.item.crafting.*;
 import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import net.minecraftforge.common.crafting.IShapedRecipe;
-import net.minecraftforge.registries.ForgeRegistryEntry;
+import net.minecraftforge.registries.ObjectHolder;
 
 
-public class OrbDuplicationRecipe implements ICraftingRecipe, IShapedRecipe<CraftingInventory>
+public class OrbDuplicationRecipe extends SpecialRecipe implements IShapedRecipe<CraftingInventory>
 {
-    private final ResourceLocation recipeId;
-    private final IRecipeSerializer<?> serializer;
+    @ObjectHolder("enderrift:orb_duplication")
+    public static SpecialRecipeSerializer<OrbDuplicationRecipe> SERIALIZER;
+
     private NonNullList<Ingredient> ingredients = NonNullList.from(
             Ingredient.EMPTY,
             Ingredient.fromItems(Items.MAGMA_CREAM),
@@ -34,11 +31,11 @@ public class OrbDuplicationRecipe implements ICraftingRecipe, IShapedRecipe<Craf
             Ingredient.fromItems(Items.ENDER_PEARL),
             Ingredient.fromItems(Items.MAGMA_CREAM)
     );
+    private ItemStack output = new ItemStack(EnderRiftMod.EnderRiftItems.RIFT_ORB, 2);
 
-    public OrbDuplicationRecipe(ResourceLocation recipeId, IRecipeSerializer<?> serializer)
+    public OrbDuplicationRecipe(ResourceLocation recipeId)
     {
-        this.recipeId = recipeId;
-        this.serializer = serializer;
+        super(recipeId);
     }
 
     @Override
@@ -114,7 +111,7 @@ public class OrbDuplicationRecipe implements ICraftingRecipe, IShapedRecipe<Craf
     @Override
     public ItemStack getRecipeOutput()
     {
-        return new ItemStack(EnderRiftMod.EnderRiftItems.RIFT_ORB, 2);
+        return output;
     }
 
     @Override
@@ -124,21 +121,9 @@ public class OrbDuplicationRecipe implements ICraftingRecipe, IShapedRecipe<Craf
     }
 
     @Override
-    public boolean isDynamic()
-    {
-        return true;
-    }
-
-    @Override
-    public ResourceLocation getId()
-    {
-        return recipeId;
-    }
-
-    @Override
     public IRecipeSerializer<?> getSerializer()
     {
-        return serializer;
+        return SERIALIZER;
     }
 
     @Override
@@ -151,27 +136,5 @@ public class OrbDuplicationRecipe implements ICraftingRecipe, IShapedRecipe<Craf
     public int getRecipeHeight()
     {
         return 3;
-    }
-
-    public static class Serializer extends ForgeRegistryEntry<IRecipeSerializer<?>>
-            implements IRecipeSerializer<OrbDuplicationRecipe>
-    {
-        @Override
-        public OrbDuplicationRecipe read(ResourceLocation recipeId, JsonObject json)
-        {
-            return new OrbDuplicationRecipe(recipeId, this);
-        }
-
-        @Override
-        public OrbDuplicationRecipe read(ResourceLocation recipeId, PacketBuffer buffer)
-        {
-            return new OrbDuplicationRecipe(recipeId, this);
-        }
-
-        @Override
-        public void write(PacketBuffer buffer, OrbDuplicationRecipe recipe)
-        {
-
-        }
     }
 }
