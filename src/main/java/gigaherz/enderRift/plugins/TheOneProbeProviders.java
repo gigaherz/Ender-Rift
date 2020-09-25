@@ -24,18 +24,12 @@ import net.minecraft.world.World;
 import javax.annotation.Nullable;
 import java.util.function.Function;
 
-public class TheOneProbeProviders implements Function<ITheOneProbe, Void>
+public class TheOneProbeProviders
 {
-    public static Function<ITheOneProbe, Void> create()
-    {
-        return new TheOneProbeProviders();
-    }
-
-    @Override
-    public Void apply(@Nullable ITheOneProbe top)
+    public static void register(@Nullable ITheOneProbe top)
     {
         if (top == null)
-            return null;
+            return;
 
         top.registerBlockDisplayOverride((probeMode, probeInfo, playerEntity, world, blockState, data) -> {
             if (blockState.getBlock() == EnderRiftMod.EnderRiftBlocks.STRUCTURE
@@ -78,8 +72,6 @@ public class TheOneProbeProviders implements Function<ITheOneProbe, Void>
                     handleGraphObject(probeInfo, (GraphObject) te);
             }
         });
-
-        return null;
     }
 
     //private static final int RF_COLOR_B = 0xFF2F0000;

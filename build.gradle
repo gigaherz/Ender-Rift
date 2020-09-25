@@ -29,8 +29,11 @@ repositories {
     maven {
         url 'https://maven.mcmoddev.com/'
     }
-    maven {
+    /*maven {
         url "https://tehnut.info/maven"
+    }*/
+    maven {
+        url "F:/Modding/tehnut-maven-backup/maven"
     }
     maven {
         url "https://github.com/TehNut/temporary-maven-thing/tree/master/maven"
@@ -47,7 +50,7 @@ repositories {
  */
 }
 
-version = "2.2.6"
+version = "2.2.7"
 group= "gigaherz.enderRift"
 archivesBaseName = "EnderRift-UNKNOWN"
 
@@ -118,7 +121,7 @@ configurations {
 }
 
 dependencies {
-    minecraft 'net.minecraftforge:forge:1.15.2-31.2.5'
+    minecraft 'net.minecraftforge:forge:1.15.2-31.2.41'
 
     compile "gigaherz.graph:GraphLib2:2.0.0"
     shade "gigaherz.graph:GraphLib2:2.0.0"
@@ -130,7 +133,7 @@ dependencies {
 
     compileOnly fg.deobf("mcp.mobius.waila:Hwyla:1.10.8-B72_1.15.2")
 
-    compileOnly fg.deobf("mcjty.theoneprobe:TheOneProbe-1.15:1.15-2.0.2-4")
+    compileOnly fg.deobf("mcjty.theoneprobe:TheOneProbe-1.15:1.15-2.0.6-6")
 
     //compile fileTree(dir: 'libs', include: '*.jar')
 }

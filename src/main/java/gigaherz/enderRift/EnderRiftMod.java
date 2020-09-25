@@ -16,9 +16,8 @@ import gigaherz.enderRift.generator.GeneratorContainer;
 import gigaherz.enderRift.generator.GeneratorScreen;
 import gigaherz.enderRift.generator.GeneratorTileEntity;
 import gigaherz.enderRift.network.*;
-import gigaherz.enderRift.plugins.TheOneProbeProviders;
+import gigaherz.enderRift.plugins.PluginProviders;
 import gigaherz.enderRift.rift.*;
-import mcjty.theoneprobe.api.ITheOneProbe;
 import net.minecraft.block.Block;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
@@ -61,7 +60,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -236,7 +234,7 @@ public class EnderRiftMod
     {
         InterModComms.sendTo("gbook", "registerBook", () -> EnderRiftMod.location("xml/book.xml"));
 
-        InterModComms.sendTo("theoneprobe", "getTheOneProbe", () -> TheOneProbeProviders.create());
+        InterModComms.sendTo("theoneprobe", "getTheOneProbe", PluginProviders::createTOP);
     }
 
     public void gatherData(GatherDataEvent event)
