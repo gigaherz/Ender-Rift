@@ -156,7 +156,7 @@ public class StructureBlock extends AggregatorBlock<StructureTileEntity>
         }
 
         @Override
-        public String func_176610_l()
+        public String getString()
         {
             return name;
         }
@@ -185,7 +185,7 @@ public class StructureBlock extends AggregatorBlock<StructureTileEntity>
         }
 
         @Override
-        public String func_176610_l()
+        public String getString()
         {
             return name;
         }
@@ -214,7 +214,7 @@ public class StructureBlock extends AggregatorBlock<StructureTileEntity>
         }
 
         @Override
-        public String func_176610_l()
+        public String getString()
         {
             return name;
         }

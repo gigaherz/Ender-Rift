@@ -51,7 +51,7 @@ public class InterfaceTileEntity extends AggregatorTileEntity implements IPowere
         if (facing == null && world != null)
         {
             BlockState state = world.getBlockState(pos);
-            if (state.func_235904_r_().contains(InterfaceBlock.FACING))
+            if (state.getProperties().contains(InterfaceBlock.FACING))
             {
                 facing = state.get(InterfaceBlock.FACING).getOpposite();
             }
@@ -164,9 +164,9 @@ public class InterfaceTileEntity extends AggregatorTileEntity implements IPowere
     }
 
     @Override
-    public void func_230337_a_(BlockState state, CompoundNBT compound)
+    public void read(BlockState state, CompoundNBT compound)
     {
-        super.func_230337_a_(state, compound);
+        super.read(state, compound);
 
         ListNBT _filters = compound.getList("Filters", Constants.NBT.TAG_COMPOUND);
         for (int i = 0; i < _filters.size(); ++i)

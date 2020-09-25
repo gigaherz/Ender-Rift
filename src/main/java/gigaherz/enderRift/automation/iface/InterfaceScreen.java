@@ -18,7 +18,7 @@ public class InterfaceScreen extends ContainerScreen<InterfaceContainer>
     {
         super(container, playerInventory, title);
         ySize = 176;
-        this.field_238745_s_ = this.ySize - 94;
+        this.playerInventoryTitleY = this.ySize - 94;
     }
 
     @Override
@@ -26,18 +26,18 @@ public class InterfaceScreen extends ContainerScreen<InterfaceContainer>
     {
         this.renderBackground(matrixStack);
         super.render(matrixStack, mouseX, mouseY, partialTicks);
-        this.func_230459_a_(matrixStack, mouseX, mouseY);
+        this.renderHoveredTooltip(matrixStack, mouseX, mouseY);
     }
 
     @Override
-    protected void func_230451_b_(MatrixStack matrixStack, int mouseX, int mouseY)
+    protected void drawGuiContainerForegroundLayer(MatrixStack matrixStack, int mouseX, int mouseY)
     {
-        super.func_230451_b_(matrixStack, mouseX, mouseY);
+        super.drawGuiContainerForegroundLayer(matrixStack, mouseX, mouseY);
         font.drawString(matrixStack, I18n.format(textFilters), 8, 20, 0x404040);
     }
 
     @Override
-    protected void func_230450_a_(MatrixStack matrixStack, float partialTicks, int mouseX, int mouseY)
+    protected void drawGuiContainerBackgroundLayer(MatrixStack matrixStack, float partialTicks, int mouseX, int mouseY)
     {
         minecraft.textureManager.bindTexture(guiTextureLocation);
         RenderSystem.color4f(1.0f, 1.0f, 1.0f, 1.0f);

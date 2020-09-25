@@ -31,7 +31,7 @@ public class RiftStorage extends WorldSavedData
             throw new RuntimeException("Attempted to get the data from a client world. This is wrong.");
         }
 
-        ServerWorld overworld = world.getServer().getWorld(World.field_234918_g_);
+        ServerWorld overworld = world.getServer().getWorld(World.OVERWORLD);
 
         DimensionSavedDataManager storage = overworld.getSavedData();
         return storage.getOrCreate(RiftStorage::new, DATA_NAME);

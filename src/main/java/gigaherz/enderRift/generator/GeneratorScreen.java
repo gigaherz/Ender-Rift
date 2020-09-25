@@ -38,13 +38,13 @@ public class GeneratorScreen extends ContainerScreen<GeneratorContainer>
     {
         this.renderBackground(matrixStack);
         super.render(matrixStack, mouseX, mouseY, partialTicks);
-        this.func_230459_a_(matrixStack, mouseX, mouseY);
+        this.renderHoveredTooltip(matrixStack, mouseX, mouseY);
     }
 
     @Override
-    protected void func_230451_b_(MatrixStack matrixStack, int mouseX, int mouseY)
+    protected void drawGuiContainerForegroundLayer(MatrixStack matrixStack, int mouseX, int mouseY)
     {
-        super.func_230451_b_(matrixStack, mouseX, mouseY);
+        super.drawGuiContainerForegroundLayer(matrixStack, mouseX, mouseY);
 
         String label;
         if (container.tile.getGenerationPower() > 0)
@@ -82,15 +82,16 @@ public class GeneratorScreen extends ContainerScreen<GeneratorContainer>
         if (rx < 0 || ry < 0 || rx > barWidth || ry > barHeight)
             return;
 
-        List<ITextProperties> tooltip = Lists.newArrayList();
+        List<ITextComponent> tooltip = Lists.newArrayList();
         tooltip.add(new TranslationTextComponent("text.enderrift.generator.energy.label"));
         tooltip.add(new StringTextComponent(String.format("%d / %d RF", container.tile.getContainedEnergy(), GeneratorTileEntity.POWER_LIMIT)));
 
-        renderTooltip(matrixStack, tooltip, mx - guiLeft, my - guiTop);
+        // renderTooltip
+        func_243308_b(matrixStack, tooltip, mx - guiLeft, my - guiTop);
     }
 
     @Override
-    protected void func_230450_a_(MatrixStack matrixStack, float partialTicks, int mouseX, int mouseY)
+    protected void drawGuiContainerBackgroundLayer(MatrixStack matrixStack, float partialTicks, int mouseX, int mouseY)
     {
         RenderSystem.color4f(1.0f, 1.0f, 1.0f, 1.0f);
 

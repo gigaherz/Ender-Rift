@@ -36,7 +36,7 @@ public abstract class AbstractBrowserScreen<T extends AbstractBrowserContainer> 
         super(container, playerInventory, title);
         xSize = 194;
         ySize = 168;
-        this.field_238745_s_ = this.ySize - 94;
+        this.playerInventoryTitleY = this.ySize - 94;
     }
 
     @Override
@@ -50,7 +50,7 @@ public abstract class AbstractBrowserScreen<T extends AbstractBrowserContainer> 
         RenderHelper.disableStandardItemLighting();
 
         this.renderLowPowerOverlay(matrixStack, mouseX, mouseY);
-        this.func_230459_a_(matrixStack, mouseX, mouseY);
+        this.renderHoveredTooltip(matrixStack, mouseX, mouseY);
     }
 
     private void renderLowPowerOverlay(MatrixStack matrixStack, int mouseX, int mouseY)
@@ -136,7 +136,7 @@ public abstract class AbstractBrowserScreen<T extends AbstractBrowserContainer> 
         if (searchField.isFocused() && searchField.charTyped(p_charTyped_1_, p_charTyped_2_))
             return true;
 
-        return this.getFocused() != null && this.getFocused().charTyped(p_charTyped_1_, p_charTyped_2_);
+        return this.getListener() != null && this.getListener().charTyped(p_charTyped_1_, p_charTyped_2_);
     }
 
     @Override
@@ -182,7 +182,7 @@ public abstract class AbstractBrowserScreen<T extends AbstractBrowserContainer> 
     }
 
     @Override
-    protected void func_230450_a_(MatrixStack matrixStack, float partialTicks, int xMouse, int yMouse)
+    protected void drawGuiContainerBackgroundLayer(MatrixStack matrixStack, float partialTicks, int xMouse, int yMouse)
     {
         minecraft.getTextureManager().bindTexture(getBackgroundTexture());
 

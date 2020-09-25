@@ -20,7 +20,7 @@ public class CraftingBrowserScreen extends AbstractBrowserScreen<CraftingBrowser
         super(container, playerInventory, title);
         xSize = 194;
         ySize = 226;
-        this.field_238745_s_ = this.ySize - 94;
+        this.playerInventoryTitleY = this.ySize - 94;
     }
 
     @Override
