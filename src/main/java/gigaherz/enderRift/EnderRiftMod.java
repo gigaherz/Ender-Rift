@@ -48,6 +48,7 @@ import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.GatherDataEvent;
 import net.minecraftforge.fml.event.lifecycle.InterModEnqueueEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.fml.network.NetworkDirection;
 import net.minecraftforge.fml.network.NetworkRegistry;
 import net.minecraftforge.fml.network.simple.SimpleChannel;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -62,6 +63,8 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
+
+import net.minecraft.block.AbstractBlock;
 
 @Mod.EventBusSubscriber
 @Mod(EnderRiftMod.MODID)
@@ -125,7 +128,6 @@ public class EnderRiftMod
     {
         instance = this;
 
-        ModLoadingContext modLoadingContext = ModLoadingContext.get();
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
 
         modEventBus.addGenericListener(Block.class, this::registerBlocks);
@@ -138,6 +140,7 @@ public class EnderRiftMod
         modEventBus.addListener(this::interComms);
         modEventBus.addListener(this::gatherData);
 
+        //ModLoadingContext modLoadingContext = ModLoadingContext.get();
         //modLoadingContext.registerConfig(ModConfig.Type.SERVER, ConfigData.SERVER_SPEC);
         //modLoadingContext.registerConfig(ModConfig.Type.CLIENT, ConfigData.CLIENT_SPEC);
     }
@@ -145,14 +148,14 @@ public class EnderRiftMod
     public void registerBlocks(RegistryEvent.Register<Block> event)
     {
         event.getRegistry().registerAll(
-                new RiftBlock(Block.Properties.create(Material.ROCK).sound(SoundType.METAL).hardnessAndResistance(3.0F, 8.0F).variableOpacity()).setRegistryName("rift"),
-                new StructureBlock(Block.Properties.create(Material.ROCK).sound(SoundType.METAL).hardnessAndResistance(3.0F, 8.0F).noDrops()).setRegistryName("structure"),
-                new InterfaceBlock(Block.Properties.create(Material.IRON, MaterialColor.STONE).sound(SoundType.METAL).hardnessAndResistance(3.0F, 8.0F)).setRegistryName("interface"),
-                new BrowserBlock(false, Block.Properties.create(Material.IRON, MaterialColor.STONE).sound(SoundType.METAL).hardnessAndResistance(3.0F, 8.0F)).setRegistryName("browser"),
-                new BrowserBlock(true, Block.Properties.create(Material.IRON, MaterialColor.STONE).sound(SoundType.METAL).hardnessAndResistance(3.0F, 8.0F)).setRegistryName("crafting_browser"),
-                new ProxyBlock(Block.Properties.create(Material.IRON, MaterialColor.STONE).sound(SoundType.METAL).hardnessAndResistance(3.0F, 8.0F)).setRegistryName("proxy"),
-                new DriverBlock(Block.Properties.create(Material.IRON, MaterialColor.STONE).sound(SoundType.METAL).hardnessAndResistance(3.0F, 8.0F)).setRegistryName("driver"),
-                new GeneratorBlock(Block.Properties.create(Material.IRON, MaterialColor.STONE).sound(SoundType.METAL).hardnessAndResistance(3.0F, 8.0F)).setRegistryName("generator")
+                new RiftBlock(AbstractBlock.Properties.create(Material.ROCK).sound(SoundType.METAL).hardnessAndResistance(3.0F, 8.0F).variableOpacity()).setRegistryName("rift"),
+                new StructureBlock(AbstractBlock.Properties.create(Material.ROCK).sound(SoundType.METAL).hardnessAndResistance(3.0F, 8.0F).noDrops()).setRegistryName("structure"),
+                new InterfaceBlock(AbstractBlock.Properties.create(Material.IRON, MaterialColor.STONE).sound(SoundType.METAL).hardnessAndResistance(3.0F, 8.0F)).setRegistryName("interface"),
+                new BrowserBlock(false, AbstractBlock.Properties.create(Material.IRON, MaterialColor.STONE).sound(SoundType.METAL).hardnessAndResistance(3.0F, 8.0F)).setRegistryName("browser"),
+                new BrowserBlock(true, AbstractBlock.Properties.create(Material.IRON, MaterialColor.STONE).sound(SoundType.METAL).hardnessAndResistance(3.0F, 8.0F)).setRegistryName("crafting_browser"),
+                new ProxyBlock(AbstractBlock.Properties.create(Material.IRON, MaterialColor.STONE).sound(SoundType.METAL).hardnessAndResistance(3.0F, 8.0F)).setRegistryName("proxy"),
+                new DriverBlock(AbstractBlock.Properties.create(Material.IRON, MaterialColor.STONE).sound(SoundType.METAL).hardnessAndResistance(3.0F, 8.0F)).setRegistryName("driver"),
+                new GeneratorBlock(AbstractBlock.Properties.create(Material.IRON, MaterialColor.STONE).sound(SoundType.METAL).hardnessAndResistance(3.0F, 8.0F)).setRegistryName("generator")
         );
     }
 
@@ -212,11 +215,11 @@ public class EnderRiftMod
     public void commonSetup(FMLCommonSetupEvent event)
     {
         int messageNumber = 0;
-        CHANNEL.messageBuilder(ClearCraftingGrid.class, messageNumber++).encoder(ClearCraftingGrid::encode).decoder(ClearCraftingGrid::new).consumer(ClearCraftingGrid::handle).add();
-        CHANNEL.messageBuilder(SendSlotChanges.class, messageNumber++).encoder(SendSlotChanges::encode).decoder(SendSlotChanges::new).consumer(SendSlotChanges::handle).add();
-        CHANNEL.messageBuilder(SetVisibleSlots.class, messageNumber++).encoder(SetVisibleSlots::encode).decoder(SetVisibleSlots::new).consumer(SetVisibleSlots::handle).add();
-        CHANNEL.messageBuilder(UpdateField.class, messageNumber++).encoder(UpdateField::encode).decoder(UpdateField::new).consumer(UpdateField::handle).add();
-        CHANNEL.messageBuilder(UpdatePowerStatus.class, messageNumber++).encoder(UpdatePowerStatus::encode).decoder(UpdatePowerStatus::new).consumer(UpdatePowerStatus::handle).add();
+        CHANNEL.messageBuilder(ClearCraftingGrid.class, messageNumber++, NetworkDirection.PLAY_TO_SERVER).encoder(ClearCraftingGrid::encode).decoder(ClearCraftingGrid::new).consumer(ClearCraftingGrid::handle).add();
+        CHANNEL.messageBuilder(SendSlotChanges.class, messageNumber++, NetworkDirection.PLAY_TO_CLIENT).encoder(SendSlotChanges::encode).decoder(SendSlotChanges::new).consumer(SendSlotChanges::handle).add();
+        CHANNEL.messageBuilder(SetVisibleSlots.class, messageNumber++, NetworkDirection.PLAY_TO_SERVER).encoder(SetVisibleSlots::encode).decoder(SetVisibleSlots::new).consumer(SetVisibleSlots::handle).add();
+        CHANNEL.messageBuilder(UpdateField.class, messageNumber++, NetworkDirection.PLAY_TO_CLIENT).encoder(UpdateField::encode).decoder(UpdateField::new).consumer(UpdateField::handle).add();
+        CHANNEL.messageBuilder(UpdatePowerStatus.class, messageNumber++, NetworkDirection.PLAY_TO_CLIENT).encoder(UpdatePowerStatus::encode).decoder(UpdatePowerStatus::new).consumer(UpdatePowerStatus::handle).add();
         logger.debug("Final message number: " + messageNumber);
 
         RiftStructure.init();
@@ -291,7 +294,7 @@ public class EnderRiftMod
             protected void validate(Map<ResourceLocation, LootTable> map, ValidationTracker validationtracker)
             {
                 map.forEach((p_218436_2_, p_218436_3_) -> {
-                    LootTableManager.func_227508_a_(validationtracker, p_218436_2_, p_218436_3_);
+                    LootTableManager.validateLootTable(validationtracker, p_218436_2_, p_218436_3_);
                 });
             }
 

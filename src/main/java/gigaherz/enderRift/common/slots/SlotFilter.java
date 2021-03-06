@@ -19,7 +19,7 @@ public class SlotFilter extends SlotItemHandler
     }
 
     @Override
-    public ItemStack onTake(PlayerEntity p_190901_1_, ItemStack p_190901_2_)
+    public ItemStack onTake(PlayerEntity thePlayer, ItemStack stack)
     {
         return ItemStack.EMPTY;
     }

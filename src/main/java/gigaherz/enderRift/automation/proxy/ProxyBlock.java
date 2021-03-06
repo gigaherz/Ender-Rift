@@ -20,6 +20,8 @@ import net.minecraft.world.IWorld;
 import javax.annotation.Nullable;
 import java.util.Map;
 
+import net.minecraft.block.AbstractBlock.Properties;
+
 public class ProxyBlock extends AggregatorBlock<ProxyTileEntity>
 {
     public static final BooleanProperty NORTH = BlockStateProperties.NORTH;

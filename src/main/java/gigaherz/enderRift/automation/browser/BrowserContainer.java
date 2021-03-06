@@ -21,4 +21,3 @@ public class BrowserContainer extends AbstractBrowserContainer
         super(TYPE, id, te, playerInventory);
     }
 }
-

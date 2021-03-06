@@ -22,6 +22,8 @@ import net.minecraft.world.IWorld;
 import javax.annotation.Nullable;
 import java.util.Map;
 
+import net.minecraft.block.AbstractBlock.Properties;
+
 public class DriverBlock extends AggregatorBlock<DriverTileEntity>
 {
     public static final BooleanProperty NORTH = BlockStateProperties.NORTH;

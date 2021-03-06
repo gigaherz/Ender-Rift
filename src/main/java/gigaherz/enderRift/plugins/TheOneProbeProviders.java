@@ -107,7 +107,7 @@ public class TheOneProbeProviders implements Function<ITheOneProbe, Void>
             c = 0xFF000000 | (r << 16) | (g << 8);
         }
 
-        return new ProgressStyle().suffix("°C").filledColor(c).alternateFilledColor(c);
+        return new ProgressStyle().suffix("Â°C").filledColor(c).alternateFilledColor(c);
     }
 
     private static void handleGenerator(IProbeInfo info, GeneratorTileEntity generator)

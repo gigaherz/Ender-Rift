@@ -11,6 +11,8 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 
+import net.minecraft.client.gui.widget.button.Button.IPressable;
+
 public class CraftingBrowserScreen extends AbstractBrowserScreen<CraftingBrowserContainer>
 {
     private static final ResourceLocation BACKGROUND_TEXTURE = new ResourceLocation(EnderRiftMod.MODID, "textures/gui/crafting_browser.png");

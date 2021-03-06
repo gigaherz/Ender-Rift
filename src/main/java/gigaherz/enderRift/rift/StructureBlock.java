@@ -23,6 +23,8 @@ import net.minecraft.loot.LootContext;
 import javax.annotation.Nullable;
 import java.util.List;
 
+import net.minecraft.block.AbstractBlock;
+
 public class StructureBlock extends AggregatorBlock<StructureTileEntity>
 {
     public static final EnumProperty<Type1> TYPE1 = EnumProperty.create("type1", Type1.class);
@@ -45,7 +47,7 @@ public class StructureBlock extends AggregatorBlock<StructureTileEntity>
     );
     public static final VoxelShape CORNER_WITH_BASE = VoxelShapes.or(SHAPE_CORNER, SHAPE_BASE);
 
-    public StructureBlock(Block.Properties properties)
+    public StructureBlock(AbstractBlock.Properties properties)
     {
         super(properties);
         setDefaultState(this.getStateContainer().getBaseState()

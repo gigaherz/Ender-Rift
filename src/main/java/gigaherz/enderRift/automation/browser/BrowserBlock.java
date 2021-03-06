@@ -25,6 +25,8 @@ import net.minecraft.world.World;
 
 import javax.annotation.Nullable;
 
+import net.minecraft.block.AbstractBlock.Properties;
+
 public class BrowserBlock extends AggregatorBlock<BrowserTileEntity>
 {
     public static final DirectionProperty FACING = BlockStateProperties.FACING;
@@ -91,7 +93,7 @@ public class BrowserBlock extends AggregatorBlock<BrowserTileEntity>
 
     @Deprecated
     @Override
-    public VoxelShape getShape(BlockState state, IBlockReader p_220053_2_, BlockPos p_220053_3_, ISelectionContext p_220053_4_)
+    public VoxelShape getShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context)
     {
         return SHAPES.get(state.get(FACING));
     }

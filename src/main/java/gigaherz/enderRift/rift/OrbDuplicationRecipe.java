@@ -45,7 +45,7 @@ public class OrbDuplicationRecipe extends SpecialRecipe implements IShapedRecipe
     }
 
     @Override
-    public boolean matches(CraftingInventory crafting, World p_77569_2_)
+    public boolean matches(CraftingInventory crafting, World worldIn)
     {
         if (crafting.getSizeInventory() < 9)
             return false;

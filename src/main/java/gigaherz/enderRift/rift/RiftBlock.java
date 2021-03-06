@@ -26,6 +26,8 @@ import net.minecraftforge.items.CapabilityItemHandler;
 import javax.annotation.Nullable;
 import java.util.List;
 
+import net.minecraft.block.AbstractBlock.Properties;
+
 public class RiftBlock extends Block
 {
     public static final BooleanProperty ASSEMBLED = BooleanProperty.create("assembled");
@@ -79,7 +81,7 @@ public class RiftBlock extends Block
 
     @Deprecated
     @Override
-    public VoxelShape getShape(BlockState state, IBlockReader p_220053_2_, BlockPos p_220053_3_, ISelectionContext p_220053_4_)
+    public VoxelShape getShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context)
     {
         return state.get(ASSEMBLED) ? SHAPE_ACTIVE : SHAPE;
     }

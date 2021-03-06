@@ -27,15 +27,7 @@ public class ClientHelper
     public static void registerModels(ModelRegistryEvent event)
     {
         ClientRegistry.bindTileEntityRenderer(RiftTileEntity.TYPE, RiftTileEntityRenderer::new);
-    }
-
-    @SubscribeEvent
-    public static void clientSetup(FMLClientSetupEvent event)
-    {
-        //noinspection deprecation
-        DeferredWorkQueue.runLater(() -> {
-            ModelLoader.addSpecialModel(EnderRiftMod.location("block/sphere"));
-        });
+        ModelLoader.addSpecialModel(EnderRiftMod.location("block/sphere"));
     }
 
     public static void handleSendSlotChanges(final SendSlotChanges message)

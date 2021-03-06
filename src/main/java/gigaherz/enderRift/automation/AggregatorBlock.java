@@ -11,6 +11,8 @@ import net.minecraft.world.World;
 
 import javax.annotation.Nullable;
 
+import net.minecraft.block.AbstractBlock.Properties;
+
 public abstract class AggregatorBlock<T extends AggregatorTileEntity> extends Block
 {
     protected AggregatorBlock(Properties properties)
@@ -30,9 +32,9 @@ public abstract class AggregatorBlock<T extends AggregatorTileEntity> extends Bl
 
     @Deprecated
     @Override
-    public void neighborChanged(BlockState state, World world, BlockPos pos, Block otherBlock, BlockPos otherPos, boolean p_220069_6_)
+    public void neighborChanged(BlockState state, World world, BlockPos pos, Block otherBlock, BlockPos otherPos, boolean isMoving)
     {
-        super.neighborChanged(state, world, pos, otherBlock, otherPos, p_220069_6_);
+        super.neighborChanged(state, world, pos, otherBlock, otherPos, isMoving);
 
         TileEntity teSelf = world.getTileEntity(pos);
         if (!(teSelf instanceof AggregatorTileEntity))
