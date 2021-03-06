@@ -31,7 +31,9 @@ public class CraftingBrowserContainer extends AbstractBrowserContainer
     public static ContainerType<CraftingBrowserContainer> TYPE;
 
     public static final int INVENTORY_SLOT_START = SCROLL_SLOTS;
-    public static final int CRAFTING_SLOT_START = SCROLL_SLOTS + PLAYER_SLOTS + 1;
+    public static final int INVENTORY_SLOT_END = SCROLL_SLOTS + PLAYER_SLOTS;
+    public static final int CRAFTING_RESULT_SLOT = INVENTORY_SLOT_END;
+    public static final int CRAFTING_SLOT_START = INVENTORY_SLOT_START + 1;
 
     private final static int CRAFTER_HEIGHT = 58;
     private final static int CRAFTING_OFFSET = 59;
@@ -148,12 +150,12 @@ public class CraftingBrowserContainer extends AbstractBrowserContainer
         ItemStack stack = slot.getStack();
         ItemStack stackCopy = stack.copy();
 
-        if (!this.mergeItemStack(stack, INVENTORY_SLOT_START, CRAFTING_SLOT_START, false))
+        if (!this.mergeItemStack(stack, INVENTORY_SLOT_START, INVENTORY_SLOT_END, false))
         {
             return ItemStack.EMPTY;
         }
 
-        if (slotIndex == CRAFTING_SLOT_START)
+        if (slotIndex == CRAFTING_RESULT_SLOT)
             slot.onSlotChange(stack, stackCopy);
 
         if (stack.getCount() == 0)

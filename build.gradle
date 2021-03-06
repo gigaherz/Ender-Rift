@@ -50,7 +50,7 @@ repositories {
  */
 }
 
-version = "2.2.7"
+version = "2.2.7.1"
 group= "gigaherz.enderRift"
 archivesBaseName = "EnderRift-UNKNOWN"
 
