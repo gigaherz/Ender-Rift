@@ -9,21 +9,25 @@ import java.util.function.Supplier;
 
 public class ClearCraftingGrid
 {
-    public int windowId;
+    public final int windowId;
+    public final boolean toPlayer;
 
-    public ClearCraftingGrid(int windowId)
+    public ClearCraftingGrid(int windowId, boolean toPlayer)
     {
         this.windowId = windowId;
+        this.toPlayer = toPlayer;
     }
 
     public ClearCraftingGrid(PacketBuffer buf)
     {
         windowId = buf.readInt();
+        toPlayer = buf.readBoolean();
     }
 
     public void encode(PacketBuffer buf)
     {
         buf.writeInt(windowId);
+        buf.writeBoolean(toPlayer);
     }
 
     public boolean handle(Supplier<NetworkEvent.Context> context)
@@ -35,7 +39,7 @@ public class ClearCraftingGrid
             if (player.openContainer instanceof CraftingBrowserContainer
                     && player.openContainer.windowId == this.windowId)
             {
-                ((CraftingBrowserContainer) player.openContainer).clearCraftingGrid(player);
+                ((CraftingBrowserContainer) player.openContainer).clearCraftingGrid(player, toPlayer);
             }
         });
         return true;

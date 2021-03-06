@@ -31,7 +31,9 @@ public class CraftingBrowserContainer extends AbstractBrowserContainer
     public static ContainerType<CraftingBrowserContainer> TYPE;
 
     public static final int INVENTORY_SLOT_START = SCROLL_SLOTS;
-    public static final int CRAFTING_SLOT_START = SCROLL_SLOTS + PLAYER_SLOTS + 1;
+    public static final int INVENTORY_SLOT_END = SCROLL_SLOTS + PLAYER_SLOTS;
+    public static final int CRAFTING_RESULT_SLOT = INVENTORY_SLOT_END;
+    public static final int CRAFTING_SLOT_START = INVENTORY_SLOT_END + 1;
 
     private final static int CRAFTER_HEIGHT = 58;
     private final static int CRAFTING_OFFSET = 59;
@@ -133,7 +135,7 @@ public class CraftingBrowserContainer extends AbstractBrowserContainer
     @Override
     public ItemStack transferStackInSlot(PlayerEntity player, int slotIndex)
     {
-        if (slotIndex < SCROLL_SLOTS + PLAYER_SLOTS)
+        if (slotIndex < CRAFTING_RESULT_SLOT)
         {
             return super.transferStackInSlot(player, slotIndex);
         }
@@ -148,13 +150,15 @@ public class CraftingBrowserContainer extends AbstractBrowserContainer
         ItemStack stack = slot.getStack();
         ItemStack stackCopy = stack.copy();
 
-        if (!this.mergeItemStack(stack, INVENTORY_SLOT_START, CRAFTING_SLOT_START, false))
+        if (!this.mergeItemStack(stack, SCROLL_SLOTS, INVENTORY_SLOT_END, false))
         {
             return ItemStack.EMPTY;
         }
 
-        if (slotIndex == CRAFTING_SLOT_START)
+        if (slotIndex == CRAFTING_RESULT_SLOT)
+        {
             slot.onSlotChange(stack, stackCopy);
+        }
 
         if (stack.getCount() == 0)
         {
@@ -181,7 +185,7 @@ public class CraftingBrowserContainer extends AbstractBrowserContainer
         return slotIn.inventory != this.craftResult && super.canMergeSlot(stack, slotIn);
     }
 
-    public void clearCraftingGrid(PlayerEntity playerIn)
+    public void clearCraftingGrid(PlayerEntity playerIn, boolean toPlayer)
     {
         boolean isRemote = tile == null ? true : tile.getWorld().isRemote;
 
@@ -195,9 +199,11 @@ public class CraftingBrowserContainer extends AbstractBrowserContainer
 
                 if (!isRemote && itemstack.getCount() > 0)
                 {
-                    ItemStack remaining = ItemStack.EMPTY;
-                    if (parent != null)
+                    ItemStack remaining = itemstack;
+                    if (parent != null && !toPlayer)
+                    {
                         remaining = AutomationHelper.insertItems(parent, itemstack);
+                    }
 
                     if (remaining.getCount() > 0)
                     {
@@ -216,7 +222,7 @@ public class CraftingBrowserContainer extends AbstractBrowserContainer
 
         if (isRemote)
         {
-            EnderRiftMod.CHANNEL.sendToServer(new ClearCraftingGrid(windowId));
+            EnderRiftMod.CHANNEL.sendToServer(new ClearCraftingGrid(windowId, toPlayer));
         }
 
         this.onCraftMatrixChanged(craftMatrix);

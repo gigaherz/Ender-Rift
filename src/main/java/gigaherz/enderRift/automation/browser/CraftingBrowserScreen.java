@@ -36,14 +36,18 @@ public class CraftingBrowserScreen extends AbstractBrowserScreen<CraftingBrowser
     {
         super.init();
 
-        addButton(new GuiButtonFlexible(guiLeft + 85, guiTop + 75, 9, 9, new StringTextComponent("x"), (btn) -> {
-            clearCraftingGrid();
+        addButton(new GuiButtonFlexible(guiLeft + 85, guiTop + 75, 9, 9, new StringTextComponent("▴"), (btn) -> {
+            clearCraftingGrid(false);
+        }));
+
+        addButton(new GuiButtonFlexible(guiLeft + 85, guiTop + 75 + 45, 9, 9, new StringTextComponent("▾"), (btn) -> {
+            clearCraftingGrid(true);
         }));
     }
 
-    private void clearCraftingGrid()
+    private void clearCraftingGrid(boolean toPlayer)
     {
-        getContainer().clearCraftingGrid(playerInventory.player);
+        getContainer().clearCraftingGrid(playerInventory.player, toPlayer);
     }
 
     private static class GuiButtonFlexible extends Button

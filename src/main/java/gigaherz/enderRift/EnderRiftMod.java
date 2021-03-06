@@ -114,7 +114,7 @@ public class EnderRiftMod
 
     public static EnderRiftMod instance;
 
-    private static final String PROTOCOL_VERSION = "1.01";
+    private static final String PROTOCOL_VERSION = "1.02";
     public static final SimpleChannel CHANNEL = NetworkRegistry.ChannelBuilder
             .named(new ResourceLocation(MODID, "main"))
             .clientAcceptedVersions(PROTOCOL_VERSION::equals)

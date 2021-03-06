@@ -97,7 +97,7 @@ public class RiftBlock extends Block
     @Override
     public void onReplaced(BlockState state, World worldIn, BlockPos pos, BlockState newState, boolean isMoving)
     {
-        if (newState.getBlock() == this)
+        if (newState.getBlock() == this || !state.get(ASSEMBLED))
         {
             super.onReplaced(state, worldIn, pos, newState, isMoving);
             return;

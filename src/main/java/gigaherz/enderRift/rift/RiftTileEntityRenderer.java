@@ -12,6 +12,7 @@ import net.minecraft.client.renderer.model.IBakedModel;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
 import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
+import net.minecraft.client.settings.GraphicsFanciness;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
@@ -25,7 +26,6 @@ import java.util.Random;
 
 public class RiftTileEntityRenderer extends TileEntityRenderer<RiftTileEntity>
 {
-    private final RenderType renderType = RenderType.getTranslucent();
     private final Random random = new Random();
 
     private static final List<Direction> DIRECTIONS_AND_NULL = Lists.newArrayList(Direction.values());
@@ -77,7 +77,13 @@ public class RiftTileEntityRenderer extends TileEntityRenderer<RiftTileEntity>
         float c0 = 1.0f / steps;
         float c1 = 1.0f / (1 - c0);
 
-        IVertexBuilder buffer = iRenderTypeBuffer.getBuffer(renderType);
+        boolean isFabulous = Minecraft.getInstance().gameSettings.graphicFanciness.equals(GraphicsFanciness.FABULOUS);
+
+        RenderType type = isFabulous ?
+                RenderType.getTranslucentMovingBlock() :
+                RenderType.getTranslucentNoCrumbling();
+
+        IVertexBuilder buffer = iRenderTypeBuffer.getBuffer(type);
         IBakedModel model = Minecraft.getInstance().getModelManager().getModel(EnderRiftMod.location("block/sphere"));
 
         for (int i = 0; i < steps; i++)
