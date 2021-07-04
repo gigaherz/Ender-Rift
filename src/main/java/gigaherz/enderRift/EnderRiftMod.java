@@ -1,6 +1,11 @@
 package gigaherz.enderRift;
 
 import com.google.common.collect.ImmutableList;
+import com.mojang.brigadier.arguments.IntegerArgumentType;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.suggestion.Suggestions;
+import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import com.mojang.datafixers.util.Pair;
 import gigaherz.enderRift.automation.browser.*;
 import gigaherz.enderRift.automation.driver.DriverBlock;
@@ -17,15 +22,21 @@ import gigaherz.enderRift.generator.GeneratorScreen;
 import gigaherz.enderRift.generator.GeneratorTileEntity;
 import gigaherz.enderRift.network.*;
 import gigaherz.enderRift.rift.*;
+import gigaherz.enderRift.rift.storage.RiftInventory;
+import gigaherz.enderRift.rift.storage.RiftStorage;
 import net.minecraft.block.Block;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.material.MaterialColor;
 import net.minecraft.client.gui.ScreenManager;
+import net.minecraft.command.CommandSource;
+import net.minecraft.command.Commands;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.IDataProvider;
 import net.minecraft.data.LootTableProvider;
 import net.minecraft.data.loot.BlockLootTables;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.inventory.container.ContainerType;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
@@ -37,7 +48,12 @@ import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.loot.*;
+import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.world.World;
+import net.minecraft.world.server.ServerWorld;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.extensions.IForgeContainerType;
+import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.InterModComms;
@@ -57,14 +73,17 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nonnull;
+import java.nio.file.Files;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import net.minecraft.block.AbstractBlock;
+import org.codehaus.plexus.util.cli.Commandline;
 
 @Mod.EventBusSubscriber
 @Mod(EnderRiftMod.MODID)
@@ -139,6 +158,8 @@ public class EnderRiftMod
         modEventBus.addListener(this::clientSetup);
         modEventBus.addListener(this::interComms);
         modEventBus.addListener(this::gatherData);
+
+        MinecraftForge.EVENT_BUS.addListener(this::commandEvent);
 
         //ModLoadingContext modLoadingContext = ModLoadingContext.get();
         //modLoadingContext.registerConfig(ModConfig.Type.SERVER, ConfigData.SERVER_SPEC);
@@ -238,6 +259,43 @@ public class EnderRiftMod
         InterModComms.sendTo("gbook", "registerBook", () -> EnderRiftMod.location("xml/book.xml"));
 
         //InterModComms.sendTo("theoneprobe", "getTheOneProbe", () -> TheOneProbeProviders.create());
+    }
+
+    public void commandEvent(RegisterCommandsEvent event)
+    {
+        event.getDispatcher().register(
+                LiteralArgumentBuilder.<CommandSource>literal("enderrift")
+                    .then(Commands.literal("locate")
+                            .then(Commands.argument("riftId", IntegerArgumentType.integer(1))
+                                    .requires(cs->cs.hasPermissionLevel(3)) //permission
+                                    .executes(this::locateSpecificRift)
+                            )
+                            .requires(cs->cs.hasPermissionLevel(3)) //permission
+                            .executes(this::locateAllRifts)
+                    )
+        );
+    }
+
+    private int locateSpecificRift(CommandContext<CommandSource> context)
+    {
+        int riftId = context.getArgument("riftId", int.class);
+        RiftInventory rift = RiftStorage.get(context.getSource().getWorld())
+                .getRift(riftId);
+        locateRiftById(context, riftId, rift);
+        return 0;
+    }
+
+    private void locateRiftById(CommandContext<CommandSource> context, int riftId, RiftInventory rift)
+    {
+        rift.locateListeners(pos ->
+                context.getSource().sendFeedback(new StringTextComponent(String.format("Found rift with id %d at %s %s %s", riftId, pos.getX(), pos.getY(), pos.getZ())), true));
+    }
+
+    private int locateAllRifts(CommandContext<CommandSource> context)
+    {
+        RiftStorage.get(context.getSource().getWorld())
+                .walkExistingRifts((id, rift) -> locateRiftById(context, id, rift));
+        return 0;
     }
 
     public void gatherData(GatherDataEvent event)

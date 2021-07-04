@@ -14,6 +14,7 @@ import net.minecraft.tileentity.ITickableTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.Direction;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
@@ -283,6 +284,12 @@ public class RiftTileEntity extends TileEntity implements ITickableTileEntity, I
     public void onRiftChanged()
     {
         markDirty();
+    }
+
+    @Override
+    public Optional<BlockPos> getLocation()
+    {
+        return Optional.of(getPos());
     }
 
     public class PoweredInventory implements IItemHandler

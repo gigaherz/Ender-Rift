@@ -11,6 +11,7 @@ import net.minecraftforge.common.util.Constants;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.BiConsumer;
 
 public class RiftStorage extends WorldSavedData
 {
@@ -56,6 +57,11 @@ public class RiftStorage extends WorldSavedData
         markDirty();
 
         return ++lastRiftId;
+    }
+
+    public void walkExistingRifts(BiConsumer<Integer, RiftInventory> consumer)
+    {
+        rifts.forEach(consumer);
     }
 
     @Override

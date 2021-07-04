@@ -5,6 +5,7 @@ import gigaherz.enderRift.rift.IRiftChangeListener;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.ListNBT;
+import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemHandlerHelper;
@@ -15,6 +16,8 @@ import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;
 import java.util.Iterator;
 import java.util.List;
+import java.util.function.Consumer;
+import java.util.stream.Stream;
 
 public class RiftInventory implements IItemHandler
 {
@@ -34,7 +37,7 @@ public class RiftInventory implements IItemHandler
         listeners.add(new WeakReference<>(e, pendingRemovals));
     }
 
-    protected void onContentsChanged()
+    private void walkListeners(Consumer<IRiftChangeListener> consumer)
     {
         for (Reference<? extends IRiftChangeListener>
              ref = pendingRemovals.poll();
@@ -49,12 +52,23 @@ public class RiftInventory implements IItemHandler
             Reference<? extends IRiftChangeListener> reference = iterator.next();
             IRiftChangeListener listener = reference.get();
             if (listener == null || listener.isInvalid())
+            {
                 iterator.remove();
-            else
-                listener.onRiftChanged();
+                continue;
+            }
+            consumer.accept(listener);
         }
+    }
 
+    protected void onContentsChanged()
+    {
+        walkListeners(IRiftChangeListener::onRiftChanged);
         manager.markDirty();
+    }
+
+    public void locateListeners(Consumer<BlockPos> locationConsumer)
+    {
+        walkListeners(listener -> listener.getLocation().ifPresent(locationConsumer));
     }
 
     public void readFromNBT(CompoundNBT nbtTagCompound)
