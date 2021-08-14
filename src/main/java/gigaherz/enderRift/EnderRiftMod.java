@@ -248,10 +248,12 @@ public class EnderRiftMod
 
     public void clientSetup(FMLClientSetupEvent event)
     {
-        ScreenManager.registerFactory(GeneratorContainer.TYPE, GeneratorScreen::new);
-        ScreenManager.registerFactory(InterfaceContainer.TYPE, InterfaceScreen::new);
-        ScreenManager.registerFactory(BrowserContainer.TYPE, BrowserScreen::new);
-        ScreenManager.registerFactory(CraftingBrowserContainer.TYPE, CraftingBrowserScreen::new);
+        event.enqueueWork(() -> {
+            ScreenManager.registerFactory(GeneratorContainer.TYPE, GeneratorScreen::new);
+            ScreenManager.registerFactory(InterfaceContainer.TYPE, InterfaceScreen::new);
+            ScreenManager.registerFactory(BrowserContainer.TYPE, BrowserScreen::new);
+            ScreenManager.registerFactory(CraftingBrowserContainer.TYPE, CraftingBrowserScreen::new);
+        });
     }
 
     public void interComms(InterModEnqueueEvent event)
