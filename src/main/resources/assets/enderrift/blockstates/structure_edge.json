@@ -1,0 +1,28 @@
+{
+  "multipart": [
+    {
+      "when": {"base": "true"},
+      "apply":[
+        { "model":  "enderrift:block/base" }
+      ]
+    },
+    {
+      "when": {"axis": "y"},
+      "apply":[
+        { "model":  "enderrift:block/straight", "x": 90 }
+      ]
+    },
+    {
+      "when": {"axis": "z"},
+      "apply":[
+        { "model":  "enderrift:block/straight" }
+      ]
+    },
+    {
+      "when": {"axis": "x"},
+      "apply":[
+        { "model":  "enderrift:block/straight", "y": 90 }
+      ]
+    }
+  ]
+}

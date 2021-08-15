@@ -1,0 +1,70 @@
+package dev.gigaherz.enderrift.automation.browser;
+
+import dev.gigaherz.enderrift.automation.AggregatorBlockEntity;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.core.Direction;
+import net.minecraftforge.registries.ObjectHolder;
+
+import javax.annotation.Nullable;
+
+public class BrowserBlockEntity extends AggregatorBlockEntity
+{
+    @ObjectHolder("enderrift:browser")
+    public static BlockEntityType<BrowserBlockEntity> TYPE;
+
+    private int changeCount = 1;
+
+    private Direction facing = null;
+
+    public BrowserBlockEntity(BlockPos pos, BlockState state)
+    {
+        super(TYPE, pos, state);
+    }
+
+    @Nullable
+    public Direction getFacing()
+    {
+        if (facing == null && level != null)
+        {
+            BlockState state = level.getBlockState(worldPosition);
+            if (state.getProperties().contains(BrowserBlock.FACING))
+            {
+                facing = state.getValue(BrowserBlock.FACING).getOpposite();
+            }
+        }
+        return facing;
+    }
+
+    @Override
+    public void setChanged()
+    {
+        changeCount++;
+        facing = null;
+        super.setChanged();
+    }
+
+    @Override
+    protected void lazyDirty()
+    {
+        changeCount++;
+    }
+
+    public int getChangeCount()
+    {
+        return changeCount;
+    }
+
+    @Override
+    protected boolean canConnectSide(Direction side)
+    {
+        return side == getFacing().getOpposite();
+    }
+
+    public static void tickStatic(Level level, BlockPos blockPos, BlockState blockState, BrowserBlockEntity te)
+    {
+        te.tick();
+    }
+}

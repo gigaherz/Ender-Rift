@@ -6,12 +6,8 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'dev.gigaherz.gradle:ForgeGradle:4.1.12'
+        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.1.14', changing: true
     }
-}
-
-plugins {
-    id 'com.github.johnrengelman.shadow' version '4.0.4'
 }
 
 apply plugin: 'java'
@@ -19,6 +15,7 @@ apply plugin: 'net.minecraftforge.gradle'
 //apply plugin: 'maven-publish'
 
 repositories {
+    mavenCentral()
     mavenLocal()
     maven {
         url 'https://dogforce-games.com/maven'
@@ -39,7 +36,7 @@ repositories {
     flatDir { dirs 'deps' }
 }
 
-version = "2.2.12"
+version = "2.3.0"
 group= "gigaherz.enderRift"
 archivesBaseName = "EnderRift-UNKNOWN"
 
@@ -47,17 +44,14 @@ project.afterEvaluate {
     archivesBaseName = "EnderRift-${project.MC_VERSION}"
 }
 
-//sourceCompatibility = targetCompatibility = '1.8' // Need this here so eclipse task generates correctly.
-compileJava {
-    sourceCompatibility = targetCompatibility = '1.8'
-}
+java.toolchain.languageVersion = JavaLanguageVersion.of(16)
 
 sourceSets {
     main.resources.srcDirs += 'src/main/generated_resources'
 }
 
 minecraft {
-    mappings channel: 'snapshot', version: '20210309-1.16.5'
+    mappings channel: 'official', version: '1.17.1'
 
     accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
 
@@ -105,23 +99,16 @@ minecraft {
     }
 }
 
-configurations {
-    shade
-}
-
 dependencies {
-    minecraft 'net.minecraftforge:forge:1.16.5-36.0.46'
+    minecraft 'net.minecraftforge:forge:1.17.1-37.0.27'
 
     compileOnly 'org.jetbrains:annotations:20.1.0'
-
-    implementation "gigaherz.graph:GraphLib2:2.0.0"
-    shade "gigaherz.graph:GraphLib2:2.0.0"
 
     //deobfCompile "gigaherz.guidebook:Guidebook-1.12.2:2.9.0"
 
 
-    compileOnly fg.deobf("mezz.jei:jei-1.16.4:7.6.1.71:api")
-    runtimeOnly fg.deobf("mezz.jei:jei-1.16.4:7.6.1.71")
+    //compileOnly fg.deobf("mezz.jei:jei-1.16.4:7.6.1.71:api")
+    //runtimeOnly fg.deobf("mezz.jei:jei-1.16.4:7.6.1.71")
 
     //compileOnly fg.deobf("mcp.mobius.waila:Hwyla:1.10.8-B72_1.15.2")
 
@@ -132,22 +119,6 @@ dependencies {
     //runtimeOnly fg.deobf("flatdir:Industrial-Reborn-1.16.1:0.7.0")
     //runtimeOnly fg.deobf("flatdir:tesseract:1.0.7-mc1.16")
 }
-
-jar {
-    classifier = 'slim'
-}
-
-shadowJar {
-    classifier = ''
-    configurations = [project.configurations.shade]
-    relocate 'gigaherz.graph2', "${project.group}.shadow.graphlib2"
-}
-
-reobf {
-    shadowJar { }
-}
-
-tasks.build.dependsOn reobfShadowJar
 
 jar {
     from('/') {
@@ -166,9 +137,3 @@ jar {
         ])
     }
 }
-
-artifacts {
-    archives shadowJar
-}
-
-System.out.println("Running with java ${System.getProperty("java.version")} (${System.getProperty("os.arch")})")
