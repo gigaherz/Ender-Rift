@@ -1,5 +1,12 @@
 package gigaherz.enderRift;
 
+import net.minecraftforge.common.ForgeConfigSpec;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.config.ModConfig;
+import org.apache.commons.lang3.tuple.Pair;
+
+@Mod.EventBusSubscriber(modid= EnderRiftMod.MODID, bus= Mod.EventBusSubscriber.Bus.MOD)
 public class ConfigValues
 {
 
@@ -13,32 +20,54 @@ public class ConfigValues
     public static float PowerPerExtractionGeometric;
     public static float PowerPerExtractionCap;
 
-    public static boolean PreferContainersWithExistingStacks;
+    public static final ServerConfig SERVER;
+    public static final ForgeConfigSpec SERVER_SPEC;
 
-    public static boolean EnableRudimentaryGenerator;
-/*
-    public static void readConfig(Configuration config)
+    static
     {
-        config.load();
-
-        ConfigValues.config = config;
-
-        Property cfg = config.get("General", "PreferContainersWithExistingStacks", true);
-        cfg.setComment("If the game lags when using the Rift Browser or Interface, disable this to make item insertion take a bit less time.");
-        PreferContainersWithExistingStacks = cfg.getBoolean();
-
-        PowerPerInsertionConstant = (float) config.get("PowerUsage", "PowerPerInsertionConstant", 1.23).getDouble();
-        PowerPerInsertionLinear = (float) config.get("PowerUsage", "PowerPerInsertionLinear", 0.93).getDouble();
-        PowerPerInsertionGeometric = (float) config.get("PowerUsage", "PowerPerInsertionGeometric", 0).getDouble();
-        PowerPerInsertionCap = (float) config.get("PowerUsage", "PowerPerInsertionCap", 10000).getDouble();
-        PowerPerExtractionConstant = (float) config.get("PowerUsage", "PowerPerExtractionConstant", 0.97).getDouble();
-        PowerPerExtractionLinear = (float) config.get("PowerUsage", "PowerPerExtractionLinear", 0.013).getDouble();
-        PowerPerExtractionGeometric = (float) config.get("PowerUsage", "PowerPerExtractionGeometric", 0).getDouble();
-        PowerPerExtractionCap = (float) config.get("PowerUsage", "PowerPerExtractionCap", 10000).getDouble();
-
-        EnableRudimentaryGenerator = config.get("Generator", "Enable", true).getBoolean();
-
-        config.save();
+        final Pair<ServerConfig, ForgeConfigSpec> specPair = new ForgeConfigSpec.Builder().configure(ServerConfig::new);
+        SERVER_SPEC = specPair.getRight();
+        SERVER = specPair.getLeft();
     }
- */
+
+    public static class ServerConfig
+    {
+        public ForgeConfigSpec.DoubleValue powerPerInsertionConstant;
+        public ForgeConfigSpec.DoubleValue powerPerInsertionLinear;
+        public ForgeConfigSpec.DoubleValue powerPerInsertionGeometric;
+        public ForgeConfigSpec.DoubleValue powerPerInsertionCap;
+        public ForgeConfigSpec.DoubleValue powerPerExtractionConstant;
+        public ForgeConfigSpec.DoubleValue powerPerExtractionLinear;
+        public ForgeConfigSpec.DoubleValue powerPerExtractionGeometric;
+        public ForgeConfigSpec.DoubleValue powerPerExtractionCap;
+
+        ServerConfig(ForgeConfigSpec.Builder builder)
+        {
+            builder.push("PowerUsage");
+
+            powerPerInsertionConstant = builder.defineInRange("powerPerInsertionConstant", 1.23, 0, Double.MAX_VALUE);
+            powerPerInsertionLinear = builder.defineInRange("powerPerInsertionLinear", 0.93, 0, Double.MAX_VALUE);
+            powerPerInsertionGeometric = builder.defineInRange("powerPerInsertionGeometric", 0, 0, Double.MAX_VALUE);
+            powerPerInsertionCap = builder.defineInRange("powerPerInsertionCap", 10000, 0, Double.MAX_VALUE);
+            powerPerExtractionConstant = builder.defineInRange("powerPerExtractionConstant", 0.97, 0, Double.MAX_VALUE);
+            powerPerExtractionLinear = builder.defineInRange("powerPerExtractionLinear", 0.013, 0, Double.MAX_VALUE);
+            powerPerExtractionGeometric = builder.defineInRange("powerPerExtractionGeometric", 0, 0, Double.MAX_VALUE);
+            powerPerExtractionCap = builder.defineInRange("powerPerExtractionCap", 10000, 0, Double.MAX_VALUE);
+
+            builder.pop();
+        }
+    }
+
+    @SubscribeEvent
+    public static void modConfig(ModConfig.ModConfigEvent event)
+    {
+        PowerPerInsertionConstant = (float)(double)SERVER.powerPerInsertionConstant.get();
+        PowerPerInsertionLinear = (float)(double)SERVER.powerPerInsertionLinear.get();
+        PowerPerInsertionGeometric = (float)(double)SERVER.powerPerInsertionGeometric.get();
+        PowerPerInsertionCap = (float)(double)SERVER.powerPerInsertionCap.get();
+        PowerPerExtractionConstant = (float)(double)SERVER.powerPerExtractionConstant.get();
+        PowerPerExtractionLinear = (float)(double)SERVER.powerPerExtractionLinear.get();
+        PowerPerExtractionGeometric = (float)(double)SERVER.powerPerExtractionGeometric.get();
+        PowerPerExtractionCap = (float)(double)SERVER.powerPerExtractionCap.get();
+    }
 }

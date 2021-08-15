@@ -104,12 +104,12 @@ public class DriverBlock extends AggregatorBlock<DriverTileEntity>
     private BlockState getStateForConnections(BlockState state, IWorld world, BlockPos pos)
     {
         return state
-                .with(NORTH, isConnectableAutomation(world, pos, Direction.NORTH))
-                .with(SOUTH, isConnectableAutomation(world, pos, Direction.SOUTH))
-                .with(WEST, isConnectableAutomation(world, pos, Direction.WEST))
-                .with(EAST, isConnectableAutomation(world, pos, Direction.EAST))
-                .with(UP, isConnectableAutomation(world, pos, Direction.UP))
-                .with(DOWN, isConnectableAutomation(world, pos, Direction.DOWN));
+                .with(NORTH, isConnectablePower(world, pos, Direction.NORTH))
+                .with(SOUTH, isConnectablePower(world, pos, Direction.SOUTH))
+                .with(WEST, isConnectablePower(world, pos, Direction.WEST))
+                .with(EAST, isConnectablePower(world, pos, Direction.EAST))
+                .with(UP, isConnectablePower(world, pos, Direction.UP))
+                .with(DOWN, isConnectablePower(world, pos, Direction.DOWN));
     }
 
     @Override

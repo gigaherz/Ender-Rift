@@ -39,7 +39,7 @@ repositories {
     flatDir { dirs 'deps' }
 }
 
-version = "2.2.12"
+version = "2.2.13"
 group= "gigaherz.enderRift"
 archivesBaseName = "EnderRift-UNKNOWN"
 
