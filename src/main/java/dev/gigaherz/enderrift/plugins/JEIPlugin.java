@@ -1,7 +1,7 @@
 package dev.gigaherz.enderrift.plugins;
-/*
-import EnderRiftMod;
-import CraftingBrowserContainer;
+
+import dev.gigaherz.enderrift.EnderRiftMod;
+import dev.gigaherz.enderrift.automation.browser.CraftingBrowserContainer;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
 import mezz.jei.api.constants.VanillaRecipeCategoryUid;
@@ -26,4 +26,4 @@ public class JEIPlugin implements IModPlugin
                 CraftingBrowserContainer.CRAFTING_SLOT_START, 9,
                 CraftingBrowserContainer.INVENTORY_SLOT_START, 36);
     }
-}*/
+}

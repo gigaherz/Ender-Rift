@@ -96,10 +96,10 @@ public class GeneratorBlock extends BaseEntityBlock
         if (worldIn.isClientSide)
             return InteractionResult.SUCCESS;
 
-        NetworkHooks.openGui((ServerPlayer) player,
-                new SimpleMenuProvider((id, playerInventory, playerEntity) -> new GeneratorContainer(id, playerInventory, be.inventory(), be.getFields(), ContainerLevelAccess.create(worldIn, pos)),
-                        new TranslatableComponent("container.enderrift.generator")
-                ), pos);
+        player.openMenu(new SimpleMenuProvider(
+                (id, playerInventory, playerEntity) -> new GeneratorContainer(id, playerInventory, be.inventory(), be.getFields(), ContainerLevelAccess.create(worldIn, pos)),
+                new TranslatableComponent("container.enderrift.generator")
+        ));
 
         return InteractionResult.SUCCESS;
     }
