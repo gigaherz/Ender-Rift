@@ -243,9 +243,9 @@ public class GeneratorBlockEntity extends BlockEntity
     }
 
     @Override
-    public CompoundTag save(CompoundTag compound)
+    protected void saveAdditional(CompoundTag compound)
     {
-        compound = super.save(compound);
+        super.saveAdditional(compound);
 
         compound.putInt("heatLevel", heatLevel);
         compound.putInt("burnTimeRemaining", burnTimeRemaining);
@@ -253,8 +253,6 @@ public class GeneratorBlockEntity extends BlockEntity
         compound.putInt("timeInterval", timeInterval);
         compound.put("storedEnergy", energyBuffer.serializeNBT());
         compound.put("fuelSlot", fuelSlot.serializeNBT());
-
-        return compound;
     }
 
     @Override

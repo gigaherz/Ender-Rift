@@ -2,11 +2,11 @@ package dev.gigaherz.enderrift.rift.storage;
 
 import com.google.common.collect.Lists;
 import dev.gigaherz.enderrift.rift.IRiftChangeListener;
+import net.minecraft.nbt.Tag;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.core.BlockPos;
-import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemHandlerHelper;
 
@@ -72,7 +72,7 @@ public class RiftInventory implements IItemHandler
 
     public void readFromNBT(CompoundTag nbtTagCompound)
     {
-        ListTag itemList = nbtTagCompound.getList("Items", Constants.NBT.TAG_COMPOUND);
+        ListTag itemList = nbtTagCompound.getList("Items", Tag.TAG_COMPOUND);
 
         inventorySlots.clear();
 

@@ -183,13 +183,13 @@ public class RiftBlockEntity extends BlockEntity implements IRiftChangeListener
     }
 
     @Override
-    public CompoundTag save(CompoundTag compound)
+    protected void saveAdditional(CompoundTag compound)
     {
-        compound = super.save(compound);
+        super.saveAdditional(compound);
+
         compound.put("Energy", energyBuffer.serializeNBT());
         compound.putBoolean("Powered", powered);
         compound.putInt("RiftId", riftId);
-        return compound;
     }
 
     @Override
@@ -210,7 +210,7 @@ public class RiftBlockEntity extends BlockEntity implements IRiftChangeListener
     @Override
     public ClientboundBlockEntityDataPacket getUpdatePacket()
     {
-        return new ClientboundBlockEntityDataPacket(worldPosition, 0, getUpdateTag());
+        return ClientboundBlockEntityDataPacket.create(this);
     }
 
     @Override

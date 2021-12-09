@@ -69,13 +69,11 @@ public class DriverBlockEntity extends AggregatorBlockEntity
     }
 
     @Override
-    public CompoundTag save(CompoundTag compound)
+    protected void saveAdditional(CompoundTag compound)
     {
-        compound = super.save(compound);
+        super.saveAdditional(compound);
 
         compound.put("storedEnergy", energyBuffer.serializeNBT());
-
-        return compound;
     }
 
     public static void tickStatic(Level level, BlockPos blockPos, BlockState blockState, DriverBlockEntity te)

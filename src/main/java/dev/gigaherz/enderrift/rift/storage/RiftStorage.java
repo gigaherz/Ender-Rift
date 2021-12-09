@@ -2,11 +2,11 @@ package dev.gigaherz.enderrift.rift.storage;
 
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.world.level.Level;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.storage.DimensionDataStorage;
 import net.minecraft.world.level.saveddata.SavedData;
-import net.minecraftforge.common.util.Constants;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -25,7 +25,7 @@ public class RiftStorage extends SavedData
 
     public RiftStorage(CompoundTag nbt)
     {
-        ListTag riftList = nbt.getList("Rifts", Constants.NBT.TAG_COMPOUND);
+        ListTag riftList = nbt.getList("Rifts", Tag.TAG_COMPOUND);
 
         rifts.clear();
 

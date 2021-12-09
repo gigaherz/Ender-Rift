@@ -1,10 +1,5 @@
 modLoader="javafml"
-loaderVersion="[37,)"
-issueTrackerURL="https://github.com/gigaherz/Ender-Rift/issues"
-displayURL="https://github.com/gigaherz/Ender-Rift"
-logoFile="logo.png"
-credits="Thanks for this example mod goes to Java"
-authors="gigaherz"
+loaderVersion="[38,)"
 license="BSD (3 clause)"
 
 [[mods]]
@@ -15,17 +10,22 @@ displayName="Ender-Rift"
 description='''
 Bottomless Powered Inventory
 '''
+issueTrackerURL="https://github.com/gigaherz/Ender-Rift/issues"
+displayURL="https://github.com/gigaherz/Ender-Rift"
+logoFile="logo.png"
+credits="Thanks for this example mod goes to Java"
+authors="gigaherz"
 
 [[dependencies.enderrift]]
    modId="forge"
    mandatory=true
-   versionRange="[37.0.15,)"
+   versionRange="[38.0.16,)"
    ordering="NONE"
    side="BOTH"
 [[dependencies.enderrift]]
    modId="minecraft"
    mandatory=true
-   versionRange="[1.17.1,1.18)"
+   versionRange="[1.18,1.19)"
    ordering="NONE"
    side="BOTH"
 [[dependencies.enderrift]]

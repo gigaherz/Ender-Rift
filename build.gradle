@@ -41,7 +41,7 @@ repositories {
     flatDir { dirs 'deps' }
 }
 
-version = "2.3.0"
+version = "2.4.0"
 group= "gigaherz.enderRift"
 archivesBaseName = "EnderRift-UNKNOWN"
 
@@ -49,14 +49,15 @@ project.afterEvaluate {
     archivesBaseName = "EnderRift-${project.MC_VERSION}"
 }
 
-java.toolchain.languageVersion = JavaLanguageVersion.of(16)
+java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 
 sourceSets {
     main.resources.srcDirs += 'src/main/generated_resources'
 }
 
 minecraft {
-    mappings channel: 'parchment', version: '2021.08.29-1.17.1'
+    //mappings channel: 'parchment', version: '2021.08.29-1.17.1'
+    mappings channel: 'official', version: '1.18'
 
     accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
 
@@ -120,15 +121,15 @@ minecraft.runs.all {
     }
 }
 dependencies {
-    minecraft 'net.minecraftforge:forge:1.17.1-37.0.75'
+    minecraft 'net.minecraftforge:forge:1.18-38.0.16'
 
     compileOnly 'org.jetbrains:annotations:20.1.0'
 
     //deobfCompile "gigaherz.guidebook:Guidebook-1.12.2:2.9.0"
     implementation fg.deobf("dev.gigaherz.graph:GraphLib3:3.0.2")
 
-    compileOnly fg.deobf("mezz.jei:jei-1.17.1:8.0.0.12:api")
-    runtimeOnly fg.deobf("mezz.jei:jei-1.17.1:8.0.0.12")
+    compileOnly fg.deobf("mezz.jei:jei-1.18:9.0.0.40:api")
+    runtimeOnly fg.deobf("mezz.jei:jei-1.18:9.0.0.40")
 
     //compileOnly fg.deobf("mcp.mobius.waila:Hwyla:1.10.8-B72_1.15.2")
 
@@ -138,8 +139,8 @@ dependencies {
     //runtimeOnly fg.deobf("flatdir:tesseract:1.0.7-mc1.16")
 
     // TheOneProbe - 1.17-4.0.2
-    compileOnly fg.deobf("curse.maven:the-one-probe-245211:3430022")
-    runtimeOnly fg.deobf("curse.maven:the-one-probe-245211:3430022")
+    compileOnly fg.deobf("curse.maven:the-one-probe-245211:3550084")
+    runtimeOnly fg.deobf("curse.maven:the-one-probe-245211:3550084")
 }
 
 jar {

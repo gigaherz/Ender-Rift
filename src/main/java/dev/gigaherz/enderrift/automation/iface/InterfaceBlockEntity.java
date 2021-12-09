@@ -4,6 +4,7 @@ import dev.gigaherz.enderrift.common.IPoweredAutomation;
 import dev.gigaherz.enderrift.automation.AggregatorBlockEntity;
 import dev.gigaherz.enderrift.automation.AutomationHelper;
 import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.Tag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.entity.player.Player;
@@ -14,7 +15,6 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.core.Direction;
 import net.minecraft.core.NonNullList;
 import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.*;
 import net.minecraftforge.registries.ObjectHolder;
@@ -170,7 +170,7 @@ public class InterfaceBlockEntity extends AggregatorBlockEntity implements IPowe
     {
         super.load(compound);
 
-        ListTag _filters = compound.getList("Filters", Constants.NBT.TAG_COMPOUND);
+        ListTag _filters = compound.getList("Filters", Tag.TAG_COMPOUND);
         for (int i = 0; i < _filters.size(); ++i)
         {
             CompoundTag nbttagcompound = _filters.getCompound(i);
@@ -182,7 +182,7 @@ public class InterfaceBlockEntity extends AggregatorBlockEntity implements IPowe
             }
         }
 
-        ListTag _outputs = compound.getList("Outputs", Constants.NBT.TAG_COMPOUND);
+        ListTag _outputs = compound.getList("Outputs", Tag.TAG_COMPOUND);
         for (int i = 0; i < _outputs.size(); ++i)
         {
             CompoundTag slot = _outputs.getCompound(i);
@@ -196,9 +196,9 @@ public class InterfaceBlockEntity extends AggregatorBlockEntity implements IPowe
     }
 
     @Override
-    public CompoundTag save(CompoundTag compound)
+    protected void saveAdditional(CompoundTag compound)
     {
-        compound = super.save(compound);
+        super.saveAdditional(compound);
 
         ListTag _filters = new ListTag();
         for (int i = 0; i < filters.getSlots(); ++i)
@@ -229,8 +229,6 @@ public class InterfaceBlockEntity extends AggregatorBlockEntity implements IPowe
         }
 
         compound.put("Outputs", _outputs);
-
-        return compound;
     }
 
     public boolean isUseableByPlayer(Player player)

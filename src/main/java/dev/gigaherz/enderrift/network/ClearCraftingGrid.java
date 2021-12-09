@@ -3,7 +3,7 @@ package dev.gigaherz.enderrift.network;
 import dev.gigaherz.enderrift.automation.browser.CraftingBrowserContainer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraftforge.fmllegacy.network.NetworkEvent;
+import net.minecraftforge.network.NetworkEvent;
 
 import java.util.function.Supplier;
 
