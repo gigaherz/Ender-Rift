@@ -7,6 +7,7 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.datafixers.util.Pair;
 import dev.gigaherz.enderrift.automation.browser.*;
 import dev.gigaherz.enderrift.network.*;
+import dev.gigaherz.enderrift.plugins.TheOneProbeProviders;
 import dev.gigaherz.enderrift.rift.*;
 import dev.gigaherz.enderrift.automation.driver.DriverBlock;
 import dev.gigaherz.enderrift.automation.driver.DriverBlockEntity;
@@ -259,9 +260,7 @@ public class EnderRiftMod
 
     public void interComms(InterModEnqueueEvent event)
     {
-        InterModComms.sendTo("gbook", "registerBook", () -> EnderRiftMod.location("xml/book.xml"));
-
-        //InterModComms.sendTo("theoneprobe", "getTheOneProbe", () -> TheOneProbeProviders.create());
+        InterModComms.sendTo("theoneprobe", "getTheOneProbe", () -> TheOneProbeProviders.create());
     }
 
     public void commandEvent(RegisterCommandsEvent event)

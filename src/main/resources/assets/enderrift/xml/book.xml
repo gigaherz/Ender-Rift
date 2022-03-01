@@ -77,7 +77,7 @@
                 <stack item="enderrift:driver" x="4" y="0" />
             </space>
             <p>The Automation Driver is a block that can provide the network with power, but can not connect to inventories by itself.</p>
-            <p>This block accepts both Forge Energy and Tesla, as a source of power. Both are treated as being equivalent as the old RF, in terms of value scaling.</p>
+            <p>This block accepts Forge Energy as a source of power. Both are treated as being equivalent as the old RF, in terms of value scaling.</p>
             <big_recipe_>
                 <special feature="lookup recipe" item="enderrift:driver" />
             </big_recipe_>
@@ -90,11 +90,11 @@
                 <space height="7" />
                 <p indent="29" underline="true" italics="true">Generating power</p>
             </space>
-            <p>Although any third-party generator/cable using the Forge Energy or Tesla APIs will work to power the Rift and the Driver, for the sake of not relying on external mods, Ender-Rift has its own limited power generation solution.</p>
+            <p>Although any third-party generator/cable using the Forge Energy will work to power the Rift and the Driver, for the sake of not relying on external mods, Ender-Rift has its own limited power generation solution.</p>
             <p>The Rudimentary Generator is slow to start, but once it's heated up, it will reach up to 200 RF-equivalent power units per tick. It is powered by the same fuels that can power a furnace, but it will do no smelting of its own, and it can't be used to charge items.</p>
         </page>
         <page>
-            <p>The Rudimentary Generator will push power to Forge- and Tesla-aware consumers/receivers, at no more than 800 RF-equivalent units per tick.</p>
+            <p>The Rudimentary Generator will push power to Forge Energy consumers/receivers, at no more than 800 RF-equivalent units per tick.</p>
         </page>
     </chapter>
     <chapter id="structure">
