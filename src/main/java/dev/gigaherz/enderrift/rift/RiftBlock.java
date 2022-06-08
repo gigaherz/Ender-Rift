@@ -31,6 +31,8 @@ import java.util.List;
 
 import org.jetbrains.annotations.Nullable;
 
+import net.minecraft.world.level.block.state.BlockBehaviour.Properties;
+
 public class RiftBlock extends BaseEntityBlock
 {
     public static final BooleanProperty ASSEMBLED = BooleanProperty.create("assembled");
@@ -45,7 +47,7 @@ public class RiftBlock extends BaseEntityBlock
                 .setValue(ASSEMBLED, false));
     }
 
-    public RenderShape getRenderShape(BlockState p_49232_) {
+    public RenderShape getRenderShape(BlockState pState) {
         return RenderShape.MODEL;
     }
 
@@ -82,9 +84,9 @@ public class RiftBlock extends BaseEntityBlock
 
     @Nullable
     @Override
-    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level p_153212_, BlockState p_153213_, BlockEntityType<T> p_153214_)
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level pLevel, BlockState pState, BlockEntityType<T> pBlockEntityType)
     {
-        return BaseEntityBlock.createTickerHelper(p_153214_, RiftBlockEntity.TYPE, RiftBlockEntity::tickStatic);
+        return BaseEntityBlock.createTickerHelper(pBlockEntityType, RiftBlockEntity.TYPE, RiftBlockEntity::tickStatic);
     }
 
     @Deprecated

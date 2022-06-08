@@ -27,6 +27,9 @@ repositories {
     mavenCentral()
     mavenLocal()
     maven {
+        url "$projectDir/../CommonMaven"
+    }
+    maven {
         url 'https://dogforce-games.com/maven'
     }
     maven {
@@ -45,7 +48,7 @@ repositories {
     flatDir { dirs 'deps' }
 }
 
-version = "2.4.2"
+version = "2.4.5"
 group= "dev.gigaherz.enderrift"
 archivesBaseName = "EnderRift-UNKNOWN"
 
@@ -60,8 +63,8 @@ sourceSets {
 }
 
 minecraft {
-    //mappings channel: 'official', version: '1.18.1'
-    mappings channel: 'parchment', version: '2021.12.19-1.18.1'
+    //mappings channel: 'official', version: '1.18.2'
+    mappings channel: 'parchment', version: '2022.05.02-1.18.2'
 
     accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
 
@@ -120,16 +123,16 @@ configurations {
 }
 
 dependencies {
-    minecraft 'net.minecraftforge:forge:1.18.1-39.1.1'
+    minecraft 'net.minecraftforge:forge:1.18.2-40.1.16'
 
     compileOnly 'org.jetbrains:annotations:20.1.0'
 
-    implementation fg.deobf("dev.gigaherz.guidebook:Guidebook-1.18:3.4.0")
+    implementation fg.deobf("dev.gigaherz.guidebook:Guidebook-1.18.2:3.4.0")
 
     shade implementation(fg.deobf("dev.gigaherz.graph:GraphLib3:3.0.2"))
 
-    compileOnly fg.deobf("mezz.jei:jei-1.18.1:9.2.1.69:api")
-    runtimeOnly fg.deobf("mezz.jei:jei-1.18.1:9.2.1.69")
+    compileOnly fg.deobf("mezz.jei:jei-1.18.2:9.7.0.194:api")
+    runtimeOnly fg.deobf("mezz.jei:jei-1.18.2:9.7.0.194")
 
     //compileOnly fg.deobf("mcp.mobius.waila:Hwyla:1.10.8-B72_1.15.2")
 
@@ -138,9 +141,9 @@ dependencies {
     //runtimeOnly fg.deobf("flatdir:Industrial-Reborn-1.16.1:0.7.0")
     //runtimeOnly fg.deobf("flatdir:tesseract:1.0.7-mc1.16")
 
-    // TheOneProbe - 1.18-5.0.4
-    compileOnly fg.deobf("curse.maven:the-one-probe-245211:3665852")
-    runtimeOnly fg.deobf("curse.maven:the-one-probe-245211:3665852")
+    // TheOneProbe - 1.18-5.1.0
+    compileOnly fg.deobf("curse.maven:the-one-probe-245211:3671753")
+    runtimeOnly fg.deobf("curse.maven:the-one-probe-245211:3671753")
 }
 
 jar {

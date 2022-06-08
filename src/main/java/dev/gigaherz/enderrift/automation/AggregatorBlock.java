@@ -15,6 +15,8 @@ import net.minecraft.world.level.Level;
 
 import org.jetbrains.annotations.Nullable;
 
+import net.minecraft.world.level.block.state.BlockBehaviour.Properties;
+
 public abstract class AggregatorBlock<T extends AggregatorBlockEntity> extends BaseEntityBlock
 {
     protected AggregatorBlock(Properties properties)
@@ -22,17 +24,17 @@ public abstract class AggregatorBlock<T extends AggregatorBlockEntity> extends B
         super(properties);
     }
 
-    public RenderShape getRenderShape(BlockState p_49232_) {
+    public RenderShape getRenderShape(BlockState pState) {
         return RenderShape.MODEL;
     }
 
     @org.jetbrains.annotations.Nullable
     @Override
-    public abstract BlockEntity newBlockEntity(BlockPos p_153215_, BlockState p_153216_);
+    public abstract BlockEntity newBlockEntity(BlockPos pPos, BlockState pState);
 
     @Nullable
     @Override
-    public abstract <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level p_153212_, BlockState p_153213_, BlockEntityType<T> p_153214_);
+    public abstract <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level pLevel, BlockState pState, BlockEntityType<T> pBlockEntityType);
 
     @Deprecated
     @Override

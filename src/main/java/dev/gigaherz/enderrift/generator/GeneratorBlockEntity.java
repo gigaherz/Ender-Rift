@@ -57,8 +57,6 @@ public class GeneratorBlockEntity extends BlockEntity
             if (getBurnTime(stack) <= 0)
                 return stack;
 
-            int[] x = {1, 2, 3, 4};
-
             return super.insertItem(slot, stack, simulate);
         }
     };

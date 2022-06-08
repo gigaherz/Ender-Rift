@@ -68,9 +68,9 @@ public class StructureCornerBlock extends AggregatorBlock<StructureCornerBlockEn
     }
 
     @Override
-    public @org.jetbrains.annotations.Nullable <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level p_153212_, BlockState p_153213_, BlockEntityType<T> p_153214_)
+    public @org.jetbrains.annotations.Nullable <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level pLevel, BlockState pState, BlockEntityType<T> pBlockEntityType)
     {
-        return BaseEntityBlock.createTickerHelper(p_153214_, StructureCornerBlockEntity.TYPE, StructureCornerBlockEntity::tickStatic);
+        return BaseEntityBlock.createTickerHelper(pBlockEntityType, StructureCornerBlockEntity.TYPE, StructureCornerBlockEntity::tickStatic);
     }
 
     @Override

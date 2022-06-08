@@ -23,6 +23,8 @@ import dev.gigaherz.enderrift.generator.GeneratorScreen;
 import dev.gigaherz.enderrift.generator.GeneratorBlockEntity;
 import dev.gigaherz.enderrift.rift.storage.RiftInventory;
 import dev.gigaherz.enderrift.rift.storage.RiftStorage;
+import net.minecraft.data.tags.BlockTagsProvider;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.material.Material;
@@ -47,6 +49,8 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.world.level.storage.loot.LootTables;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.Tags;
+import net.minecraftforge.common.data.ExistingFileHelper;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -321,7 +325,7 @@ public class EnderRiftMod
                 //gen.addProvider(new Recipes(gen));
                 gen.addProvider(new LootTableGen(gen));
                 //gen.addProvider(new ItemTagGens(gen));
-                //gen.addProvider(new BlockTagGens(gen));
+                gen.addProvider(new BlockTagGens(gen, event.getExistingFileHelper()));
             }
             if (event.includeClient())
             {
@@ -379,6 +383,29 @@ public class EnderRiftMod
                             .filter(b -> b.getRegistryName().getNamespace().equals(MODID))
                             .collect(Collectors.toList());
                 }
+            }
+        }
+
+        private static class BlockTagGens extends BlockTagsProvider implements DataProvider
+        {
+            public BlockTagGens(DataGenerator gen, ExistingFileHelper existingFileHelper)
+            {
+                super(gen, MODID, existingFileHelper);
+            }
+
+            @Override
+            protected void addTags()
+            {
+                tag(BlockTags.MINEABLE_WITH_PICKAXE)
+                        .add(EnderRiftBlocks.BROWSER)
+                        .add(EnderRiftBlocks.CRAFTING_BROWSER)
+                        .add(EnderRiftBlocks.INTERFACE)
+                        .add(EnderRiftBlocks.PROXY)
+                        .add(EnderRiftBlocks.DRIVER)
+                        .add(EnderRiftBlocks.RIFT)
+                        .add(EnderRiftBlocks.GENERATOR)
+                        .add(EnderRiftBlocks.STRUCTURE_CORNER)
+                        .add(EnderRiftBlocks.STRUCTURE_EDGE);
             }
         }
     }

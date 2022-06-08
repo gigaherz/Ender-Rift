@@ -29,6 +29,8 @@ import net.minecraft.world.level.Level;
 
 import javax.annotation.Nullable;
 
+import net.minecraft.world.level.block.state.BlockBehaviour.Properties;
+
 public class GeneratorBlock extends BaseEntityBlock
 {
     public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
@@ -41,7 +43,7 @@ public class GeneratorBlock extends BaseEntityBlock
     public static final VoxelShape SHAPE_SUPPORTS_NS = Block.box(1, 4, 5, 15, 11, 11);
     public static final VoxelShape SHAPE_SUPPORTS_WE = Block.box(5, 4, 1, 11, 11, 15);
 
-    public RenderShape getRenderShape(BlockState p_49232_) {
+    public RenderShape getRenderShape(BlockState pState) {
         return RenderShape.MODEL;
     }
 
@@ -71,9 +73,9 @@ public class GeneratorBlock extends BaseEntityBlock
 
     @org.jetbrains.annotations.Nullable
     @Override
-    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level p_153212_, BlockState p_153213_, BlockEntityType<T> p_153214_)
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level pLevel, BlockState pState, BlockEntityType<T> pBlockEntityType)
     {
-        return BaseEntityBlock.createTickerHelper(p_153214_, GeneratorBlockEntity.TYPE, GeneratorBlockEntity::tickStatic);
+        return BaseEntityBlock.createTickerHelper(pBlockEntityType, GeneratorBlockEntity.TYPE, GeneratorBlockEntity::tickStatic);
     }
 
     @Override

@@ -28,6 +28,8 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import java.util.List;
 import java.util.function.Function;
 
+import net.minecraft.world.level.block.state.BlockBehaviour.Properties;
+
 public class StructureEdgeBlock extends Block
 {
     public static final EnumProperty<Direction.Axis> AXIS = BlockStateProperties.AXIS;

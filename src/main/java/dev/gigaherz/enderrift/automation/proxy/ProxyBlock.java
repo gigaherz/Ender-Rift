@@ -24,6 +24,8 @@ import net.minecraft.world.level.LevelAccessor;
 import javax.annotation.Nullable;
 import java.util.Map;
 
+import net.minecraft.world.level.block.state.BlockBehaviour.Properties;
+
 public class ProxyBlock extends AggregatorBlock<ProxyBlockEntity>
 {
     public static final BooleanProperty NORTH = BlockStateProperties.NORTH;
@@ -75,9 +77,9 @@ public class ProxyBlock extends AggregatorBlock<ProxyBlockEntity>
     }
 
     @Override
-    public @org.jetbrains.annotations.Nullable <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level p_153212_, BlockState p_153213_, BlockEntityType<T> p_153214_)
+    public @org.jetbrains.annotations.Nullable <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level pLevel, BlockState pState, BlockEntityType<T> pBlockEntityType)
     {
-        return BaseEntityBlock.createTickerHelper(p_153214_, ProxyBlockEntity.TYPE, ProxyBlockEntity::tickStatic);
+        return BaseEntityBlock.createTickerHelper(pBlockEntityType, ProxyBlockEntity.TYPE, ProxyBlockEntity::tickStatic);
     }
 
     @Deprecated

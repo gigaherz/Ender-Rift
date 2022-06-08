@@ -28,6 +28,8 @@ import net.minecraft.world.level.Level;
 
 import javax.annotation.Nullable;
 
+import net.minecraft.world.level.block.state.BlockBehaviour.Properties;
+
 public class BrowserBlock extends AggregatorBlock<BrowserBlockEntity>
 {
     public static final DirectionProperty FACING = BlockStateProperties.FACING;
@@ -92,9 +94,9 @@ public class BrowserBlock extends AggregatorBlock<BrowserBlockEntity>
     }
 
     @Override
-    public @org.jetbrains.annotations.Nullable <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level p_153212_, BlockState p_153213_, BlockEntityType<T> p_153214_)
+    public @org.jetbrains.annotations.Nullable <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level pLevel, BlockState pState, BlockEntityType<T> pBlockEntityType)
     {
-        return BaseEntityBlock.createTickerHelper(p_153214_, BrowserBlockEntity.TYPE, BrowserBlockEntity::tickStatic);
+        return BaseEntityBlock.createTickerHelper(pBlockEntityType, BrowserBlockEntity.TYPE, BrowserBlockEntity::tickStatic);
     }
 
     @Deprecated

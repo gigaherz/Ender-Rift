@@ -1,6 +1,7 @@
 modLoader="javafml"
 loaderVersion="[38,)"
 license="BSD (3 clause)"
+issueTrackerURL="https://github.com/gigaherz/Ender-Rift/issues"
 
 [[mods]]
 modId="enderrift"
@@ -10,10 +11,8 @@ displayName="Ender-Rift"
 description='''
 Bottomless Powered Inventory
 '''
-issueTrackerURL="https://github.com/gigaherz/Ender-Rift/issues"
 displayURL="https://github.com/gigaherz/Ender-Rift"
 logoFile="logo.png"
-credits="Thanks for this example mod goes to Java"
 authors="gigaherz"
 
 [[dependencies.enderrift]]
