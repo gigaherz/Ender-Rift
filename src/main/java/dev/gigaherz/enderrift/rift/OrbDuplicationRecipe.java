@@ -20,22 +20,19 @@ import net.minecraft.world.item.crafting.SimpleRecipeSerializer;
 
 public class OrbDuplicationRecipe extends CustomRecipe implements IShapedRecipe<CraftingContainer>
 {
-    @ObjectHolder("enderrift:orb_duplication")
-    public static SimpleRecipeSerializer<OrbDuplicationRecipe> SERIALIZER;
-
     private NonNullList<Ingredient> ingredients = NonNullList.of(
             Ingredient.EMPTY,
             Ingredient.of(Items.MAGMA_CREAM),
             Ingredient.of(Items.ENDER_PEARL),
             Ingredient.of(Items.MAGMA_CREAM),
             Ingredient.of(Items.ENDER_PEARL),
-            Ingredient.of(EnderRiftMod.EnderRiftItems.RIFT_ORB),
+            Ingredient.of(EnderRiftMod.RIFT_ORB.get()),
             Ingredient.of(Items.ENDER_PEARL),
             Ingredient.of(Items.MAGMA_CREAM),
             Ingredient.of(Items.ENDER_PEARL),
             Ingredient.of(Items.MAGMA_CREAM)
     );
-    private ItemStack output = new ItemStack(EnderRiftMod.EnderRiftItems.RIFT_ORB, 2);
+    private ItemStack output = new ItemStack(EnderRiftMod.RIFT_ORB.get(), 2);
 
     public OrbDuplicationRecipe(ResourceLocation recipeId)
     {
@@ -58,7 +55,7 @@ public class OrbDuplicationRecipe extends CustomRecipe implements IShapedRecipe<
         if (stack.getCount() <= 0)
             return false;
 
-        if (stack.getItem() != EnderRiftMod.EnderRiftItems.RIFT_ORB)
+        if (stack.getItem() != EnderRiftMod.RIFT_ORB.get())
             return false;
 
         CompoundTag tag = stack.getTag();
@@ -127,7 +124,7 @@ public class OrbDuplicationRecipe extends CustomRecipe implements IShapedRecipe<
     @Override
     public RecipeSerializer<?> getSerializer()
     {
-        return SERIALIZER;
+        return EnderRiftMod.ORB_DUPLICATION.get();
     }
 
     @Override

@@ -27,7 +27,7 @@ public class ClientHelper
     @SubscribeEvent
     public static void clientSetup(FMLClientSetupEvent event)
     {
-        BlockEntityRenderers.register(RiftBlockEntity.TYPE, RiftRenderer::new);
+        BlockEntityRenderers.register(EnderRiftMod.RIFT_BLOCK_ENTITY.get(), RiftRenderer::new);
     }
 
     public static void handleSendSlotChanges(final SendSlotChanges message)

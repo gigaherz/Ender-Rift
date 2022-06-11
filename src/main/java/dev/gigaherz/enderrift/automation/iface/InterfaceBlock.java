@@ -1,7 +1,9 @@
 package dev.gigaherz.enderrift.automation.iface;
 
+import dev.gigaherz.enderrift.EnderRiftMod;
 import dev.gigaherz.enderrift.automation.AggregatorBlock;
 import dev.gigaherz.enderrift.automation.browser.BrowserBlock;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.inventory.ContainerLevelAccess;
 import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.Block;
@@ -25,7 +27,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.network.NetworkHooks;
@@ -60,7 +61,7 @@ public class InterfaceBlock extends AggregatorBlock<InterfaceBlockEntity>
     @Override
     public @org.jetbrains.annotations.Nullable <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level pLevel, BlockState pState, BlockEntityType<T> pBlockEntityType)
     {
-        return BaseEntityBlock.createTickerHelper(pBlockEntityType, InterfaceBlockEntity.TYPE, InterfaceBlockEntity::tickStatic);
+        return BaseEntityBlock.createTickerHelper(pBlockEntityType, EnderRiftMod.INTERFACE_BLOCK_ENTITY.get(), InterfaceBlockEntity::tickStatic);
     }
 
     @Deprecated
@@ -91,7 +92,7 @@ public class InterfaceBlock extends AggregatorBlock<InterfaceBlockEntity>
 
         NetworkHooks.openGui((ServerPlayer) player, new SimpleMenuProvider(
                 (id, playerInventory, playerEntity) -> new InterfaceContainer(id, playerInventory, be.inventoryFilter(), be.inventoryOutputs(), ContainerLevelAccess.create(be.getLevel(), be.getBlockPos())),
-                new TranslatableComponent("container.enderrift.interface")), pos);
+                Component.translatable("container.enderrift.interface")), pos);
 
         return InteractionResult.SUCCESS;
     }

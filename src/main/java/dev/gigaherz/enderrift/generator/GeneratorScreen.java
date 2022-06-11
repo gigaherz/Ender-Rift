@@ -10,8 +10,6 @@ import net.minecraft.client.resources.language.I18n;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraft.network.chat.TranslatableComponent;
 
 import java.util.List;
 
@@ -86,8 +84,8 @@ public class GeneratorScreen extends AbstractContainerScreen<GeneratorContainer>
             return;
 
         List<Component> tooltip = Lists.newArrayList();
-        tooltip.add(new TranslatableComponent("text.enderrift.generator.energy.label"));
-        tooltip.add(new TextComponent(String.format("%d / %d RF", clientFields.energy, GeneratorBlockEntity.POWER_LIMIT)));
+        tooltip.add(Component.translatable("text.enderrift.generator.energy.label"));
+        tooltip.add(Component.literal(String.format("%d / %d RF", clientFields.energy, GeneratorBlockEntity.POWER_LIMIT)));
 
         // renderTooltip
         renderComponentTooltip(matrixStack, tooltip, mx - leftPos, my - topPos);

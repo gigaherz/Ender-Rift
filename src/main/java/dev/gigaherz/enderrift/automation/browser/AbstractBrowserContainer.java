@@ -17,7 +17,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.network.protocol.game.ClientboundContainerSetSlotPacket;
 import net.minecraft.core.NonNullList;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
 import net.minecraftforge.network.NetworkDirection;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.IItemHandlerModifiable;
@@ -327,14 +326,13 @@ public class AbstractBrowserContainer extends AbstractContainerMenu
     @Override
     public void clicked(int slotId, int clickedButton, ClickType mode, Player playerIn)
     {
-        Inventory inventoryPlayer = playerIn.getInventory();
-
         if (slotId >= 0 && slotId < SCROLL_SLOTS)
         {
             IItemHandler parent = getTileInventory();
 
             Slot slot = this.slots.get(slotId);
             ItemStack existing = slot.getItem();
+            int existingSize = isClient() ? getClient().getStackSizeForSlot(slotId) : existing.getCount();
 
             if (mode == ClickType.PICKUP)
             {
@@ -393,13 +391,13 @@ public class AbstractBrowserContainer extends AbstractContainerMenu
                         setCarried(dropping);
                     }
                 }
-                else if (existing.getCount() > 0)
+                else if (existingSize > 0)
                 {
                     int amount = clickedButton == 0
                             ? existing.getMaxStackSize()
                             : existing.getMaxStackSize() / 2;
 
-                    ItemStack extracted = extractItemsSided(parent, existing, amount, false);
+                    ItemStack extracted = extractItemsSided(parent, existing, existingSize, amount, false);
                     if (extracted.getCount() > 0)
                     {
                         markTileDirty();
@@ -418,7 +416,7 @@ public class AbstractBrowserContainer extends AbstractContainerMenu
                 broadcastChanges();
                 return;
             }
-            else if (mode == ClickType.QUICK_MOVE && existing.getCount() > 0)
+            else if (mode == ClickType.QUICK_MOVE && existingSize > 0)
             {
                 int amount = existing.getMaxStackSize();
                 if (clickedButton != 0 && amount > 1)
@@ -434,7 +432,7 @@ public class AbstractBrowserContainer extends AbstractContainerMenu
 
                 if (amount > 0)
                 {
-                    ItemStack finalExtract = extractItemsSided(parent, existing, amount, false);
+                    ItemStack finalExtract = extractItemsSided(parent, existing, existingSize, amount, false);
 
                     if (finalExtract.getCount() > 0)
                     {
@@ -465,11 +463,13 @@ public class AbstractBrowserContainer extends AbstractContainerMenu
             tile.setChanged();
     }
 
-    private ItemStack extractItemsSided(@Nullable IItemHandler parent, ItemStack existing, int amount, boolean simulate)
+    private ItemStack extractItemsSided(@Nullable IItemHandler parent, ItemStack existing, int existingSize, int amount, boolean simulate)
     {
         if (isClient() || parent == null)
         {
-            return existing.copy();
+            var copy = existing.copy();
+            copy.setCount(Math.min(existingSize, amount));
+            return copy;
         }
         return AutomationHelper.extractItems(parent, existing, amount, simulate);
     }
@@ -777,7 +777,7 @@ public class AbstractBrowserContainer extends AbstractContainerMenu
                     itemData.clear();
                     Item item = invStack.getItem();
                     itemData.add(stack.getHoverName());
-                    itemData.add(new TextComponent(ForgeRegistries.ITEMS.getKey(item).toString()));
+                    itemData.add(Component.literal(ForgeRegistries.ITEMS.getKey(item).toString()));
                     item.appendHoverText(stack, player.level, itemData, TooltipFlag.Default.NORMAL);
                     matchesSearch = false;
                     for (Component s : itemData)

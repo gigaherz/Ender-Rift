@@ -13,9 +13,6 @@ import net.minecraftforge.registries.ObjectHolder;
 
 public class GeneratorContainer extends AbstractContainerMenu
 {
-    @ObjectHolder("enderrift:generator")
-    public static MenuType<GeneratorContainer> TYPE;
-
     private final Player player;
     private final ContainerLevelAccess levelAccess;
 
@@ -28,7 +25,7 @@ public class GeneratorContainer extends AbstractContainerMenu
 
     public GeneratorContainer(int id, Inventory playerInventory, IItemHandlerModifiable inventory, ContainerData data, final ContainerLevelAccess levelAccess)
     {
-        super(TYPE, id);
+        super(EnderRiftMod.GENERATOR_MENU.get(), id);
 
         this.player = playerInventory.player;
         this.levelAccess = levelAccess;
@@ -64,7 +61,7 @@ public class GeneratorContainer extends AbstractContainerMenu
     {
         return levelAccess.evaluate((world, pos) -> {
             BlockState blockState = world.getBlockState(pos);
-            if (!blockState.is(EnderRiftMod.EnderRiftBlocks.GENERATOR)) return false;
+            if (!blockState.is(EnderRiftMod.GENERATOR.get())) return false;
 
             return playerIn.distanceToSqr(pos.getX() + 0.5D, pos.getY() + 0.5D, pos.getZ() + 0.5D) <= 64.0D;
         }, true);

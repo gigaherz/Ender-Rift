@@ -30,7 +30,7 @@ public class RiftStructure
 
                 // Middle
                 Blocks.REDSTONE_BLOCK, null, Blocks.REDSTONE_BLOCK,
-                null, EnderRiftMod.EnderRiftBlocks.RIFT, null,
+                null, EnderRiftMod.RIFT.get(), null,
                 Blocks.REDSTONE_BLOCK, null, Blocks.REDSTONE_BLOCK,
 
                 // Top
@@ -42,42 +42,42 @@ public class RiftStructure
         StructureStates = new BlockState[]{
 
                 // Bottom
-                EnderRiftMod.EnderRiftBlocks.STRUCTURE_CORNER.cornerState(StructureCornerBlock.Corner.NW, true),
-                EnderRiftMod.EnderRiftBlocks.STRUCTURE_EDGE.edgeState(Direction.Axis.X, true),
-                EnderRiftMod.EnderRiftBlocks.STRUCTURE_CORNER.cornerState(StructureCornerBlock.Corner.NE, true),
+                EnderRiftMod.STRUCTURE_CORNER.get().cornerState(StructureCornerBlock.Corner.NW, true),
+                EnderRiftMod.STRUCTURE_EDGE.get().edgeState(Direction.Axis.X, true),
+                EnderRiftMod.STRUCTURE_CORNER.get().cornerState(StructureCornerBlock.Corner.NE, true),
 
 
-                EnderRiftMod.EnderRiftBlocks.STRUCTURE_EDGE.edgeState(Direction.Axis.Z, true),
+                EnderRiftMod.STRUCTURE_EDGE.get().edgeState(Direction.Axis.Z, true),
                 null,
-                EnderRiftMod.EnderRiftBlocks.STRUCTURE_EDGE.edgeState(Direction.Axis.Z, true),
+                EnderRiftMod.STRUCTURE_EDGE.get().edgeState(Direction.Axis.Z, true),
 
-                EnderRiftMod.EnderRiftBlocks.STRUCTURE_CORNER.cornerState(StructureCornerBlock.Corner.SW, true),
-                EnderRiftMod.EnderRiftBlocks.STRUCTURE_EDGE.edgeState(Direction.Axis.X, true),
-                EnderRiftMod.EnderRiftBlocks.STRUCTURE_CORNER.cornerState(StructureCornerBlock.Corner.SE, true),
+                EnderRiftMod.STRUCTURE_CORNER.get().cornerState(StructureCornerBlock.Corner.SW, true),
+                EnderRiftMod.STRUCTURE_EDGE.get().edgeState(Direction.Axis.X, true),
+                EnderRiftMod.STRUCTURE_CORNER.get().cornerState(StructureCornerBlock.Corner.SE, true),
 
                 // Middle
-                EnderRiftMod.EnderRiftBlocks.STRUCTURE_EDGE.edgeState(Direction.Axis.Y, false),
+                EnderRiftMod.STRUCTURE_EDGE.get().edgeState(Direction.Axis.Y, false),
                 null,
-                EnderRiftMod.EnderRiftBlocks.STRUCTURE_EDGE.edgeState(Direction.Axis.Y, false),
+                EnderRiftMod.STRUCTURE_EDGE.get().edgeState(Direction.Axis.Y, false),
 
                 null, null, null,
 
-                EnderRiftMod.EnderRiftBlocks.STRUCTURE_EDGE.edgeState(Direction.Axis.Y, false),
+                EnderRiftMod.STRUCTURE_EDGE.get().edgeState(Direction.Axis.Y, false),
                 null,
-                EnderRiftMod.EnderRiftBlocks.STRUCTURE_EDGE.edgeState(Direction.Axis.Y, false),
+                EnderRiftMod.STRUCTURE_EDGE.get().edgeState(Direction.Axis.Y, false),
 
                 // Top
-                EnderRiftMod.EnderRiftBlocks.STRUCTURE_CORNER.cornerState(StructureCornerBlock.Corner.NW, false),
-                EnderRiftMod.EnderRiftBlocks.STRUCTURE_EDGE.edgeState(Direction.Axis.X, false),
-                EnderRiftMod.EnderRiftBlocks.STRUCTURE_CORNER.cornerState(StructureCornerBlock.Corner.NE, false),
+                EnderRiftMod.STRUCTURE_CORNER.get().cornerState(StructureCornerBlock.Corner.NW, false),
+                EnderRiftMod.STRUCTURE_EDGE.get().edgeState(Direction.Axis.X, false),
+                EnderRiftMod.STRUCTURE_CORNER.get().cornerState(StructureCornerBlock.Corner.NE, false),
 
-                EnderRiftMod.EnderRiftBlocks.STRUCTURE_EDGE.edgeState(Direction.Axis.Z, false),
+                EnderRiftMod.STRUCTURE_EDGE.get().edgeState(Direction.Axis.Z, false),
                 null,
-                EnderRiftMod.EnderRiftBlocks.STRUCTURE_EDGE.edgeState(Direction.Axis.Z, false),
+                EnderRiftMod.STRUCTURE_EDGE.get().edgeState(Direction.Axis.Z, false),
 
-                EnderRiftMod.EnderRiftBlocks.STRUCTURE_CORNER.cornerState(StructureCornerBlock.Corner.SW, false),
-                EnderRiftMod.EnderRiftBlocks.STRUCTURE_EDGE.edgeState(Direction.Axis.X, false),
-                EnderRiftMod.EnderRiftBlocks.STRUCTURE_CORNER.cornerState(StructureCornerBlock.Corner.SE, false),
+                EnderRiftMod.STRUCTURE_CORNER.get().cornerState(StructureCornerBlock.Corner.SW, false),
+                EnderRiftMod.STRUCTURE_EDGE.get().edgeState(Direction.Axis.X, false),
+                EnderRiftMod.STRUCTURE_CORNER.get().cornerState(StructureCornerBlock.Corner.SE, false),
         };
     }
 
@@ -104,7 +104,7 @@ public class RiftStructure
                 for (int zz = -1; zz <= 1; zz++)
                 {
                     BlockPos pos2 = pos.offset(xx, yy, zz);
-                    if (world.getBlockState(pos2).getBlock() == EnderRiftMod.EnderRiftBlocks.RIFT)
+                    if (world.getBlockState(pos2).getBlock() == EnderRiftMod.RIFT.get())
                     {
                         RiftStructure.dismantle(world, pos2);
                         return;
@@ -118,7 +118,7 @@ public class RiftStructure
     {
         BlockState state = world.getBlockState(pos);
 
-        if (state.getBlock() != EnderRiftMod.EnderRiftBlocks.RIFT)
+        if (state.getBlock() != EnderRiftMod.RIFT.get())
             return false;
 
         if (state.getValue(RiftBlock.ASSEMBLED))
@@ -141,7 +141,7 @@ public class RiftStructure
                             if (!st.isAir())
                                 return false;
                         }
-                        else if (b != EnderRiftMod.EnderRiftBlocks.RIFT)
+                        else if (b != EnderRiftMod.RIFT.get())
                         {
                             if (b != w)
                                 return false;
@@ -199,11 +199,11 @@ public class RiftStructure
                 for (int xx = 0; xx <= 2; xx++)
                 {
                     Block b = StructurePattern[yy * 9 + zz * 3 + xx];
-                    if (b != null && b != Blocks.AIR && b != EnderRiftMod.EnderRiftBlocks.RIFT)
+                    if (b != null && b != Blocks.AIR && b != EnderRiftMod.RIFT.get())
                     {
                         BlockPos bp = pos.offset(xx - 1, yy - 1, zz - 1);
                         Block block = world.getBlockState(bp).getBlock();
-                        if (block == EnderRiftMod.EnderRiftBlocks.STRUCTURE_EDGE || block == EnderRiftMod.EnderRiftBlocks.STRUCTURE_CORNER)
+                        if (block == EnderRiftMod.STRUCTURE_EDGE.get() || block == EnderRiftMod.STRUCTURE_CORNER.get())
                             world.setBlockAndUpdate(bp, b.defaultBlockState());
                     }
                 }
@@ -212,7 +212,7 @@ public class RiftStructure
 
         BlockState state = world.getBlockState(pos);
 
-        if (state.getBlock() == EnderRiftMod.EnderRiftBlocks.RIFT && state.getValue(RiftBlock.ASSEMBLED))
+        if (state.getBlock() == EnderRiftMod.RIFT.get() && state.getValue(RiftBlock.ASSEMBLED))
         {
             world.setBlockAndUpdate(pos, state.setValue(RiftBlock.ASSEMBLED, false));
 
@@ -227,11 +227,11 @@ public class RiftStructure
 
     public static Block getOriginalBlock(BlockState state)
     {
-        if (state.getBlock() == EnderRiftMod.EnderRiftBlocks.STRUCTURE_CORNER)
+        if (state.getBlock() == EnderRiftMod.STRUCTURE_CORNER.get())
         {
             return StructurePattern[0];
         }
-        else if (state.getBlock() == EnderRiftMod.EnderRiftBlocks.STRUCTURE_EDGE)
+        else if (state.getBlock() == EnderRiftMod.STRUCTURE_EDGE.get())
         {
             return StructurePattern[1];
         }
@@ -250,7 +250,7 @@ public class RiftStructure
                 for (int xx = 0; xx <= 2; xx++)
                 {
                     BlockPos pos2 = pos.offset(1 - xx, 1 - yy, 1 - zz);
-                    if (worldIn.getBlockState(pos2).getBlock() == EnderRiftMod.EnderRiftBlocks.RIFT)
+                    if (worldIn.getBlockState(pos2).getBlock() == EnderRiftMod.RIFT.get())
                     {
                         return StructurePattern[yy * 9 + zz * 3 + xx];
                     }

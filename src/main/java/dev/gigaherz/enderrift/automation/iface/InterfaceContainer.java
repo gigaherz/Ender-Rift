@@ -17,8 +17,6 @@ import net.minecraftforge.registries.ObjectHolder;
 
 public class InterfaceContainer extends AbstractContainerMenu
 {
-    @ObjectHolder("enderrift:interface")
-    public static MenuType<InterfaceContainer> TYPE;
     private final ContainerLevelAccess levelAccess;
 
     public InterfaceContainer(int id, Inventory playerInventory)
@@ -28,7 +26,7 @@ public class InterfaceContainer extends AbstractContainerMenu
 
     public InterfaceContainer(int id, Inventory playerInventory, IItemHandlerModifiable filters, IItemHandlerModifiable outputs, final ContainerLevelAccess levelAccess)
     {
-        super(TYPE, id);
+        super(EnderRiftMod.INTERFACE_MENU.get(), id);
 
         this.levelAccess = levelAccess;
 
@@ -68,7 +66,7 @@ public class InterfaceContainer extends AbstractContainerMenu
     {
         return levelAccess.evaluate((world, pos) -> {
             BlockState blockState = world.getBlockState(pos);
-            if (!blockState.is(EnderRiftMod.EnderRiftBlocks.INTERFACE)) return false;
+            if (!blockState.is(EnderRiftMod.INTERFACE.get())) return false;
 
             return playerIn.distanceToSqr(pos.getX() + 0.5D, pos.getY() + 0.5D, pos.getZ() + 0.5D) <= 64.0D;
         }, true);

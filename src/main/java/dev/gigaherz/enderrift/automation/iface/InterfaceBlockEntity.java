@@ -1,5 +1,6 @@
 package dev.gigaherz.enderrift.automation.iface;
 
+import dev.gigaherz.enderrift.EnderRiftMod;
 import dev.gigaherz.enderrift.common.IPoweredAutomation;
 import dev.gigaherz.enderrift.automation.AggregatorBlockEntity;
 import dev.gigaherz.enderrift.automation.AutomationHelper;
@@ -24,9 +25,6 @@ import javax.annotation.Nullable;
 
 public class InterfaceBlockEntity extends AggregatorBlockEntity implements IPoweredAutomation
 {
-    @ObjectHolder("enderrift:interface")
-    public static BlockEntityType<InterfaceBlockEntity> TYPE;
-
     private static final int FilterCount = 9;
 
     private FilterInventory filters = new FilterInventory(FilterCount);
@@ -44,7 +42,7 @@ public class InterfaceBlockEntity extends AggregatorBlockEntity implements IPowe
 
     public InterfaceBlockEntity(BlockPos pos, BlockState state)
     {
-        super(TYPE, pos, state);
+        super(EnderRiftMod.INTERFACE_BLOCK_ENTITY.get(), pos, state);
     }
 
     @Nullable

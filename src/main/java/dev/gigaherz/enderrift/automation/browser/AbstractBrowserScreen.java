@@ -14,7 +14,6 @@ import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
 import org.lwjgl.glfw.GLFW;
 
 import javax.annotation.Nonnull;
@@ -83,7 +82,7 @@ public abstract class AbstractBrowserScreen<T extends AbstractBrowserContainer> 
     {
         super.init();
 
-        addRenderableWidget(this.sortModeButton = new Button(leftPos - 22, topPos + 12, 20, 20, new TextComponent(""), (btn) -> {
+        addRenderableWidget(this.sortModeButton = new Button(leftPos - 22, topPos + 12, 20, 20, Component.literal(""), (btn) -> {
             SortMode mode = getMenu().sortMode;
             switch (mode)
             {
@@ -99,7 +98,7 @@ public abstract class AbstractBrowserScreen<T extends AbstractBrowserContainer> 
         }));
 
         //Keyboard.enableRepeatEvents(true);
-        addRenderableWidget(this.searchField = new EditBox(this.font, leftPos + 114, topPos + 6, 71, this.font.lineHeight, new TextComponent(""))
+        addRenderableWidget(this.searchField = new EditBox(this.font, leftPos + 114, topPos + 6, 71, this.font.lineHeight, Component.literal(""))
         {
             @Override
             public boolean mouseClicked(double mouseX, double mouseY, int mouseButton)
@@ -171,10 +170,10 @@ public abstract class AbstractBrowserScreen<T extends AbstractBrowserContainer> 
         switch (mode)
         {
             case ALPHABETIC:
-                sortModeButton.setMessage(new TextComponent("Az"));
+                sortModeButton.setMessage(Component.literal("Az"));
                 break;
             case STACK_SIZE:
-                sortModeButton.setMessage(new TextComponent("#"));
+                sortModeButton.setMessage(Component.literal("#"));
                 break;
         }
 

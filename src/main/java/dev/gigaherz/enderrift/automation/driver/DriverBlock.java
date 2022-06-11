@@ -1,6 +1,7 @@
 package dev.gigaherz.enderrift.automation.driver;
 
 import com.google.common.collect.ImmutableMap;
+import dev.gigaherz.enderrift.EnderRiftMod;
 import dev.gigaherz.enderrift.automation.AggregatorBlock;
 import dev.gigaherz.enderrift.automation.AggregatorBlockEntity;
 import dev.gigaherz.enderrift.automation.AutomationHelper;
@@ -81,7 +82,7 @@ public class DriverBlock extends AggregatorBlock<DriverBlockEntity>
     @Override
     public @org.jetbrains.annotations.Nullable <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level pLevel, BlockState pState, BlockEntityType<T> pBlockEntityType)
     {
-        return BaseEntityBlock.createTickerHelper(pBlockEntityType, DriverBlockEntity.TYPE, DriverBlockEntity::tickStatic);
+        return BaseEntityBlock.createTickerHelper(pBlockEntityType, EnderRiftMod.DRIVER_BLOCK_ENTITY.get(), DriverBlockEntity::tickStatic);
     }
 
     @Deprecated

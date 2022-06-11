@@ -10,7 +10,6 @@ import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
 
 import net.minecraft.client.gui.components.Button.OnPress;
 
@@ -39,11 +38,11 @@ public class CraftingBrowserScreen extends AbstractBrowserScreen<CraftingBrowser
     {
         super.init();
 
-        addRenderableWidget(new GuiButtonFlexible(leftPos + 85, topPos + 75, 9, 9, new TextComponent("▴"), (btn) -> {
+        addRenderableWidget(new GuiButtonFlexible(leftPos + 85, topPos + 75, 9, 9, Component.literal("▴"), (btn) -> {
             clearCraftingGrid(false);
         }));
 
-        addRenderableWidget(new GuiButtonFlexible(leftPos + 85, topPos + 75 + 45, 9, 9, new TextComponent("▾"), (btn) -> {
+        addRenderableWidget(new GuiButtonFlexible(leftPos + 85, topPos + 75 + 45, 9, 9, Component.literal("▾"), (btn) -> {
             clearCraftingGrid(true);
         }));
     }

@@ -13,7 +13,7 @@ import mcjty.theoneprobe.apiimpl.ProbeHitData;
 import mcjty.theoneprobe.apiimpl.providers.DefaultProbeInfoProvider;
 import mcjty.theoneprobe.apiimpl.styles.ProgressStyle;
 import mcjty.theoneprobe.config.Config;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -40,10 +40,10 @@ public class TheOneProbeProviders implements Function<ITheOneProbe, Void>
             return null;
 
         top.registerBlockDisplayOverride((probeMode, probeInfo, playerEntity, world, blockState, data) -> {
-            if (blockState.getBlock() == EnderRiftMod.EnderRiftBlocks.STRUCTURE_CORNER)
+            if (blockState.getBlock() == EnderRiftMod.STRUCTURE_CORNER.get())
             {
                 IProbeConfig config = Config.getRealConfig();
-                data = new ProbeHitData(data.getPos(), data.getHitVec(), data.getSideHit(), new ItemStack(EnderRiftMod.EnderRiftBlocks.STRUCTURE_CORNER));
+                data = new ProbeHitData(data.getPos(), data.getHitVec(), data.getSideHit(), new ItemStack(EnderRiftMod.STRUCTURE_CORNER.get()));
                 DefaultProbeInfoProvider.showStandardBlockInfo(config, probeMode, probeInfo, blockState, blockState.getBlock(), world, data.getPos(), playerEntity, data);
                 return true;
             }
@@ -116,15 +116,15 @@ public class TheOneProbeProviders implements Function<ITheOneProbe, Void>
         int powerGen = generator.getGenerationPower();
         if (powerGen > 0)
         {
-            info.text(new TranslatableComponent("text.enderrift.generator.status.generating", powerGen));
+            info.text(Component.translatable("text.enderrift.generator.status.generating", powerGen));
         }
         else if (generator.isBurning())
         {
-            info.text(new TranslatableComponent("text.enderrift.generator.status.heating"));
+            info.text(Component.translatable("text.enderrift.generator.status.heating"));
         }
         else
         {
-            info.text(new TranslatableComponent("text.enderrift.generator.status.idle"));
+            info.text(Component.translatable("text.enderrift.generator.status.idle"));
         }
 
         int heat = generator.getHeatValue();
@@ -147,7 +147,7 @@ public class TheOneProbeProviders implements Function<ITheOneProbe, Void>
 
     private static void handleStructureTooltip(IProbeInfo info, StructureCornerBlockEntity structure)
     {
-        //info.item(new ItemStack(EnderRiftMod.EnderRiftBlocks.STRUCTURE));
+        //info.item(new ItemStack(EnderRiftMod.STRUCTURE.get()));
         structure.getParent().ifPresent(rift -> handleRiftTooltip(info, rift));
     }
 
@@ -156,15 +156,15 @@ public class TheOneProbeProviders implements Function<ITheOneProbe, Void>
         boolean isFormed = rift.getBlockState().getValue(RiftBlock.ASSEMBLED);
         if (isFormed)
         {
-            info.text(new TranslatableComponent("text.enderrift.rift.is_formed", true));
-            info.text(new TranslatableComponent("text.enderrift.rift.is_powered", rift.isPowered()));
-            info.text(new TranslatableComponent("text.enderrift.rift.rift_id", rift.getRiftId()));
-            info.text(new TranslatableComponent("text.enderrift.rift.used_slots", rift.countInventoryStacks()));
+            info.text(Component.translatable("text.enderrift.rift.is_formed", true));
+            info.text(Component.translatable("text.enderrift.rift.is_powered", rift.isPowered()));
+            info.text(Component.translatable("text.enderrift.rift.rift_id", rift.getRiftId()));
+            info.text(Component.translatable("text.enderrift.rift.used_slots", rift.countInventoryStacks()));
             //info.progress(rift.getEnergyBuffer().map(IEnergyStorage::getEnergyStored).orElse(0), RiftTileEntity.BUFFER_POWER, RF_STYLE);
         }
         else
         {
-            info.text(new TranslatableComponent("text.enderrift.rift.waila.isFormed", false));
+            info.text(Component.translatable("text.enderrift.rift.waila.isFormed", false));
         }
     }
 }

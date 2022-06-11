@@ -27,9 +27,6 @@ import java.util.Optional;
 
 public class CraftingBrowserContainer extends AbstractBrowserContainer
 {
-    @ObjectHolder("enderrift:crafting_browser")
-    public static MenuType<CraftingBrowserContainer> TYPE;
-
     public static final int INVENTORY_SLOT_START = SCROLL_SLOTS;
     public static final int INVENTORY_SLOT_END = SCROLL_SLOTS + PLAYER_SLOTS;
     public static final int CRAFTING_RESULT_SLOT = INVENTORY_SLOT_END;
@@ -53,7 +50,7 @@ public class CraftingBrowserContainer extends AbstractBrowserContainer
 
     public CraftingBrowserContainer(int id, @Nullable BrowserBlockEntity te, Inventory playerInventory)
     {
-        super(TYPE, id, te, playerInventory);
+        super(EnderRiftMod.CRAFTING_BROWSER_MENU.get(), id, te, playerInventory);
 
         this.world = playerInventory.player.level;
         this.player = playerInventory.player;

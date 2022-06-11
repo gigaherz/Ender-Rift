@@ -17,6 +17,7 @@ import net.minecraft.client.GraphicsStatus;
 import net.minecraft.core.Direction;
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.Mth;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.phys.Vec3;
 import com.mojang.math.Vector3f;
 import net.minecraftforge.client.model.data.EmptyModelData;
@@ -27,7 +28,7 @@ import java.util.Random;
 public class RiftRenderer
         implements BlockEntityRenderer<RiftBlockEntity>
 {
-    private final Random random = new Random();
+    private final RandomSource random = RandomSource.create();
 
     private static final List<Direction> DIRECTIONS_AND_NULL = Lists.newArrayList(Direction.values());
 
@@ -80,7 +81,7 @@ public class RiftRenderer
             float c0 = 1.0f / steps;
             float c1 = 1.0f / (1 - c0);
 
-            boolean isFabulous = minecraft.options.graphicsMode.equals(GraphicsStatus.FABULOUS);
+            boolean isFabulous = minecraft.options.graphicsMode().get().equals(GraphicsStatus.FABULOUS);
 
             RenderType type = isFabulous ?
                     RenderType.translucentMovingBlock() :

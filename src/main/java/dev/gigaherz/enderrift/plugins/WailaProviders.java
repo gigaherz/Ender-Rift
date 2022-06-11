@@ -159,7 +159,7 @@ public class WailaProviders implements IWailaPlugin
         @Override
         public void appendBody(List<ITextComponent> tooltip, IDataAccessor accessor, IPluginConfig config)
         {
-            if (config.get(CONFIG_RIFT) && (accessor.getBlock() != EnderRiftMod.EnderRiftBlocks.STRUCTURE || accessor.getBlockState().get(StructureBlock.TYPE1) == StructureBlock.Type1.CORNER))
+            if (config.get(CONFIG_RIFT) && (accessor.getBlock() != EnderRiftMod.STRUCTURE.get() || accessor.getBlockState().get(StructureBlock.TYPE1) == StructureBlock.Type1.CORNER))
             {
                 CompoundNBT tag = accessor.getServerData();
 

@@ -1,6 +1,7 @@
 package dev.gigaherz.enderrift.automation.proxy;
 
 import com.google.common.collect.ImmutableMap;
+import dev.gigaherz.enderrift.EnderRiftMod;
 import dev.gigaherz.enderrift.automation.AggregatorBlock;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BaseEntityBlock;
@@ -79,7 +80,7 @@ public class ProxyBlock extends AggregatorBlock<ProxyBlockEntity>
     @Override
     public @org.jetbrains.annotations.Nullable <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level pLevel, BlockState pState, BlockEntityType<T> pBlockEntityType)
     {
-        return BaseEntityBlock.createTickerHelper(pBlockEntityType, ProxyBlockEntity.TYPE, ProxyBlockEntity::tickStatic);
+        return BaseEntityBlock.createTickerHelper(pBlockEntityType, EnderRiftMod.PROXY_BLOCK_ENTITY.get(), ProxyBlockEntity::tickStatic);
     }
 
     @Deprecated

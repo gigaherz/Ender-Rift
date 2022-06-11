@@ -1,6 +1,7 @@
 package dev.gigaherz.enderrift.rift;
 
 import com.google.common.collect.Lists;
+import dev.gigaherz.enderrift.EnderRiftMod;
 import dev.gigaherz.enderrift.automation.AggregatorBlock;
 import net.minecraft.Util;
 import net.minecraft.world.level.block.BaseEntityBlock;
@@ -70,7 +71,7 @@ public class StructureCornerBlock extends AggregatorBlock<StructureCornerBlockEn
     @Override
     public @org.jetbrains.annotations.Nullable <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level pLevel, BlockState pState, BlockEntityType<T> pBlockEntityType)
     {
-        return BaseEntityBlock.createTickerHelper(pBlockEntityType, StructureCornerBlockEntity.TYPE, StructureCornerBlockEntity::tickStatic);
+        return BaseEntityBlock.createTickerHelper(pBlockEntityType, EnderRiftMod.STRUCTURE_CORNER_BLOCK_ENTITY.get(), StructureCornerBlockEntity::tickStatic);
     }
 
     @Override

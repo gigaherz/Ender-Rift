@@ -19,16 +19,13 @@ import java.util.Optional;
 
 public class StructureCornerBlockEntity extends AggregatorBlockEntity
 {
-    @ObjectHolder("enderrift:structure")
-    public static BlockEntityType<StructureCornerBlockEntity> TYPE;
-
     private RiftBlockEntity energyParent;
 
     private final LazyOptional<IEnergyStorage> bufferProvider = LazyOptional.of(() -> getEnergyBuffer().orElse(null));
 
     public StructureCornerBlockEntity(BlockPos pos, BlockState state)
     {
-        super(TYPE, pos, state);
+        super(EnderRiftMod.STRUCTURE_CORNER_BLOCK_ENTITY.get(), pos, state);
     }
 
     @SuppressWarnings("unchecked")
@@ -69,7 +66,7 @@ public class StructureCornerBlockEntity extends AggregatorBlockEntity
         if (energyParent == null)
         {
             BlockState state = level.getBlockState(worldPosition);
-            if (state.getBlock() != EnderRiftMod.EnderRiftBlocks.STRUCTURE_CORNER)
+            if (state.getBlock() != EnderRiftMod.STRUCTURE_CORNER.get())
                 return Optional.empty();
 
             BlockEntity te = level.getBlockEntity(getRiftFromCorner(state, worldPosition));

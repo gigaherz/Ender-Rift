@@ -23,8 +23,13 @@ import dev.gigaherz.enderrift.generator.GeneratorScreen;
 import dev.gigaherz.enderrift.generator.GeneratorBlockEntity;
 import dev.gigaherz.enderrift.rift.storage.RiftInventory;
 import dev.gigaherz.enderrift.rift.storage.RiftStorage;
+import net.minecraft.core.NonNullList;
 import net.minecraft.data.tags.BlockTagsProvider;
+import net.minecraft.network.chat.Component;
 import net.minecraft.tags.BlockTags;
+import net.minecraft.world.entity.ai.village.poi.PoiType;
+import net.minecraft.world.entity.npc.VillagerProfession;
+import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.material.Material;
@@ -44,15 +49,11 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.SimpleRecipeSerializer;
 import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraft.core.NonNullList;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.network.chat.TextComponent;
 import net.minecraft.world.level.storage.loot.LootTables;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.common.Tags;
 import net.minecraftforge.common.data.ExistingFileHelper;
 import net.minecraftforge.event.RegisterCommandsEvent;
-import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.InterModComms;
 import net.minecraftforge.fml.ModLoadingContext;
@@ -66,12 +67,12 @@ import net.minecraftforge.network.NetworkDirection;
 import net.minecraftforge.network.NetworkRegistry;
 import net.minecraftforge.network.simple.SimpleChannel;
 import net.minecraftforge.forge.event.lifecycle.GatherDataEvent;
+import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.ObjectHolder;
+import net.minecraftforge.registries.RegistryObject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import javax.annotation.Nonnull;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
@@ -90,50 +91,58 @@ import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 @Mod(EnderRiftMod.MODID)
 public class EnderRiftMod
 {
-    /*
-        dependencies = "after:Waila;after:gbook",
-        updateJSON =
-     */
-
     public static final String MODID = "enderrift";
 
-    @SuppressWarnings("ConstantConditions")
-    @Nonnull
-    private static <T> T toBeInitializedLater()
-    {
-        return null;
-    }
+    private static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, MODID);
+    private static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(ForgeRegistries.BLOCKS, MODID);
+    private static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITIES = DeferredRegister.create(ForgeRegistries.BLOCK_ENTITIES, MODID);
+    private static final DeferredRegister<RecipeSerializer<?>> RECIPE_SERIALIZERS = DeferredRegister.create(ForgeRegistries.RECIPE_SERIALIZERS, MODID);
+    private static final DeferredRegister<MenuType<?>> MENU_TYPES = DeferredRegister.create(ForgeRegistries.CONTAINERS, MODID);
 
-    @ObjectHolder("enderrift")
-    public static class EnderRiftBlocks
-    {
-        public static final Block RIFT = toBeInitializedLater();
-        public static final StructureCornerBlock STRUCTURE_CORNER = toBeInitializedLater();
-        public static final StructureEdgeBlock STRUCTURE_EDGE = toBeInitializedLater();
-        public static final Block INTERFACE = toBeInitializedLater();
-        public static final Block GENERATOR = toBeInitializedLater();
-        public static final Block BROWSER = toBeInitializedLater();
-        public static final Block CRAFTING_BROWSER = toBeInitializedLater();
-        public static final Block PROXY = toBeInitializedLater();
-        public static final Block DRIVER = toBeInitializedLater();
-    }
-
-    @ObjectHolder("enderrift")
-    public static class EnderRiftItems
-    {
-        public static final Item RIFT_ORB = toBeInitializedLater();
-    }
-
-    public static CreativeModeTab tabEnderRift = new CreativeModeTab("tabEnderRift")
+    public static CreativeModeTab ENDERRIFT_CREATIVE_TAB = new CreativeModeTab("tabEnderRift")
     {
         @Override
         public ItemStack makeIcon()
         {
-            return new ItemStack(EnderRiftItems.RIFT_ORB);
+            return new ItemStack(EnderRiftMod.RIFT_ORB.get());
         }
     };
 
-    public static EnderRiftMod instance;
+    public static final RegistryObject<Block> RIFT = BLOCKS.register("rift", () -> new RiftBlock(BlockBehaviour.Properties.of(Material.STONE).sound(SoundType.METAL).strength(3.0F, 8.0F).dynamicShape()));
+    public static final RegistryObject<StructureCornerBlock> STRUCTURE_CORNER = BLOCKS.register("structure_corner", () -> new StructureCornerBlock(BlockBehaviour.Properties.of(Material.STONE).sound(SoundType.METAL).strength(3.0F, 8.0F).noLootTable()));
+    public static final RegistryObject<StructureEdgeBlock> STRUCTURE_EDGE = BLOCKS.register("structure_edge", () -> new StructureEdgeBlock(BlockBehaviour.Properties.of(Material.STONE).sound(SoundType.METAL).strength(3.0F, 8.0F).noLootTable()));
+    public static final RegistryObject<Block> INTERFACE = BLOCKS.register("interface", () -> new InterfaceBlock(BlockBehaviour.Properties.of(Material.METAL, MaterialColor.STONE).sound(SoundType.METAL).strength(3.0F, 8.0F)));
+    public static final RegistryObject<Block> BROWSER = BLOCKS.register("browser", () -> new BrowserBlock(true, BlockBehaviour.Properties.of(Material.METAL, MaterialColor.STONE).sound(SoundType.METAL).strength(3.0F, 8.0F)));
+    public static final RegistryObject<Block> CRAFTING_BROWSER = BLOCKS.register("crafting_browser", () ->new BrowserBlock(false, BlockBehaviour.Properties.of(Material.METAL, MaterialColor.STONE).sound(SoundType.METAL).strength(3.0F, 8.0F)));
+    public static final RegistryObject<Block> PROXY = BLOCKS.register("proxy", () ->  new ProxyBlock(BlockBehaviour.Properties.of(Material.METAL, MaterialColor.STONE).sound(SoundType.METAL).strength(3.0F, 8.0F)));
+    public static final RegistryObject<Block> DRIVER = BLOCKS.register("driver", () -> new DriverBlock(BlockBehaviour.Properties.of(Material.METAL, MaterialColor.STONE).sound(SoundType.METAL).strength(3.0F, 8.0F)));
+    public static final RegistryObject<Block> GENERATOR = BLOCKS.register("generator", () -> new GeneratorBlock(BlockBehaviour.Properties.of(Material.METAL, MaterialColor.STONE).sound(SoundType.METAL).strength(3.0F, 8.0F)));
+
+    public static final RegistryObject<Item> RIFT_ITEM = ITEMS.register("rift", () -> new BlockItem(RIFT.get(), new Item.Properties().tab(ENDERRIFT_CREATIVE_TAB)));
+    public static final RegistryObject<Item> STRUCTURE_CORNER_ITEM = ITEMS.register("structure_corner", () -> new BlockItemNC(STRUCTURE_CORNER.get(), new Item.Properties().tab(ENDERRIFT_CREATIVE_TAB)));
+    public static final RegistryObject<Item> STRUCTURE_EDGE_ITEM = ITEMS.register("structure_edge", () -> new BlockItemNC(STRUCTURE_EDGE.get(), new Item.Properties().tab(ENDERRIFT_CREATIVE_TAB)));
+    public static final RegistryObject<Item> INTERFACE_ITEM = ITEMS.register("interface", () -> new BlockItem(INTERFACE.get(), new Item.Properties().tab(ENDERRIFT_CREATIVE_TAB)));
+    public static final RegistryObject<Item> BROWSER_ITEM = ITEMS.register("browser", () -> new BlockItem(BROWSER.get(), new Item.Properties().tab(ENDERRIFT_CREATIVE_TAB)));
+    public static final RegistryObject<Item> CRAFTING_BROWSER_ITEM = ITEMS.register("crafting_browser", () -> new BlockItem(CRAFTING_BROWSER.get(), new Item.Properties().tab(ENDERRIFT_CREATIVE_TAB)));
+    public static final RegistryObject<Item> PROXY_ITEM = ITEMS.register("proxy", () -> new BlockItem(PROXY.get(), new Item.Properties().tab(ENDERRIFT_CREATIVE_TAB)));
+    public static final RegistryObject<Item> DRIVER_ITEM = ITEMS.register("driver", () -> new BlockItem(DRIVER.get(), new Item.Properties().tab(ENDERRIFT_CREATIVE_TAB)));
+    public static final RegistryObject<Item> GENERATOR_ITEM = ITEMS.register("generator", () -> new BlockItem(GENERATOR.get(), new Item.Properties().tab(ENDERRIFT_CREATIVE_TAB)));
+    public static final RegistryObject<Item> RIFT_ORB = ITEMS.register("rift_orb", () -> new RiftItem(new Item.Properties().stacksTo(16).tab(ENDERRIFT_CREATIVE_TAB)));
+
+    public static final RegistryObject<BlockEntityType<RiftBlockEntity>> RIFT_BLOCK_ENTITY = BLOCK_ENTITIES.register("rift", () -> BlockEntityType.Builder.of(RiftBlockEntity::new, RIFT.get()).build(null));
+    public static final RegistryObject<BlockEntityType<StructureCornerBlockEntity>> STRUCTURE_CORNER_BLOCK_ENTITY = BLOCK_ENTITIES.register("structure", () -> BlockEntityType.Builder.of(StructureCornerBlockEntity::new, STRUCTURE_CORNER.get()).build(null));
+    public static final RegistryObject<BlockEntityType<InterfaceBlockEntity>> INTERFACE_BLOCK_ENTITY = BLOCK_ENTITIES.register("interface", () -> BlockEntityType.Builder.of(InterfaceBlockEntity::new, INTERFACE.get()).build(null));
+    public static final RegistryObject<BlockEntityType<BrowserBlockEntity>> BROWSER_BLOCK_ENTITY = BLOCK_ENTITIES.register("browser", () -> BlockEntityType.Builder.of(BrowserBlockEntity::new, BROWSER.get(), CRAFTING_BROWSER.get()).build(null));
+    public static final RegistryObject<BlockEntityType<ProxyBlockEntity>> PROXY_BLOCK_ENTITY = BLOCK_ENTITIES.register("proxy", () -> BlockEntityType.Builder.of(ProxyBlockEntity::new, PROXY.get()).build(null));
+    public static final RegistryObject<BlockEntityType<DriverBlockEntity>> DRIVER_BLOCK_ENTITY = BLOCK_ENTITIES.register("driver", () -> BlockEntityType.Builder.of(DriverBlockEntity::new, DRIVER.get()).build(null));
+    public static final RegistryObject<BlockEntityType<GeneratorBlockEntity>> GENERATOR_BLOCK_ENTITY = BLOCK_ENTITIES.register("generator", () -> BlockEntityType.Builder.of(GeneratorBlockEntity::new, GENERATOR.get()).build(null));
+
+    public static final RegistryObject<MenuType<BrowserContainer>> BROWSER_MENU = MENU_TYPES.register("browser", () -> new MenuType<>(BrowserContainer::new));
+    public static final RegistryObject<MenuType<CraftingBrowserContainer>> CRAFTING_BROWSER_MENU = MENU_TYPES.register("crafting_browser", () -> new MenuType<>(CraftingBrowserContainer::new));
+    public static final RegistryObject<MenuType<InterfaceContainer>> INTERFACE_MENU = MENU_TYPES.register("interface", () -> new MenuType<>(InterfaceContainer::new));
+    public static final RegistryObject<MenuType<GeneratorContainer>> GENERATOR_MENU = MENU_TYPES.register("generator", () -> new MenuType<>(GeneratorContainer::new));
+
+    public static final RegistryObject<SimpleRecipeSerializer<OrbDuplicationRecipe>> ORB_DUPLICATION = RECIPE_SERIALIZERS.register("orb_duplication", () -> new SimpleRecipeSerializer<>(OrbDuplicationRecipe::new));
 
     private static final String PROTOCOL_VERSION = "1.1.0";
     public static final SimpleChannel CHANNEL = NetworkRegistry.ChannelBuilder
@@ -147,15 +156,14 @@ public class EnderRiftMod
 
     public EnderRiftMod()
     {
-        instance = this;
-
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
 
-        modEventBus.addGenericListener(Block.class, this::registerBlocks);
-        modEventBus.addGenericListener(Item.class, this::registerItems);
-        modEventBus.addGenericListener(BlockEntityType.class, this::registerTEs);
-        modEventBus.addGenericListener(MenuType.class, this::registerContainers);
-        modEventBus.addGenericListener(RecipeSerializer.class, this::registerRecipeSerializers);
+        ITEMS.register(modEventBus);
+        BLOCKS.register(modEventBus);
+        BLOCK_ENTITIES.register(modEventBus);
+        RECIPE_SERIALIZERS.register(modEventBus);
+        MENU_TYPES.register(modEventBus);
+
         modEventBus.addListener(this::commonSetup);
         modEventBus.addListener(this::clientSetup);
         modEventBus.addListener(this::interComms);
@@ -166,81 +174,6 @@ public class EnderRiftMod
         ModLoadingContext modLoadingContext = ModLoadingContext.get();
         modLoadingContext.registerConfig(ModConfig.Type.SERVER, ConfigValues.SERVER_SPEC);
         //modLoadingContext.registerConfig(ModConfig.Type.CLIENT, ConfigData.CLIENT_SPEC);
-    }
-
-    public void registerBlocks(RegistryEvent.Register<Block> event)
-    {
-        event.getRegistry().registerAll(
-                new RiftBlock(BlockBehaviour.Properties.of(Material.STONE).sound(SoundType.METAL).strength(3.0F, 8.0F).dynamicShape()).setRegistryName("rift"),
-                new StructureCornerBlock(BlockBehaviour.Properties.of(Material.STONE).sound(SoundType.METAL).strength(3.0F, 8.0F).noDrops()).setRegistryName("structure_corner"),
-                new StructureEdgeBlock(BlockBehaviour.Properties.of(Material.STONE).sound(SoundType.METAL).strength(3.0F, 8.0F).noDrops()).setRegistryName("structure_edge"),
-                new InterfaceBlock(BlockBehaviour.Properties.of(Material.METAL, MaterialColor.STONE).sound(SoundType.METAL).strength(3.0F, 8.0F)).setRegistryName("interface"),
-                new BrowserBlock(false, BlockBehaviour.Properties.of(Material.METAL, MaterialColor.STONE).sound(SoundType.METAL).strength(3.0F, 8.0F)).setRegistryName("browser"),
-                new BrowserBlock(true, BlockBehaviour.Properties.of(Material.METAL, MaterialColor.STONE).sound(SoundType.METAL).strength(3.0F, 8.0F)).setRegistryName("crafting_browser"),
-                new ProxyBlock(BlockBehaviour.Properties.of(Material.METAL, MaterialColor.STONE).sound(SoundType.METAL).strength(3.0F, 8.0F)).setRegistryName("proxy"),
-                new DriverBlock(BlockBehaviour.Properties.of(Material.METAL, MaterialColor.STONE).sound(SoundType.METAL).strength(3.0F, 8.0F)).setRegistryName("driver"),
-                new GeneratorBlock(BlockBehaviour.Properties.of(Material.METAL, MaterialColor.STONE).sound(SoundType.METAL).strength(3.0F, 8.0F)).setRegistryName("generator")
-        );
-    }
-
-    public void registerItems(RegistryEvent.Register<Item> event)
-    {
-        event.getRegistry().registerAll(
-                new BlockItem(EnderRiftBlocks.RIFT, new Item.Properties().tab(tabEnderRift)).setRegistryName(EnderRiftBlocks.RIFT.getRegistryName()),
-                new BlockItem(EnderRiftBlocks.INTERFACE, new Item.Properties().tab(tabEnderRift)).setRegistryName(EnderRiftBlocks.INTERFACE.getRegistryName()),
-                new BlockItem(EnderRiftBlocks.BROWSER, new Item.Properties().tab(tabEnderRift)).setRegistryName(EnderRiftBlocks.BROWSER.getRegistryName()),
-                new BlockItem(EnderRiftBlocks.CRAFTING_BROWSER, new Item.Properties().tab(tabEnderRift)).setRegistryName(EnderRiftBlocks.CRAFTING_BROWSER.getRegistryName()),
-                new BlockItem(EnderRiftBlocks.PROXY, new Item.Properties().tab(tabEnderRift)).setRegistryName(EnderRiftBlocks.PROXY.getRegistryName()),
-                new BlockItem(EnderRiftBlocks.DRIVER, new Item.Properties().tab(tabEnderRift)).setRegistryName(EnderRiftBlocks.DRIVER.getRegistryName()),
-                new BlockItem(EnderRiftBlocks.GENERATOR, new Item.Properties().tab(tabEnderRift)).setRegistryName(EnderRiftBlocks.GENERATOR.getRegistryName()),
-                new BlockItem(EnderRiftBlocks.STRUCTURE_CORNER, new Item.Properties().tab(tabEnderRift))
-                {
-                    @Override
-                    public void fillItemCategory(CreativeModeTab group, NonNullList<ItemStack> items)
-                    {
-                        // Do not offer in creative menu!
-                    }
-                }.setRegistryName(EnderRiftBlocks.STRUCTURE_CORNER.getRegistryName()),
-                new BlockItem(EnderRiftBlocks.STRUCTURE_EDGE, new Item.Properties().tab(tabEnderRift))
-                {
-                    @Override
-                    public void fillItemCategory(CreativeModeTab group, NonNullList<ItemStack> items)
-                    {
-                        // Do not offer in creative menu!
-                    }
-                }.setRegistryName(EnderRiftBlocks.STRUCTURE_EDGE.getRegistryName()),
-                new RiftItem(new Item.Properties().stacksTo(16).tab(tabEnderRift)).setRegistryName("rift_orb")
-        );
-    }
-
-    public void registerTEs(RegistryEvent.Register<BlockEntityType<?>> event)
-    {
-        event.getRegistry().registerAll(
-                BlockEntityType.Builder.of(RiftBlockEntity::new, EnderRiftBlocks.RIFT).build(null).setRegistryName("rift"),
-                BlockEntityType.Builder.of(StructureCornerBlockEntity::new, EnderRiftBlocks.STRUCTURE_CORNER).build(null).setRegistryName("structure"),
-                BlockEntityType.Builder.of(InterfaceBlockEntity::new, EnderRiftBlocks.INTERFACE).build(null).setRegistryName("interface"),
-                BlockEntityType.Builder.of(BrowserBlockEntity::new, EnderRiftBlocks.BROWSER, EnderRiftBlocks.CRAFTING_BROWSER).build(null).setRegistryName("browser"),
-                BlockEntityType.Builder.of(ProxyBlockEntity::new, EnderRiftBlocks.PROXY).build(null).setRegistryName("proxy"),
-                BlockEntityType.Builder.of(DriverBlockEntity::new, EnderRiftBlocks.DRIVER).build(null).setRegistryName("driver"),
-                BlockEntityType.Builder.of(GeneratorBlockEntity::new, EnderRiftBlocks.GENERATOR).build(null).setRegistryName("generator")
-        );
-    }
-
-    public void registerContainers(RegistryEvent.Register<MenuType<?>> event)
-    {
-        event.getRegistry().registerAll(
-                new MenuType<>(BrowserContainer::new).setRegistryName("browser"),
-                new MenuType<>(CraftingBrowserContainer::new).setRegistryName("crafting_browser"),
-                new MenuType<>(InterfaceContainer::new).setRegistryName("interface"),
-                new MenuType<>(GeneratorContainer::new).setRegistryName("generator")
-        );
-    }
-
-    public void registerRecipeSerializers(RegistryEvent.Register<RecipeSerializer<?>> event)
-    {
-        event.getRegistry().registerAll(
-                new SimpleRecipeSerializer<>(OrbDuplicationRecipe::new).setRegistryName("orb_duplication")
-        );
     }
 
     public void commonSetup(FMLCommonSetupEvent event)
@@ -256,10 +189,10 @@ public class EnderRiftMod
 
     public void clientSetup(FMLClientSetupEvent event)
     {
-        MenuScreens.register(GeneratorContainer.TYPE, GeneratorScreen::new);
-        MenuScreens.register(InterfaceContainer.TYPE, InterfaceScreen::new);
-        MenuScreens.register(BrowserContainer.TYPE, BrowserScreen::new);
-        MenuScreens.register(CraftingBrowserContainer.TYPE, CraftingBrowserScreen::new);
+        MenuScreens.register(GENERATOR_MENU.get(), GeneratorScreen::new);
+        MenuScreens.register(INTERFACE_MENU.get(), InterfaceScreen::new);
+        MenuScreens.register(BROWSER_MENU.get(), BrowserScreen::new);
+        MenuScreens.register(CRAFTING_BROWSER_MENU.get(), CraftingBrowserScreen::new);
     }
 
     public void interComms(InterModEnqueueEvent event)
@@ -294,7 +227,7 @@ public class EnderRiftMod
     private void locateRiftById(CommandContext<CommandSourceStack> context, int riftId, RiftInventory rift)
     {
         rift.locateListeners(pos ->
-                context.getSource().sendSuccess(new TextComponent(String.format("Found rift with id %d at %s %s %s", riftId, pos.getX(), pos.getY(), pos.getZ())), true));
+                context.getSource().sendSuccess(Component.literal(String.format("Found rift with id %d at %s %s %s", riftId, pos.getX(), pos.getY(), pos.getZ())), true));
     }
 
     private int locateAllRifts(CommandContext<CommandSourceStack> context)
@@ -320,17 +253,8 @@ public class EnderRiftMod
         {
             DataGenerator gen = event.getGenerator();
 
-            if (event.includeServer())
-            {
-                //gen.addProvider(new Recipes(gen));
-                gen.addProvider(new LootTableGen(gen));
-                //gen.addProvider(new ItemTagGens(gen));
-                gen.addProvider(new BlockTagGens(gen, event.getExistingFileHelper()));
-            }
-            if (event.includeClient())
-            {
-                //gen.addProvider(new BlockStates(gen, event));
-            }
+            gen.addProvider(event.includeServer(), new LootTableGen(gen));
+            gen.addProvider(event.includeServer(), new BlockTagGens(gen, event.getExistingFileHelper()));
         }
 
         private static class LootTableGen extends LootTableProvider implements DataProvider
@@ -367,20 +291,21 @@ public class EnderRiftMod
                 @Override
                 protected void addTables()
                 {
-                    this.dropSelf(EnderRiftBlocks.GENERATOR);
-                    this.dropSelf(EnderRiftBlocks.DRIVER);
-                    this.dropSelf(EnderRiftBlocks.PROXY);
-                    this.dropSelf(EnderRiftBlocks.INTERFACE);
-                    this.dropSelf(EnderRiftBlocks.BROWSER);
-                    this.dropSelf(EnderRiftBlocks.CRAFTING_BROWSER);
-                    this.dropSelf(EnderRiftBlocks.RIFT);
+                    this.dropSelf(GENERATOR.get());
+                    this.dropSelf(DRIVER.get());
+                    this.dropSelf(PROXY.get());
+                    this.dropSelf(INTERFACE.get());
+                    this.dropSelf(BROWSER.get());
+                    this.dropSelf(CRAFTING_BROWSER.get());
+                    this.dropSelf(RIFT.get());
                 }
 
                 @Override
                 protected Iterable<Block> getKnownBlocks()
                 {
-                    return ForgeRegistries.BLOCKS.getValues().stream()
-                            .filter(b -> b.getRegistryName().getNamespace().equals(MODID))
+                    return ForgeRegistries.BLOCKS.getEntries().stream()
+                            .filter(e -> e.getKey().location().getNamespace().equals(EnderRiftMod.MODID))
+                            .map(Map.Entry::getValue)
                             .collect(Collectors.toList());
                 }
             }
@@ -397,16 +322,30 @@ public class EnderRiftMod
             protected void addTags()
             {
                 tag(BlockTags.MINEABLE_WITH_PICKAXE)
-                        .add(EnderRiftBlocks.BROWSER)
-                        .add(EnderRiftBlocks.CRAFTING_BROWSER)
-                        .add(EnderRiftBlocks.INTERFACE)
-                        .add(EnderRiftBlocks.PROXY)
-                        .add(EnderRiftBlocks.DRIVER)
-                        .add(EnderRiftBlocks.RIFT)
-                        .add(EnderRiftBlocks.GENERATOR)
-                        .add(EnderRiftBlocks.STRUCTURE_CORNER)
-                        .add(EnderRiftBlocks.STRUCTURE_EDGE);
+                        .add(BROWSER.get())
+                        .add(CRAFTING_BROWSER.get())
+                        .add(INTERFACE.get())
+                        .add(PROXY.get())
+                        .add(DRIVER.get())
+                        .add(RIFT.get())
+                        .add(GENERATOR.get())
+                        .add(STRUCTURE_CORNER.get())
+                        .add(STRUCTURE_EDGE.get());
             }
+        }
+    }
+
+    public static class BlockItemNC extends BlockItem
+    {
+        public BlockItemNC(Block p_40565_, Properties p_40566_)
+        {
+            super(p_40565_, p_40566_);
+        }
+
+        @Override
+        public void fillItemCategory(CreativeModeTab p_40569_, NonNullList<ItemStack> p_40570_)
+        {
+            // do nothing
         }
     }
 }

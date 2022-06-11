@@ -1,5 +1,6 @@
 package dev.gigaherz.enderrift.automation.proxy;
 
+import dev.gigaherz.enderrift.EnderRiftMod;
 import dev.gigaherz.enderrift.automation.AggregatorBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
@@ -10,12 +11,9 @@ import net.minecraftforge.registries.ObjectHolder;
 
 public class ProxyBlockEntity extends AggregatorBlockEntity
 {
-    @ObjectHolder("enderrift:proxy")
-    public static BlockEntityType<ProxyBlockEntity> TYPE;
-
     public ProxyBlockEntity(BlockPos pos, BlockState state)
     {
-        super(TYPE, pos, state);
+        super(EnderRiftMod.PROXY_BLOCK_ENTITY.get(), pos, state);
     }
 
     @Override

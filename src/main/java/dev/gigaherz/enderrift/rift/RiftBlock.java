@@ -86,7 +86,7 @@ public class RiftBlock extends BaseEntityBlock
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level pLevel, BlockState pState, BlockEntityType<T> pBlockEntityType)
     {
-        return BaseEntityBlock.createTickerHelper(pBlockEntityType, RiftBlockEntity.TYPE, RiftBlockEntity::tickStatic);
+        return BaseEntityBlock.createTickerHelper(pBlockEntityType, EnderRiftMod.RIFT_BLOCK_ENTITY.get(), RiftBlockEntity::tickStatic);
     }
 
     @Deprecated
@@ -131,7 +131,7 @@ public class RiftBlock extends BaseEntityBlock
 
         ItemStack stack = playerIn.getItemInHand(handIn);
 
-        if (stack.getItem() == EnderRiftMod.EnderRiftItems.RIFT_ORB)
+        if (stack.getItem() == EnderRiftMod.RIFT_ORB.get())
             return InteractionResult.PASS;
 
         if (state.getBlock() != this || !state.getValue(ASSEMBLED))
@@ -178,7 +178,7 @@ public class RiftBlock extends BaseEntityBlock
         ItemStack stack = playerIn.getItemInHand(InteractionHand.MAIN_HAND);
         if (stack.getCount() <= 0)
         {
-            if (stack.getItem() == EnderRiftMod.EnderRiftItems.RIFT_ORB)
+            if (stack.getItem() == EnderRiftMod.RIFT_ORB.get())
                 return;
         }
         else

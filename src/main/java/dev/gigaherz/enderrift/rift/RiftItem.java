@@ -12,7 +12,6 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.core.Direction;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.world.level.Level;
 
 import javax.annotation.Nullable;
@@ -43,7 +42,7 @@ public class RiftItem extends Item
         CompoundTag tag = stack.getTag();
         if (tag != null && tag.contains("RiftId"))
         {
-            tooltip.add(new TranslatableComponent("text.enderrift.tooltip.riftid", tag.getInt("RiftId")));
+            tooltip.add(Component.translatable("text.enderrift.tooltip.riftid", tag.getInt("RiftId")));
         }
     }
 
@@ -64,7 +63,7 @@ public class RiftItem extends Item
 
         BlockState state = world.getBlockState(pos);
 
-        if (state.getBlock() != EnderRiftMod.EnderRiftBlocks.RIFT)
+        if (state.getBlock() != EnderRiftMod.RIFT.get())
             return InteractionResult.PASS;
 
         if (state.getValue(RiftBlock.ASSEMBLED))

@@ -1,5 +1,6 @@
 package dev.gigaherz.enderrift.automation.browser;
 
+import dev.gigaherz.enderrift.EnderRiftMod;
 import dev.gigaherz.enderrift.automation.AggregatorBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
@@ -12,16 +13,13 @@ import javax.annotation.Nullable;
 
 public class BrowserBlockEntity extends AggregatorBlockEntity
 {
-    @ObjectHolder("enderrift:browser")
-    public static BlockEntityType<BrowserBlockEntity> TYPE;
-
     private int changeCount = 1;
 
     private Direction facing = null;
 
     public BrowserBlockEntity(BlockPos pos, BlockState state)
     {
-        super(TYPE, pos, state);
+        super(EnderRiftMod.BROWSER_BLOCK_ENTITY.get(), pos, state);
     }
 
     @Nullable

@@ -1,5 +1,6 @@
 package dev.gigaherz.enderrift.generator;
 
+import dev.gigaherz.enderrift.EnderRiftMod;
 import dev.gigaherz.enderrift.common.EnergyBuffer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.inventory.ContainerData;
@@ -27,9 +28,6 @@ import javax.annotation.Nullable;
 
 public class GeneratorBlockEntity extends BlockEntity
 {
-    @ObjectHolder("enderrift:generator")
-    public static BlockEntityType<GeneratorBlockEntity> TYPE;
-
     public static final int SLOT_COUNT = 1;
     public static final int POWER_LIMIT = 100000;
     public static final int MIN_HEAT = 100;
@@ -69,7 +67,7 @@ public class GeneratorBlockEntity extends BlockEntity
 
     public GeneratorBlockEntity(BlockPos pos, BlockState state)
     {
-        super(TYPE, pos, state);
+        super(EnderRiftMod.GENERATOR_BLOCK_ENTITY.get(), pos, state);
     }
 
     @Override

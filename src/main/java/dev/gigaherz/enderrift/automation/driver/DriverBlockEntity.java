@@ -1,5 +1,6 @@
 package dev.gigaherz.enderrift.automation.driver;
 
+import dev.gigaherz.enderrift.EnderRiftMod;
 import dev.gigaherz.enderrift.automation.AggregatorBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
@@ -20,9 +21,6 @@ import java.util.Optional;
 
 public class DriverBlockEntity extends AggregatorBlockEntity
 {
-    @ObjectHolder("enderrift:driver")
-    public static BlockEntityType<DriverBlockEntity> TYPE;
-
     public static final int POWER_LIMIT = 100000;
 
     final EnergyStorage energyBuffer = new EnergyStorage(POWER_LIMIT);
@@ -30,7 +28,7 @@ public class DriverBlockEntity extends AggregatorBlockEntity
 
     public DriverBlockEntity(BlockPos pos, BlockState state)
     {
-        super(TYPE, pos, state);
+        super(EnderRiftMod.DRIVER_BLOCK_ENTITY.get(), pos, state);
     }
 
     @Nonnull

@@ -1,7 +1,9 @@
 package dev.gigaherz.enderrift.automation.browser;
 
 import com.google.common.collect.ImmutableMap;
+import dev.gigaherz.enderrift.EnderRiftMod;
 import dev.gigaherz.enderrift.automation.AggregatorBlock;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
@@ -22,7 +24,6 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraft.world.phys.shapes.Shapes;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 
@@ -96,7 +97,7 @@ public class BrowserBlock extends AggregatorBlock<BrowserBlockEntity>
     @Override
     public @org.jetbrains.annotations.Nullable <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level pLevel, BlockState pState, BlockEntityType<T> pBlockEntityType)
     {
-        return BaseEntityBlock.createTickerHelper(pBlockEntityType, BrowserBlockEntity.TYPE, BrowserBlockEntity::tickStatic);
+        return BaseEntityBlock.createTickerHelper(pBlockEntityType, EnderRiftMod.BROWSER_BLOCK_ENTITY.get(), BrowserBlockEntity::tickStatic);
     }
 
     @Deprecated
@@ -137,13 +138,13 @@ public class BrowserBlock extends AggregatorBlock<BrowserBlockEntity>
     {
         player.openMenu(new SimpleMenuProvider(
                 (id, playerInventory, playerEntity) -> new BrowserContainer(id, tileEntity, playerInventory),
-                new TranslatableComponent("container.enderrift.browser")));
+                Component.translatable("container.enderrift.browser")));
     }
 
     private void openCraftingBrowser(Player player, BrowserBlockEntity tileEntity)
     {
         player.openMenu(new SimpleMenuProvider(
                 (id, playerInventory, playerEntity) -> new CraftingBrowserContainer(id, tileEntity, playerInventory),
-                new TranslatableComponent("container.enderrift.crafting_browser")));
+                Component.translatable("container.enderrift.crafting_browser")));
     }
 }

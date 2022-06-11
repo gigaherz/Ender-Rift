@@ -30,9 +30,6 @@ import java.util.Random;
 
 public class RiftBlockEntity extends BlockEntity implements IRiftChangeListener
 {
-    @ObjectHolder("enderrift:rift")
-    public static BlockEntityType<RiftBlockEntity> TYPE;
-
     private static final int STARTUP_POWER = 10000;
     public static final int BUFFER_POWER = 1000000;
     private final Random rand = new Random();
@@ -54,7 +51,7 @@ public class RiftBlockEntity extends BlockEntity implements IRiftChangeListener
 
     public RiftBlockEntity(BlockPos pos, BlockState state)
     {
-        super(TYPE, pos, state);
+        super(EnderRiftMod.RIFT_BLOCK_ENTITY.get(), pos, state);
     }
 
     public Optional<IEnergyStorage> getEnergyBuffer()
@@ -161,7 +158,7 @@ public class RiftBlockEntity extends BlockEntity implements IRiftChangeListener
 
     public ItemStack getRiftItem()
     {
-        ItemStack stack = new ItemStack(EnderRiftMod.EnderRiftItems.RIFT_ORB);
+        ItemStack stack = new ItemStack(EnderRiftMod.RIFT_ORB.get());
 
         CompoundTag tag = new CompoundTag();
 
