@@ -53,6 +53,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.storage.loot.LootTables;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.data.ExistingFileHelper;
+import net.minecraftforge.data.event.GatherDataEvent;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.InterModComms;
@@ -66,7 +67,6 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.network.NetworkDirection;
 import net.minecraftforge.network.NetworkRegistry;
 import net.minecraftforge.network.simple.SimpleChannel;
-import net.minecraftforge.forge.event.lifecycle.GatherDataEvent;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
@@ -87,6 +87,8 @@ import net.minecraft.world.level.storage.loot.ValidationContext;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSet;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 
+import net.minecraft.world.item.Item.Properties;
+
 @Mod.EventBusSubscriber
 @Mod(EnderRiftMod.MODID)
 public class EnderRiftMod
@@ -95,9 +97,9 @@ public class EnderRiftMod
 
     private static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, MODID);
     private static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(ForgeRegistries.BLOCKS, MODID);
-    private static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITIES = DeferredRegister.create(ForgeRegistries.BLOCK_ENTITIES, MODID);
+    private static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITIES = DeferredRegister.create(ForgeRegistries.BLOCK_ENTITY_TYPES, MODID);
     private static final DeferredRegister<RecipeSerializer<?>> RECIPE_SERIALIZERS = DeferredRegister.create(ForgeRegistries.RECIPE_SERIALIZERS, MODID);
-    private static final DeferredRegister<MenuType<?>> MENU_TYPES = DeferredRegister.create(ForgeRegistries.CONTAINERS, MODID);
+    private static final DeferredRegister<MenuType<?>> MENU_TYPES = DeferredRegister.create(ForgeRegistries.MENU_TYPES, MODID);
 
     public static CreativeModeTab ENDERRIFT_CREATIVE_TAB = new CreativeModeTab("tabEnderRift")
     {
@@ -112,8 +114,8 @@ public class EnderRiftMod
     public static final RegistryObject<StructureCornerBlock> STRUCTURE_CORNER = BLOCKS.register("structure_corner", () -> new StructureCornerBlock(BlockBehaviour.Properties.of(Material.STONE).sound(SoundType.METAL).strength(3.0F, 8.0F).noLootTable()));
     public static final RegistryObject<StructureEdgeBlock> STRUCTURE_EDGE = BLOCKS.register("structure_edge", () -> new StructureEdgeBlock(BlockBehaviour.Properties.of(Material.STONE).sound(SoundType.METAL).strength(3.0F, 8.0F).noLootTable()));
     public static final RegistryObject<Block> INTERFACE = BLOCKS.register("interface", () -> new InterfaceBlock(BlockBehaviour.Properties.of(Material.METAL, MaterialColor.STONE).sound(SoundType.METAL).strength(3.0F, 8.0F)));
-    public static final RegistryObject<Block> BROWSER = BLOCKS.register("browser", () -> new BrowserBlock(true, BlockBehaviour.Properties.of(Material.METAL, MaterialColor.STONE).sound(SoundType.METAL).strength(3.0F, 8.0F)));
-    public static final RegistryObject<Block> CRAFTING_BROWSER = BLOCKS.register("crafting_browser", () ->new BrowserBlock(false, BlockBehaviour.Properties.of(Material.METAL, MaterialColor.STONE).sound(SoundType.METAL).strength(3.0F, 8.0F)));
+    public static final RegistryObject<Block> BROWSER = BLOCKS.register("browser", () -> new BrowserBlock(false, BlockBehaviour.Properties.of(Material.METAL, MaterialColor.STONE).sound(SoundType.METAL).strength(3.0F, 8.0F)));
+    public static final RegistryObject<Block> CRAFTING_BROWSER = BLOCKS.register("crafting_browser", () ->new BrowserBlock(true, BlockBehaviour.Properties.of(Material.METAL, MaterialColor.STONE).sound(SoundType.METAL).strength(3.0F, 8.0F)));
     public static final RegistryObject<Block> PROXY = BLOCKS.register("proxy", () ->  new ProxyBlock(BlockBehaviour.Properties.of(Material.METAL, MaterialColor.STONE).sound(SoundType.METAL).strength(3.0F, 8.0F)));
     public static final RegistryObject<Block> DRIVER = BLOCKS.register("driver", () -> new DriverBlock(BlockBehaviour.Properties.of(Material.METAL, MaterialColor.STONE).sound(SoundType.METAL).strength(3.0F, 8.0F)));
     public static final RegistryObject<Block> GENERATOR = BLOCKS.register("generator", () -> new GeneratorBlock(BlockBehaviour.Properties.of(Material.METAL, MaterialColor.STONE).sound(SoundType.METAL).strength(3.0F, 8.0F)));
@@ -179,9 +181,9 @@ public class EnderRiftMod
     public void commonSetup(FMLCommonSetupEvent event)
     {
         int messageNumber = 0;
-        CHANNEL.messageBuilder(ClearCraftingGrid.class, messageNumber++, NetworkDirection.PLAY_TO_SERVER).encoder(ClearCraftingGrid::encode).decoder(ClearCraftingGrid::new).consumer(ClearCraftingGrid::handle).add();
-        CHANNEL.messageBuilder(SendSlotChanges.class, messageNumber++, NetworkDirection.PLAY_TO_CLIENT).encoder(SendSlotChanges::encode).decoder(SendSlotChanges::new).consumer(SendSlotChanges::handle).add();
-        CHANNEL.messageBuilder(SetVisibleSlots.class, messageNumber++, NetworkDirection.PLAY_TO_SERVER).encoder(SetVisibleSlots::encode).decoder(SetVisibleSlots::new).consumer(SetVisibleSlots::handle).add();
+        CHANNEL.messageBuilder(ClearCraftingGrid.class, messageNumber++, NetworkDirection.PLAY_TO_SERVER).encoder(ClearCraftingGrid::encode).decoder(ClearCraftingGrid::new).consumerNetworkThread(ClearCraftingGrid::handle).add();
+        CHANNEL.messageBuilder(SendSlotChanges.class, messageNumber++, NetworkDirection.PLAY_TO_CLIENT).encoder(SendSlotChanges::encode).decoder(SendSlotChanges::new).consumerNetworkThread(SendSlotChanges::handle).add();
+        CHANNEL.messageBuilder(SetVisibleSlots.class, messageNumber++, NetworkDirection.PLAY_TO_SERVER).encoder(SetVisibleSlots::encode).decoder(SetVisibleSlots::new).consumerNetworkThread(SetVisibleSlots::handle).add();
         logger.debug("Final message number: " + messageNumber);
 
         RiftStructure.init();
@@ -337,13 +339,13 @@ public class EnderRiftMod
 
     public static class BlockItemNC extends BlockItem
     {
-        public BlockItemNC(Block p_40565_, Properties p_40566_)
+        public BlockItemNC(Block pBlock, Properties pProperties)
         {
-            super(p_40565_, p_40566_);
+            super(pBlock, pProperties);
         }
 
         @Override
-        public void fillItemCategory(CreativeModeTab p_40569_, NonNullList<ItemStack> p_40570_)
+        public void fillItemCategory(CreativeModeTab pGroup, NonNullList<ItemStack> pItems)
         {
             // do nothing
         }

@@ -156,7 +156,7 @@ public class GeneratorBlockEntity extends BlockEntity
                 currentItemBurnTime = burnTimeRemaining = getBurnTime(fuelSlot.getStackInSlot(0));
                 timeInterval = 0;
                 if (stack.getCount() == 1)
-                    fuelSlot.setStackInSlot(0, stack.getItem().getContainerItem(stack));
+                    fuelSlot.setStackInSlot(0, stack.getItem().getCraftingRemainingItem(stack));
                 else
                     stack.shrink(1);
                 anyChanged = true;

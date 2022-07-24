@@ -9,8 +9,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.client.event.ModelRegistryEvent;
-import net.minecraftforge.client.model.ForgeModelBakery;
+import net.minecraftforge.client.event.ModelEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
@@ -19,9 +18,9 @@ import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 public class ClientHelper
 {
     @SubscribeEvent
-    public static void registerModels(ModelRegistryEvent event)
+    public static void registerModels(ModelEvent.RegisterAdditional event)
     {
-        ForgeModelBakery.addSpecialModel(EnderRiftMod.location("block/sphere"));
+        event.register(EnderRiftMod.location("block/sphere"));
     }
 
     @SubscribeEvent

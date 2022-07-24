@@ -90,7 +90,7 @@ public class InterfaceBlock extends AggregatorBlock<InterfaceBlockEntity>
         if (worldIn.isClientSide)
             return InteractionResult.SUCCESS;
 
-        NetworkHooks.openGui((ServerPlayer) player, new SimpleMenuProvider(
+        NetworkHooks.openScreen((ServerPlayer) player, new SimpleMenuProvider(
                 (id, playerInventory, playerEntity) -> new InterfaceContainer(id, playerInventory, be.inventoryFilter(), be.inventoryOutputs(), ContainerLevelAccess.create(be.getLevel(), be.getBlockPos())),
                 Component.translatable("container.enderrift.interface")), pos);
 

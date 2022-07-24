@@ -20,7 +20,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.phys.Vec3;
 import com.mojang.math.Vector3f;
-import net.minecraftforge.client.model.data.EmptyModelData;
+import net.minecraftforge.client.model.data.ModelData;
 
 import java.util.List;
 import java.util.Random;
@@ -107,7 +107,7 @@ public class RiftRenderer
 
                 for (Direction d : DIRECTIONS_AND_NULL)
                 {
-                    for (BakedQuad quad : model.getQuads(null, d, random, EmptyModelData.INSTANCE))
+                    for (BakedQuad quad : model.getQuads(null, d, random, ModelData.EMPTY, null))
                     {
                         buffer.putBulkData(matrixStack.last(), quad, rgb, rgb, rgb, a, 0x00F000F0, OverlayTexture.NO_OVERLAY, true);
                     }
