@@ -2,7 +2,6 @@ package dev.gigaherz.enderrift.debug;
 
 import dev.gigaherz.enderrift.EnderRiftMod;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
