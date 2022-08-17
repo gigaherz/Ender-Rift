@@ -17,6 +17,8 @@ import dev.gigaherz.enderrift.automation.iface.InterfaceScreen;
 import dev.gigaherz.enderrift.automation.iface.InterfaceBlockEntity;
 import dev.gigaherz.enderrift.automation.proxy.ProxyBlock;
 import dev.gigaherz.enderrift.automation.proxy.ProxyBlockEntity;
+import dev.gigaherz.enderrift.debug.DebugItemBlock;
+import dev.gigaherz.enderrift.debug.DebugItemBlockEntity;
 import dev.gigaherz.enderrift.generator.GeneratorBlock;
 import dev.gigaherz.enderrift.generator.GeneratorContainer;
 import dev.gigaherz.enderrift.generator.GeneratorScreen;
@@ -27,9 +29,6 @@ import net.minecraft.core.NonNullList;
 import net.minecraft.data.tags.BlockTagsProvider;
 import net.minecraft.network.chat.Component;
 import net.minecraft.tags.BlockTags;
-import net.minecraft.world.entity.ai.village.poi.PoiType;
-import net.minecraft.world.entity.npc.VillagerProfession;
-import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.material.Material;
@@ -110,6 +109,7 @@ public class EnderRiftMod
         }
     };
 
+    public static final RegistryObject<Block> DEBUG_ITEM_BLOCK = BLOCKS.register("debug_item_block", () -> new DebugItemBlock(BlockBehaviour.Properties.of(Material.STONE).sound(SoundType.METAL).strength(3.0F, 8.0F).dynamicShape()));
     public static final RegistryObject<Block> RIFT = BLOCKS.register("rift", () -> new RiftBlock(BlockBehaviour.Properties.of(Material.STONE).sound(SoundType.METAL).strength(3.0F, 8.0F).dynamicShape()));
     public static final RegistryObject<StructureCornerBlock> STRUCTURE_CORNER = BLOCKS.register("structure_corner", () -> new StructureCornerBlock(BlockBehaviour.Properties.of(Material.STONE).sound(SoundType.METAL).strength(3.0F, 8.0F).noLootTable()));
     public static final RegistryObject<StructureEdgeBlock> STRUCTURE_EDGE = BLOCKS.register("structure_edge", () -> new StructureEdgeBlock(BlockBehaviour.Properties.of(Material.STONE).sound(SoundType.METAL).strength(3.0F, 8.0F).noLootTable()));
@@ -120,6 +120,7 @@ public class EnderRiftMod
     public static final RegistryObject<Block> DRIVER = BLOCKS.register("driver", () -> new DriverBlock(BlockBehaviour.Properties.of(Material.METAL, MaterialColor.STONE).sound(SoundType.METAL).strength(3.0F, 8.0F)));
     public static final RegistryObject<Block> GENERATOR = BLOCKS.register("generator", () -> new GeneratorBlock(BlockBehaviour.Properties.of(Material.METAL, MaterialColor.STONE).sound(SoundType.METAL).strength(3.0F, 8.0F)));
 
+    public static final RegistryObject<Item> DEBUG_ITEM_BLOCK_ITEM = ITEMS.register("debug_item_block", () -> new BlockItem(DEBUG_ITEM_BLOCK.get(), new Item.Properties().tab(ENDERRIFT_CREATIVE_TAB)));
     public static final RegistryObject<Item> RIFT_ITEM = ITEMS.register("rift", () -> new BlockItem(RIFT.get(), new Item.Properties().tab(ENDERRIFT_CREATIVE_TAB)));
     public static final RegistryObject<Item> STRUCTURE_CORNER_ITEM = ITEMS.register("structure_corner", () -> new BlockItemNC(STRUCTURE_CORNER.get(), new Item.Properties().tab(ENDERRIFT_CREATIVE_TAB)));
     public static final RegistryObject<Item> STRUCTURE_EDGE_ITEM = ITEMS.register("structure_edge", () -> new BlockItemNC(STRUCTURE_EDGE.get(), new Item.Properties().tab(ENDERRIFT_CREATIVE_TAB)));
@@ -131,6 +132,7 @@ public class EnderRiftMod
     public static final RegistryObject<Item> GENERATOR_ITEM = ITEMS.register("generator", () -> new BlockItem(GENERATOR.get(), new Item.Properties().tab(ENDERRIFT_CREATIVE_TAB)));
     public static final RegistryObject<Item> RIFT_ORB = ITEMS.register("rift_orb", () -> new RiftItem(new Item.Properties().stacksTo(16).tab(ENDERRIFT_CREATIVE_TAB)));
 
+    public static final RegistryObject<BlockEntityType<DebugItemBlockEntity>> DEBUG_ITEM_BLOCK_ENTITY = BLOCK_ENTITIES.register("debug_item_block", () -> BlockEntityType.Builder.of(DebugItemBlockEntity::new, DEBUG_ITEM_BLOCK.get()).build(null));
     public static final RegistryObject<BlockEntityType<RiftBlockEntity>> RIFT_BLOCK_ENTITY = BLOCK_ENTITIES.register("rift", () -> BlockEntityType.Builder.of(RiftBlockEntity::new, RIFT.get()).build(null));
     public static final RegistryObject<BlockEntityType<StructureCornerBlockEntity>> STRUCTURE_CORNER_BLOCK_ENTITY = BLOCK_ENTITIES.register("structure", () -> BlockEntityType.Builder.of(StructureCornerBlockEntity::new, STRUCTURE_CORNER.get()).build(null));
     public static final RegistryObject<BlockEntityType<InterfaceBlockEntity>> INTERFACE_BLOCK_ENTITY = BLOCK_ENTITIES.register("interface", () -> BlockEntityType.Builder.of(InterfaceBlockEntity::new, INTERFACE.get()).build(null));

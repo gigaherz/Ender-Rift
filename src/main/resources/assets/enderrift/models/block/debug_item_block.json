@@ -1,0 +1,9 @@
+{
+  "parent": "block/block",
+  "loader": "forge:obj",
+  "model": "enderrift:models/block/driver_main.obj",
+  "textures": {
+    "all": "enderrift:block/browser",
+    "particle": "#all"
+  }
+}
