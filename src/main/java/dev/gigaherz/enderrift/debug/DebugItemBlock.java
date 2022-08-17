@@ -17,28 +17,33 @@ import java.util.List;
 
 import org.jetbrains.annotations.Nullable;
 
-public class DebugItemBlock extends BaseEntityBlock {
+public class DebugItemBlock extends BaseEntityBlock
+{
 
-    public DebugItemBlock(Properties properties) {
-        super(properties);
-    }
+	public DebugItemBlock(Properties properties)
+	{
+		super(properties);
+	}
 
-    @org.jetbrains.annotations.Nullable
-    @Override
-    public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
-        return new DebugItemBlockEntity(pos, state);
-    }
+	@org.jetbrains.annotations.Nullable
+	@Override
+	public BlockEntity newBlockEntity(BlockPos pos, BlockState state)
+	{
+		return new DebugItemBlockEntity(pos, state);
+	}
 
-    @Nullable
-    @Override
-    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level pLevel, BlockState pState, BlockEntityType<T> pBlockEntityType) {
-        return BaseEntityBlock.createTickerHelper(pBlockEntityType, EnderRiftMod.RIFT_BLOCK_ENTITY.get(), RiftBlockEntity::tickStatic);
-    }
+	@Nullable
+	@Override
+	public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level pLevel, BlockState pState, BlockEntityType<T> pBlockEntityType)
+	{
+		return BaseEntityBlock.createTickerHelper(pBlockEntityType, EnderRiftMod.RIFT_BLOCK_ENTITY.get(), RiftBlockEntity::tickStatic);
+	}
 
-    @Deprecated
-    @Override
-    public List<ItemStack> getDrops(BlockState state, LootContext.Builder builder) {
-        return Lists.newArrayList(new ItemStack(this));
-    }
+	@Deprecated
+	@Override
+	public List<ItemStack> getDrops(BlockState state, LootContext.Builder builder)
+	{
+		return Lists.newArrayList(new ItemStack(this));
+	}
 
 }
