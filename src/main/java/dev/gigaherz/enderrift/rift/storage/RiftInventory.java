@@ -2,33 +2,40 @@ package dev.gigaherz.enderrift.rift.storage;
 
 import com.google.common.collect.Lists;
 import dev.gigaherz.enderrift.rift.IRiftChangeListener;
-import net.minecraft.nbt.Tag;
-import net.minecraft.world.item.ItemStack;
+import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
-import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.Tag;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.items.IItemHandler;
-import net.minecraftforge.items.ItemHandlerHelper;
+import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nonnull;
 import java.lang.ref.Reference;
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
 import java.util.function.Consumer;
 
 public class RiftInventory implements IItemHandler
 {
-    private final RiftStorage manager;
 
     final List<Reference<? extends IRiftChangeListener>> listeners = Lists.newArrayList();
     final ReferenceQueue<IRiftChangeListener> pendingRemovals = new ReferenceQueue<>();
-    private final List<ItemStack> inventorySlots = Lists.newArrayList();
+    private final List<RiftSlot> slots = Lists.newArrayList();
+    private final RiftHolder holder;
 
-    RiftInventory(RiftStorage manager)
+    RiftInventory(final RiftHolder holder)
     {
-        this.manager = manager;
+        this.holder = Objects.requireNonNull(holder);
+    }
+
+    public UUID getId()
+    {
+        return holder.getId();
     }
 
     public void addWeakListener(IRiftChangeListener e)
@@ -38,10 +45,7 @@ public class RiftInventory implements IItemHandler
 
     private void walkListeners(Consumer<IRiftChangeListener> consumer)
     {
-        for (Reference<? extends IRiftChangeListener>
-             ref = pendingRemovals.poll();
-             ref != null;
-             ref = pendingRemovals.poll())
+        for (Reference<? extends IRiftChangeListener> ref = pendingRemovals.poll(); ref != null; ref = pendingRemovals.poll())
         {
             listeners.remove(ref);
         }
@@ -62,137 +66,172 @@ public class RiftInventory implements IItemHandler
     protected void onContentsChanged()
     {
         walkListeners(IRiftChangeListener::onRiftChanged);
-        manager.setDirty();
     }
 
-    public void locateListeners(Consumer<BlockPos> locationConsumer)
+    public void locateListeners(Level level, Consumer<BlockPos> locationConsumer)
     {
-        walkListeners(listener -> listener.getLocation().ifPresent(locationConsumer));
-    }
-
-    public void readFromNBT(CompoundTag nbtTagCompound)
-    {
-        ListTag itemList = nbtTagCompound.getList("Items", Tag.TAG_COMPOUND);
-
-        inventorySlots.clear();
-
-        for (int i = 0; i < itemList.size(); ++i)
-        {
-            CompoundTag slot = itemList.getCompound(i);
-            inventorySlots.add(ItemStack.of(slot));
-        }
-    }
-
-    public void writeToNBT(CompoundTag nbtTagCompound)
-    {
-        ListTag itemList = new ListTag();
-
-        for (ItemStack stack : inventorySlots)
-        {
-            if (stack != null)
+        walkListeners(listener -> {
+            if (!level.dimension().equals(listener.getRiftLevel().map(Level::dimension).orElse(null)))
             {
-                CompoundTag slot = new CompoundTag();
-                stack.save(slot);
-                itemList.add(slot);
+                return;
             }
-        }
+            listener.getLocation().ifPresent(locationConsumer);
+        });
+    }
 
-        nbtTagCompound.put("Items", itemList);
+    public long getCount(int slot)
+    {
+        if (slot < 0 || slot >= slots.size())
+        {
+            return 0;
+        }
+        return slots.get(slot).getCount();
+    }
+
+    CompoundTag save()
+    {
+        CompoundTag root = new CompoundTag();
+        ListTag list = new ListTag();
+        RiftSlot[] slots = this.slots.toArray(RiftSlot[]::new);
+        for (RiftSlot slot : slots)
+        {
+            CompoundTag tag = new CompoundTag();
+            tag.putLong("Count", slot.getCount());
+            tag.put("Item", slot.getSample().save(new CompoundTag()));
+            list.add(tag);
+        }
+        root.put("Contents", list);
+        return root;
+    }
+
+    void load(CompoundTag root)
+    {
+        slots.clear();
+        ListTag list = root.getList("Contents", Tag.TAG_COMPOUND);
+        for (Tag rawTag : list)
+        {
+            CompoundTag tag = (CompoundTag) rawTag;
+            long count = tag.getLong("Count");
+            ItemStack stack = ItemStack.of(tag.getCompound("Item"));
+            RiftSlot slot = new RiftSlot(stack);
+            slot.setCount(count);
+            slots.add(slot);
+        }
+        onContentsChanged();
     }
 
     @Override
     public int getSlots()
     {
-        return inventorySlots.size() + 1;
+        return slots.size() + 1;
     }
 
     @Override
-    public ItemStack getStackInSlot(int index)
+    public @NotNull ItemStack getStackInSlot(int index)
     {
-        if (index >= inventorySlots.size())
-            return ItemStack.EMPTY;
-        return inventorySlots.get(index);
-    }
-
-    @Override
-    public ItemStack insertItem(int index, ItemStack stack, boolean simulate)
-    {
-        if (index >= inventorySlots.size())
+        if (index >= slots.size())
         {
-            if (!simulate)
+            return ItemStack.EMPTY;
+        }
+        RiftSlot slot = slots.get(index);
+        ItemStack stack = slot.getSample().copy();
+        stack.setCount((int) Math.min(Integer.MAX_VALUE, slot.getCount()));
+        return stack;
+    }
+
+    @Override
+    public @NotNull ItemStack insertItem(int index, @NotNull ItemStack stack, boolean simulate)
+    {
+        if (simulate)
+        {
+            return ItemStack.EMPTY;
+        }
+        try
+        {
+            if (index < slots.size() && index >= 0 && add(index, stack))
             {
-                inventorySlots.add(stack.copy());
-                onContentsChanged();
+                return ItemStack.EMPTY;
             }
-            return ItemStack.EMPTY;
-        }
-
-        ItemStack remaining = stack.copy();
-        ItemStack slot = inventorySlots.get(index);
-        if (slot.getCount() > 0)
-        {
-            int max = Math.min(remaining.getMaxStackSize(), 64);
-            int transfer = Math.min(remaining.getCount(), max - slot.getCount());
-            if (transfer > 0 && ItemHandlerHelper.canItemStacksStack(remaining, slot))
+            for (int i = 0; i < slots.size(); i++)
             {
-                if (!simulate) slot.grow(transfer);
-                remaining.shrink(transfer);
-                if (remaining.getCount() <= 0)
-                    remaining = ItemStack.EMPTY;
+                if (index == i || !add(i, stack))
+                {
+                    continue;
+                }
+                return ItemStack.EMPTY;
             }
+            slots.add(new RiftSlot(stack));
+            return ItemStack.EMPTY;
         }
+        finally
+        {
+            onContentsChanged();
+        }
+    }
 
-        if (!simulate) onContentsChanged();
-
-        return remaining;
+    private boolean add(int index, ItemStack stack)
+    {
+        RiftSlot slot = slots.get(index);
+        ItemStack sample = slot.getSample();
+        if (ItemStack.isSame(sample, stack) && ItemStack.tagMatches(sample, stack))
+        {
+            slot.addCount(stack.getCount());
+            return true;
+        }
+        return false;
     }
 
     @Override
-    public ItemStack extractItem(int index, int wanted, boolean simulate)
+    public @NotNull ItemStack extractItem(int index, int wanted, boolean simulate)
     {
-        if (index >= inventorySlots.size())
+        if (index >= slots.size())
         {
             return ItemStack.EMPTY;
         }
-
-        ItemStack slot = inventorySlots.get(index);
-        if (slot == null)
-            return ItemStack.EMPTY;
-
-        ItemStack _extracted = slot.copy();
-        int extractedCount = 0;
-
-        int available = Math.min(wanted, slot.getCount());
-        if (available > 0)
+        RiftSlot slot = slots.get(index);
+        long count = slot.getCount();
+        if (simulate)
         {
-            extractedCount += available;
-
-            if (!simulate)
+            int amount = (int) Math.min(wanted, count);
+            ItemStack stack = slot.getSample().copy();
+            stack.setCount(amount);
+            return stack;
+        }
+        try
+        {
+            if (count <= wanted)
             {
-                slot.shrink(available);
-                if (slot.getCount() <= 0)
-                    inventorySlots.remove(index);
+                ItemStack stack = slot.getSample();
+                stack.setCount((int) count);
+                slots.remove(index);
+                return stack;
             }
+            ItemStack stack = slot.getSample().copy();
+            stack.setCount(wanted);
+            slot.subtractCount(wanted);
+            return stack;
         }
-
-        if (extractedCount <= 0)
-            return ItemStack.EMPTY;
-
-        if (!simulate) onContentsChanged();
-
-        _extracted.setCount(extractedCount);
-        return _extracted;
+        finally
+        {
+            onContentsChanged();
+        }
     }
 
     @Override
-    public int getSlotLimit(int slot)
+    public int getSlotLimit(int index)
     {
-        return 64;
+        return Integer.MAX_VALUE;
     }
 
     @Override
-    public boolean isItemValid(int slot, @Nonnull ItemStack stack)
+    public boolean isItemValid(int slot, @NotNull ItemStack stack)
     {
-        return true;
+        return !ItemStack.isSame(ItemStack.EMPTY, stack);
+    }
+
+    public void clear()
+    {
+        slots.clear();
+        onContentsChanged();
     }
 }

@@ -1,24 +1,26 @@
 package dev.gigaherz.enderrift.automation.iface;
 
 import dev.gigaherz.enderrift.EnderRiftMod;
-import dev.gigaherz.enderrift.common.IPoweredAutomation;
 import dev.gigaherz.enderrift.automation.AggregatorBlockEntity;
 import dev.gigaherz.enderrift.automation.AutomationHelper;
+import dev.gigaherz.enderrift.common.IPoweredAutomation;
 import net.minecraft.core.BlockPos;
-import net.minecraft.nbt.Tag;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
-import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.core.Direction;
 import net.minecraft.core.NonNullList;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.Tag;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.items.*;
-import net.minecraftforge.registries.ObjectHolder;
+import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.items.IItemHandlerModifiable;
+import net.minecraftforge.items.ItemHandlerHelper;
+import net.minecraftforge.items.ItemStackHandler;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -75,7 +77,7 @@ public class InterfaceBlockEntity extends AggregatorBlockEntity implements IPowe
     {
         if (facing == getFacing())
         {
-            if (capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
+            if (capability == ForgeCapabilities.ITEM_HANDLER)
                 return outputsProvider.cast();
         }
         return super.getCapability(capability, facing);

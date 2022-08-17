@@ -1,23 +1,25 @@
 package dev.gigaherz.enderrift.rift;
 
 import dev.gigaherz.enderrift.EnderRiftMod;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.item.TooltipFlag;
+import dev.gigaherz.enderrift.rift.storage.RiftStorage;
+import dev.gigaherz.enderrift.rift.storage.migration.RiftMigration_17_08_2022;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.UseOnContext;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.world.InteractionResult;
-import net.minecraft.core.Direction;
-import net.minecraft.core.BlockPos;
-import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
 
 import javax.annotation.Nullable;
 import java.util.List;
-
-import net.minecraft.world.item.Item.Properties;
+import java.util.UUID;
 
 public class RiftItem extends Item
 {
@@ -37,12 +39,26 @@ public class RiftItem extends Item
     }
 
     @Override
+    public void verifyTagAfterLoad(CompoundTag tag)
+    {
+        if (RiftStorage.isAvailable() && tag.contains("RiftId", Tag.TAG_ANY_NUMERIC))
+        {
+            UUID id = RiftStorage.get().getMigration(RiftMigration_17_08_2022.class).getMigratedId(tag.getInt("RiftId"));
+            tag.remove("RiftId");
+            if (id != null)
+            {
+                tag.putUUID("RiftId", id);
+            }
+        }
+    }
+
+    @Override
     public void appendHoverText(ItemStack stack, @Nullable Level worldIn, List<Component> tooltip, TooltipFlag flagIn)
     {
         CompoundTag tag = stack.getTag();
         if (tag != null && tag.contains("RiftId"))
         {
-            tooltip.add(Component.translatable("text.enderrift.tooltip.riftid", tag.getInt("RiftId")));
+            tooltip.add(Component.translatable("text.enderrift.tooltip.riftid", tag.getUUID("RiftId")));
         }
     }
 

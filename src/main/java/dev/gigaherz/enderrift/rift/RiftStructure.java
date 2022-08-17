@@ -2,18 +2,20 @@ package dev.gigaherz.enderrift.rift;
 
 import dev.gigaherz.enderrift.EnderRiftMod;
 import dev.gigaherz.enderrift.rift.storage.RiftStorage;
-import net.minecraft.core.Direction;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.Containers;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.Containers;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+
+import java.util.UUID;
 
 public class RiftStructure
 {
@@ -45,7 +47,6 @@ public class RiftStructure
                 EnderRiftMod.STRUCTURE_CORNER.get().cornerState(StructureCornerBlock.Corner.NW, true),
                 EnderRiftMod.STRUCTURE_EDGE.get().edgeState(Direction.Axis.X, true),
                 EnderRiftMod.STRUCTURE_CORNER.get().cornerState(StructureCornerBlock.Corner.NE, true),
-
 
                 EnderRiftMod.STRUCTURE_EDGE.get().edgeState(Direction.Axis.Z, true),
                 null,
@@ -182,12 +183,14 @@ public class RiftStructure
 
         if (tagCompound != null && tagCompound.contains("RiftId"))
         {
-            rift.assemble(tagCompound.getInt("RiftId"));
+            UUID id = tagCompound.getUUID("RiftId");
+            if (id != null)
+            {
+                rift.assemble(RiftStorage.get().getRift(id));
+                return;
+            }
         }
-        else
-        {
-            rift.assemble(RiftStorage.get(world).getNextRiftId());
-        }
+        rift.assemble(RiftStorage.get().newRift());
     }
 
     public static void dismantle(Level world, BlockPos pos)

@@ -1,4 +1,5 @@
 {
+    "block.enderrift.debug_item_block": "Zufälliger Item Generator",
     "block.enderrift.rift": "Ender-Rift-Kern",
     "block.enderrift.structure": "Ender-Rift-Struktur",
     "block.enderrift.interface": "Riftinterface",

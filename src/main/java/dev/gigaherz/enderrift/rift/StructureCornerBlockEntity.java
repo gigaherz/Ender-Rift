@@ -2,17 +2,15 @@ package dev.gigaherz.enderrift.rift;
 
 import dev.gigaherz.enderrift.EnderRiftMod;
 import dev.gigaherz.enderrift.automation.AggregatorBlockEntity;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraft.core.Direction;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.IEnergyStorage;
-import net.minecraftforge.registries.ObjectHolder;
 
 import javax.annotation.Nullable;
 import java.util.Optional;
@@ -32,7 +30,7 @@ public class StructureCornerBlockEntity extends AggregatorBlockEntity
     @Override
     public <T> LazyOptional<T> getCapability(Capability<T> capability, @Nullable Direction facing)
     {
-        if (capability == CapabilityEnergy.ENERGY)
+        if (capability == ForgeCapabilities.ENERGY)
             return bufferProvider.cast();
         return super.getCapability(capability, facing);
     }

@@ -2,24 +2,24 @@ package dev.gigaherz.enderrift.automation.browser;
 
 import com.google.common.collect.Lists;
 import dev.gigaherz.enderrift.EnderRiftMod;
-import dev.gigaherz.enderrift.common.slots.SlotFake;
 import dev.gigaherz.enderrift.automation.AutomationHelper;
+import dev.gigaherz.enderrift.common.slots.SlotFake;
 import dev.gigaherz.enderrift.network.SendSlotChanges;
 import dev.gigaherz.enderrift.network.SetVisibleSlots;
 import joptsimple.internal.Strings;
-import net.minecraft.world.inventory.*;
-import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.network.protocol.game.ClientboundContainerSetSlotPacket;
 import net.minecraft.core.NonNullList;
 import net.minecraft.network.chat.Component;
-import net.minecraftforge.network.NetworkDirection;
+import net.minecraft.network.protocol.game.ClientboundContainerSetSlotPacket;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.*;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.IItemHandlerModifiable;
+import net.minecraftforge.network.NetworkDirection;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.apache.commons.lang3.StringUtils;
 
@@ -155,10 +155,10 @@ public class AbstractBrowserContainer extends AbstractContainerMenu
         return true;
     }
 
-
     @Override
     public void broadcastChanges()
     {
+
         if (isClient())
             return;
 
@@ -239,7 +239,7 @@ public class AbstractBrowserContainer extends AbstractContainerMenu
         NonNullList<ItemStack> oldStacks = currentStacks;
         currentStacks = NonNullList.withSize(newLength, ItemStack.EMPTY);
         for (int i = 0; i < Math.min(newLength, oldLength); i++)
-        { currentStacks.set(i, oldStacks.get(i)); }
+        {currentStacks.set(i, oldStacks.get(i));}
     }
 
     private void sendStackInCursor(ServerPlayer player, ItemStack newStack)
@@ -395,7 +395,7 @@ public class AbstractBrowserContainer extends AbstractContainerMenu
                 {
                     int amount = clickedButton == 0
                             ? existing.getMaxStackSize()
-                            : existing.getMaxStackSize() / 2;
+                            : Math.min(existing.getCount(), existing.getMaxStackSize()) / 2;
 
                     ItemStack extracted = extractItemsSided(parent, existing, existingSize, amount, false);
                     if (extracted.getCount() > 0)
@@ -418,9 +418,9 @@ public class AbstractBrowserContainer extends AbstractContainerMenu
             }
             else if (mode == ClickType.QUICK_MOVE && existingSize > 0)
             {
-                int amount = existing.getMaxStackSize();
-                if (clickedButton != 0 && amount > 1)
-                    amount /= 2;
+                int amount = clickedButton == 0
+                        ? existing.getMaxStackSize()
+                        : Math.min(existing.getCount(), existing.getMaxStackSize()) / 2;
 
                 if (amount == 0)
                     return;

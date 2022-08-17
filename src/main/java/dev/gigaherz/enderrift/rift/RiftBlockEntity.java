@@ -2,31 +2,32 @@ package dev.gigaherz.enderrift.rift;
 
 import dev.gigaherz.enderrift.EnderRiftMod;
 import dev.gigaherz.enderrift.common.EnergyBuffer;
-import dev.gigaherz.enderrift.rift.storage.RiftStorage;
+import dev.gigaherz.enderrift.rift.storage.RiftHolder;
 import dev.gigaherz.enderrift.rift.storage.RiftInventory;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.item.ItemStack;
+import dev.gigaherz.enderrift.rift.storage.RiftStorage;
+import dev.gigaherz.enderrift.rift.storage.migration.RiftMigration_17_08_2022;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
-import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraft.core.Direction;
-import net.minecraft.core.BlockPos;
 import net.minecraft.util.Mth;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.energy.IEnergyStorage;
-import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
-import net.minecraftforge.registries.ObjectHolder;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Optional;
 import java.util.Random;
+import java.util.UUID;
 
 public class RiftBlockEntity extends BlockEntity implements IRiftChangeListener
 {
@@ -37,8 +38,8 @@ public class RiftBlockEntity extends BlockEntity implements IRiftChangeListener
     private EnergyBuffer energyBuffer = new EnergyBuffer(BUFFER_POWER);
 
     private boolean powered;
-    private int riftId;
-    private RiftInventory inventory;
+    private RiftHolder holder;
+    private boolean listenerState;
 
     // Client-side, for rendering
     private float lastPoweringState;
@@ -122,38 +123,38 @@ public class RiftBlockEntity extends BlockEntity implements IRiftChangeListener
         }
     }
 
-    public void assemble(int id)
+    public void assemble(RiftHolder holder)
     {
-        inventory = null;
-        riftId = id;
+        this.holder = holder;
+        listenerState = false;
         setChanged();
     }
 
     public void unassemble()
     {
-        inventory = null;
-        riftId = -1;
+        holder = null;
+        listenerState = false;
         setChanged();
     }
 
     @Nullable
-    public IItemHandler getInventory()
+    public RiftInventory getInventory()
     {
-        if (riftId < 0)
+        if (holder == null)
             return null;
 
-        if (inventory == null && level != null && !level.isClientSide)
+        if (!listenerState && level != null && !level.isClientSide)
         {
-            inventory = RiftStorage.get(level).getRift(riftId);
-            inventory.addWeakListener(this);
+            holder.getInventoryOrCreate().addWeakListener(this);
+            listenerState = true;
         }
-        return inventory;
+        return holder.getInventory();
     }
 
     public int countInventoryStacks()
     {
         IItemHandler handler = getInventory();
-        return handler == null ? 0 : handler.getSlots();
+        return handler == null ? 0 : (handler.getSlots() - 1);
     }
 
     public ItemStack getRiftItem()
@@ -162,7 +163,7 @@ public class RiftBlockEntity extends BlockEntity implements IRiftChangeListener
 
         CompoundTag tag = new CompoundTag();
 
-        tag.putInt("RiftId", riftId);
+        tag.putUUID("RiftId", holder.getId());
 
         stack.setTag(tag);
 
@@ -176,7 +177,12 @@ public class RiftBlockEntity extends BlockEntity implements IRiftChangeListener
 
         energyBuffer.deserializeNBT(compound.get("Energy"));
         powered = compound.getBoolean("Powered");
-        riftId = compound.getInt("RiftId");
+        if (compound.contains("RiftId"))
+        {
+            RiftStorage storage = RiftStorage.get();
+            UUID id = compound.hasUUID("RiftId") ? compound.getUUID("RiftId") : storage.getMigration(RiftMigration_17_08_2022.class).getMigratedId(compound.getInt("RiftId"));
+            holder = storage.getRift(id);
+        }
     }
 
     @Override
@@ -186,7 +192,11 @@ public class RiftBlockEntity extends BlockEntity implements IRiftChangeListener
 
         compound.put("Energy", energyBuffer.serializeNBT());
         compound.putBoolean("Powered", powered);
-        compound.putInt("RiftId", riftId);
+        compound.remove("RiftId");
+        if (holder != null)
+        {
+            compound.putUUID("RiftId", holder.getId());
+        }
     }
 
     @Override
@@ -220,7 +230,7 @@ public class RiftBlockEntity extends BlockEntity implements IRiftChangeListener
     @Override
     public <T> LazyOptional<T> getCapability(@Nonnull final Capability<T> cap, final @Nullable Direction side)
     {
-        if (cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
+        if (cap == ForgeCapabilities.ITEM_HANDLER)
             return poweredInventoryProvider.cast();
         return super.getCapability(cap, side);
     }
@@ -241,9 +251,13 @@ public class RiftBlockEntity extends BlockEntity implements IRiftChangeListener
         return poweredInventory.getStackInSlot(slot);
     }
 
-    public int getRiftId()
+    public UUID getRiftId()
     {
-        return riftId;
+        if (holder == null)
+        {
+            return null;
+        }
+        return holder.getId();
     }
 
     public int getEnergyUsage()
@@ -282,9 +296,15 @@ public class RiftBlockEntity extends BlockEntity implements IRiftChangeListener
     }
 
     @Override
+    public Optional<Level> getRiftLevel()
+    {
+        return Optional.ofNullable(getLevel());
+    }
+
+    @Override
     public Optional<BlockPos> getLocation()
     {
-        return Optional.of(getBlockPos());
+        return Optional.ofNullable(getBlockPos());
     }
 
     public static void tickStatic(Level level, BlockPos blockPos, BlockState blockState, RiftBlockEntity te)
@@ -294,6 +314,16 @@ public class RiftBlockEntity extends BlockEntity implements IRiftChangeListener
 
     public class PoweredInventory implements IItemHandler
     {
+        public long getCount(int slot)
+        {
+            RiftInventory inventory = getInventory();
+            if (inventory == null)
+            {
+                return 0;
+            }
+            return inventory.getCount(slot);
+        }
+
         @Override
         public int getSlots()
         {

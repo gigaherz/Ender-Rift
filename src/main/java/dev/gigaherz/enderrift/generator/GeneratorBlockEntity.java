@@ -3,26 +3,23 @@ package dev.gigaherz.enderrift.generator;
 import dev.gigaherz.enderrift.EnderRiftMod;
 import dev.gigaherz.enderrift.common.EnergyBuffer;
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.inventory.ContainerData;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.ContainerData;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.IEnergyStorage;
-import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.ItemStackHandler;
-import net.minecraftforge.registries.ObjectHolder;
 
 import javax.annotation.Nullable;
 
@@ -73,9 +70,9 @@ public class GeneratorBlockEntity extends BlockEntity
     @Override
     public <T> LazyOptional<T> getCapability(Capability<T> cap, @Nullable Direction side)
     {
-        if (cap == CapabilityEnergy.ENERGY)
+        if (cap == ForgeCapabilities.ENERGY)
             return energyBufferGetter.cast();
-        if (cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
+        if (cap == ForgeCapabilities.ITEM_HANDLER)
             return fuelSlotProvider.cast();
         return super.getCapability(cap, side);
     }
@@ -186,7 +183,7 @@ public class GeneratorBlockEntity extends BlockEntity
                     continue;
 
                 IEnergyStorage handler = null;
-                LazyOptional<IEnergyStorage> opt = e.getCapability(CapabilityEnergy.ENERGY, from);
+                LazyOptional<IEnergyStorage> opt = e.getCapability(ForgeCapabilities.ENERGY, from);
                 if (opt.isPresent())
                 {
                     handler = opt.orElse(null);
@@ -268,14 +265,15 @@ public class GeneratorBlockEntity extends BlockEntity
         @Override
         public int get(int field)
         {
-            return switch(field){
-                case 0 -> burnTimeRemaining;
-                case 1 -> currentItemBurnTime;
-                case 2 -> energyBuffer.getEnergyStored() & 0xFFFF;
-                case 3 -> energyBuffer.getEnergyStored() >> 16;
-                case 4 -> heatLevel;
-                default -> 0;
-            };
+            return switch (field)
+                    {
+                        case 0 -> burnTimeRemaining;
+                        case 1 -> currentItemBurnTime;
+                        case 2 -> energyBuffer.getEnergyStored() & 0xFFFF;
+                        case 3 -> energyBuffer.getEnergyStored() >> 16;
+                        case 4 -> heatLevel;
+                        default -> 0;
+                    };
         }
 
         @Override

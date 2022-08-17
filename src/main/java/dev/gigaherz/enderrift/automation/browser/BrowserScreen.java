@@ -1,7 +1,7 @@
 package dev.gigaherz.enderrift.automation.browser;
 
-import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.entity.player.Inventory;
 
 public class BrowserScreen extends AbstractBrowserScreen<BrowserContainer>
 {

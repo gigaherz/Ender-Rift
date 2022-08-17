@@ -1,6 +1,5 @@
 package dev.gigaherz.enderrift;
 
-import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import dev.gigaherz.enderrift.automation.browser.*;
@@ -20,23 +19,27 @@ import dev.gigaherz.enderrift.network.ClearCraftingGrid;
 import dev.gigaherz.enderrift.network.SendSlotChanges;
 import dev.gigaherz.enderrift.network.SetVisibleSlots;
 import dev.gigaherz.enderrift.rift.*;
+import dev.gigaherz.enderrift.rift.storage.RiftHolder;
 import dev.gigaherz.enderrift.rift.storage.RiftInventory;
 import dev.gigaherz.enderrift.rift.storage.RiftStorage;
 import net.minecraft.Util;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
+import net.minecraft.commands.arguments.UuidArgument;
 import net.minecraft.core.HolderLookup;
-import net.minecraft.core.NonNullList;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.loot.BlockLootSubProvider;
 import net.minecraft.data.loot.LootTableProvider;
 import net.minecraft.data.registries.VanillaRegistries;
 import net.minecraft.data.tags.IntrinsicHolderTagsProvider;
-import net.minecraft.data.tags.VanillaBlockTagsProvider;
+import net.minecraft.network.chat.ClickEvent;
+import net.minecraft.network.chat.ClickEvent.Action;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.flag.FeatureFlags;
 import net.minecraft.world.inventory.MenuType;
@@ -46,6 +49,8 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.SimpleCraftingRecipeSerializer;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -58,8 +63,10 @@ import net.minecraftforge.common.data.ExistingFileHelper;
 import net.minecraftforge.data.event.GatherDataEvent;
 import net.minecraftforge.event.CreativeModeTabEvent;
 import net.minecraftforge.event.RegisterCommandsEvent;
+import net.minecraftforge.event.level.LevelEvent;
+import net.minecraftforge.event.server.ServerAboutToStartEvent;
+import net.minecraftforge.event.server.ServerStoppingEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.fml.InterModComms;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
@@ -79,6 +86,7 @@ import org.apache.logging.log4j.Logger;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
@@ -101,8 +109,8 @@ public class EnderRiftMod
     public static final RegistryObject<StructureEdgeBlock> STRUCTURE_EDGE = BLOCKS.register("structure_edge", () -> new StructureEdgeBlock(BlockBehaviour.Properties.of(Material.STONE).sound(SoundType.METAL).strength(3.0F, 8.0F).noLootTable()));
     public static final RegistryObject<Block> INTERFACE = BLOCKS.register("interface", () -> new InterfaceBlock(BlockBehaviour.Properties.of(Material.METAL, MaterialColor.STONE).sound(SoundType.METAL).strength(3.0F, 8.0F)));
     public static final RegistryObject<Block> BROWSER = BLOCKS.register("browser", () -> new BrowserBlock(false, BlockBehaviour.Properties.of(Material.METAL, MaterialColor.STONE).sound(SoundType.METAL).strength(3.0F, 8.0F)));
-    public static final RegistryObject<Block> CRAFTING_BROWSER = BLOCKS.register("crafting_browser", () ->new BrowserBlock(true, BlockBehaviour.Properties.of(Material.METAL, MaterialColor.STONE).sound(SoundType.METAL).strength(3.0F, 8.0F)));
-    public static final RegistryObject<Block> PROXY = BLOCKS.register("proxy", () ->  new ProxyBlock(BlockBehaviour.Properties.of(Material.METAL, MaterialColor.STONE).sound(SoundType.METAL).strength(3.0F, 8.0F)));
+    public static final RegistryObject<Block> CRAFTING_BROWSER = BLOCKS.register("crafting_browser", () -> new BrowserBlock(true, BlockBehaviour.Properties.of(Material.METAL, MaterialColor.STONE).sound(SoundType.METAL).strength(3.0F, 8.0F)));
+    public static final RegistryObject<Block> PROXY = BLOCKS.register("proxy", () -> new ProxyBlock(BlockBehaviour.Properties.of(Material.METAL, MaterialColor.STONE).sound(SoundType.METAL).strength(3.0F, 8.0F)));
     public static final RegistryObject<Block> DRIVER = BLOCKS.register("driver", () -> new DriverBlock(BlockBehaviour.Properties.of(Material.METAL, MaterialColor.STONE).sound(SoundType.METAL).strength(3.0F, 8.0F)));
     public static final RegistryObject<Block> GENERATOR = BLOCKS.register("generator", () -> new GeneratorBlock(BlockBehaviour.Properties.of(Material.METAL, MaterialColor.STONE).sound(SoundType.METAL).strength(3.0F, 8.0F)));
 
@@ -133,12 +141,7 @@ public class EnderRiftMod
     public static final RegistryObject<SimpleCraftingRecipeSerializer<OrbDuplicationRecipe>> ORB_DUPLICATION = RECIPE_SERIALIZERS.register("orb_duplication", () -> new SimpleCraftingRecipeSerializer<>(OrbDuplicationRecipe::new));
 
     private static final String PROTOCOL_VERSION = "1.1.0";
-    public static final SimpleChannel CHANNEL = NetworkRegistry.ChannelBuilder
-            .named(new ResourceLocation(MODID, "main"))
-            .clientAcceptedVersions(PROTOCOL_VERSION::equals)
-            .serverAcceptedVersions(PROTOCOL_VERSION::equals)
-            .networkProtocolVersion(() -> PROTOCOL_VERSION)
-            .simpleChannel();
+    public static final SimpleChannel CHANNEL = NetworkRegistry.ChannelBuilder.named(new ResourceLocation(MODID, "main")).clientAcceptedVersions(PROTOCOL_VERSION::equals).serverAcceptedVersions(PROTOCOL_VERSION::equals).networkProtocolVersion(() -> PROTOCOL_VERSION).simpleChannel();
 
     public static final Logger logger = LogManager.getLogger(MODID);
 
@@ -158,11 +161,15 @@ public class EnderRiftMod
         modEventBus.addListener(this::gatherData);
         modEventBus.addListener(this::registerTabs);
 
+        MinecraftForge.EVENT_BUS.addListener(this::serverStart);
+        MinecraftForge.EVENT_BUS.addListener(this::serverStop);
+        MinecraftForge.EVENT_BUS.addListener(this::serverSave);
         MinecraftForge.EVENT_BUS.addListener(this::commandEvent);
 
         ModLoadingContext modLoadingContext = ModLoadingContext.get();
         modLoadingContext.registerConfig(ModConfig.Type.SERVER, ConfigValues.SERVER_SPEC);
-        //modLoadingContext.registerConfig(ModConfig.Type.CLIENT, ConfigData.CLIENT_SPEC);
+        // modLoadingContext.registerConfig(ModConfig.Type.CLIENT,
+        // ConfigData.CLIENT_SPEC);
     }
 
     private void registerTabs(CreativeModeTabEvent.Register event)
@@ -202,6 +209,26 @@ public class EnderRiftMod
         MenuScreens.register(CRAFTING_BROWSER_MENU.get(), CraftingBrowserScreen::new);
     }
 
+    public void serverStart(ServerAboutToStartEvent event)
+    {
+        RiftStorage.init(event.getServer());
+    }
+
+    public void serverSave(LevelEvent.Save event)
+    {
+        LevelAccessor levelAccessor = event.getLevel();
+        if (!(levelAccessor instanceof ServerLevel) || !((ServerLevel) levelAccessor).dimension().equals(Level.OVERWORLD) || !RiftStorage.isAvailable())
+        {
+            return;
+        }
+        RiftStorage.get().saveAll();
+    }
+
+    public void serverStop(ServerStoppingEvent event)
+    {
+        RiftStorage.deinit();
+    }
+
     public void interComms(InterModEnqueueEvent event)
     {
         //InterModComms.sendTo("theoneprobe", "getTheOneProbe", () -> TheOneProbeProviders.create());
@@ -211,36 +238,46 @@ public class EnderRiftMod
     {
         event.getDispatcher().register(
                 LiteralArgumentBuilder.<CommandSourceStack>literal("enderrift")
-                    .then(Commands.literal("locate")
-                            .then(Commands.argument("riftId", IntegerArgumentType.integer(1))
-                                    .requires(cs->cs.hasPermission(3)) //permission
-                                    .executes(this::locateSpecificRift)
-                            )
-                            .requires(cs->cs.hasPermission(3)) //permission
-                            .executes(this::locateAllRifts)
-                    )
+                        .then(Commands.literal("locate")
+                                .then(Commands.argument("riftId", UuidArgument.uuid())
+                                        .requires(cs -> cs.hasPermission(3)) //permission
+                                        .executes(this::locateSpecificRift)
+                                )
+                                .requires(cs -> cs.hasPermission(3)) //permission
+                                .executes(this::locateAllRifts)
+                        )
         );
     }
 
     private int locateSpecificRift(CommandContext<CommandSourceStack> context)
     {
-        int riftId = context.getArgument("riftId", int.class);
-        RiftInventory rift = RiftStorage.get(context.getSource().getLevel())
-                .getRift(riftId);
-        locateRiftById(context, riftId, rift);
+        if (!RiftStorage.isAvailable())
+        {
+            context.getSource().sendFailure(Component.literal("Failed to retrieve RiftStorage"));
+            return 0;
+        }
+        UUID id = context.getArgument("riftId", UUID.class);
+        RiftHolder holder = RiftStorage.get().getRift(id);
+        if (holder == null || !holder.isValid())
+        {
+            context.getSource().sendFailure(Component.literal(String.format("Couldn't find rift with id '%s'", id)));
+            return 0;
+        }
+        locateRiftById(context, id, holder.getInventory());
         return 0;
     }
 
-    private void locateRiftById(CommandContext<CommandSourceStack> context, int riftId, RiftInventory rift)
+    private void locateRiftById(CommandContext<CommandSourceStack> context, UUID riftId, RiftInventory rift)
     {
-        rift.locateListeners(pos ->
-                context.getSource().sendSuccess(Component.literal(String.format("Found rift with id %d at %s %s %s", riftId, pos.getX(), pos.getY(), pos.getZ())), true));
+        rift.locateListeners(context.getSource().getLevel(), (pos) ->
+                context.getSource().sendSuccess(
+                        Component.literal(String.format("Found rift with id '%s' at %s %s %s", riftId, pos.getX(), pos.getY(), pos.getZ()))
+                                .setStyle(Style.EMPTY.withClickEvent(new ClickEvent(Action.RUN_COMMAND, String.format("/tp %s %s %s", pos.getX(), pos.getY(), pos.getZ())))), true));
     }
 
     private int locateAllRifts(CommandContext<CommandSourceStack> context)
     {
-        RiftStorage.get(context.getSource().getLevel())
-                .walkExistingRifts((id, rift) -> locateRiftById(context, id, rift));
+        RiftStorage.get().walkRifts((id, rift) -> locateRiftById(context, id, rift));
         return 0;
     }
 

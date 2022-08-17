@@ -2,35 +2,33 @@ package dev.gigaherz.enderrift.generator;
 
 import dev.gigaherz.enderrift.EnderRiftMod;
 import dev.gigaherz.enderrift.automation.iface.InterfaceBlock;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.SimpleMenuProvider;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.ContainerLevelAccess;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.RenderShape;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.SimpleMenuProvider;
-import net.minecraft.world.item.context.BlockPlaceContext;
-import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.InteractionResult;
-import net.minecraft.core.Direction;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
-import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraft.world.phys.shapes.Shapes;
-import net.minecraft.world.level.BlockGetter;
-import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.shapes.VoxelShape;
 
 import javax.annotation.Nullable;
-
-import net.minecraft.world.level.block.state.BlockBehaviour.Properties;
 
 public class GeneratorBlock extends BaseEntityBlock
 {
@@ -44,7 +42,8 @@ public class GeneratorBlock extends BaseEntityBlock
     public static final VoxelShape SHAPE_SUPPORTS_NS = Block.box(1, 4, 5, 15, 11, 11);
     public static final VoxelShape SHAPE_SUPPORTS_WE = Block.box(5, 4, 1, 11, 11, 15);
 
-    public RenderShape getRenderShape(BlockState pState) {
+    public RenderShape getRenderShape(BlockState pState)
+    {
         return RenderShape.MODEL;
     }
 

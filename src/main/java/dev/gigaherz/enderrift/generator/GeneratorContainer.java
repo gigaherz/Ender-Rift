@@ -1,15 +1,17 @@
 package dev.gigaherz.enderrift.generator;
 
 import dev.gigaherz.enderrift.EnderRiftMod;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.inventory.*;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.ContainerData;
+import net.minecraft.world.inventory.ContainerLevelAccess;
+import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.ItemStackHandler;
 import net.minecraftforge.items.SlotItemHandler;
-import net.minecraftforge.registries.ObjectHolder;
 
 public class GeneratorContainer extends AbstractContainerMenu
 {

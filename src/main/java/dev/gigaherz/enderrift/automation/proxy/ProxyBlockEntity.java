@@ -3,11 +3,9 @@ package dev.gigaherz.enderrift.automation.proxy;
 import dev.gigaherz.enderrift.EnderRiftMod;
 import dev.gigaherz.enderrift.automation.AggregatorBlockEntity;
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.core.Direction;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.registries.ObjectHolder;
 
 public class ProxyBlockEntity extends AggregatorBlockEntity
 {

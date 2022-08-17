@@ -2,10 +2,10 @@ package dev.gigaherz.enderrift.network;
 
 import com.google.common.collect.Lists;
 import dev.gigaherz.enderrift.client.ClientHelper;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.network.NetworkEvent;
 
 import java.util.List;

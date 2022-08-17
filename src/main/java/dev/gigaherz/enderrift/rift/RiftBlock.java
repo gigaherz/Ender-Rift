@@ -3,35 +3,32 @@ package dev.gigaherz.enderrift.rift;
 import com.google.common.collect.Lists;
 import dev.gigaherz.enderrift.EnderRiftMod;
 import dev.gigaherz.enderrift.automation.AutomationHelper;
-import net.minecraft.world.level.block.BaseEntityBlock;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.RenderShape;
-import net.minecraft.world.level.block.entity.BlockEntityTicker;
-import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.block.state.properties.BooleanProperty;
-import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.BaseEntityBlock;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.InteractionResult;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.minecraft.world.level.BlockGetter;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.storage.loot.LootContext;
-import net.minecraftforge.items.CapabilityItemHandler;
-
-import java.util.List;
-
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import org.jetbrains.annotations.Nullable;
 
-import net.minecraft.world.level.block.state.BlockBehaviour.Properties;
+import java.util.List;
 
 public class RiftBlock extends BaseEntityBlock
 {
@@ -47,7 +44,8 @@ public class RiftBlock extends BaseEntityBlock
                 .setValue(ASSEMBLED, false));
     }
 
-    public RenderShape getRenderShape(BlockState pState) {
+    public RenderShape getRenderShape(BlockState pState)
+    {
         return RenderShape.MODEL;
     }
 
@@ -148,7 +146,7 @@ public class RiftBlock extends BaseEntityBlock
 
         int count = stack.getCount();
         ItemStack stackToPush = stack.split(count);
-        ItemStack remaining = AutomationHelper.insertItems(rift.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null).orElseThrow(() -> new RuntimeException("WAT")), stackToPush);
+        ItemStack remaining = AutomationHelper.insertItems(rift.getCapability(ForgeCapabilities.ITEM_HANDLER, null).orElseThrow(() -> new RuntimeException("WAT")), stackToPush);
         stack.grow(remaining.getCount());
 
         if (stack.getCount() <= 0)
@@ -190,7 +188,7 @@ public class RiftBlock extends BaseEntityBlock
 
         int numberToExtract = playerIn.isShiftKeyDown() ? 1 : stack.getMaxStackSize();
 
-        ItemStack extracted = AutomationHelper.extractItems(rift.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null).orElseThrow(() -> new RuntimeException("WAT")), stack.copy(), numberToExtract, false);
+        ItemStack extracted = AutomationHelper.extractItems(rift.getCapability(ForgeCapabilities.ITEM_HANDLER, null).orElseThrow(() -> new RuntimeException("WAT")), stack.copy(), numberToExtract, false);
         if (extracted.getCount() > 0)
         {
             popResource(worldIn, pos, extracted);
@@ -216,7 +214,7 @@ public class RiftBlock extends BaseEntityBlock
 
         ItemStack stack = item.getItem().copy();
 
-        ItemStack remaining = AutomationHelper.insertItems(rift.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null).orElseThrow(() -> new RuntimeException("WAT")), stack);
+        ItemStack remaining = AutomationHelper.insertItems(rift.getCapability(ForgeCapabilities.ITEM_HANDLER, null).orElseThrow(() -> new RuntimeException("WAT")), stack);
 
         if (remaining.getCount() <= 0)
         {

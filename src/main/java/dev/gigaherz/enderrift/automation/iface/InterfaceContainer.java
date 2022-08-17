@@ -2,18 +2,17 @@ package dev.gigaherz.enderrift.automation.iface;
 
 import dev.gigaherz.enderrift.EnderRiftMod;
 import dev.gigaherz.enderrift.common.slots.SlotFilter;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.inventory.*;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.ClickType;
+import net.minecraft.world.inventory.ContainerLevelAccess;
+import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.ItemStackHandler;
 import net.minecraftforge.items.SlotItemHandler;
-import net.minecraftforge.registries.ObjectHolder;
 
 public class InterfaceContainer extends AbstractContainerMenu
 {

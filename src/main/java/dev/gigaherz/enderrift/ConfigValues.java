@@ -1,13 +1,12 @@
 package dev.gigaherz.enderrift;
 
-import com.google.common.collect.Lists;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.config.ModConfigEvent;
 import org.apache.commons.lang3.tuple.Pair;
 
-@Mod.EventBusSubscriber(modid=EnderRiftMod.MODID, bus= Mod.EventBusSubscriber.Bus.MOD)
+@Mod.EventBusSubscriber(modid = EnderRiftMod.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class ConfigValues
 {
 
@@ -53,7 +52,7 @@ public class ConfigValues
             powerPerExtractionConstant = builder.defineInRange("powerPerExtractionConstant", 0.97, 0, Double.MAX_VALUE);
             powerPerExtractionLinear = builder.defineInRange("powerPerExtractionLinear", 0.013, 0, Double.MAX_VALUE);
             powerPerExtractionGeometric = builder.defineInRange("powerPerExtractionGeometric", 0, 0, Double.MAX_VALUE);
-            powerPerExtractionCap = builder.defineInRange("powerPerExtractionCap", 10000, 0, Double.MAX_VALUE);            
+            powerPerExtractionCap = builder.defineInRange("powerPerExtractionCap", 10000, 0, Double.MAX_VALUE);
 
             builder.pop();
         }
@@ -62,13 +61,13 @@ public class ConfigValues
     @SubscribeEvent
     public static void modConfig(ModConfigEvent event)
     {
-        PowerPerInsertionConstant = (float)(double)SERVER.powerPerInsertionConstant.get();
-        PowerPerInsertionLinear = (float)(double)SERVER.powerPerInsertionLinear.get();
-        PowerPerInsertionGeometric = (float)(double)SERVER.powerPerInsertionGeometric.get();
-        PowerPerInsertionCap = (float)(double)SERVER.powerPerInsertionCap.get();
-        PowerPerExtractionConstant = (float)(double)SERVER.powerPerExtractionConstant.get();
-        PowerPerExtractionLinear = (float)(double)SERVER.powerPerExtractionLinear.get();
-        PowerPerExtractionGeometric = (float)(double)SERVER.powerPerExtractionGeometric.get();
-        PowerPerExtractionCap = (float)(double)SERVER.powerPerExtractionCap.get();
+        PowerPerInsertionConstant = (float) (double) SERVER.powerPerInsertionConstant.get();
+        PowerPerInsertionLinear = (float) (double) SERVER.powerPerInsertionLinear.get();
+        PowerPerInsertionGeometric = (float) (double) SERVER.powerPerInsertionGeometric.get();
+        PowerPerInsertionCap = (float) (double) SERVER.powerPerInsertionCap.get();
+        PowerPerExtractionConstant = (float) (double) SERVER.powerPerExtractionConstant.get();
+        PowerPerExtractionLinear = (float) (double) SERVER.powerPerExtractionLinear.get();
+        PowerPerExtractionGeometric = (float) (double) SERVER.powerPerExtractionGeometric.get();
+        PowerPerExtractionCap = (float) (double) SERVER.powerPerExtractionCap.get();
     }
 }

@@ -1,10 +1,9 @@
 package dev.gigaherz.enderrift.client;
 
-import dev.gigaherz.enderrift.rift.RiftRenderer;
 import dev.gigaherz.enderrift.EnderRiftMod;
 import dev.gigaherz.enderrift.automation.browser.AbstractBrowserContainer;
 import dev.gigaherz.enderrift.network.SendSlotChanges;
-import dev.gigaherz.enderrift.rift.RiftBlockEntity;
+import dev.gigaherz.enderrift.rift.RiftRenderer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import net.minecraft.world.entity.player.Player;

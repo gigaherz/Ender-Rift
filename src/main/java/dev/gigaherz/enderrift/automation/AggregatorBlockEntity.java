@@ -8,13 +8,13 @@ import dev.gigaherz.graph3.Graph;
 import dev.gigaherz.graph3.GraphObject;
 import dev.gigaherz.graph3.Mergeable;
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraft.core.Direction;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.energy.IEnergyStorage;
-import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 
 import javax.annotation.Nullable;
@@ -169,7 +169,7 @@ public abstract class AggregatorBlockEntity extends BlockEntity
 
             if (AutomationHelper.isAutomatable(teOther, f.getOpposite()))
             {
-                teOther.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, f.getOpposite())
+                teOther.getCapability(ForgeCapabilities.ITEM_HANDLER, f.getOpposite())
                         .ifPresent(this.connectedInventories::add);
             }
         }

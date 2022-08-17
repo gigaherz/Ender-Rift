@@ -3,17 +3,15 @@ package dev.gigaherz.enderrift.automation.driver;
 import dev.gigaherz.enderrift.EnderRiftMod;
 import dev.gigaherz.enderrift.automation.AggregatorBlockEntity;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraft.core.Direction;
 import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.EnergyStorage;
 import net.minecraftforge.energy.IEnergyStorage;
-import net.minecraftforge.registries.ObjectHolder;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -35,7 +33,7 @@ public class DriverBlockEntity extends AggregatorBlockEntity
     @Override
     public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, @Nullable Direction side)
     {
-        if (cap == CapabilityEnergy.ENERGY)
+        if (cap == ForgeCapabilities.ENERGY)
             return energyBufferGetter.cast();
         return super.getCapability(cap, side);
     }
