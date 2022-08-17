@@ -10,7 +10,7 @@ public interface IRiftChangeListener
     boolean isInvalid();
 
     void onRiftChanged();
-    
+
     Optional<Level> getRiftLevel();
 
     Optional<BlockPos> getLocation();
