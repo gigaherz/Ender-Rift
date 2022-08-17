@@ -115,7 +115,8 @@ public class AbstractBrowserContainer extends AbstractContainerMenu
         {
             for (int x = 0; x < SCROLL_COLUMNS; x++)
             {
-                addSlot(new SlotFake(scrollInventory, x + y * SCROLL_COLUMNS, LEFT + x * SLOT_WIDTH, TOP + y * SLOT_HEIGHT));
+                addSlot(new SlotFake(scrollInventory, x + y * SCROLL_COLUMNS, 
+                        LEFT + x * SLOT_WIDTH, TOP + y * SLOT_HEIGHT));
             }
         }
 
@@ -135,7 +136,9 @@ public class AbstractBrowserContainer extends AbstractContainerMenu
         {
             for (int x = 0; x < 9; x++)
             {
-                addSlot(new Slot(playerInventory, x + y * 9 + 9, LEFT + x * SLOT_WIDTH, top + y * SLOT_HEIGHT));
+                addSlot(new Slot(playerInventory, 
+                        x + y * 9 + 9, 
+                        LEFT + x * SLOT_WIDTH, top + y * SLOT_HEIGHT));
             }
         }
 
@@ -155,6 +158,7 @@ public class AbstractBrowserContainer extends AbstractContainerMenu
     @Override
     public void broadcastChanges()
     {
+        
         if (isClient())
             return;
 
@@ -170,6 +174,7 @@ public class AbstractBrowserContainer extends AbstractContainerMenu
         List<Integer> indicesChanged = Lists.newArrayList();
         List<ItemStack> stacksChanged = Lists.newArrayList();
 
+        
         newLength = serverInv.getRealSizeInventory();
         if (newLength != oldLength)
         {
@@ -234,9 +239,7 @@ public class AbstractBrowserContainer extends AbstractContainerMenu
         NonNullList<ItemStack> oldStacks = currentStacks;
         currentStacks = NonNullList.withSize(newLength, ItemStack.EMPTY);
         for (int i = 0; i < Math.min(newLength, oldLength); i++)
-        {
-            currentStacks.set(i, oldStacks.get(i));
-        }
+        { currentStacks.set(i, oldStacks.get(i)); }
     }
 
     private void sendStackInCursor(ServerPlayer player, ItemStack newStack)
@@ -390,7 +393,9 @@ public class AbstractBrowserContainer extends AbstractContainerMenu
                 }
                 else if (existingSize > 0)
                 {
-                    int amount = clickedButton == 0 ? existing.getMaxStackSize() : existing.getMaxStackSize() / 2;
+                    int amount = clickedButton == 0 
+                            ? existing.getMaxStackSize() 
+                            : existing.getMaxStackSize() / 2;
 
                     ItemStack extracted = extractItemsSided(parent, existing, existingSize, amount, false);
                     if (extracted.getCount() > 0)
@@ -508,7 +513,9 @@ public class AbstractBrowserContainer extends AbstractContainerMenu
                 Slot slot = this.slots.get(i);
                 ItemStack stackInSlot = slot.getItem();
 
-                if (stackInSlot.getCount() < stackInSlot.getMaxStackSize() && ItemStack.isSame(stackInSlot, stack) && ItemStack.tagMatches(stack, stackInSlot))
+                if (stackInSlot.getCount() < stackInSlot.getMaxStackSize() 
+                        && ItemStack.isSame(stackInSlot, stack)
+                        && ItemStack.tagMatches(stack, stackInSlot))
                 {
                     int j = stackInSlot.getCount() + stack.getCount();
 
@@ -795,24 +802,24 @@ public class AbstractBrowserContainer extends AbstractContainerMenu
                 switch (sortMode)
                 {
                 case ALPHABETIC:
-                    indices.sort((ia, ib) -> {
-                        ItemStack a = stacks.get(ia);
-                        ItemStack b = stacks.get(ib);
-                        return a.getHoverName().getString().compareToIgnoreCase(b.getHoverName().getString());
-                    });
-                    break;
+                        indices.sort((ia, ib) -> 
+                        {
+                            ItemStack a = stacks.get(ia);
+                            ItemStack b = stacks.get(ib);
+                            return a.getHoverName().getString().compareToIgnoreCase(b.getHoverName().getString());
+                        });
+                        break;
                 case STACK_SIZE:
-                    indices.sort((ia, ib) -> {
-                        ItemStack a = stacks.get(ia);
-                        ItemStack b = stacks.get(ib);
-                        int diff = a.getCount() - b.getCount();
-                        if (diff > 0)
-                            return -1;
-                        if (diff < 0)
-                            return 1;
-                        return a.getHoverName().getString().compareToIgnoreCase(b.getHoverName().getString());
-                    });
-                    break;
+                        indices.sort((ia, ib) -> 
+                        {
+                            ItemStack a = stacks.get(ia);
+                            ItemStack b = stacks.get(ib);
+                            int diff = a.getCount() - b.getCount();
+                            if (diff > 0) return -1;
+                            if (diff < 0) return 1;
+                            return a.getHoverName().getString().compareToIgnoreCase(b.getHoverName().getString());
+                        });
+                        break;
                 }
             }
 

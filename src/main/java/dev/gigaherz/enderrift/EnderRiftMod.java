@@ -235,9 +235,17 @@ public class EnderRiftMod
 
     public void commandEvent(RegisterCommandsEvent event)
     {
-        event.getDispatcher().register(LiteralArgumentBuilder.<CommandSourceStack>literal("enderrift").then(Commands.literal("locate").then(Commands.argument("riftId", UuidArgument.uuid()).requires(cs -> cs.hasPermission(3)) // permission
-                .executes(this::locateSpecificRift)).requires(cs -> cs.hasPermission(3)) // permission
-                .executes(this::locateAllRifts)));
+        event.getDispatcher().register(
+                LiteralArgumentBuilder.<CommandSourceStack>literal("enderrift")
+                    .then(Commands.literal("locate")
+                            .then(Commands.argument("riftId", UuidArgument.uuid())
+                                    .requires(cs->cs.hasPermission(3)) //permission
+                                    .executes(this::locateSpecificRift)
+                            )
+                            .requires(cs->cs.hasPermission(3)) //permission
+                            .executes(this::locateAllRifts)
+                    )
+        );
     }
 
     private int locateSpecificRift(CommandContext<CommandSourceStack> context)
@@ -260,7 +268,10 @@ public class EnderRiftMod
 
     private void locateRiftById(CommandContext<CommandSourceStack> context, UUID riftId, RiftInventory rift)
     {
-        rift.locateListeners(context.getSource().getLevel(), (pos) -> context.getSource().sendSuccess(Component.literal(String.format("Found rift with id '%s' at %s %s %s", riftId, pos.getX(), pos.getY(), pos.getZ())).setStyle(Style.EMPTY.withClickEvent(new ClickEvent(Action.RUN_COMMAND, String.format("/tp %s %s %s", pos.getX(), pos.getY(), pos.getZ())))), true));
+        rift.locateListeners(context.getSource().getLevel(), (pos) -> 
+            context.getSource().sendSuccess(
+                    Component.literal(String.format("Found rift with id '%s' at %s %s %s", riftId, pos.getX(), pos.getY(), pos.getZ()))
+                    .setStyle(Style.EMPTY.withClickEvent(new ClickEvent(Action.RUN_COMMAND, String.format("/tp %s %s %s", pos.getX(), pos.getY(), pos.getZ())))), true));
     }
 
     private int locateAllRifts(CommandContext<CommandSourceStack> context)
@@ -296,11 +307,12 @@ public class EnderRiftMod
                 super(gen);
             }
 
-            private final List<Pair<Supplier<Consumer<BiConsumer<ResourceLocation, LootTable.Builder>>>, LootContextParamSet>> tables = ImmutableList.of(Pair.of(BlockTables::new, LootContextParamSets.BLOCK)
-            // Pair.of(FishingLootTables::new, LootParameterSets.FISHING),
-            // Pair.of(ChestLootTables::new, LootParameterSets.CHEST),
-            // Pair.of(EntityLootTables::new, LootParameterSets.ENTITY),
-            // Pair.of(GiftLootTables::new, LootParameterSets.GIFT)
+            private final List<Pair<Supplier<Consumer<BiConsumer<ResourceLocation, LootTable.Builder>>>, LootContextParamSet>> tables = ImmutableList.of(
+                Pair.of(BlockTables::new, LootContextParamSets.BLOCK)
+                // Pair.of(FishingLootTables::new, LootParameterSets.FISHING),
+                // Pair.of(ChestLootTables::new, LootParameterSets.CHEST),
+                // Pair.of(EntityLootTables::new, LootParameterSets.ENTITY),
+                // Pair.of(GiftLootTables::new, LootParameterSets.GIFT)
             );
 
             @Override
@@ -334,7 +346,10 @@ public class EnderRiftMod
                 @Override
                 protected Iterable<Block> getKnownBlocks()
                 {
-                    return ForgeRegistries.BLOCKS.getEntries().stream().filter(e -> e.getKey().location().getNamespace().equals(EnderRiftMod.MODID)).map(Map.Entry::getValue).collect(Collectors.toList());
+                    return ForgeRegistries.BLOCKS.getEntries().stream()
+                            .filter(e -> e.getKey().location().getNamespace().equals(EnderRiftMod.MODID))
+                            .map(Map.Entry::getValue)
+                            .collect(Collectors.toList());
                 }
             }
         }
@@ -349,7 +364,16 @@ public class EnderRiftMod
             @Override
             protected void addTags()
             {
-                tag(BlockTags.MINEABLE_WITH_PICKAXE).add(BROWSER.get()).add(CRAFTING_BROWSER.get()).add(INTERFACE.get()).add(PROXY.get()).add(DRIVER.get()).add(RIFT.get()).add(GENERATOR.get()).add(STRUCTURE_CORNER.get()).add(STRUCTURE_EDGE.get());
+                tag(BlockTags.MINEABLE_WITH_PICKAXE)
+                    .add(BROWSER.get())
+                    .add(CRAFTING_BROWSER.get())
+                    .add(INTERFACE.get())
+                    .add(PROXY.get())
+                    .add(DRIVER.get())
+                    .add(RIFT.get())
+                    .add(GENERATOR.get())
+                    .add(STRUCTURE_CORNER.get())
+                    .add(STRUCTURE_EDGE.get());
             }
         }
     }

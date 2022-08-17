@@ -24,62 +24,62 @@ public class RiftStructure
 
     public static void init()
     {
-        StructurePattern = new Block[]
-        {
+        StructurePattern = new Block[]{
                 // Bottom
-                Blocks.IRON_BLOCK, Blocks.REDSTONE_BLOCK, Blocks.IRON_BLOCK, 
-                Blocks.REDSTONE_BLOCK, null, Blocks.REDSTONE_BLOCK, 
+                Blocks.IRON_BLOCK, Blocks.REDSTONE_BLOCK, Blocks.IRON_BLOCK,
+                Blocks.REDSTONE_BLOCK, null, Blocks.REDSTONE_BLOCK,
                 Blocks.IRON_BLOCK, Blocks.REDSTONE_BLOCK, Blocks.IRON_BLOCK,
 
                 // Middle
-                Blocks.REDSTONE_BLOCK, null, Blocks.REDSTONE_BLOCK, 
-                null, EnderRiftMod.RIFT.get(), null, 
+                Blocks.REDSTONE_BLOCK, null, Blocks.REDSTONE_BLOCK,
+                null, EnderRiftMod.RIFT.get(), null,
                 Blocks.REDSTONE_BLOCK, null, Blocks.REDSTONE_BLOCK,
 
                 // Top
-                Blocks.IRON_BLOCK, Blocks.REDSTONE_BLOCK, Blocks.IRON_BLOCK, 
-                Blocks.REDSTONE_BLOCK, null, Blocks.REDSTONE_BLOCK, 
-                Blocks.IRON_BLOCK, Blocks.REDSTONE_BLOCK, Blocks.IRON_BLOCK, };
+                Blocks.IRON_BLOCK, Blocks.REDSTONE_BLOCK, Blocks.IRON_BLOCK,
+                Blocks.REDSTONE_BLOCK, null, Blocks.REDSTONE_BLOCK,
+                Blocks.IRON_BLOCK, Blocks.REDSTONE_BLOCK, Blocks.IRON_BLOCK,
+        };
 
-        StructureStates = new BlockState[]
-        {
+        StructureStates = new BlockState[]{
 
                 // Bottom
-                EnderRiftMod.STRUCTURE_CORNER.get().cornerState(StructureCornerBlock.Corner.NW, true), 
-                EnderRiftMod.STRUCTURE_EDGE.get().edgeState(Direction.Axis.X, true), 
+                EnderRiftMod.STRUCTURE_CORNER.get().cornerState(StructureCornerBlock.Corner.NW, true),
+                EnderRiftMod.STRUCTURE_EDGE.get().edgeState(Direction.Axis.X, true),
                 EnderRiftMod.STRUCTURE_CORNER.get().cornerState(StructureCornerBlock.Corner.NE, true),
 
-                EnderRiftMod.STRUCTURE_EDGE.get().edgeState(Direction.Axis.Z, true), 
-                null, 
+                EnderRiftMod.STRUCTURE_EDGE.get().edgeState(Direction.Axis.Z, true),
+                null,
                 EnderRiftMod.STRUCTURE_EDGE.get().edgeState(Direction.Axis.Z, true),
 
-                EnderRiftMod.STRUCTURE_CORNER.get().cornerState(StructureCornerBlock.Corner.SW, true), 
+                EnderRiftMod.STRUCTURE_CORNER.get().cornerState(StructureCornerBlock.Corner.SW, true),
                 EnderRiftMod.STRUCTURE_EDGE.get().edgeState(Direction.Axis.X, true),
                 EnderRiftMod.STRUCTURE_CORNER.get().cornerState(StructureCornerBlock.Corner.SE, true),
 
                 // Middle
-                EnderRiftMod.STRUCTURE_EDGE.get().edgeState(Direction.Axis.Y, false), 
-                null, 
+                EnderRiftMod.STRUCTURE_EDGE.get().edgeState(Direction.Axis.Y, false),
+                null,
                 EnderRiftMod.STRUCTURE_EDGE.get().edgeState(Direction.Axis.Y, false),
 
                 null, null, null,
 
-                EnderRiftMod.STRUCTURE_EDGE.get().edgeState(Direction.Axis.Y, false), 
-                null, 
+                EnderRiftMod.STRUCTURE_EDGE.get().edgeState(Direction.Axis.Y, false),
+                null,
                 EnderRiftMod.STRUCTURE_EDGE.get().edgeState(Direction.Axis.Y, false),
 
                 // Top
-                EnderRiftMod.STRUCTURE_CORNER.get().cornerState(StructureCornerBlock.Corner.NW, false), 
-                EnderRiftMod.STRUCTURE_EDGE.get().edgeState(Direction.Axis.X, false), 
+                EnderRiftMod.STRUCTURE_CORNER.get().cornerState(StructureCornerBlock.Corner.NW, false),
+                EnderRiftMod.STRUCTURE_EDGE.get().edgeState(Direction.Axis.X, false),
                 EnderRiftMod.STRUCTURE_CORNER.get().cornerState(StructureCornerBlock.Corner.NE, false),
 
-                EnderRiftMod.STRUCTURE_EDGE.get().edgeState(Direction.Axis.Z, false), 
-                null, 
+                EnderRiftMod.STRUCTURE_EDGE.get().edgeState(Direction.Axis.Z, false),
+                null,
                 EnderRiftMod.STRUCTURE_EDGE.get().edgeState(Direction.Axis.Z, false),
 
-                EnderRiftMod.STRUCTURE_CORNER.get().cornerState(StructureCornerBlock.Corner.SW, false), 
-                EnderRiftMod.STRUCTURE_EDGE.get().edgeState(Direction.Axis.X, false), 
-                EnderRiftMod.STRUCTURE_CORNER.get().cornerState(StructureCornerBlock.Corner.SE, false), };
+                EnderRiftMod.STRUCTURE_CORNER.get().cornerState(StructureCornerBlock.Corner.SW, false),
+                EnderRiftMod.STRUCTURE_EDGE.get().edgeState(Direction.Axis.X, false),
+                EnderRiftMod.STRUCTURE_CORNER.get().cornerState(StructureCornerBlock.Corner.SE, false),
+        };
     }
 
     public static boolean duplicateOrb(Level world, BlockPos pos, Player player)
@@ -141,7 +141,7 @@ public class RiftStructure
                             BlockState st = world.getBlockState(bp);
                             if (!st.isAir())
                                 return false;
-                        } 
+                        }
                         else if (b != EnderRiftMod.RIFT.get())
                         {
                             if (b != w)
@@ -233,11 +233,11 @@ public class RiftStructure
         if (state.getBlock() == EnderRiftMod.STRUCTURE_CORNER.get())
         {
             return StructurePattern[0];
-        } 
+        }
         else if (state.getBlock() == EnderRiftMod.STRUCTURE_EDGE.get())
         {
             return StructurePattern[1];
-        } 
+        }
         else
         {
             return StructurePattern[13];
