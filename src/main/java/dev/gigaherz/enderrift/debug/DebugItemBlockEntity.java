@@ -31,15 +31,6 @@ public class DebugItemBlockEntity extends BlockEntity {
         return handler;
     }
 
-    public ItemStack getItem() {
-        ItemStack stack = new ItemStack(EnderRiftMod.DEBUG_ITEM_BLOCK_ITEM.get());
-        CompoundTag tag = new CompoundTag();
-        tag.putLong("Seed", handler.getSeed());
-        tag.putLong("Itr", handler.getIterations());
-        stack.setTag(tag);
-        return stack;
-    }
-
     @Override
     public void load(CompoundTag compound) {
         super.load(compound);
@@ -48,8 +39,10 @@ public class DebugItemBlockEntity extends BlockEntity {
     }
 
     @Override
-    protected void saveAdditional(CompoundTag compound) {
-        super.saveAdditional(compound);
+    protected void saveAdditional(CompoundTag tag) {
+        super.saveAdditional(tag);
+        tag.putLong("Seed", handler.getSeed());
+        tag.putLong("Itr", handler.getIterations());
     }
 
     @Override

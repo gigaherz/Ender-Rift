@@ -103,7 +103,6 @@ public class DebugItemHandler implements IItemHandler {
     private ItemStack next(boolean nulled) {
         Holder<Item> holder = DebugKeyCache.getItem(nextInt(DebugKeyCache.size()));
         if (holder == null) {
-            iterations--;
             DebugKeyCache.update();
             if (nulled) {
                 return ItemStack.EMPTY;
