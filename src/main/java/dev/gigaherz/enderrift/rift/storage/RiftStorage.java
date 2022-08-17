@@ -3,10 +3,11 @@ package dev.gigaherz.enderrift.rift.storage;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
-import java.nio.file.Path;
+import java.lang.reflect.InvocationTargetException;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
@@ -15,6 +16,7 @@ import org.slf4j.Logger;
 
 import com.mojang.logging.LogUtils;
 
+import dev.gigaherz.enderrift.rift.storage.migration.*;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtIo;
 import net.minecraft.server.MinecraftServer;
@@ -28,6 +30,11 @@ public class RiftStorage implements FilenameFilter {
 
     private static final Logger LOGGER = LogUtils.getLogger();
     private static final Function<UUID, RiftHolder> BUILDER = RiftHolder::new;
+
+    @SuppressWarnings("unchecked")
+    private static final Class<? extends RiftMigration>[] MIGRATIONS = new Class[] {
+        RiftMigration_17_08_2022.class
+    };
 
     private static RiftStorage STORAGE;
 
@@ -44,6 +51,7 @@ public class RiftStorage implements FilenameFilter {
             return;
         }
         STORAGE = new RiftStorage(server);
+        STORAGE.migrate();
         STORAGE.loadAll();
     }
 
@@ -56,13 +64,54 @@ public class RiftStorage implements FilenameFilter {
     }
 
     private final HashMap<UUID, RiftHolder> rifts = new HashMap<>();
+    private final Map<Class<? extends RiftMigration>, RiftMigration> migrations;
     // ReadLock => Access to the rift data
     // WriteLock => Modification of rift data
     private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
-    private final Path dataDirectory;
+    private final File dataDirectory;
 
     private RiftStorage(MinecraftServer server) {
-        this.dataDirectory = server.getWorldPath(DATA_DIR);
+        this.dataDirectory = server.getWorldPath(DATA_DIR).toFile();
+        Map<Class<? extends RiftMigration>, RiftMigration> migrations = new HashMap<>();
+        for (Class<? extends RiftMigration> migration : MIGRATIONS) {
+            if (migration == null) {
+                continue;
+            }
+            try {
+                migrations.put(migration, migration.cast(migration.getConstructor().newInstance()));
+            } catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException
+                | NoSuchMethodException | SecurityException e) {
+                LOGGER.warn("Failed to load migration '{}'", migration.getSimpleName());
+                continue;
+            }
+        }
+        this.migrations = Collections.unmodifiableMap(migrations);
+    }
+
+    public <E extends RiftMigration> E getMigration(Class<E> type) {
+        RiftMigration migration = migrations.get(type);
+        if (migration == null) {
+            return null;
+        }
+        return type.cast(migration);
+    }
+
+    private void migrate() {
+        for (RiftMigration migration : migrations.values()) {
+            if (!migration.isApplicable(this)) {
+                continue;
+            }
+            LOGGER.info("Running migration '{}'", migration.getName());
+            try {
+                migration.migrate(this);
+            } catch (Exception exp) {
+                LOGGER.warn("Failed to run migration '{}'", migration.getName(), exp);
+            }
+        }
+    }
+
+    public File getDataDirectory() {
+        return dataDirectory;
     }
 
     public RiftHolder newRift() {
@@ -93,11 +142,10 @@ public class RiftStorage implements FilenameFilter {
         // Prevent others from reading the map before every Rift is fully loaded
         lock.writeLock().lock();
         try {
-            File folder = dataDirectory.toFile();
-            if (!folder.exists()) {
+            if (!dataDirectory.exists()) {
                 return;
             }
-            File[] files = folder.listFiles(this);
+            File[] files = dataDirectory.listFiles(this);
             for (File file : files) {
                 String name = file.getName();
                 name = name.substring(0, name.length() - FILE_FORMAT_LENGTH);
@@ -116,7 +164,7 @@ public class RiftStorage implements FilenameFilter {
     }
 
     public void load(UUID id) {
-        File file = dataDirectory.resolve(id.toString() + FILE_FORMAT).toFile();
+        File file = new File(dataDirectory, id.toString() + FILE_FORMAT);
         if (!file.exists()) {
             return;
         }
@@ -172,7 +220,7 @@ public class RiftStorage implements FilenameFilter {
         }
         String id = holder.getId().toString();
         RiftInventory inventory = holder.getInventory();
-        File file = dataDirectory.resolve(id + FILE_FORMAT).toFile();
+        File file = new File(dataDirectory, id + FILE_FORMAT);
         LOGGER.info("Saving rift {}...", id);
         try {
             if (!file.exists()) {

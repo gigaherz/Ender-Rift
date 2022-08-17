@@ -5,6 +5,7 @@ import dev.gigaherz.enderrift.common.EnergyBuffer;
 import dev.gigaherz.enderrift.rift.storage.RiftHolder;
 import dev.gigaherz.enderrift.rift.storage.RiftInventory;
 import dev.gigaherz.enderrift.rift.storage.RiftStorage;
+import dev.gigaherz.enderrift.rift.storage.migration.RiftMigration_17_08_2022;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.item.ItemStack;
@@ -154,8 +155,11 @@ public class RiftBlockEntity extends BlockEntity implements IRiftChangeListener 
 
         energyBuffer.deserializeNBT(compound.get("Energy"));
         powered = compound.getBoolean("Powered");
-        if(compound.hasUUID("RiftId")) {
-            holder = RiftStorage.get().getRift(compound.getUUID("RiftId"));
+        if (compound.contains("RiftId")) {
+            RiftStorage storage = RiftStorage.get();
+            UUID id = compound.hasUUID("RiftId") ? compound.getUUID("RiftId")
+                : storage.getMigration(RiftMigration_17_08_2022.class).getMigratedId(compound.getInt("RiftId"));
+            holder = storage.getRift(id);
         }
     }
 
@@ -165,10 +169,9 @@ public class RiftBlockEntity extends BlockEntity implements IRiftChangeListener 
 
         compound.put("Energy", energyBuffer.serializeNBT());
         compound.putBoolean("Powered", powered);
+        compound.remove("RiftId");
         if (holder != null) {
             compound.putUUID("RiftId", holder.getId());
-        } else {
-            compound.remove("RiftId");
         }
     }
 

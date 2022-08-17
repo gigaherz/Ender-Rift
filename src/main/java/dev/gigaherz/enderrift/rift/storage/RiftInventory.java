@@ -10,10 +10,8 @@ import java.util.UUID;
 import java.util.function.Consumer;
 
 import org.jetbrains.annotations.NotNull;
-import org.slf4j.Logger;
 
 import com.google.common.collect.Lists;
-import com.mojang.logging.LogUtils;
 
 import dev.gigaherz.enderrift.rift.IRiftChangeListener;
 import net.minecraft.core.BlockPos;
