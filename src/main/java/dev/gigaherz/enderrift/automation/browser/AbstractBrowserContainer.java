@@ -104,7 +104,8 @@ public class AbstractBrowserContainer extends AbstractContainerMenu
         {
             this.tile = null;
             scrollInventory = new ClientScrollInventory();
-        } else
+        }
+        else
         {
             this.tile = Objects.requireNonNull(tileEntity);
             scrollInventory = new ServerScrollInventory(tile);
@@ -277,7 +278,8 @@ public class AbstractBrowserContainer extends AbstractContainerMenu
         if (isClient())
         {
             EnderRiftMod.CHANNEL.sendToServer(new SetVisibleSlots(containerId, visible));
-        } else
+        }
+        else
         {
             getServer().setVisible(visible);
         }
@@ -347,12 +349,14 @@ public class AbstractBrowserContainer extends AbstractContainerMenu
                             {
                                 sendStackInCursor(crafter, remaining);
                             }
-                        } else
+                        }
+                        else
                         {
                             markTileDirty();
                         }
                         setCarried(remaining);
-                    } else
+                    }
+                    else
                     {
                         int amount = 1;
 
@@ -372,7 +376,8 @@ public class AbstractBrowserContainer extends AbstractContainerMenu
                             {
                                 sendStackInCursor(crafter, remaining);
                             }
-                        } else
+                        }
+                        else
                         {
                             markTileDirty();
                         }
@@ -382,7 +387,8 @@ public class AbstractBrowserContainer extends AbstractContainerMenu
 
                         setCarried(dropping);
                     }
-                } else if (existingSize > 0)
+                }
+                else if (existingSize > 0)
                 {
                     int amount = clickedButton == 0 ? existing.getMaxStackSize() : existing.getMaxStackSize() / 2;
 
@@ -390,7 +396,8 @@ public class AbstractBrowserContainer extends AbstractContainerMenu
                     if (extracted.getCount() > 0)
                     {
                         markTileDirty();
-                    } else
+                    }
+                    else
                     {
 
                         if (player instanceof ServerPlayer crafter)
@@ -403,7 +410,8 @@ public class AbstractBrowserContainer extends AbstractContainerMenu
 
                 broadcastChanges();
                 return;
-            } else if (mode == ClickType.QUICK_MOVE && existingSize > 0)
+            }
+            else if (mode == ClickType.QUICK_MOVE && existingSize > 0)
             {
                 int amount = existing.getMaxStackSize();
                 if (clickedButton != 0 && amount > 1)
@@ -508,7 +516,8 @@ public class AbstractBrowserContainer extends AbstractContainerMenu
                     {
                         stack.setCount(0);
                         canInsert = true;
-                    } else
+                    }
+                    else
                     {
                         stack.shrink(stack.getMaxStackSize() - stackInSlot.getCount());
                         canInsert = true;
@@ -570,7 +579,8 @@ public class AbstractBrowserContainer extends AbstractContainerMenu
         {
             // Shouldn't even happen, handled above.
             return ItemStack.EMPTY;
-        } else
+        }
+        else
         {
             ItemStack stack = slot.getItem();
             ItemStack stackCopy = stack.copy();
@@ -591,7 +601,8 @@ public class AbstractBrowserContainer extends AbstractContainerMenu
                 markTileDirty();
                 stack.setCount(remaining.getCount());
                 slot.setChanged();
-            } else
+            }
+            else
             {
                 markTileDirty();
                 stack.setCount(0);

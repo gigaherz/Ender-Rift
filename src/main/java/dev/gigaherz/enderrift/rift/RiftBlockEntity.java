@@ -81,7 +81,8 @@ public class RiftBlockEntity extends BlockEntity implements IRiftChangeListener
                     poweringState += 0.1f;
                 else
                     poweringState = 1;
-            } else
+            }
+            else
             {
                 poweringStartParticlesSpawned = false;
                 if (poweringState > 0)
@@ -105,14 +106,16 @@ public class RiftBlockEntity extends BlockEntity implements IRiftChangeListener
             if (powered)
             {
                 energyBuffer.setEnergy(energyStored - energyUsage);
-            } else if (energyStored >= STARTUP_POWER)
+            }
+            else if (energyStored >= STARTUP_POWER)
             {
                 powered = true;
                 energyBuffer.setEnergy(energyStored - STARTUP_POWER);
                 BlockState state = level.getBlockState(worldPosition);
                 level.sendBlockUpdated(worldPosition, state, state, 3);
             }
-        } else
+        }
+        else
         {
             powered = false;
             BlockState state = level.getBlockState(worldPosition);

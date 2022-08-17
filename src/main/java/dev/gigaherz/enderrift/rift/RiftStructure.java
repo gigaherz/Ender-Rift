@@ -141,7 +141,8 @@ public class RiftStructure
                             BlockState st = world.getBlockState(bp);
                             if (!st.isAir())
                                 return false;
-                        } else if (b != EnderRiftMod.RIFT.get())
+                        } 
+                        else if (b != EnderRiftMod.RIFT.get())
                         {
                             if (b != w)
                                 return false;
@@ -232,10 +233,12 @@ public class RiftStructure
         if (state.getBlock() == EnderRiftMod.STRUCTURE_CORNER.get())
         {
             return StructurePattern[0];
-        } else if (state.getBlock() == EnderRiftMod.STRUCTURE_EDGE.get())
+        } 
+        else if (state.getBlock() == EnderRiftMod.STRUCTURE_EDGE.get())
         {
             return StructurePattern[1];
-        } else
+        } 
+        else
         {
             return StructurePattern[13];
         }
