@@ -150,20 +150,20 @@ dependencies {
     runtimeOnly fg.deobf("curse.maven:the-one-probe-245211:3871444")
     
     // PipeZ - 1.19-1.0.6
-    compileOnly fg.deobf("curse.maven:pipez-443900:3877192")
-    runtimeOnly fg.deobf("curse.maven:pipez-443900:3877192")
+    // compileOnly fg.deobf("curse.maven:pipez-443900:3877192")
+    // runtimeOnly fg.deobf("curse.maven:pipez-443900:3877192")
     
     // Spark - 1.19-1.9.25
-    compileOnly fg.deobf("curse.maven:spark-361579:3875647")
-    runtimeOnly fg.deobf("curse.maven:spark-361579:3875647")
+    // compileOnly fg.deobf("curse.maven:spark-361579:3875647")
+    // runtimeOnly fg.deobf("curse.maven:spark-361579:3875647")
     
     // SolarGeneration - 1.19-5.0.1
-    compileOnly fg.deobf("curse.maven:solargeneration-336538:3873840")
-    runtimeOnly fg.deobf("curse.maven:solargeneration-336538:3873840")
+    // compileOnly fg.deobf("curse.maven:solargeneration-336538:3873840")
+    // runtimeOnly fg.deobf("curse.maven:solargeneration-336538:3873840")
     
     // EdivadLib - 1.19-1.0.2
-    compileOnly fg.deobf("curse.maven:edivadlib-638508:3864277")
-    runtimeOnly fg.deobf("curse.maven:edivadlib-638508:3864277")
+    // compileOnly fg.deobf("curse.maven:edivadlib-638508:3864277")
+    // runtimeOnly fg.deobf("curse.maven:edivadlib-638508:3864277")
 }
 
 jar {
