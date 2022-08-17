@@ -17,8 +17,6 @@ import net.minecraft.world.level.Level;
 import javax.annotation.Nullable;
 import java.util.List;
 
-import net.minecraft.world.item.Item.Properties;
-
 public class RiftItem extends Item
 {
     public RiftItem(Properties properties)
@@ -42,7 +40,7 @@ public class RiftItem extends Item
         CompoundTag tag = stack.getTag();
         if (tag != null && tag.contains("RiftId"))
         {
-            tooltip.add(Component.translatable("text.enderrift.tooltip.riftid", tag.getInt("RiftId")));
+            tooltip.add(Component.translatable("text.enderrift.tooltip.riftid", tag.getUUID("RiftId")));
         }
     }
 

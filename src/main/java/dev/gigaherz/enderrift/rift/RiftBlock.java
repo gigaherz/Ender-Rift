@@ -31,8 +31,6 @@ import java.util.List;
 
 import org.jetbrains.annotations.Nullable;
 
-import net.minecraft.world.level.block.state.BlockBehaviour.Properties;
-
 public class RiftBlock extends BaseEntityBlock
 {
     public static final BooleanProperty ASSEMBLED = BooleanProperty.create("assembled");
