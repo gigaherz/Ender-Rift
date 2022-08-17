@@ -6,6 +6,8 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.UUID;
+import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
@@ -38,7 +40,7 @@ public class RiftStorage implements FilenameFilter {
     }
 
     public static void init(MinecraftServer server) {
-        if(STORAGE != null) {
+        if (STORAGE != null) {
             return;
         }
         STORAGE = new RiftStorage(server);
@@ -54,7 +56,9 @@ public class RiftStorage implements FilenameFilter {
     }
 
     private final HashMap<UUID, RiftHolder> rifts = new HashMap<>();
-
+    // ReadLock => Access to the rift data
+    // WriteLock => Modification of rift data
+    private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
     private final Path dataDirectory;
 
     private RiftStorage(MinecraftServer server) {
@@ -63,35 +67,51 @@ public class RiftStorage implements FilenameFilter {
 
     public RiftHolder newRift() {
         UUID id;
-        while (rifts.containsKey(id = UUID.randomUUID())) {
+        lock.readLock().lock();
+        try {
+            while (rifts.containsKey(id = UUID.randomUUID())) {
+            }
+            return rifts.computeIfAbsent(id, BUILDER);
+        } finally {
+            lock.readLock().unlock();
         }
-        return getRift(id);
     }
 
     public RiftHolder getRift(UUID id) {
         if (id == null) {
             return null;
         }
-        return rifts.computeIfAbsent(id, BUILDER);
+        lock.readLock().lock();
+        try {
+            return rifts.computeIfAbsent(id, BUILDER);
+        } finally {
+            lock.readLock().unlock();
+        }
     }
 
     public void loadAll() {
-        File folder = dataDirectory.toFile();
-        if (!folder.exists()) {
-            return;
-        }
-        File[] files = folder.listFiles(this);
-        for (File file : files) {
-            String name = file.getName();
-            name = name.substring(0, name.length() - FILE_FORMAT_LENGTH);
-            UUID id;
-            try {
-                id = UUID.fromString(name);
-            } catch (IllegalArgumentException iae) {
-                LOGGER.warn("Found invalid rift name {}", name, iae);
-                continue;
+        // Prevent others from reading the map before every Rift is fully loaded
+        lock.writeLock().lock();
+        try {
+            File folder = dataDirectory.toFile();
+            if (!folder.exists()) {
+                return;
             }
-            load(id, file);
+            File[] files = folder.listFiles(this);
+            for (File file : files) {
+                String name = file.getName();
+                name = name.substring(0, name.length() - FILE_FORMAT_LENGTH);
+                UUID id;
+                try {
+                    id = UUID.fromString(name);
+                } catch (IllegalArgumentException iae) {
+                    LOGGER.warn("Found invalid rift name {}", name, iae);
+                    continue;
+                }
+                load(id, file);
+            }
+        } finally {
+            lock.writeLock().unlock();
         }
     }
 
@@ -100,13 +120,18 @@ public class RiftStorage implements FilenameFilter {
         if (!file.exists()) {
             return;
         }
-        load(id, file);
+        lock.writeLock().lock();
+        try {
+            load(id, file);
+        } finally {
+            lock.writeLock().unlock();
+        }
     }
 
     private void load(UUID id, File file) {
         RiftHolder holder = rifts.computeIfAbsent(id, BUILDER);
-        holder.resetDirty();
         CompoundTag tag;
+        LOGGER.info("Loading rift {}...", id);
         try {
             tag = NbtIo.readCompressed(file);
         } catch (IOException e) {
@@ -118,34 +143,48 @@ public class RiftStorage implements FilenameFilter {
     }
 
     public void saveAll() {
-        RiftHolder[] holders = rifts.values().toArray(RiftHolder[]::new);
+        RiftHolder[] holders;
+        lock.readLock().lock();
+        try {
+            holders = rifts.values().toArray(RiftHolder[]::new);
+        } finally {
+            lock.readLock().unlock();
+        }
         for (RiftHolder holder : holders) {
             save(holder);
         }
     }
 
     public void save(UUID id) {
-        save(rifts.get(id));
+        lock.readLock().lock();
+        RiftHolder holder;
+        try {
+            holder = rifts.get(id);
+        } finally {
+            lock.readLock().unlock();
+        }
+        save(holder);
     }
 
     private void save(RiftHolder holder) {
-        if (holder == null || !holder.isValid() || !holder.isDirty()) {
+        if (holder == null || !holder.isValid()) {
             return;
         }
-        holder.resetDirty();
         String id = holder.getId().toString();
         RiftInventory inventory = holder.getInventory();
         File file = dataDirectory.resolve(id + FILE_FORMAT).toFile();
-        if (!file.exists()) {
-            File folder = file.getParentFile();
-            if (!folder.exists()) {
-                folder.mkdirs();
-            }
-        }
+        LOGGER.info("Saving rift {}...", id);
         try {
+            if (!file.exists()) {
+                File folder = file.getParentFile();
+                if (folder != null && !folder.exists()) {
+                    folder.mkdirs();
+                }
+                file.createNewFile();
+            }
             NbtIo.writeCompressed(inventory.save(), file);
         } catch (IOException ioexception) {
-            LOGGER.error("Could not rift {}", id, ioexception);
+            LOGGER.error("Could not save rift {}", id, ioexception);
         }
     }
 

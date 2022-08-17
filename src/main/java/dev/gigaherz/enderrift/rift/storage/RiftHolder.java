@@ -6,7 +6,6 @@ public class RiftHolder {
 
     private final UUID id;
     private RiftInventory inventory;
-    private boolean dirty;
 
     RiftHolder(UUID id) {
         this.id = id;
@@ -27,20 +26,8 @@ public class RiftHolder {
         return inventory = new RiftInventory(this);
     }
 
-    void resetDirty() {
-        dirty = false;
-    }
-
-    public boolean isDirty() {
-        return dirty;
-    }
-
-    public void setDirty() {
-        dirty = true;
-    }
-
     public boolean isValid() {
-        return false;
+        return inventory != null;
     }
 
 }

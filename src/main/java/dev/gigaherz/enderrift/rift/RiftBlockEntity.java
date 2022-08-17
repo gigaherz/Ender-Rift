@@ -3,6 +3,7 @@ package dev.gigaherz.enderrift.rift;
 import dev.gigaherz.enderrift.EnderRiftMod;
 import dev.gigaherz.enderrift.common.EnergyBuffer;
 import dev.gigaherz.enderrift.rift.storage.RiftHolder;
+import dev.gigaherz.enderrift.rift.storage.RiftInventory;
 import dev.gigaherz.enderrift.rift.storage.RiftStorage;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
@@ -36,6 +37,7 @@ public class RiftBlockEntity extends BlockEntity implements IRiftChangeListener 
 
     private boolean powered;
     private RiftHolder holder;
+    private boolean listenerState;
 
     // Client-side, for rendering
     private float lastPoweringState;
@@ -107,28 +109,31 @@ public class RiftBlockEntity extends BlockEntity implements IRiftChangeListener 
 
     public void assemble(RiftHolder holder) {
         this.holder = holder;
+        listenerState = false;
         setChanged();
     }
 
     public void unassemble() {
         holder = null;
+        listenerState = false;
         setChanged();
     }
 
     @Nullable
-    public IItemHandler getInventory() {
+    public RiftInventory getInventory() {
         if (holder == null)
             return null;
 
-        if (!holder.isValid() && level != null && !level.isClientSide) {
+        if (!listenerState && level != null && !level.isClientSide) {
             holder.getInventoryOrCreate().addWeakListener(this);
+            listenerState = true;
         }
         return holder.getInventory();
     }
 
     public int countInventoryStacks() {
         IItemHandler handler = getInventory();
-        return handler == null ? 0 : handler.getSlots();
+        return handler == null ? 0 : (handler.getSlots() - 1);
     }
 
     public ItemStack getRiftItem() {
@@ -149,7 +154,9 @@ public class RiftBlockEntity extends BlockEntity implements IRiftChangeListener 
 
         energyBuffer.deserializeNBT(compound.get("Energy"));
         powered = compound.getBoolean("Powered");
-        holder = RiftStorage.get().getRift(compound.getUUID("RiftId"));
+        if(compound.hasUUID("RiftId")) {
+            holder = RiftStorage.get().getRift(compound.getUUID("RiftId"));
+        }
     }
 
     @Override
@@ -262,6 +269,14 @@ public class RiftBlockEntity extends BlockEntity implements IRiftChangeListener 
     }
 
     public class PoweredInventory implements IItemHandler {
+        public long getCount(int slot) {
+            RiftInventory inventory = getInventory();
+            if (inventory == null) {
+                return 0;
+            }
+            return inventory.getCount(slot);
+        }
+
         @Override
         public int getSlots() {
             IItemHandler handler = getInventory();

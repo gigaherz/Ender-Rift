@@ -1,7 +1,6 @@
 package dev.gigaherz.enderrift;
 
 import com.google.common.collect.ImmutableList;
-import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.datafixers.util.Pair;
@@ -33,6 +32,8 @@ import net.minecraft.network.chat.ClickEvent.Action;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 import net.minecraft.tags.BlockTags;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.material.Material;
@@ -54,12 +55,15 @@ import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.SimpleRecipeSerializer;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.storage.loot.LootTables;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.data.ExistingFileHelper;
 import net.minecraftforge.data.event.GatherDataEvent;
 import net.minecraftforge.event.RegisterCommandsEvent;
-import net.minecraftforge.event.server.ServerStartedEvent;
+import net.minecraftforge.event.level.LevelEvent;
+import net.minecraftforge.event.level.LevelEvent.Save;
+import net.minecraftforge.event.server.ServerAboutToStartEvent;
 import net.minecraftforge.event.server.ServerStoppingEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.InterModComms;
@@ -206,11 +210,12 @@ public class EnderRiftMod {
 
         modEventBus.addListener(this::commonSetup);
         modEventBus.addListener(this::clientSetup);
-        modEventBus.addListener(this::serverStart);
-        modEventBus.addListener(this::serverStop);
         modEventBus.addListener(this::interComms);
         modEventBus.addListener(this::gatherData);
 
+        MinecraftForge.EVENT_BUS.addListener(this::serverStart);
+        MinecraftForge.EVENT_BUS.addListener(this::serverStop);
+        MinecraftForge.EVENT_BUS.addListener(this::serverSave);
         MinecraftForge.EVENT_BUS.addListener(this::commandEvent);
 
         ModLoadingContext modLoadingContext = ModLoadingContext.get();
@@ -238,8 +243,16 @@ public class EnderRiftMod {
         MenuScreens.register(CRAFTING_BROWSER_MENU.get(), CraftingBrowserScreen::new);
     }
 
-    public void serverStart(ServerStartedEvent event) {
+    public void serverStart(ServerAboutToStartEvent event) {
         RiftStorage.init(event.getServer());
+    }
+
+    public void serverSave(LevelEvent.Save event) {
+        LevelAccessor levelAccessor = event.getLevel();
+        if (!(levelAccessor instanceof ServerLevel) || !((ServerLevel) levelAccessor).dimension().equals(Level.OVERWORLD) || !RiftStorage.isAvailable()) {
+            return;
+        }
+        RiftStorage.get().saveAll();
     }
 
     public void serverStop(ServerStoppingEvent event) {

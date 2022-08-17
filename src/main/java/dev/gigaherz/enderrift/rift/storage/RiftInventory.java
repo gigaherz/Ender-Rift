@@ -10,8 +10,10 @@ import java.util.UUID;
 import java.util.function.Consumer;
 
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
 
 import com.google.common.collect.Lists;
+import com.mojang.logging.LogUtils;
 
 import dev.gigaherz.enderrift.rift.IRiftChangeListener;
 import net.minecraft.core.BlockPos;
@@ -59,7 +61,6 @@ public class RiftInventory implements IItemHandler {
 
     protected void onContentsChanged() {
         walkListeners(IRiftChangeListener::onRiftChanged);
-        holder.setDirty();
     }
 
     public void locateListeners(Level level, Consumer<BlockPos> locationConsumer) {
@@ -69,6 +70,13 @@ public class RiftInventory implements IItemHandler {
             }
             listener.getLocation().ifPresent(locationConsumer);
         });
+    }
+
+    public long getCount(int slot) {
+        if (slot < 0 || slot >= slots.size()) {
+            return 0;
+        }
+        return slots.get(slot).getCount();
     }
 
     CompoundTag save() {
@@ -111,11 +119,7 @@ public class RiftInventory implements IItemHandler {
         }
         RiftSlot slot = slots.get(index);
         ItemStack stack = slot.getSample().copy();
-        if (slot.getCount() > stack.getMaxStackSize()) {
-            stack.setCount(stack.getMaxStackSize());
-        } else {
-            stack.setCount((int) slot.getCount());
-        }
+        stack.setCount((int) Math.min(Integer.MAX_VALUE, slot.getCount()));
         return stack;
     }
 
@@ -187,7 +191,7 @@ public class RiftInventory implements IItemHandler {
 
     @Override
     public boolean isItemValid(int slot, @NotNull ItemStack stack) {
-        return true;
+        return !ItemStack.isSame(ItemStack.EMPTY, stack);
     }
 
     public void clear() {
