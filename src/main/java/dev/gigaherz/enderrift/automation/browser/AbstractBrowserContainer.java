@@ -395,7 +395,7 @@ public class AbstractBrowserContainer extends AbstractContainerMenu
                 {
                     int amount = clickedButton == 0 
                             ? existing.getMaxStackSize() 
-                            : existing.getMaxStackSize() / 2;
+                            : Math.min(existing.getCount() / 2, existing.getMaxStackSize() / 2);
 
                     ItemStack extracted = extractItemsSided(parent, existing, existingSize, amount, false);
                     if (extracted.getCount() > 0)
