@@ -395,7 +395,7 @@ public class AbstractBrowserContainer extends AbstractContainerMenu
                 {
                     int amount = clickedButton == 0 
                             ? existing.getMaxStackSize() 
-                            : Math.min(existing.getCount() / 2, existing.getMaxStackSize() / 2);
+                            : Math.min(existing.getCount(), existing.getMaxStackSize()) / 2;
 
                     ItemStack extracted = extractItemsSided(parent, existing, existingSize, amount, false);
                     if (extracted.getCount() > 0)
@@ -418,9 +418,9 @@ public class AbstractBrowserContainer extends AbstractContainerMenu
             }
             else if (mode == ClickType.QUICK_MOVE && existingSize > 0)
             {
-                int amount = existing.getMaxStackSize();
-                if (clickedButton != 0 && amount > 1)
-                    amount /= 2;
+                int amount = clickedButton == 0 
+                        ? existing.getMaxStackSize() 
+                        : Math.min(existing.getCount(), existing.getMaxStackSize()) / 2;
 
                 if (amount == 0)
                     return;
