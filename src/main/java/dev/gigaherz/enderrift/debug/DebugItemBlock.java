@@ -1,24 +1,23 @@
 package dev.gigaherz.enderrift.debug;
 
 import com.google.common.collect.Lists;
-import dev.gigaherz.enderrift.EnderRiftMod;
-import dev.gigaherz.enderrift.rift.RiftBlockEntity;
+
+import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.block.BaseEntityBlock;
-import net.minecraft.world.level.block.entity.BlockEntityTicker;
-import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.storage.loot.LootContext;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.VoxelShape;
 
 import java.util.List;
 
-import org.jetbrains.annotations.Nullable;
-
 public class DebugItemBlock extends BaseEntityBlock
 {
+    private static final VoxelShape SHAPE = Block.box(4, 4, 4, 12, 12, 12);
 
     public DebugItemBlock(Properties properties)
     {
@@ -32,18 +31,17 @@ public class DebugItemBlock extends BaseEntityBlock
         return new DebugItemBlockEntity(pos, state);
     }
 
-    @Nullable
-    @Override
-    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level pLevel, BlockState pState, BlockEntityType<T> pBlockEntityType)
-    {
-        return BaseEntityBlock.createTickerHelper(pBlockEntityType, EnderRiftMod.RIFT_BLOCK_ENTITY.get(), RiftBlockEntity::tickStatic);
-    }
-
     @Deprecated
     @Override
     public List<ItemStack> getDrops(BlockState state, LootContext.Builder builder)
     {
         return Lists.newArrayList(new ItemStack(this));
+    }
+    
+    @Override
+    public VoxelShape getShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext ctx)
+    {
+        return SHAPE;
     }
 
 }

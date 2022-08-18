@@ -86,15 +86,20 @@ public class DebugItemHandler implements IItemHandler
 
     private int nextInt(int max)
     {
+        if (iterations < 0 || iterations == Long.MAX_VALUE)
+        {
+            iterations = 0;
+        }
+        return nextInt(iterations++, max);
+    }
+
+    private int nextInt(long iterations, int max)
+    {
         if (max <= 0)
         {
             return 0;
         }
-        if (iterations == Long.MAX_VALUE)
-        {
-            iterations = 0;
-        }
-        long num = (iterations++) * 3432918353L;
+        long num = iterations * 3432918353L;
         num = (num << 15 | num >> 17);
         num *= 461845907L;
         long num2 = seed ^ num;

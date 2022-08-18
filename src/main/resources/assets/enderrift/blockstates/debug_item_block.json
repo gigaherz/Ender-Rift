@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "enderrift:block/debug_item_block"
+    }
+  }
+}
