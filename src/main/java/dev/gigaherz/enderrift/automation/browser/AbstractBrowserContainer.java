@@ -239,7 +239,9 @@ public class AbstractBrowserContainer extends AbstractContainerMenu
         NonNullList<ItemStack> oldStacks = currentStacks;
         currentStacks = NonNullList.withSize(newLength, ItemStack.EMPTY);
         for (int i = 0; i < Math.min(newLength, oldLength); i++)
-        {currentStacks.set(i, oldStacks.get(i));}
+        {
+            currentStacks.set(i, oldStacks.get(i));
+        }
     }
 
     private void sendStackInCursor(ServerPlayer player, ItemStack newStack)
@@ -395,7 +397,7 @@ public class AbstractBrowserContainer extends AbstractContainerMenu
                 {
                     int amount = clickedButton == 0
                             ? existing.getMaxStackSize()
-                            : Math.min(existing.getCount(), existing.getMaxStackSize()) / 2;
+                            : Math.max(1, Math.min(existing.getCount(), existing.getMaxStackSize()) / 2);
 
                     ItemStack extracted = extractItemsSided(parent, existing, existingSize, amount, false);
                     if (extracted.getCount() > 0)
@@ -420,7 +422,7 @@ public class AbstractBrowserContainer extends AbstractContainerMenu
             {
                 int amount = clickedButton == 0
                         ? existing.getMaxStackSize()
-                        : Math.min(existing.getCount(), existing.getMaxStackSize()) / 2;
+                        : Math.max(1, Math.min(existing.getCount(), existing.getMaxStackSize()) / 2);
 
                 if (amount == 0)
                     return;

@@ -141,7 +141,12 @@ public class EnderRiftMod
     public static final RegistryObject<SimpleCraftingRecipeSerializer<OrbDuplicationRecipe>> ORB_DUPLICATION = RECIPE_SERIALIZERS.register("orb_duplication", () -> new SimpleCraftingRecipeSerializer<>(OrbDuplicationRecipe::new));
 
     private static final String PROTOCOL_VERSION = "1.1.0";
-    public static final SimpleChannel CHANNEL = NetworkRegistry.ChannelBuilder.named(new ResourceLocation(MODID, "main")).clientAcceptedVersions(PROTOCOL_VERSION::equals).serverAcceptedVersions(PROTOCOL_VERSION::equals).networkProtocolVersion(() -> PROTOCOL_VERSION).simpleChannel();
+    public static final SimpleChannel CHANNEL = NetworkRegistry.ChannelBuilder
+            .named(new ResourceLocation(MODID, "main"))
+            .clientAcceptedVersions(PROTOCOL_VERSION::equals)
+            .serverAcceptedVersions(PROTOCOL_VERSION::equals)
+            .networkProtocolVersion(() -> PROTOCOL_VERSION)
+            .simpleChannel();
 
     public static final Logger logger = LogManager.getLogger(MODID);
 
@@ -161,15 +166,11 @@ public class EnderRiftMod
         modEventBus.addListener(this::gatherData);
         modEventBus.addListener(this::registerTabs);
 
-        MinecraftForge.EVENT_BUS.addListener(this::serverStart);
-        MinecraftForge.EVENT_BUS.addListener(this::serverStop);
-        MinecraftForge.EVENT_BUS.addListener(this::serverSave);
         MinecraftForge.EVENT_BUS.addListener(this::commandEvent);
 
         ModLoadingContext modLoadingContext = ModLoadingContext.get();
         modLoadingContext.registerConfig(ModConfig.Type.SERVER, ConfigValues.SERVER_SPEC);
-        // modLoadingContext.registerConfig(ModConfig.Type.CLIENT,
-        // ConfigData.CLIENT_SPEC);
+        //modLoadingContext.registerConfig(ModConfig.Type.CLIENT, ConfigData.CLIENT_SPEC);
     }
 
     private void registerTabs(CreativeModeTabEvent.Register event)
@@ -207,26 +208,6 @@ public class EnderRiftMod
         MenuScreens.register(INTERFACE_MENU.get(), InterfaceScreen::new);
         MenuScreens.register(BROWSER_MENU.get(), BrowserScreen::new);
         MenuScreens.register(CRAFTING_BROWSER_MENU.get(), CraftingBrowserScreen::new);
-    }
-
-    public void serverStart(ServerAboutToStartEvent event)
-    {
-        RiftStorage.init(event.getServer());
-    }
-
-    public void serverSave(LevelEvent.Save event)
-    {
-        LevelAccessor levelAccessor = event.getLevel();
-        if (!(levelAccessor instanceof ServerLevel) || !((ServerLevel) levelAccessor).dimension().equals(Level.OVERWORLD) || !RiftStorage.isAvailable())
-        {
-            return;
-        }
-        RiftStorage.get().saveAll();
-    }
-
-    public void serverStop(ServerStoppingEvent event)
-    {
-        RiftStorage.deinit();
     }
 
     public void interComms(InterModEnqueueEvent event)

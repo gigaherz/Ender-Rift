@@ -61,13 +61,13 @@ public class ConfigValues
     @SubscribeEvent
     public static void modConfig(ModConfigEvent event)
     {
-        PowerPerInsertionConstant = (float) (double) SERVER.powerPerInsertionConstant.get();
-        PowerPerInsertionLinear = (float) (double) SERVER.powerPerInsertionLinear.get();
-        PowerPerInsertionGeometric = (float) (double) SERVER.powerPerInsertionGeometric.get();
-        PowerPerInsertionCap = (float) (double) SERVER.powerPerInsertionCap.get();
-        PowerPerExtractionConstant = (float) (double) SERVER.powerPerExtractionConstant.get();
-        PowerPerExtractionLinear = (float) (double) SERVER.powerPerExtractionLinear.get();
-        PowerPerExtractionGeometric = (float) (double) SERVER.powerPerExtractionGeometric.get();
-        PowerPerExtractionCap = (float) (double) SERVER.powerPerExtractionCap.get();
+        PowerPerInsertionConstant = (float)(double)SERVER.powerPerInsertionConstant.get();
+        PowerPerInsertionLinear = (float)(double)SERVER.powerPerInsertionLinear.get();
+        PowerPerInsertionGeometric = (float)(double)SERVER.powerPerInsertionGeometric.get();
+        PowerPerInsertionCap = (float)(double)SERVER.powerPerInsertionCap.get();
+        PowerPerExtractionConstant = (float)(double)SERVER.powerPerExtractionConstant.get();
+        PowerPerExtractionLinear = (float)(double)SERVER.powerPerExtractionLinear.get();
+        PowerPerExtractionGeometric = (float)(double)SERVER.powerPerExtractionGeometric.get();
+        PowerPerExtractionCap = (float)(double)SERVER.powerPerExtractionCap.get();
     }
 }

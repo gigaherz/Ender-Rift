@@ -1,11 +1,20 @@
 package dev.gigaherz.enderrift.rift.storage;
 
 import com.mojang.logging.LogUtils;
+import dev.gigaherz.enderrift.EnderRiftMod;
 import dev.gigaherz.enderrift.rift.storage.migration.RiftMigration_17_08_2022;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtIo;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.storage.LevelResource;
+import net.minecraftforge.event.level.LevelEvent;
+import net.minecraftforge.event.server.ServerAboutToStartEvent;
+import net.minecraftforge.event.server.ServerStoppingEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
 import org.slf4j.Logger;
 
 import java.io.File;
@@ -20,8 +29,32 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
+@Mod.EventBusSubscriber(modid= EnderRiftMod.MODID, bus= Mod.EventBusSubscriber.Bus.MOD)
 public class RiftStorage implements FilenameFilter
 {
+    @SubscribeEvent
+    public static void serverStart(ServerAboutToStartEvent event)
+    {
+        RiftStorage.init(event.getServer());
+    }
+
+    @SubscribeEvent
+    public static void serverSave(LevelEvent.Save event)
+    {
+        LevelAccessor levelAccessor = event.getLevel();
+        if (!(levelAccessor instanceof ServerLevel) || !((ServerLevel) levelAccessor).dimension().equals(Level.OVERWORLD) || !RiftStorage.isAvailable())
+        {
+            return;
+        }
+        RiftStorage.get().saveAll();
+    }
+
+    @SubscribeEvent
+    public static void serverStop(ServerStoppingEvent event)
+    {
+        RiftStorage.deinit();
+    }
+
 
     public static final LevelResource DATA_DIR = new LevelResource("enderrift");
     public static final String FILE_FORMAT = ".dat";

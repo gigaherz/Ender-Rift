@@ -148,13 +148,13 @@ public class RiftInventory implements IItemHandler
         }
         try
         {
-            if (index < slots.size() && index >= 0 && add(index, stack))
+            if (index < slots.size() && index >= 0 && tryCombineStacks(index, stack))
             {
                 return ItemStack.EMPTY;
             }
             for (int i = 0; i < slots.size(); i++)
             {
-                if (index == i || !add(i, stack))
+                if (index == i || !tryCombineStacks(i, stack))
                 {
                     continue;
                 }
@@ -169,7 +169,7 @@ public class RiftInventory implements IItemHandler
         }
     }
 
-    private boolean add(int index, ItemStack stack)
+    private boolean tryCombineStacks(int index, ItemStack stack)
     {
         RiftSlot slot = slots.get(index);
         ItemStack sample = slot.getSample();
