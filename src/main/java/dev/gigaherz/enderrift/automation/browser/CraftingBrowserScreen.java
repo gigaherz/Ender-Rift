@@ -56,7 +56,7 @@ public class CraftingBrowserScreen extends AbstractBrowserScreen<CraftingBrowser
     {
         public GuiButtonFlexible(int x, int y, int widthIn, int heightIn, Component buttonText, OnPress callback)
         {
-            super(x, y, widthIn, heightIn, buttonText, callback);
+            super(x, y, widthIn, heightIn, buttonText, callback, DEFAULT_NARRATION);
         }
 
         @Override
@@ -69,7 +69,7 @@ public class CraftingBrowserScreen extends AbstractBrowserScreen<CraftingBrowser
             RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
             RenderSystem.setShaderTexture(0, WIDGETS_LOCATION);
 
-            isHovered = mouseX >= x && mouseY >= y && mouseX < x + width && mouseY < y + height;
+            isHovered = mouseX >= getX() && mouseY >= getY() && mouseX < getX() + width && mouseY < getY() + height;
 
             int i = getYImage(isHovered);
 
@@ -81,14 +81,14 @@ public class CraftingBrowserScreen extends AbstractBrowserScreen<CraftingBrowser
             int halfwidth2 = this.width - halfwidth1;
             int halfheight1 = this.height / 2;
             int halfheight2 = this.height - halfheight1;
-            blit(matrixStack, x, y, 0,
+            blit(matrixStack, getX(), getY(), 0,
                     46 + i * 20, halfwidth1, halfheight1);
-            blit(matrixStack, x + halfwidth1, y, 200 - halfwidth2,
+            blit(matrixStack, getX() + halfwidth1, getY(), 200 - halfwidth2,
                     46 + i * 20, halfwidth2, halfheight1);
 
-            blit(matrixStack, x, y + halfheight1,
+            blit(matrixStack, getX(), getY() + halfheight1,
                     0, 46 + i * 20 + 20 - halfheight2, halfwidth1, halfheight2);
-            blit(matrixStack, x + halfwidth1, y + halfheight1,
+            blit(matrixStack, getX() + halfwidth1, getY() + halfheight1,
                     200 - halfwidth2, 46 + i * 20 + 20 - halfheight2, halfwidth2, halfheight2);
 
             int textColor = 14737632;
@@ -106,7 +106,7 @@ public class CraftingBrowserScreen extends AbstractBrowserScreen<CraftingBrowser
                 textColor = 16777120;
             }
 
-            this.drawCenteredString(matrixStack, fontrenderer, getMessage(), x + halfwidth2, y + (this.height - 8) / 2, textColor);
+            this.drawCenteredString(matrixStack, fontrenderer, getMessage(), getX() + halfwidth2, getY() + (this.height - 8) / 2, textColor);
         }
     }
 }

@@ -82,7 +82,7 @@ public abstract class AbstractBrowserScreen<T extends AbstractBrowserContainer> 
     {
         super.init();
 
-        addRenderableWidget(this.sortModeButton = new Button(leftPos - 22, topPos + 12, 20, 20, Component.literal(""), (btn) -> {
+        addRenderableWidget(this.sortModeButton = Button.builder(Component.literal(""), (btn) -> {
             SortMode mode = getMenu().sortMode;
             switch (mode)
             {
@@ -95,7 +95,7 @@ public abstract class AbstractBrowserScreen<T extends AbstractBrowserContainer> 
             }
 
             changeSorting(mode);
-        }));
+        }).pos(leftPos - 22, topPos + 12).size(20, 20).build());
 
         //Keyboard.enableRepeatEvents(true);
         addRenderableWidget(this.searchField = new EditBox(this.font, leftPos + 114, topPos + 6, 71, this.font.lineHeight, Component.literal(""))
@@ -103,8 +103,8 @@ public abstract class AbstractBrowserScreen<T extends AbstractBrowserContainer> 
             @Override
             public boolean mouseClicked(double mouseX, double mouseY, int mouseButton)
             {
-                if (mouseX >= (double) this.x && mouseX < (double) (this.x + this.width)
-                        && mouseY >= (double) this.y && mouseY < (double) (this.y + this.height))
+                if (mouseX >= (double) this.getX() && mouseX < (double) (this.getX() + this.width)
+                        && mouseY >= (double) this.getY() && mouseY < (double) (this.getY() + this.height))
                 {
                     if (mouseButton == 1 && !Strings.isNullOrEmpty(getValue()) && getValue().length() > 0)
                     {

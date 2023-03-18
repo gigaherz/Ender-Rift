@@ -16,7 +16,7 @@ public class RiftStorage extends SavedData
 {
     private static final String DATA_NAME = "enderRiftStorageManager";
 
-    private Map<Integer, RiftInventory> rifts = new HashMap<Integer, RiftInventory>();
+    private final Map<Integer, RiftInventory> rifts = new HashMap<>();
     private int lastRiftId;
 
     public RiftStorage()

@@ -3,6 +3,7 @@ package dev.gigaherz.enderrift.rift;
 import com.google.common.collect.Lists;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.math.Axis;
 import dev.gigaherz.enderrift.EnderRiftMod;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Camera;
@@ -19,7 +20,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.phys.Vec3;
-import com.mojang.math.Vector3f;
 import net.minecraftforge.client.model.data.ModelData;
 
 import java.util.List;
@@ -67,8 +67,8 @@ public class RiftRenderer
 
             matrixStack.pushPose();
             matrixStack.translate(0.5, 0.5, 0.5);
-            matrixStack.mulPose(Vector3f.YP.rotation(-yaw));
-            matrixStack.mulPose(Vector3f.ZP.rotation(pitch));
+            matrixStack.mulPose(Axis.YP.rotation(-yaw));
+            matrixStack.mulPose(Axis.ZP.rotation(pitch));
             matrixStack.translate(-0.5, -0.5, -0.5);
 
             int step_time = 20;

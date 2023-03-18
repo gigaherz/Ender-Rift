@@ -1,59 +1,62 @@
 package dev.gigaherz.enderrift;
 
-import com.google.common.collect.ImmutableList;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
-import com.mojang.datafixers.util.Pair;
 import dev.gigaherz.enderrift.automation.browser.*;
-import dev.gigaherz.enderrift.network.*;
-import dev.gigaherz.enderrift.plugins.TheOneProbeProviders;
-import dev.gigaherz.enderrift.rift.*;
 import dev.gigaherz.enderrift.automation.driver.DriverBlock;
 import dev.gigaherz.enderrift.automation.driver.DriverBlockEntity;
 import dev.gigaherz.enderrift.automation.iface.InterfaceBlock;
+import dev.gigaherz.enderrift.automation.iface.InterfaceBlockEntity;
 import dev.gigaherz.enderrift.automation.iface.InterfaceContainer;
 import dev.gigaherz.enderrift.automation.iface.InterfaceScreen;
-import dev.gigaherz.enderrift.automation.iface.InterfaceBlockEntity;
 import dev.gigaherz.enderrift.automation.proxy.ProxyBlock;
 import dev.gigaherz.enderrift.automation.proxy.ProxyBlockEntity;
 import dev.gigaherz.enderrift.generator.GeneratorBlock;
+import dev.gigaherz.enderrift.generator.GeneratorBlockEntity;
 import dev.gigaherz.enderrift.generator.GeneratorContainer;
 import dev.gigaherz.enderrift.generator.GeneratorScreen;
-import dev.gigaherz.enderrift.generator.GeneratorBlockEntity;
+import dev.gigaherz.enderrift.network.ClearCraftingGrid;
+import dev.gigaherz.enderrift.network.SendSlotChanges;
+import dev.gigaherz.enderrift.network.SetVisibleSlots;
+import dev.gigaherz.enderrift.rift.*;
 import dev.gigaherz.enderrift.rift.storage.RiftInventory;
 import dev.gigaherz.enderrift.rift.storage.RiftStorage;
-import net.minecraft.core.NonNullList;
-import net.minecraft.data.tags.BlockTagsProvider;
-import net.minecraft.network.chat.Component;
-import net.minecraft.tags.BlockTags;
-import net.minecraft.world.entity.ai.village.poi.PoiType;
-import net.minecraft.world.entity.npc.VillagerProfession;
-import net.minecraft.world.item.crafting.RecipeType;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.SoundType;
-import net.minecraft.world.level.material.Material;
-import net.minecraft.world.level.material.MaterialColor;
+import net.minecraft.Util;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.NonNullList;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.data.DataGenerator;
-import net.minecraft.data.DataProvider;
+import net.minecraft.data.loot.BlockLootSubProvider;
 import net.minecraft.data.loot.LootTableProvider;
-import net.minecraft.data.loot.BlockLoot;
+import net.minecraft.data.registries.VanillaRegistries;
+import net.minecraft.data.tags.IntrinsicHolderTagsProvider;
+import net.minecraft.data.tags.VanillaBlockTagsProvider;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.BlockTags;
+import net.minecraft.world.flag.FeatureFlags;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.BlockItem;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeSerializer;
-import net.minecraft.world.item.crafting.SimpleRecipeSerializer;
+import net.minecraft.world.item.crafting.SimpleCraftingRecipeSerializer;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.level.storage.loot.LootTables;
+import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.material.Material;
+import net.minecraft.world.level.material.MaterialColor;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.data.ExistingFileHelper;
 import net.minecraftforge.data.event.GatherDataEvent;
+import net.minecraftforge.event.CreativeModeTabEvent;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.InterModComms;
@@ -75,19 +78,9 @@ import org.apache.logging.log4j.Logger;
 
 import java.util.List;
 import java.util.Map;
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
+import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
-
-import net.minecraft.world.level.block.state.BlockBehaviour;
-
-import net.minecraft.world.level.storage.loot.LootTable;
-import net.minecraft.world.level.storage.loot.ValidationContext;
-import net.minecraft.world.level.storage.loot.parameters.LootContextParamSet;
-import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
-
-import net.minecraft.world.item.Item.Properties;
 
 @Mod.EventBusSubscriber
 @Mod(EnderRiftMod.MODID)
@@ -101,14 +94,7 @@ public class EnderRiftMod
     private static final DeferredRegister<RecipeSerializer<?>> RECIPE_SERIALIZERS = DeferredRegister.create(ForgeRegistries.RECIPE_SERIALIZERS, MODID);
     private static final DeferredRegister<MenuType<?>> MENU_TYPES = DeferredRegister.create(ForgeRegistries.MENU_TYPES, MODID);
 
-    public static CreativeModeTab ENDERRIFT_CREATIVE_TAB = new CreativeModeTab("tabEnderRift")
-    {
-        @Override
-        public ItemStack makeIcon()
-        {
-            return new ItemStack(EnderRiftMod.RIFT_ORB.get());
-        }
-    };
+    public static CreativeModeTab ENDERRIFT_CREATIVE_TAB;
 
     public static final RegistryObject<Block> RIFT = BLOCKS.register("rift", () -> new RiftBlock(BlockBehaviour.Properties.of(Material.STONE).sound(SoundType.METAL).strength(3.0F, 8.0F).dynamicShape()));
     public static final RegistryObject<StructureCornerBlock> STRUCTURE_CORNER = BLOCKS.register("structure_corner", () -> new StructureCornerBlock(BlockBehaviour.Properties.of(Material.STONE).sound(SoundType.METAL).strength(3.0F, 8.0F).noLootTable()));
@@ -120,16 +106,16 @@ public class EnderRiftMod
     public static final RegistryObject<Block> DRIVER = BLOCKS.register("driver", () -> new DriverBlock(BlockBehaviour.Properties.of(Material.METAL, MaterialColor.STONE).sound(SoundType.METAL).strength(3.0F, 8.0F)));
     public static final RegistryObject<Block> GENERATOR = BLOCKS.register("generator", () -> new GeneratorBlock(BlockBehaviour.Properties.of(Material.METAL, MaterialColor.STONE).sound(SoundType.METAL).strength(3.0F, 8.0F)));
 
-    public static final RegistryObject<Item> RIFT_ITEM = ITEMS.register("rift", () -> new BlockItem(RIFT.get(), new Item.Properties().tab(ENDERRIFT_CREATIVE_TAB)));
-    public static final RegistryObject<Item> STRUCTURE_CORNER_ITEM = ITEMS.register("structure_corner", () -> new BlockItemNC(STRUCTURE_CORNER.get(), new Item.Properties().tab(ENDERRIFT_CREATIVE_TAB)));
-    public static final RegistryObject<Item> STRUCTURE_EDGE_ITEM = ITEMS.register("structure_edge", () -> new BlockItemNC(STRUCTURE_EDGE.get(), new Item.Properties().tab(ENDERRIFT_CREATIVE_TAB)));
-    public static final RegistryObject<Item> INTERFACE_ITEM = ITEMS.register("interface", () -> new BlockItem(INTERFACE.get(), new Item.Properties().tab(ENDERRIFT_CREATIVE_TAB)));
-    public static final RegistryObject<Item> BROWSER_ITEM = ITEMS.register("browser", () -> new BlockItem(BROWSER.get(), new Item.Properties().tab(ENDERRIFT_CREATIVE_TAB)));
-    public static final RegistryObject<Item> CRAFTING_BROWSER_ITEM = ITEMS.register("crafting_browser", () -> new BlockItem(CRAFTING_BROWSER.get(), new Item.Properties().tab(ENDERRIFT_CREATIVE_TAB)));
-    public static final RegistryObject<Item> PROXY_ITEM = ITEMS.register("proxy", () -> new BlockItem(PROXY.get(), new Item.Properties().tab(ENDERRIFT_CREATIVE_TAB)));
-    public static final RegistryObject<Item> DRIVER_ITEM = ITEMS.register("driver", () -> new BlockItem(DRIVER.get(), new Item.Properties().tab(ENDERRIFT_CREATIVE_TAB)));
-    public static final RegistryObject<Item> GENERATOR_ITEM = ITEMS.register("generator", () -> new BlockItem(GENERATOR.get(), new Item.Properties().tab(ENDERRIFT_CREATIVE_TAB)));
-    public static final RegistryObject<Item> RIFT_ORB = ITEMS.register("rift_orb", () -> new RiftItem(new Item.Properties().stacksTo(16).tab(ENDERRIFT_CREATIVE_TAB)));
+    public static final RegistryObject<Item> RIFT_ITEM = ITEMS.register("rift", () -> new BlockItem(RIFT.get(), new Item.Properties()));
+    public static final RegistryObject<Item> STRUCTURE_CORNER_ITEM = ITEMS.register("structure_corner", () -> new BlockItem(STRUCTURE_CORNER.get(), new Item.Properties()));
+    public static final RegistryObject<Item> STRUCTURE_EDGE_ITEM = ITEMS.register("structure_edge", () -> new BlockItem(STRUCTURE_EDGE.get(), new Item.Properties()));
+    public static final RegistryObject<Item> INTERFACE_ITEM = ITEMS.register("interface", () -> new BlockItem(INTERFACE.get(), new Item.Properties()));
+    public static final RegistryObject<Item> BROWSER_ITEM = ITEMS.register("browser", () -> new BlockItem(BROWSER.get(), new Item.Properties()));
+    public static final RegistryObject<Item> CRAFTING_BROWSER_ITEM = ITEMS.register("crafting_browser", () -> new BlockItem(CRAFTING_BROWSER.get(), new Item.Properties()));
+    public static final RegistryObject<Item> PROXY_ITEM = ITEMS.register("proxy", () -> new BlockItem(PROXY.get(), new Item.Properties()));
+    public static final RegistryObject<Item> DRIVER_ITEM = ITEMS.register("driver", () -> new BlockItem(DRIVER.get(), new Item.Properties()));
+    public static final RegistryObject<Item> GENERATOR_ITEM = ITEMS.register("generator", () -> new BlockItem(GENERATOR.get(), new Item.Properties()));
+    public static final RegistryObject<Item> RIFT_ORB = ITEMS.register("rift_orb", () -> new RiftItem(new Item.Properties().stacksTo(16)));
 
     public static final RegistryObject<BlockEntityType<RiftBlockEntity>> RIFT_BLOCK_ENTITY = BLOCK_ENTITIES.register("rift", () -> BlockEntityType.Builder.of(RiftBlockEntity::new, RIFT.get()).build(null));
     public static final RegistryObject<BlockEntityType<StructureCornerBlockEntity>> STRUCTURE_CORNER_BLOCK_ENTITY = BLOCK_ENTITIES.register("structure", () -> BlockEntityType.Builder.of(StructureCornerBlockEntity::new, STRUCTURE_CORNER.get()).build(null));
@@ -144,7 +130,7 @@ public class EnderRiftMod
     public static final RegistryObject<MenuType<InterfaceContainer>> INTERFACE_MENU = MENU_TYPES.register("interface", () -> new MenuType<>(InterfaceContainer::new));
     public static final RegistryObject<MenuType<GeneratorContainer>> GENERATOR_MENU = MENU_TYPES.register("generator", () -> new MenuType<>(GeneratorContainer::new));
 
-    public static final RegistryObject<SimpleRecipeSerializer<OrbDuplicationRecipe>> ORB_DUPLICATION = RECIPE_SERIALIZERS.register("orb_duplication", () -> new SimpleRecipeSerializer<>(OrbDuplicationRecipe::new));
+    public static final RegistryObject<SimpleCraftingRecipeSerializer<OrbDuplicationRecipe>> ORB_DUPLICATION = RECIPE_SERIALIZERS.register("orb_duplication", () -> new SimpleCraftingRecipeSerializer<>(OrbDuplicationRecipe::new));
 
     private static final String PROTOCOL_VERSION = "1.1.0";
     public static final SimpleChannel CHANNEL = NetworkRegistry.ChannelBuilder
@@ -170,12 +156,31 @@ public class EnderRiftMod
         modEventBus.addListener(this::clientSetup);
         modEventBus.addListener(this::interComms);
         modEventBus.addListener(this::gatherData);
+        modEventBus.addListener(this::registerTabs);
 
         MinecraftForge.EVENT_BUS.addListener(this::commandEvent);
 
         ModLoadingContext modLoadingContext = ModLoadingContext.get();
         modLoadingContext.registerConfig(ModConfig.Type.SERVER, ConfigValues.SERVER_SPEC);
         //modLoadingContext.registerConfig(ModConfig.Type.CLIENT, ConfigData.CLIENT_SPEC);
+    }
+
+    private void registerTabs(CreativeModeTabEvent.Register event)
+    {
+        ENDERRIFT_CREATIVE_TAB = event.registerCreativeModeTab(location("ender_rift_tab"), builder -> builder
+                .icon(() -> new ItemStack(RIFT_ORB.get()))
+                .title(Component.translatable("itemGroup.tabEnderRift"))
+                .displayItems((featureFlags, output, hasOp) -> {
+                    output.accept(RIFT_ITEM.get());
+                    output.accept(RIFT_ORB.get());
+                    output.accept(INTERFACE_ITEM.get());
+                    output.accept(BROWSER_ITEM.get());
+                    output.accept(CRAFTING_BROWSER_ITEM.get());
+                    output.accept(PROXY_ITEM.get());
+                    output.accept(DRIVER_ITEM.get());
+                    output.accept(GENERATOR_ITEM.get());
+                })
+        );
     }
 
     public void commonSetup(FMLCommonSetupEvent event)
@@ -199,7 +204,7 @@ public class EnderRiftMod
 
     public void interComms(InterModEnqueueEvent event)
     {
-        InterModComms.sendTo("theoneprobe", "getTheOneProbe", () -> TheOneProbeProviders.create());
+        //InterModComms.sendTo("theoneprobe", "getTheOneProbe", () -> TheOneProbeProviders.create());
     }
 
     public void commandEvent(RegisterCommandsEvent event)
@@ -255,43 +260,28 @@ public class EnderRiftMod
         {
             DataGenerator gen = event.getGenerator();
 
-            gen.addProvider(event.includeServer(), new LootTableGen(gen));
+            gen.addProvider(event.includeServer(), Loot.create(gen));
             gen.addProvider(event.includeServer(), new BlockTagGens(gen, event.getExistingFileHelper()));
         }
 
-        private static class LootTableGen extends LootTableProvider implements DataProvider
+        private static class Loot
         {
-            public LootTableGen(DataGenerator gen)
+            public static LootTableProvider create(DataGenerator gen)
             {
-                super(gen);
+                return new LootTableProvider(gen.getPackOutput(), Set.of(), List.of(
+                        new LootTableProvider.SubProviderEntry(Loot.BlockTables::new, LootContextParamSets.BLOCK)
+                ));
             }
 
-            private final List<Pair<Supplier<Consumer<BiConsumer<ResourceLocation, LootTable.Builder>>>, LootContextParamSet>> tables = ImmutableList.of(
-                    Pair.of(BlockTables::new, LootContextParamSets.BLOCK)
-                    //Pair.of(FishingLootTables::new, LootParameterSets.FISHING),
-                    //Pair.of(ChestLootTables::new, LootParameterSets.CHEST),
-                    //Pair.of(EntityLootTables::new, LootParameterSets.ENTITY),
-                    //Pair.of(GiftLootTables::new, LootParameterSets.GIFT)
-            );
-
-            @Override
-            protected List<Pair<Supplier<Consumer<BiConsumer<ResourceLocation, LootTable.Builder>>>, LootContextParamSet>> getTables()
+            public static class BlockTables extends BlockLootSubProvider
             {
-                return tables;
-            }
+                protected BlockTables()
+                {
+                    super(Set.of(), FeatureFlags.REGISTRY.allFlags());
+                }
 
-            @Override
-            protected void validate(Map<ResourceLocation, LootTable> map, ValidationContext validationtracker)
-            {
-                map.forEach((p_218436_2_, p_218436_3_) -> {
-                    LootTables.validate(validationtracker, p_218436_2_, p_218436_3_);
-                });
-            }
-
-            public static class BlockTables extends BlockLoot
-            {
                 @Override
-                protected void addTables()
+                protected void generate()
                 {
                     this.dropSelf(GENERATOR.get());
                     this.dropSelf(DRIVER.get());
@@ -313,15 +303,18 @@ public class EnderRiftMod
             }
         }
 
-        private static class BlockTagGens extends BlockTagsProvider implements DataProvider
+        private static class BlockTagGens extends IntrinsicHolderTagsProvider<Block>
         {
             public BlockTagGens(DataGenerator gen, ExistingFileHelper existingFileHelper)
             {
-                super(gen, MODID, existingFileHelper);
+                super(gen.getPackOutput(), Registries.BLOCK,
+                        CompletableFuture.supplyAsync(VanillaRegistries::createLookup, Util.backgroundExecutor()),
+                        (p_255627_) -> p_255627_.builtInRegistryHolder().key(),
+                        EnderRiftMod.MODID, existingFileHelper);
             }
 
             @Override
-            protected void addTags()
+            protected void addTags(HolderLookup.Provider p_255662_)
             {
                 tag(BlockTags.MINEABLE_WITH_PICKAXE)
                         .add(BROWSER.get())
@@ -334,20 +327,6 @@ public class EnderRiftMod
                         .add(STRUCTURE_CORNER.get())
                         .add(STRUCTURE_EDGE.get());
             }
-        }
-    }
-
-    public static class BlockItemNC extends BlockItem
-    {
-        public BlockItemNC(Block pBlock, Properties pProperties)
-        {
-            super(pBlock, pProperties);
-        }
-
-        @Override
-        public void fillItemCategory(CreativeModeTab pGroup, NonNullList<ItemStack> pItems)
-        {
-            // do nothing
         }
     }
 }

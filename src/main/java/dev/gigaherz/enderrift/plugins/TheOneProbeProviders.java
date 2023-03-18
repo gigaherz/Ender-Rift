@@ -1,5 +1,5 @@
 package dev.gigaherz.enderrift.plugins;
-
+/*
 import dev.gigaherz.enderrift.EnderRiftMod;
 import dev.gigaherz.enderrift.automation.driver.DriverBlockEntity;
 import dev.gigaherz.enderrift.generator.GeneratorBlockEntity;
@@ -168,3 +168,4 @@ public class TheOneProbeProviders implements Function<ITheOneProbe, Void>
         }
     }
 }
+*/
