@@ -97,7 +97,7 @@ public class CraftingBrowserContainer extends AbstractBrowserContainer
                 if (recipe.isSpecial() || !world.getGameRules().getBoolean(GameRules.RULE_LIMITED_CRAFTING) || entityplayermp.getRecipeBook().contains(recipe))
                 {
                     craftingResult.setRecipeUsed(recipe);
-                    return recipe.assemble(inventoryCrafting);
+                    return recipe.assemble(inventoryCrafting, world.registryAccess());
                 }
                 return null;
             });
@@ -184,16 +184,17 @@ public class CraftingBrowserContainer extends AbstractBrowserContainer
     {
         boolean isRemote = tile == null ? true : tile.getLevel().isClientSide;
 
-        if (!this.world.isClientSide)
+        if (!isRemote)
         {
+            boolean anyChanged = false;
             IItemHandler parent = tile.getCombinedInventory();
 
             for (int i = 0; i < 9; ++i)
             {
                 ItemStack itemstack = this.craftMatrix.removeItemNoUpdate(i);
-
-                if (!isRemote && itemstack.getCount() > 0)
+                if (itemstack.getCount() > 0)
                 {
+                    anyChanged = true;
                     ItemStack remaining = itemstack;
                     if (parent != null && !toPlayer)
                     {
@@ -212,6 +213,12 @@ public class CraftingBrowserContainer extends AbstractBrowserContainer
                         tile.setChanged();
                     }
                 }
+            }
+
+            if(anyChanged)
+            {
+                slotsChanged(this.craftMatrix);
+                this.broadcastChanges();
             }
         }
 

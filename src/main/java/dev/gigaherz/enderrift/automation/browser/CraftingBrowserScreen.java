@@ -36,75 +36,17 @@ public class CraftingBrowserScreen extends AbstractBrowserScreen<CraftingBrowser
     {
         super.init();
 
-        addRenderableWidget(new GuiButtonFlexible(leftPos + 85, topPos + 75, 9, 9, Component.literal("▴"), (btn) -> {
+        addRenderableWidget(Button.builder(Component.literal("▴"), (btn) -> {
             clearCraftingGrid(false);
-        }));
+        }).pos(leftPos + 85, topPos + 75).size(9, 9).build());
 
-        addRenderableWidget(new GuiButtonFlexible(leftPos + 85, topPos + 75 + 45, 9, 9, Component.literal("▾"), (btn) -> {
+        addRenderableWidget(Button.builder(Component.literal("▾"), (btn) -> {
             clearCraftingGrid(true);
-        }));
+        }).pos(leftPos + 85, topPos + 75 + 45).size(9, 9).build());
     }
 
     private void clearCraftingGrid(boolean toPlayer)
     {
         getMenu().clearCraftingGrid(inventory.player, toPlayer);
-    }
-
-    private static class GuiButtonFlexible extends Button
-    {
-        public GuiButtonFlexible(int x, int y, int widthIn, int heightIn, Component buttonText, OnPress callback)
-        {
-            super(x, y, widthIn, heightIn, buttonText, callback, DEFAULT_NARRATION);
-        }
-
-        @Override
-        public void renderButton(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks)
-        {
-            Minecraft minecraft = Minecraft.getInstance();
-            Font fontrenderer = minecraft.font;
-
-            RenderSystem.setShader(GameRenderer::getPositionTexShader);
-            RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-            RenderSystem.setShaderTexture(0, WIDGETS_LOCATION);
-
-            isHovered = mouseX >= getX() && mouseY >= getY() && mouseX < getX() + width && mouseY < getY() + height;
-
-            int i = getYImage(isHovered);
-
-            RenderSystem.enableBlend();
-            RenderSystem.blendFuncSeparate(770, 771, 1, 0);
-            RenderSystem.blendFunc(770, 771);
-
-            int halfwidth1 = this.width / 2;
-            int halfwidth2 = this.width - halfwidth1;
-            int halfheight1 = this.height / 2;
-            int halfheight2 = this.height - halfheight1;
-            blit(matrixStack, getX(), getY(), 0,
-                    46 + i * 20, halfwidth1, halfheight1);
-            blit(matrixStack, getX() + halfwidth1, getY(), 200 - halfwidth2,
-                    46 + i * 20, halfwidth2, halfheight1);
-
-            blit(matrixStack, getX(), getY() + halfheight1,
-                    0, 46 + i * 20 + 20 - halfheight2, halfwidth1, halfheight2);
-            blit(matrixStack, getX() + halfwidth1, getY() + halfheight1,
-                    200 - halfwidth2, 46 + i * 20 + 20 - halfheight2, halfwidth2, halfheight2);
-
-            int textColor = 14737632;
-
-            if (packedFGColor != 0)
-            {
-                textColor = packedFGColor;
-            }
-            else if (!this.visible)
-            {
-                textColor = 10526880;
-            }
-            else if (this.isHovered)
-            {
-                textColor = 16777120;
-            }
-
-            this.drawCenteredString(matrixStack, fontrenderer, getMessage(), getX() + halfwidth2, getY() + (this.height - 8) / 2, textColor);
-        }
     }
 }

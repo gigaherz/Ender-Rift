@@ -1,5 +1,6 @@
 package dev.gigaherz.enderrift.automation.browser;
 
+import com.google.common.base.Suppliers;
 import com.google.common.collect.Lists;
 import dev.gigaherz.enderrift.EnderRiftMod;
 import dev.gigaherz.enderrift.automation.AutomationHelper;
@@ -28,6 +29,7 @@ import javax.annotation.Nullable;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Supplier;
 
 public class AbstractBrowserContainer extends AbstractContainerMenu
 {
@@ -158,6 +160,30 @@ public class AbstractBrowserContainer extends AbstractContainerMenu
     @Override
     public void broadcastChanges()
     {
+        /* super stuff */
+
+        for(int i = 0; i < this.slots.size(); ++i) {
+            var slot = this.slots.get(i);
+            if (slot instanceof SlotFake) continue; // exclude fake slots, we sync them below
+            ItemStack itemstack = slot.getItem();
+            Supplier<ItemStack> supplier = Suppliers.memoize(itemstack::copy);
+            this.triggerSlotListeners(i, itemstack, supplier);
+            this.synchronizeSlotToRemote(i, itemstack, supplier);
+        }
+
+        this.synchronizeCarriedToRemote();
+
+        for(int j = 0; j < this.dataSlots.size(); ++j) {
+            DataSlot dataslot = this.dataSlots.get(j);
+            int k = dataslot.get();
+            if (dataslot.checkAndClearUpdateFlag()) {
+                this.updateDataSlotListeners(j, k);
+            }
+
+            this.synchronizeDataSlotToRemote(j, k);
+        }
+
+        /* end super stuff */
 
         if (isClient())
             return;
@@ -217,7 +243,7 @@ public class AbstractBrowserContainer extends AbstractContainerMenu
         {
             if (newLength != oldLength || indicesChanged.size() > 0)
             {
-                EnderRiftMod.CHANNEL.sendTo(new SendSlotChanges(containerId, newLength, indicesChanged, stacksChanged), crafter.connection.getConnection(), NetworkDirection.PLAY_TO_CLIENT);
+                EnderRiftMod.CHANNEL.sendTo(new SendSlotChanges(containerId, newLength, indicesChanged, stacksChanged), crafter.connection.connection, NetworkDirection.PLAY_TO_CLIENT);
             }
 
             ItemStack newStack = getCarried();

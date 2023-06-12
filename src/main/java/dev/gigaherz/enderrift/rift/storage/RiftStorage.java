@@ -29,7 +29,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
-@Mod.EventBusSubscriber(modid= EnderRiftMod.MODID, bus= Mod.EventBusSubscriber.Bus.MOD)
+@Mod.EventBusSubscriber(modid= EnderRiftMod.MODID, bus= Mod.EventBusSubscriber.Bus.FORGE)
 public class RiftStorage implements FilenameFilter
 {
     @SubscribeEvent

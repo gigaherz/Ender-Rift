@@ -9,17 +9,6 @@ import org.apache.commons.lang3.tuple.Pair;
 @Mod.EventBusSubscriber(modid = EnderRiftMod.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class ConfigValues
 {
-
-    public static float PowerPerInsertionConstant;
-    public static float PowerPerInsertionLinear;
-    public static float PowerPerInsertionGeometric;
-    public static float PowerPerInsertionCap;
-
-    public static float PowerPerExtractionConstant;
-    public static float PowerPerExtractionLinear;
-    public static float PowerPerExtractionGeometric;
-    public static float PowerPerExtractionCap;
-
     public static final ServerConfig SERVER;
     public static final ForgeConfigSpec SERVER_SPEC;
 
@@ -57,6 +46,16 @@ public class ConfigValues
             builder.pop();
         }
     }
+
+    public static float PowerPerInsertionConstant;
+    public static float PowerPerInsertionLinear;
+    public static float PowerPerInsertionGeometric;
+    public static float PowerPerInsertionCap;
+
+    public static float PowerPerExtractionConstant;
+    public static float PowerPerExtractionLinear;
+    public static float PowerPerExtractionGeometric;
+    public static float PowerPerExtractionCap;
 
     @SubscribeEvent
     public static void modConfig(ModConfigEvent event)

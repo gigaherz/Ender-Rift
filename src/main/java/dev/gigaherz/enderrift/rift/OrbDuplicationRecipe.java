@@ -2,6 +2,7 @@ package dev.gigaherz.enderrift.rift;
 
 import dev.gigaherz.enderrift.EnderRiftMod;
 import net.minecraft.core.NonNullList;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.CraftingContainer;
@@ -93,7 +94,7 @@ public class OrbDuplicationRecipe extends CustomRecipe implements IShapedRecipe<
     }
 
     @Override
-    public ItemStack assemble(CraftingContainer crafting)
+    public ItemStack assemble(CraftingContainer crafting, RegistryAccess registryAccess)
     {
         ItemStack stack = crafting.getItem(4).copy();
         stack.setCount(2);
@@ -107,7 +108,7 @@ public class OrbDuplicationRecipe extends CustomRecipe implements IShapedRecipe<
     }
 
     @Override
-    public ItemStack getResultItem()
+    public ItemStack getResultItem(RegistryAccess registryAccess)
     {
         return output;
     }

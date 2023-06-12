@@ -5,7 +5,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.+', changing: true
+        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.1.+', changing: true
         classpath 'org.parchmentmc:librarian:1.+'
     }
 }
@@ -16,8 +16,7 @@ plugins {
 
 apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'org.parchmentmc.librarian.forgegradle'
-
-//apply from: 'https://raw.githubusercontent.com/SizableShrimp/ForgeUpdatesRemapper/main/remapper.gradle'
+apply plugin: 'maven-publish'
 
 repositories {
     maven {
@@ -65,8 +64,8 @@ sourceSets {
 }
 
 minecraft {
-    mappings channel: 'official', version: '1.19.3'
-    //mappings channel: 'parchment', version: '2022.05.02-1.18.2'
+    //mappings channel: 'official', version: '1.19.4'
+    mappings channel: 'parchment', version: '1.19.3-2023.03.12-1.19.4'
 
     accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
 
@@ -125,7 +124,7 @@ configurations {
 }
 
 dependencies {
-    minecraft 'net.minecraftforge:forge:1.19.3-44.0.6'
+    minecraft 'net.minecraftforge:forge:1.19.4-45.0.9'
 
     compileOnly 'org.jetbrains:annotations:20.1.0'
 

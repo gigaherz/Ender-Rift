@@ -122,7 +122,7 @@ public abstract class AbstractBrowserScreen<T extends AbstractBrowserContainer> 
         searchField.setVisible(true);
         searchField.setTextColor(16777215);
         searchField.setCanLoseFocus(false);
-        searchField.setFocus(true);
+        searchField.setFocused(true);
         searchField.setValue(getMenu().filterText);
         searchField.setResponder(this::updateSearchFilter);
 
@@ -215,8 +215,6 @@ public abstract class AbstractBrowserScreen<T extends AbstractBrowserContainer> 
 
     private void drawSlotText(PoseStack matrixStack, Slot slotIn)
     {
-        setBlitOffset(100);
-
         int xPosition = slotIn.x;
         int yPosition = slotIn.y;
         ItemStack stack = slotIn.getItem();
@@ -235,8 +233,6 @@ public abstract class AbstractBrowserScreen<T extends AbstractBrowserContainer> 
                 //RenderSystem.enableDepthTest();
             }
         }
-
-        setBlitOffset(0);
     }
 
     private String getSizeString(int count)
