@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import dev.gigaherz.enderrift.EnderRiftMod;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.resources.language.I18n;
@@ -34,48 +35,48 @@ public class GeneratorScreen extends AbstractContainerScreen<GeneratorContainer>
     }
 
     @Override
-    public void render(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks)
+    public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks)
     {
-        this.renderBackground(matrixStack);
-        super.render(matrixStack, mouseX, mouseY, partialTicks);
-        this.renderTooltip(matrixStack, mouseX, mouseY);
+        this.renderBackground(graphics);
+        super.render(graphics, mouseX, mouseY, partialTicks);
+        this.renderTooltip(graphics, mouseX, mouseY);
     }
 
     @Override
-    protected void renderLabels(PoseStack matrixStack, int mouseX, int mouseY)
+    protected void renderLabels(GuiGraphics graphics, int mouseX, int mouseY)
     {
-        super.renderLabels(matrixStack, mouseX, mouseY);
+        super.renderLabels(graphics, mouseX, mouseY);
 
         String label;
         int generationPower = GeneratorBlockEntity.calculateGenerationPower(clientFields.heatLevel);
         if (generationPower > 0)
         {
             label = I18n.get("text.enderrift.generator.status.generating.label");
-            font.draw(matrixStack, label, 8, 22, 0x404040);
-            font.draw(matrixStack, String.format("%d RF/t", generationPower), 12, 32, 0x404040);
+            graphics.drawString(font, label, 8, 22, 0x404040);
+            graphics.drawString(font, String.format("%d RF/t", generationPower), 12, 32, 0x404040);
         }
         else if (clientFields.burnTimeRemaining > 0)
         {
             label = I18n.get("text.enderrift.generator.status.heating");
-            font.draw(matrixStack, label, 8, 22, 0x404040);
+            graphics.drawString(font, label, 8, 22, 0x404040);
         }
         else
         {
             label = I18n.get("text.enderrift.generator.status.idle");
-            font.draw(matrixStack, label, 8, 22, 0x404040);
+            graphics.drawString(font, label, 8, 22, 0x404040);
         }
 
         label = I18n.get("text.enderrift.generator.heat.label");
-        font.draw(matrixStack, label, 8, 46, 0x404040);
-        font.draw(matrixStack, String.format("%d C", clientFields.heatLevel), 12, 56, getHeatColor());
+        graphics.drawString(font, label, 8, 46, 0x404040);
+        graphics.drawString(font, String.format("%d C", clientFields.heatLevel), 12, 56, getHeatColor());
 
         String str = String.format("%d RF", clientFields.energy);
-        font.draw(matrixStack, str, imageWidth - 8 - font.width(str), 64, 0x404040);
+        graphics.drawString(font, str, imageWidth - 8 - font.width(str), 64, 0x404040);
 
-        drawBarTooltip(matrixStack, mouseX, mouseY, imageWidth - 14 - 8, 20);
+        drawBarTooltip(graphics, mouseX, mouseY, imageWidth - 14 - 8, 20);
     }
 
-    private void drawBarTooltip(PoseStack matrixStack, int mx, int my, int ox, int oy)
+    private void drawBarTooltip(GuiGraphics graphics, int mx, int my, int ox, int oy)
     {
         int rx = mx - ox - leftPos;
         int ry = my - oy - topPos;
@@ -88,28 +89,28 @@ public class GeneratorScreen extends AbstractContainerScreen<GeneratorContainer>
         tooltip.add(Component.literal(String.format("%d / %d RF", clientFields.energy, GeneratorBlockEntity.POWER_LIMIT)));
 
         // renderTooltip
-        renderComponentTooltip(matrixStack, tooltip, mx - leftPos, my - topPos);
+        graphics.renderComponentTooltip(font, tooltip, mx - leftPos, my - topPos);
     }
 
     @Override
-    protected void renderBg(PoseStack matrixStack, float partialTicks, int mouseX, int mouseY)
+    protected void renderBg(GuiGraphics graphics, float partialTicks, int mouseX, int mouseY)
     {
         RenderSystem.setShader(GameRenderer::getPositionTexShader);
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
         RenderSystem.setShaderTexture(0, guiTextureLocation);
 
-        blit(matrixStack, leftPos, topPos, 0, 0, imageWidth, imageHeight);
+        graphics.blit(guiTextureLocation, leftPos, topPos, 0, 0, imageWidth, imageHeight);
 
         if (clientFields.burnTimeRemaining > 0)
         {
             int k = getBurnLeftScaled(13);
-            blit(matrixStack, leftPos + 80, topPos + 36 + 12 - k, 176, 12 - k, 14, k + 1);
+            graphics.blit(guiTextureLocation, leftPos + 80, topPos + 36 + 12 - k, 176, 12 - k, 14, k + 1);
         }
 
-        drawEnergyBar(matrixStack, leftPos + imageWidth - 14 - 8, topPos + 20, clientFields.energy, GeneratorBlockEntity.POWER_LIMIT);
+        drawEnergyBar(graphics, leftPos + imageWidth - 14 - 8, topPos + 20, clientFields.energy, GeneratorBlockEntity.POWER_LIMIT);
     }
 
-    private void drawEnergyBar(PoseStack matrixStack, int x, int y, int powerLevel, int powerLimit)
+    private void drawEnergyBar(GuiGraphics graphics, int x, int y, int powerLevel, int powerLimit)
     {
         RenderSystem.setShader(GameRenderer::getPositionTexShader);
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
@@ -118,8 +119,8 @@ public class GeneratorScreen extends AbstractContainerScreen<GeneratorContainer>
         int bar2height = 1 + powerLevel * (barHeight - 2) / powerLimit;
         int bar1height = barHeight - bar2height;
 
-        blit(matrixStack, x, y, bar1x, 0, barWidth, bar1height, 32, 64);
-        blit(matrixStack, x, y + bar1height, bar2x, bar1height, barWidth, bar2height, 32, 64);
+        graphics.blit(energyTextureLocation, x, y, bar1x, 0, barWidth, bar1height, 32, 64);
+        graphics.blit(energyTextureLocation, x, y + bar1height, bar2x, bar1height, barWidth, bar2height, 32, 64);
     }
 
     private int getHeatColor()

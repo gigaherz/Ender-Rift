@@ -3,6 +3,7 @@ package dev.gigaherz.enderrift.automation.iface;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import dev.gigaherz.enderrift.EnderRiftMod;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.resources.language.I18n;
@@ -23,27 +24,25 @@ public class InterfaceScreen extends AbstractContainerScreen<InterfaceContainer>
     }
 
     @Override
-    public void render(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks)
+    public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks)
     {
-        this.renderBackground(matrixStack);
-        super.render(matrixStack, mouseX, mouseY, partialTicks);
-        this.renderTooltip(matrixStack, mouseX, mouseY);
+        this.renderBackground(graphics);
+        super.render(graphics, mouseX, mouseY, partialTicks);
+        this.renderTooltip(graphics, mouseX, mouseY);
     }
 
     @Override
-    protected void renderLabels(PoseStack matrixStack, int mouseX, int mouseY)
+    protected void renderLabels(GuiGraphics graphics, int mouseX, int mouseY)
     {
-        super.renderLabels(matrixStack, mouseX, mouseY);
-        font.draw(matrixStack, I18n.get(textFilters), 8, 20, 0x404040);
+        super.renderLabels(graphics, mouseX, mouseY);
+        graphics.drawString(font, I18n.get(textFilters), 8, 20, 0x404040, false);
     }
 
     @Override
-    protected void renderBg(PoseStack matrixStack, float partialTicks, int mouseX, int mouseY)
+    protected void renderBg(GuiGraphics graphics, float partialTicks, int mouseX, int mouseY)
     {
-        RenderSystem.setShader(GameRenderer::getPositionTexShader);
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-        RenderSystem.setShaderTexture(0, guiTextureLocation);
 
-        blit(matrixStack, leftPos, topPos, 0, 0, imageWidth, imageHeight);
+        graphics.blit(guiTextureLocation, leftPos, topPos, 0, 0, imageWidth, imageHeight);
     }
 }

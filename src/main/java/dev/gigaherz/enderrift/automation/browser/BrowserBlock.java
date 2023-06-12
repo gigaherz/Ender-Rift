@@ -121,7 +121,7 @@ public class BrowserBlock extends AggregatorBlock<BrowserBlockEntity>
         if (!(tileEntity instanceof BrowserBlockEntity) || player.isShiftKeyDown())
             return InteractionResult.FAIL;
 
-        if (player.level.isClientSide)
+        if (player.level().isClientSide)
             return InteractionResult.SUCCESS;
 
         if (crafting)

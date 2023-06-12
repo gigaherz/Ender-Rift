@@ -100,7 +100,7 @@ public class AbstractBrowserContainer extends AbstractContainerMenu
         super(type, id);
 
         this.player = playerInventory.player;
-        boolean isClient = player.level.isClientSide;
+        boolean isClient = player.level().isClientSide;
 
         if (isClient)
         {
@@ -542,8 +542,7 @@ public class AbstractBrowserContainer extends AbstractContainerMenu
                 ItemStack stackInSlot = slot.getItem();
 
                 if (stackInSlot.getCount() < stackInSlot.getMaxStackSize()
-                        && ItemStack.isSame(stackInSlot, stack)
-                        && ItemStack.tagMatches(stack, stackInSlot))
+                        && ItemStack.isSameItemSameTags(stackInSlot, stack))
                 {
                     int j = stackInSlot.getCount() + stack.getCount();
 
@@ -702,7 +701,7 @@ public class AbstractBrowserContainer extends AbstractContainerMenu
 
                 for (ItemStack cachedStack : slotsSeen)
                 {
-                    if (ItemStack.isSame(cachedStack, invStack) && ItemStack.tagMatches(cachedStack, invStack))
+                    if (ItemStack.isSameItemSameTags(cachedStack, invStack))
                     {
                         cachedStack.grow(invStack.getCount());
                         found = true;
@@ -806,7 +805,7 @@ public class AbstractBrowserContainer extends AbstractContainerMenu
                     Item item = invStack.getItem();
                     itemData.add(stack.getHoverName());
                     itemData.add(Component.literal(ForgeRegistries.ITEMS.getKey(item).toString()));
-                    item.appendHoverText(stack, player.level, itemData, TooltipFlag.Default.NORMAL);
+                    item.appendHoverText(stack, player.level(), itemData, TooltipFlag.Default.NORMAL);
                     matchesSearch = false;
                     for (Component s : itemData)
                     {

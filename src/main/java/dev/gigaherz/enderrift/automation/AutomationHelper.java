@@ -64,7 +64,7 @@ public abstract class AutomationHelper
             if (slot.getCount() > 0)
             {
                 int requested = Math.min(wanted, slot.getCount());
-                if (requested > 0 && ItemStack.isSame(slot, stack) && ItemStack.tagMatches(slot, stack))
+                if (requested > 0 && ItemStack.isSameItemSameTags(slot, stack))
                 {
                     ItemStack obtained = parent.extractItem(i, requested, simulate);
 

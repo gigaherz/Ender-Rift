@@ -8,10 +8,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.inventory.CraftingContainer;
-import net.minecraft.world.inventory.ResultContainer;
-import net.minecraft.world.inventory.ResultSlot;
-import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.inventory.*;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.CraftingRecipe;
 import net.minecraft.world.item.crafting.RecipeType;
@@ -33,7 +30,7 @@ public class CraftingBrowserContainer extends AbstractBrowserContainer
     private final static int CRAFTER_HEIGHT = 58;
     private final static int CRAFTING_OFFSET = 59;
 
-    public CraftingContainer craftMatrix = new CraftingContainer(this, 3, 3);
+    public CraftingContainer craftMatrix = new TransientCraftingContainer(this, 3, 3);
     public ResultContainer craftResult = new ResultContainer();
 
     private final Level world;
@@ -50,7 +47,7 @@ public class CraftingBrowserContainer extends AbstractBrowserContainer
     {
         super(EnderRiftMod.CRAFTING_BROWSER_MENU.get(), id, te, playerInventory);
 
-        this.world = playerInventory.player.level;
+        this.world = playerInventory.player.level();
         this.player = playerInventory.player;
 
         bindCraftingGrid(player.getInventory(), CRAFTING_OFFSET);

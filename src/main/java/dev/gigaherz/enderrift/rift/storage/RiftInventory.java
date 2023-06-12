@@ -173,7 +173,7 @@ public class RiftInventory implements IItemHandler
     {
         RiftSlot slot = slots.get(index);
         ItemStack sample = slot.getSample();
-        if (ItemStack.isSame(sample, stack) && ItemStack.tagMatches(sample, stack))
+        if (ItemStack.isSameItemSameTags(sample, stack))
         {
             slot.addCount(stack.getCount());
             return true;
@@ -226,7 +226,7 @@ public class RiftInventory implements IItemHandler
     @Override
     public boolean isItemValid(int slot, @NotNull ItemStack stack)
     {
-        return !ItemStack.isSame(ItemStack.EMPTY, stack);
+        return !ItemStack.isSameItem(ItemStack.EMPTY, stack);
     }
 
     public void clear()

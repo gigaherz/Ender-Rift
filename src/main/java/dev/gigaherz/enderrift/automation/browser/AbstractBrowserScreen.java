@@ -5,6 +5,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import dev.gigaherz.enderrift.EnderRiftMod;
 import joptsimple.internal.Strings;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
@@ -39,20 +40,20 @@ public abstract class AbstractBrowserScreen<T extends AbstractBrowserContainer> 
     }
 
     @Override
-    public void render(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks)
+    public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks)
     {
-        this.renderBackground(matrixStack);
-        super.render(matrixStack, mouseX, mouseY, partialTicks);
+        this.renderBackground(graphics);
+        super.render(graphics, mouseX, mouseY, partialTicks);
 
         //Lighting.turnBackOn();
-        drawCustomSlotTexts(matrixStack);
+        drawCustomSlotTexts(graphics);
         //Lighting.turnOff();
 
-        this.renderLowPowerOverlay(matrixStack, mouseX, mouseY);
-        this.renderTooltip(matrixStack, mouseX, mouseY);
+        this.renderLowPowerOverlay(graphics, mouseX, mouseY);
+        this.renderTooltip(graphics, mouseX, mouseY);
     }
 
-    private void renderLowPowerOverlay(PoseStack matrixStack, int mouseX, int mouseY)
+    private void renderLowPowerOverlay(GuiGraphics graphics, int mouseX, int mouseY)
     {
         if (getMenu().isLowOnPower())
         {
@@ -62,11 +63,11 @@ public abstract class AbstractBrowserScreen<T extends AbstractBrowserContainer> 
             int h = 54;
             RenderSystem.disableDepthTest();
             RenderSystem.setShaderColor(1, 1, 1, 1);
-            fill(matrixStack, l, t, l + w, t + h, 0x7f000000);
+            graphics.fill(l, t, l + w, t + h, 0x7f000000);
             long tm = Minecraft.getInstance().level.getGameTime() % 30;
             if (tm < 15)
             {
-                drawCenteredString(matrixStack, font, "NO POWER", l + w / 2, t + h / 2 - font.lineHeight / 2, 0xFFFFFF);
+                graphics.drawCenteredString(font, "NO POWER", l + w / 2, t + h / 2 - font.lineHeight / 2, 0xFFFFFF);
             }
             RenderSystem.enableDepthTest();
         }
@@ -181,39 +182,38 @@ public abstract class AbstractBrowserScreen<T extends AbstractBrowserContainer> 
     }
 
     @Override
-    protected void renderBg(PoseStack matrixStack, float partialTicks, int xMouse, int yMouse)
+    protected void renderBg(GuiGraphics graphics, float partialTicks, int xMouse, int yMouse)
     {
-        RenderSystem.setShader(GameRenderer::getPositionTexShader);
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-        RenderSystem.setShaderTexture(0, getBackgroundTexture());
 
-        blit(matrixStack, leftPos, topPos, 0, 0, imageWidth, imageHeight);
-        blit(matrixStack, leftPos - 27, topPos + 8, 194, 0, 27, 28);
+        graphics.blit(getBackgroundTexture(), leftPos, topPos, 0, 0, imageWidth, imageHeight);
+        graphics.blit(getBackgroundTexture(), leftPos - 27, topPos + 8, 194, 0, 27, 28);
 
         RenderSystem.setShaderTexture(0, TABS_TEXTURE);
 
         boolean isEnabled = needsScrollBar();
         if (isEnabled)
-            blit(matrixStack, leftPos + 174, topPos + 18 + scrollY, 232, 0, 12, 15);
+            graphics.blit(getBackgroundTexture(), leftPos + 174, topPos + 18 + scrollY, 232, 0, 12, 15);
         else
-            blit(matrixStack, leftPos + 174, topPos + 18, 244, 0, 12, 15);
+            graphics.blit(getBackgroundTexture(), leftPos + 174, topPos + 18, 244, 0, 12, 15);
 
-        searchField.render(matrixStack, xMouse, yMouse, partialTicks);
+        searchField.render(graphics, xMouse, yMouse, partialTicks);
     }
 
-    private void drawCustomSlotTexts(PoseStack matrixStack)
+    private void drawCustomSlotTexts(GuiGraphics graphics)
     {
-        matrixStack.pushPose();
-        matrixStack.translate(this.leftPos, this.topPos, 300);
+        var poseStack = graphics.pose();
+        poseStack.pushPose();
+        poseStack.translate(this.leftPos, this.topPos, 300);
         for (int i = 0; i < AbstractBrowserContainer.SCROLL_SLOTS; ++i)
         {
             Slot slot = getMenu().slots.get(i);
-            drawSlotText(matrixStack, slot);
+            drawSlotText(graphics, slot);
         }
-        matrixStack.popPose();
+        poseStack.popPose();
     }
 
-    private void drawSlotText(PoseStack matrixStack, Slot slotIn)
+    private void drawSlotText(GuiGraphics graphics, Slot slotIn)
     {
         int xPosition = slotIn.x;
         int yPosition = slotIn.y;
@@ -229,7 +229,7 @@ public abstract class AbstractBrowserScreen<T extends AbstractBrowserContainer> 
 
                 RenderSystem.enableDepthTest();
                 RenderSystem.disableBlend();
-                font.drawShadow(matrixStack, s, (float) (xPosition + 19 - 2 - font.width(s)), (float) (yPosition + 6 + 3), 16777215);
+                graphics.drawString(font, s, (float) (xPosition + 19 - 2 - font.width(s)), (float) (yPosition + 6 + 3), 16777215, true);
                 //RenderSystem.enableDepthTest();
             }
         }

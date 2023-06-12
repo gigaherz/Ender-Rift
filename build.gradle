@@ -65,7 +65,7 @@ sourceSets {
 
 minecraft {
     //mappings channel: 'official', version: '1.19.4'
-    mappings channel: 'parchment', version: '1.19.3-2023.03.12-1.19.4'
+    mappings channel: 'parchment', version: '1.19.3-2023.03.12-1.20'
 
     accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
 
@@ -124,7 +124,7 @@ configurations {
 }
 
 dependencies {
-    minecraft 'net.minecraftforge:forge:1.19.4-45.0.9'
+    minecraft 'net.minecraftforge:forge:1.20-46.0.12'
 
     compileOnly 'org.jetbrains:annotations:20.1.0'
 

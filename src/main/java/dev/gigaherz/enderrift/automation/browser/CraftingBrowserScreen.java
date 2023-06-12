@@ -36,11 +36,11 @@ public class CraftingBrowserScreen extends AbstractBrowserScreen<CraftingBrowser
     {
         super.init();
 
-        addRenderableWidget(Button.builder(Component.literal("▴"), (btn) -> {
+        addRenderableWidget(Button.builder(Component.literal("\u25B4"), (btn) -> {
             clearCraftingGrid(false);
         }).pos(leftPos + 85, topPos + 75).size(9, 9).build());
 
-        addRenderableWidget(Button.builder(Component.literal("▾"), (btn) -> {
+        addRenderableWidget(Button.builder(Component.literal("\u25BE"), (btn) -> {
             clearCraftingGrid(true);
         }).pos(leftPos + 85, topPos + 75 + 45).size(9, 9).build());
     }
