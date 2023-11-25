@@ -11,11 +11,12 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.*;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.CraftingRecipe;
+import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.items.IItemHandler;
-import net.minecraftforge.items.ItemHandlerHelper;
+import net.neoforged.neoforge.items.IItemHandler;
+import net.neoforged.neoforge.items.ItemHandlerHelper;
 
 import javax.annotation.Nullable;
 import java.util.Optional;
@@ -88,13 +89,13 @@ public class CraftingBrowserContainer extends AbstractBrowserContainer
         if (!world.isClientSide)
         {
             ServerPlayer entityplayermp = (ServerPlayer) player;
-            Optional<CraftingRecipe> irecipe = this.world.getRecipeManager().getRecipeFor(RecipeType.CRAFTING, inventoryCrafting, world);
+            Optional<RecipeHolder<CraftingRecipe>> irecipe = this.world.getRecipeManager().getRecipeFor(RecipeType.CRAFTING, inventoryCrafting, world);
 
             Optional<ItemStack> stack = irecipe.map((recipe) -> {
-                if (recipe.isSpecial() || !world.getGameRules().getBoolean(GameRules.RULE_LIMITED_CRAFTING) || entityplayermp.getRecipeBook().contains(recipe))
+                if (recipe.value().isSpecial() || !world.getGameRules().getBoolean(GameRules.RULE_LIMITED_CRAFTING) || entityplayermp.getRecipeBook().contains(recipe))
                 {
                     craftingResult.setRecipeUsed(recipe);
-                    return recipe.assemble(inventoryCrafting, world.registryAccess());
+                    return recipe.value().assemble(inventoryCrafting, world.registryAccess());
                 }
                 return null;
             });

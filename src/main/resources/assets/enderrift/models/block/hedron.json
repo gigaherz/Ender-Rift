@@ -1,6 +1,6 @@
 {
   "parent": "block/block",
-  "loader": "forge:obj",
+  "loader": "neoforge:obj",
   "model": "enderrift:models/block/hedron.obj",
   "textures": {
     "all": "enderrift:block/structure_corner",

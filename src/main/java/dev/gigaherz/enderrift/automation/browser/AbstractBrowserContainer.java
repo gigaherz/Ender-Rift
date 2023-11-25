@@ -9,6 +9,7 @@ import dev.gigaherz.enderrift.network.SendSlotChanges;
 import dev.gigaherz.enderrift.network.SetVisibleSlots;
 import joptsimple.internal.Strings;
 import net.minecraft.core.NonNullList;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundContainerSetSlotPacket;
 import net.minecraft.server.level.ServerPlayer;
@@ -18,10 +19,9 @@ import net.minecraft.world.inventory.*;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
-import net.minecraftforge.items.IItemHandler;
-import net.minecraftforge.items.IItemHandlerModifiable;
-import net.minecraftforge.network.NetworkDirection;
-import net.minecraftforge.registries.ForgeRegistries;
+import net.neoforged.neoforge.items.IItemHandler;
+import net.neoforged.neoforge.items.IItemHandlerModifiable;
+import net.neoforged.neoforge.network.PlayNetworkDirection;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.annotation.Nonnull;
@@ -243,7 +243,7 @@ public class AbstractBrowserContainer extends AbstractContainerMenu
         {
             if (newLength != oldLength || indicesChanged.size() > 0)
             {
-                EnderRiftMod.CHANNEL.sendTo(new SendSlotChanges(containerId, newLength, indicesChanged, stacksChanged), crafter.connection.connection, NetworkDirection.PLAY_TO_CLIENT);
+                EnderRiftMod.CHANNEL.sendTo(new SendSlotChanges(containerId, newLength, indicesChanged, stacksChanged), crafter.connection.connection, PlayNetworkDirection.PLAY_TO_CLIENT);
             }
 
             ItemStack newStack = getCarried();
@@ -804,7 +804,7 @@ public class AbstractBrowserContainer extends AbstractContainerMenu
                     itemData.clear();
                     Item item = invStack.getItem();
                     itemData.add(stack.getHoverName());
-                    itemData.add(Component.literal(ForgeRegistries.ITEMS.getKey(item).toString()));
+                    itemData.add(Component.literal(BuiltInRegistries.ITEM.getKey(item).toString()));
                     item.appendHoverText(stack, player.level(), itemData, TooltipFlag.Default.NORMAL);
                     matchesSearch = false;
                     for (Component s : itemData)

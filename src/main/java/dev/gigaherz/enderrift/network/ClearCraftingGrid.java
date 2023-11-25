@@ -3,7 +3,7 @@ package dev.gigaherz.enderrift.network;
 import dev.gigaherz.enderrift.automation.browser.CraftingBrowserContainer;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraftforge.network.NetworkEvent;
+import net.neoforged.neoforge.network.NetworkEvent;
 
 import java.util.function.Supplier;
 
@@ -30,11 +30,11 @@ public class ClearCraftingGrid
         buf.writeBoolean(toPlayer);
     }
 
-    public boolean handle(Supplier<NetworkEvent.Context> context)
+    public boolean handle(NetworkEvent.Context context)
     {
-        context.get().enqueueWork(() ->
+        context.enqueueWork(() ->
         {
-            final ServerPlayer player = context.get().getSender();
+            final ServerPlayer player = context.getSender();
 
             if (player.containerMenu instanceof CraftingBrowserContainer
                     && player.containerMenu.containerId == this.windowId)

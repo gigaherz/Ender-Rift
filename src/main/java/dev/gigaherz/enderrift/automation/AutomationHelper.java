@@ -2,9 +2,9 @@ package dev.gigaherz.enderrift.automation;
 
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.common.capabilities.ICapabilityProvider;
-import net.minecraftforge.items.IItemHandler;
+import net.neoforged.neoforge.common.capabilities.Capabilities;
+import net.neoforged.neoforge.common.capabilities.ICapabilityProvider;
+import net.neoforged.neoforge.items.IItemHandler;
 
 /**
  * Provides a basic implementation for automatable inventory.
@@ -18,7 +18,7 @@ public abstract class AutomationHelper
 
         ICapabilityProvider cap = (ICapabilityProvider) object;
 
-        return cap.getCapability(ForgeCapabilities.ENERGY, facing).isPresent();
+        return cap.getCapability(Capabilities.ENERGY, facing).isPresent();
     }
 
     public static boolean isAutomatable(Object object, Direction facing)
@@ -28,7 +28,7 @@ public abstract class AutomationHelper
 
         ICapabilityProvider cap = (ICapabilityProvider) object;
 
-        return cap.getCapability(ForgeCapabilities.ITEM_HANDLER, facing).isPresent();
+        return cap.getCapability(Capabilities.ITEM_HANDLER, facing).isPresent();
     }
 
     public static ItemStack insertItems(IItemHandler parent, ItemStack stack)

@@ -42,7 +42,7 @@ public abstract class AbstractBrowserScreen<T extends AbstractBrowserContainer> 
     @Override
     public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks)
     {
-        this.renderBackground(graphics);
+        this.renderBackground(graphics, mouseX, mouseY, partialTicks);
         super.render(graphics, mouseX, mouseY, partialTicks);
 
         //Lighting.turnBackOn();
@@ -263,9 +263,9 @@ public abstract class AbstractBrowserScreen<T extends AbstractBrowserContainer> 
     }
 
     @Override
-    public boolean mouseScrolled(double mouseX, double mouseY, double wheelDelta)
+    public boolean mouseScrolled(double mouseX, double mouseY, double something, double wheelDelta)
     {
-        if (super.mouseScrolled(mouseX, mouseY, wheelDelta))
+        if (super.mouseScrolled(mouseX, mouseY, something, wheelDelta))
             return true;
 
         scrollAcc += wheelDelta * 120;

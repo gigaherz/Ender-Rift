@@ -12,14 +12,15 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.common.ForgeHooks;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.energy.IEnergyStorage;
-import net.minecraftforge.items.IItemHandler;
-import net.minecraftforge.items.IItemHandlerModifiable;
-import net.minecraftforge.items.ItemStackHandler;
+import net.neoforged.neoforge.common.CommonHooks;
+import net.neoforged.neoforge.common.capabilities.Capabilities;
+import net.neoforged.neoforge.common.capabilities.Capability;
+import net.neoforged.neoforge.common.util.LazyOptional;
+import net.neoforged.neoforge.energy.IEnergyStorage;
+import net.neoforged.neoforge.event.EventHooks;
+import net.neoforged.neoforge.items.IItemHandler;
+import net.neoforged.neoforge.items.IItemHandlerModifiable;
+import net.neoforged.neoforge.items.ItemStackHandler;
 
 import javax.annotation.Nullable;
 
@@ -70,9 +71,9 @@ public class GeneratorBlockEntity extends BlockEntity
     @Override
     public <T> LazyOptional<T> getCapability(Capability<T> cap, @Nullable Direction side)
     {
-        if (cap == ForgeCapabilities.ENERGY)
+        if (cap == Capabilities.ENERGY)
             return energyBufferGetter.cast();
-        if (cap == ForgeCapabilities.ITEM_HANDLER)
+        if (cap == Capabilities.ITEM_HANDLER)
             return fuelSlotProvider.cast();
         return super.getCapability(cap, side);
     }
@@ -183,7 +184,7 @@ public class GeneratorBlockEntity extends BlockEntity
                     continue;
 
                 IEnergyStorage handler = null;
-                LazyOptional<IEnergyStorage> opt = e.getCapability(ForgeCapabilities.ENERGY, from);
+                LazyOptional<IEnergyStorage> opt = e.getCapability(Capabilities.ENERGY, from);
                 if (opt.isPresent())
                 {
                     handler = opt.orElse(null);
@@ -347,7 +348,7 @@ public class GeneratorBlockEntity extends BlockEntity
 
     public static int getBurnTime(ItemStack itemStack)
     {
-        return ForgeHooks.getBurnTime(itemStack, null);
+        return CommonHooks.getBurnTime(itemStack, null);
     }
 
     public static void tickStatic(Level level, BlockPos blockPos, BlockState blockState, GeneratorBlockEntity te)

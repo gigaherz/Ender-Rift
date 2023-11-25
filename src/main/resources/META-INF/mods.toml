@@ -1,5 +1,5 @@
 modLoader="javafml"
-loaderVersion="[46,)"
+loaderVersion="[1,)"
 license="BSD (3 clause)"
 issueTrackerURL="https://github.com/gigaherz/Ender-Rift/issues"
 
@@ -16,15 +16,15 @@ logoFile="logo.png"
 authors="gigaherz"
 
 [[dependencies.enderrift]]
-   modId="forge"
+   modId="neoforge"
    mandatory=true
-   versionRange="[46.0.12,)"
+   versionRange="[20.2.62-beta,)"
    ordering="NONE"
    side="BOTH"
 [[dependencies.enderrift]]
    modId="minecraft"
    mandatory=true
-   versionRange="[1.20,1.21)"
+   versionRange="[1.20.2,1.21)"
    ordering="NONE"
    side="BOTH"
 [[dependencies.enderrift]]

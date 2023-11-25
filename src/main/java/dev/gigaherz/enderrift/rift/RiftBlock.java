@@ -26,7 +26,7 @@ import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
+import net.neoforged.neoforge.common.capabilities.Capabilities;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -147,7 +147,7 @@ public class RiftBlock extends BaseEntityBlock
 
         int count = stack.getCount();
         ItemStack stackToPush = stack.split(count);
-        ItemStack remaining = AutomationHelper.insertItems(rift.getCapability(ForgeCapabilities.ITEM_HANDLER, null).orElseThrow(() -> new RuntimeException("WAT")), stackToPush);
+        ItemStack remaining = AutomationHelper.insertItems(rift.getCapability(Capabilities.ITEM_HANDLER, null).orElseThrow(() -> new RuntimeException("WAT")), stackToPush);
         stack.grow(remaining.getCount());
 
         if (stack.getCount() <= 0)
@@ -189,7 +189,7 @@ public class RiftBlock extends BaseEntityBlock
 
         int numberToExtract = playerIn.isShiftKeyDown() ? 1 : stack.getMaxStackSize();
 
-        ItemStack extracted = AutomationHelper.extractItems(rift.getCapability(ForgeCapabilities.ITEM_HANDLER, null).orElseThrow(() -> new RuntimeException("WAT")), stack.copy(), numberToExtract, false);
+        ItemStack extracted = AutomationHelper.extractItems(rift.getCapability(Capabilities.ITEM_HANDLER, null).orElseThrow(() -> new RuntimeException("WAT")), stack.copy(), numberToExtract, false);
         if (extracted.getCount() > 0)
         {
             popResource(worldIn, pos, extracted);
@@ -215,7 +215,7 @@ public class RiftBlock extends BaseEntityBlock
 
         ItemStack stack = item.getItem().copy();
 
-        ItemStack remaining = AutomationHelper.insertItems(rift.getCapability(ForgeCapabilities.ITEM_HANDLER, null).orElseThrow(() -> new RuntimeException("WAT")), stack);
+        ItemStack remaining = AutomationHelper.insertItems(rift.getCapability(Capabilities.ITEM_HANDLER, null).orElseThrow(() -> new RuntimeException("WAT")), stack);
 
         if (remaining.getCount() <= 0)
         {

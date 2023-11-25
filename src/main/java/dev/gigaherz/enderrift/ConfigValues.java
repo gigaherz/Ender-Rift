@@ -1,36 +1,36 @@
 package dev.gigaherz.enderrift;
 
-import net.minecraftforge.common.ForgeConfigSpec;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.event.config.ModConfigEvent;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.event.config.ModConfigEvent;
+import net.neoforged.neoforge.common.ModConfigSpec;
 import org.apache.commons.lang3.tuple.Pair;
 
 @Mod.EventBusSubscriber(modid = EnderRiftMod.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class ConfigValues
 {
     public static final ServerConfig SERVER;
-    public static final ForgeConfigSpec SERVER_SPEC;
+    public static final ModConfigSpec SERVER_SPEC;
 
     static
     {
-        final Pair<ServerConfig, ForgeConfigSpec> specPair = new ForgeConfigSpec.Builder().configure(ServerConfig::new);
+        final Pair<ServerConfig, ModConfigSpec> specPair = new ModConfigSpec.Builder().configure(ServerConfig::new);
         SERVER_SPEC = specPair.getRight();
         SERVER = specPair.getLeft();
     }
 
     public static class ServerConfig
     {
-        public ForgeConfigSpec.DoubleValue powerPerInsertionConstant;
-        public ForgeConfigSpec.DoubleValue powerPerInsertionLinear;
-        public ForgeConfigSpec.DoubleValue powerPerInsertionGeometric;
-        public ForgeConfigSpec.DoubleValue powerPerInsertionCap;
-        public ForgeConfigSpec.DoubleValue powerPerExtractionConstant;
-        public ForgeConfigSpec.DoubleValue powerPerExtractionLinear;
-        public ForgeConfigSpec.DoubleValue powerPerExtractionGeometric;
-        public ForgeConfigSpec.DoubleValue powerPerExtractionCap;
+        public ModConfigSpec.DoubleValue powerPerInsertionConstant;
+        public ModConfigSpec.DoubleValue powerPerInsertionLinear;
+        public ModConfigSpec.DoubleValue powerPerInsertionGeometric;
+        public ModConfigSpec.DoubleValue powerPerInsertionCap;
+        public ModConfigSpec.DoubleValue powerPerExtractionConstant;
+        public ModConfigSpec.DoubleValue powerPerExtractionLinear;
+        public ModConfigSpec.DoubleValue powerPerExtractionGeometric;
+        public ModConfigSpec.DoubleValue powerPerExtractionCap;
 
-        ServerConfig(ForgeConfigSpec.Builder builder)
+        ServerConfig(ModConfigSpec.Builder builder)
         {
             builder.push("PowerUsage");
 

@@ -1,6 +1,6 @@
 {
   "parent": "block/block",
-  "loader": "forge:obj",
+  "loader": "neoforge:obj",
   "model": "enderrift:models/block/driver_main.obj",
   "textures": {
     "all": "enderrift:block/driver_side",

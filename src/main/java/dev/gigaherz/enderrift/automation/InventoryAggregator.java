@@ -2,7 +2,7 @@ package dev.gigaherz.enderrift.automation;
 
 import com.google.common.collect.Lists;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.items.IItemHandler;
+import net.neoforged.neoforge.items.IItemHandler;
 
 import javax.annotation.Nonnull;
 import java.util.List;

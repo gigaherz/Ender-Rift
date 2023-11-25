@@ -37,7 +37,7 @@ public class GeneratorScreen extends AbstractContainerScreen<GeneratorContainer>
     @Override
     public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks)
     {
-        this.renderBackground(graphics);
+        this.renderBackground(graphics, mouseX, mouseY, partialTicks);
         super.render(graphics, mouseX, mouseY, partialTicks);
         this.renderTooltip(graphics, mouseX, mouseY);
     }
@@ -52,26 +52,26 @@ public class GeneratorScreen extends AbstractContainerScreen<GeneratorContainer>
         if (generationPower > 0)
         {
             label = I18n.get("text.enderrift.generator.status.generating.label");
-            graphics.drawString(font, label, 8, 22, 0x404040);
-            graphics.drawString(font, String.format("%d RF/t", generationPower), 12, 32, 0x404040);
+            graphics.drawString(font, label, 8, 22, 0x404040, false);
+            graphics.drawString(font, String.format("%d RF/t", generationPower), 12, 32, 0x404040, false);
         }
         else if (clientFields.burnTimeRemaining > 0)
         {
             label = I18n.get("text.enderrift.generator.status.heating");
-            graphics.drawString(font, label, 8, 22, 0x404040);
+            graphics.drawString(font, label, 8, 22, 0x404040, false);
         }
         else
         {
             label = I18n.get("text.enderrift.generator.status.idle");
-            graphics.drawString(font, label, 8, 22, 0x404040);
+            graphics.drawString(font, label, 8, 22, 0x404040, false);
         }
 
         label = I18n.get("text.enderrift.generator.heat.label");
-        graphics.drawString(font, label, 8, 46, 0x404040);
-        graphics.drawString(font, String.format("%d C", clientFields.heatLevel), 12, 56, getHeatColor());
+        graphics.drawString(font, label, 8, 46, 0x404040, false);
+        graphics.drawString(font, String.format("%d C", clientFields.heatLevel), 12, 56, getHeatColor(), false);
 
         String str = String.format("%d RF", clientFields.energy);
-        graphics.drawString(font, str, imageWidth - 8 - font.width(str), 64, 0x404040);
+        graphics.drawString(font, str, imageWidth - 8 - font.width(str), 64, 0x404040, false);
 
         drawBarTooltip(graphics, mouseX, mouseY, imageWidth - 14 - 8, 20);
     }

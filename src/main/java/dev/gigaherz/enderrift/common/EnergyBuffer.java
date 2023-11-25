@@ -1,6 +1,6 @@
 package dev.gigaherz.enderrift.common;
 
-import net.minecraftforge.energy.EnergyStorage;
+import net.neoforged.neoforge.energy.EnergyStorage;
 
 public class EnergyBuffer extends EnergyStorage
 {

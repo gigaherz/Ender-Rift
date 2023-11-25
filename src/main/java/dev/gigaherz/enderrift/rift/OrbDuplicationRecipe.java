@@ -14,7 +14,7 @@ import net.minecraft.world.item.crafting.CustomRecipe;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.common.crafting.IShapedRecipe;
+import net.neoforged.neoforge.common.crafting.IShapedRecipe;
 
 public class OrbDuplicationRecipe extends CustomRecipe implements IShapedRecipe<CraftingContainer>
 {
@@ -32,9 +32,9 @@ public class OrbDuplicationRecipe extends CustomRecipe implements IShapedRecipe<
     );
     private ItemStack output = new ItemStack(EnderRiftMod.RIFT_ORB.get(), 2);
 
-    public OrbDuplicationRecipe(ResourceLocation recipeId, CraftingBookCategory category)
+    public OrbDuplicationRecipe(CraftingBookCategory category)
     {
-        super(recipeId, category);
+        super(category);
     }
 
     @Override

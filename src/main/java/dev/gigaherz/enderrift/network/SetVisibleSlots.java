@@ -3,7 +3,7 @@ package dev.gigaherz.enderrift.network;
 import dev.gigaherz.enderrift.automation.browser.AbstractBrowserContainer;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraftforge.network.NetworkEvent;
+import net.neoforged.neoforge.network.NetworkEvent;
 
 import java.util.function.Supplier;
 
@@ -39,11 +39,11 @@ public class SetVisibleSlots
         }
     }
 
-    public boolean handle(Supplier<NetworkEvent.Context> context)
+    public boolean handle(NetworkEvent.Context context)
     {
-        final ServerPlayer player = context.get().getSender();
+        final ServerPlayer player = context.getSender();
 
-        context.get().enqueueWork(() ->
+        context.enqueueWork(() ->
         {
             if (player != null)
             {

@@ -1,7 +1,7 @@
 package dev.gigaherz.enderrift.automation;
 
 import com.google.common.collect.Lists;
-import net.minecraftforge.energy.IEnergyStorage;
+import net.neoforged.neoforge.energy.IEnergyStorage;
 
 import java.util.List;
 

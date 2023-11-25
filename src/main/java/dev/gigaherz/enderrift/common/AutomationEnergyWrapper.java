@@ -2,8 +2,8 @@ package dev.gigaherz.enderrift.common;
 
 import dev.gigaherz.enderrift.ConfigValues;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.energy.IEnergyStorage;
-import net.minecraftforge.items.IItemHandler;
+import net.neoforged.neoforge.energy.IEnergyStorage;
+import net.neoforged.neoforge.items.IItemHandler;
 
 import javax.annotation.Nonnull;
 import java.util.Optional;
