@@ -4,13 +4,11 @@ import dev.gigaherz.enderrift.rift.storage.RiftHolder;
 import dev.gigaherz.enderrift.rift.storage.RiftInventory;
 import dev.gigaherz.enderrift.rift.storage.RiftMigration;
 import dev.gigaherz.enderrift.rift.storage.RiftStorage;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.NbtIo;
-import net.minecraft.nbt.Tag;
+import net.minecraft.nbt.*;
 import net.minecraft.world.item.ItemStack;
 
 import java.io.File;
+import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.UUID;
 
@@ -27,8 +25,8 @@ public class RiftMigration_17_08_2022 extends RiftMigration
     @Override
     public void migrate(RiftStorage storage) throws Exception
     {
-        File oldStorage = new File(storage.getDataDirectory(), "../data/enderRiftStorageManager.dat");
-        CompoundTag tag = NbtIo.readCompressed(oldStorage);
+        var oldStorage = storage.getDataDirectory().resolve("../data/enderRiftStorageManager.dat");
+        CompoundTag tag = NbtIo.readCompressed(oldStorage, NbtAccounter.create(0x6400000L));
         CompoundTag data = tag.getCompound("data");
         ListTag rifts = data.getList("Rifts", Tag.TAG_COMPOUND);
         for (int index = 0; index < rifts.size(); index++)
@@ -60,6 +58,6 @@ public class RiftMigration_17_08_2022 extends RiftMigration
     @Override
     protected boolean isApplicable(RiftStorage storage)
     {
-        return new File(storage.getDataDirectory(), "../data/enderRiftStorageManager.dat").exists();
+        return Files.exists(storage.getDataDirectory().resolve("../data/enderRiftStorageManager.dat"));
     }
 }

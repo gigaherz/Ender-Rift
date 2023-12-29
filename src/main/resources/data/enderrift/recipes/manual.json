@@ -1,24 +1,17 @@
 {
-  "type": "neoforge:conditional",
-  "recipes": [
+  "neoforge:conditions" : [
     {
-      "conditions": [
-        {
-          "type": "neoforge:mod_loaded",
-          "modid": "gbook"
-        }
-      ],
-      "recipe": {
-        "type": "minecraft:crafting_shapeless",
-        "ingredients": [
-          { "item": "minecraft:book" },
-          { "item": "minecraft:ender_pearl" }
-        ],
-        "result": {
-          "item": "gbook:guidebook",
-          "nbt": "{Book:\"enderrift:xml/book.xml\"}"
-        }
-      }
+      "type": "neoforge:mod_loaded",
+      "modid": "gbook"
     }
-  ]
+  ],
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    { "item": "minecraft:book" },
+    { "item": "minecraft:ender_pearl" }
+  ],
+  "result": {
+    "item": "gbook:guidebook",
+    "nbt": "{Book:\"enderrift:xml/book.xml\"}"
+  }
 }

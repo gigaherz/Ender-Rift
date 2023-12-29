@@ -7,32 +7,32 @@ import net.minecraft.core.Direction;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.common.capabilities.Capabilities;
-import net.neoforged.neoforge.common.capabilities.Capability;
-import net.neoforged.neoforge.common.util.LazyOptional;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.neoforge.capabilities.Capabilities;
+import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.neoforged.neoforge.energy.IEnergyStorage;
 
-import javax.annotation.Nullable;
 import java.util.Optional;
 
+@Mod.EventBusSubscriber(modid = EnderRiftMod.MODID, bus= Mod.EventBusSubscriber.Bus.MOD)
 public class StructureCornerBlockEntity extends AggregatorBlockEntity
 {
-    private RiftBlockEntity energyParent;
+    @SubscribeEvent
+    private static void registerCapability(RegisterCapabilitiesEvent event)
+    {
+        event.registerBlockEntity(
+                Capabilities.EnergyStorage.BLOCK,
+                EnderRiftMod.STRUCTURE_CORNER_BLOCK_ENTITY.get(),
+                (be, context) -> be.getEnergyBuffer().orElse(null)
+        );
+    }
 
-    private final LazyOptional<IEnergyStorage> bufferProvider = LazyOptional.of(() -> getEnergyBuffer().orElse(null));
+    private RiftBlockEntity energyParent;
 
     public StructureCornerBlockEntity(BlockPos pos, BlockState state)
     {
         super(EnderRiftMod.STRUCTURE_CORNER_BLOCK_ENTITY.get(), pos, state);
-    }
-
-    @SuppressWarnings("unchecked")
-    @Override
-    public <T> LazyOptional<T> getCapability(Capability<T> capability, @Nullable Direction facing)
-    {
-        if (capability == Capabilities.ENERGY)
-            return bufferProvider.cast();
-        return super.getCapability(capability, facing);
     }
 
     @Override

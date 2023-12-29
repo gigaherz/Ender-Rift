@@ -17,9 +17,10 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.common.capabilities.Capabilities;
-import net.neoforged.neoforge.common.capabilities.Capability;
-import net.neoforged.neoforge.common.util.LazyOptional;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.neoforge.capabilities.Capabilities;
+import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.neoforged.neoforge.energy.IEnergyStorage;
 import net.neoforged.neoforge.items.IItemHandler;
 
@@ -29,8 +30,19 @@ import java.util.Optional;
 import java.util.Random;
 import java.util.UUID;
 
+@Mod.EventBusSubscriber(modid = EnderRiftMod.MODID, bus= Mod.EventBusSubscriber.Bus.MOD)
 public class RiftBlockEntity extends BlockEntity implements IRiftChangeListener
 {
+    @SubscribeEvent
+    private static void registerCapability(RegisterCapabilitiesEvent event)
+    {
+        event.registerBlockEntity(
+                Capabilities.ItemHandler.BLOCK,
+                EnderRiftMod.RIFT_BLOCK_ENTITY.get(),
+                (be, context) -> be.poweredInventory
+        );
+    }
+
     private static final int STARTUP_POWER = 10000;
     public static final int BUFFER_POWER = 1000000;
     private final Random rand = new Random();
@@ -48,7 +60,6 @@ public class RiftBlockEntity extends BlockEntity implements IRiftChangeListener
     // End of Client-side fields
 
     public PoweredInventory poweredInventory = new PoweredInventory();
-    public LazyOptional<IItemHandler> poweredInventoryProvider = LazyOptional.of(() -> poweredInventory);
 
     public RiftBlockEntity(BlockPos pos, BlockState state)
     {
@@ -224,15 +235,6 @@ public class RiftBlockEntity extends BlockEntity implements IRiftChangeListener
     public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket pkt)
     {
         handleUpdateTag(pkt.getTag());
-    }
-
-    @Nonnull
-    @Override
-    public <T> LazyOptional<T> getCapability(@Nonnull final Capability<T> cap, final @Nullable Direction side)
-    {
-        if (cap == Capabilities.ITEM_HANDLER)
-            return poweredInventoryProvider.cast();
-        return super.getCapability(cap, side);
     }
 
     public ItemStack chooseRandomStack()

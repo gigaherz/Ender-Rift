@@ -84,7 +84,7 @@ public class RiftRenderer
 
         RenderType type = isFabulous ?
                 RenderType.translucentMovingBlock() :
-                RenderType.translucentNoCrumbling();
+                RenderType.translucent();
 
         VertexConsumer buffer = iRenderTypeBuffer.getBuffer(type);
         BakedModel model = minecraft.getModelManager().getModel(EnderRiftMod.location("block/sphere"));

@@ -12,20 +12,33 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.neoforge.capabilities.Capabilities;
+import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.neoforged.neoforge.common.CommonHooks;
-import net.neoforged.neoforge.common.capabilities.Capabilities;
-import net.neoforged.neoforge.common.capabilities.Capability;
-import net.neoforged.neoforge.common.util.LazyOptional;
 import net.neoforged.neoforge.energy.IEnergyStorage;
-import net.neoforged.neoforge.event.EventHooks;
-import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.IItemHandlerModifiable;
 import net.neoforged.neoforge.items.ItemStackHandler;
 
-import javax.annotation.Nullable;
-
+@Mod.EventBusSubscriber(modid = EnderRiftMod.MODID, bus= Mod.EventBusSubscriber.Bus.MOD)
 public class GeneratorBlockEntity extends BlockEntity
 {
+    @SubscribeEvent
+    private static void registerCapability(RegisterCapabilitiesEvent event)
+    {
+        event.registerBlockEntity(
+                Capabilities.EnergyStorage.BLOCK,
+                EnderRiftMod.GENERATOR_BLOCK_ENTITY.get(),
+                (be, context) -> be.energyBuffer
+        );
+        event.registerBlockEntity(
+                Capabilities.ItemHandler.BLOCK,
+                EnderRiftMod.GENERATOR_BLOCK_ENTITY.get(),
+                (be, context) -> be.fuelSlot
+        );
+    }
+
     public static final int SLOT_COUNT = 1;
     public static final int POWER_LIMIT = 100000;
     public static final int MIN_HEAT = 100;
@@ -36,7 +49,6 @@ public class GeneratorBlockEntity extends BlockEntity
     public static final int POWER_TRANSFER_MAX = 800;
 
     private final EnergyBuffer energyBuffer = new EnergyBuffer(POWER_LIMIT);
-    private final LazyOptional<EnergyBuffer> energyBufferGetter = LazyOptional.of(() -> energyBuffer);
 
     private final ItemStackHandler fuelSlot = new ItemStackHandler(SLOT_COUNT)
     {
@@ -56,7 +68,6 @@ public class GeneratorBlockEntity extends BlockEntity
             return super.insertItem(slot, stack, simulate);
         }
     };
-    public LazyOptional<IItemHandler> fuelSlotProvider = LazyOptional.of(() -> fuelSlot);
 
     public int heatLevel;
     public int burnTimeRemaining;
@@ -66,16 +77,6 @@ public class GeneratorBlockEntity extends BlockEntity
     public GeneratorBlockEntity(BlockPos pos, BlockState state)
     {
         super(EnderRiftMod.GENERATOR_BLOCK_ENTITY.get(), pos, state);
-    }
-
-    @Override
-    public <T> LazyOptional<T> getCapability(Capability<T> cap, @Nullable Direction side)
-    {
-        if (cap == Capabilities.ENERGY)
-            return energyBufferGetter.cast();
-        if (cap == Capabilities.ITEM_HANDLER)
-            return fuelSlotProvider.cast();
-        return super.getCapability(cap, side);
     }
 
     public void tick()
@@ -183,16 +184,8 @@ public class GeneratorBlockEntity extends BlockEntity
                 if (e == null)
                     continue;
 
-                IEnergyStorage handler = null;
-                LazyOptional<IEnergyStorage> opt = e.getCapability(Capabilities.ENERGY, from);
-                if (opt.isPresent())
-                {
-                    handler = opt.orElse(null);
-                    if (!handler.canReceive())
-                        handler = null;
-                }
-
-                if (handler != null)
+                IEnergyStorage handler = e.getLevel().getCapability(Capabilities.EnergyStorage.BLOCK, e.getBlockPos(), e.getBlockState(), e, from);
+                if (handler != null && handler.canReceive())
                 {
                     handlers[from.ordinal()] = handler;
                     int wanted = handler.receiveEnergy(sendPower, true);

@@ -1,5 +1,8 @@
 package dev.gigaherz.enderrift.generator;
 
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import dev.gigaherz.enderrift.EnderRiftMod;
 import dev.gigaherz.enderrift.automation.iface.InterfaceBlock;
 import net.minecraft.core.BlockPos;
@@ -19,6 +22,7 @@ import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
@@ -32,6 +36,7 @@ import javax.annotation.Nullable;
 
 public class GeneratorBlock extends BaseEntityBlock
 {
+    public static final MapCodec<GeneratorBlock> CODEC = RecordCodecBuilder.mapCodec(inst -> inst.group(Properties.CODEC.fieldOf("properties").forGetter(GeneratorBlock::properties)).apply(inst, GeneratorBlock::new));
     public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
 
     public static final VoxelShape SHAPE_BASE = Block.box(0, 0, 0, 16, 4, 16);
@@ -62,6 +67,12 @@ public class GeneratorBlock extends BaseEntityBlock
     {
         super(properties);
         registerDefaultState(getStateDefinition().any().setValue(FACING, Direction.NORTH));
+    }
+
+    @Override
+    protected MapCodec<? extends BaseEntityBlock> codec()
+    {
+        return CODEC;
     }
 
     @org.jetbrains.annotations.Nullable

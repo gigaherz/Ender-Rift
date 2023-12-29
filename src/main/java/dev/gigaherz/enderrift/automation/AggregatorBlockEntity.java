@@ -13,7 +13,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.common.capabilities.Capabilities;
+import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.energy.IEnergyStorage;
 import net.neoforged.neoforge.items.IItemHandler;
 
@@ -169,8 +169,9 @@ public abstract class AggregatorBlockEntity extends BlockEntity
 
             if (AutomationHelper.isAutomatable(teOther, f.getOpposite()))
             {
-                teOther.getCapability(Capabilities.ITEM_HANDLER, f.getOpposite())
-                        .ifPresent(this.connectedInventories::add);
+                var inventory = teOther.getLevel().getCapability(Capabilities.ItemHandler.BLOCK, teOther.getBlockPos(), teOther.getBlockState(), teOther, f.getOpposite());
+                if (inventory != null)
+                        this.connectedInventories.add(inventory);
             }
         }
 

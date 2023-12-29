@@ -14,10 +14,10 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.common.capabilities.Capabilities;
-import net.neoforged.neoforge.common.capabilities.Capability;
-import net.neoforged.neoforge.common.util.LazyOptional;
-import net.neoforged.neoforge.items.IItemHandler;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.neoforge.capabilities.Capabilities;
+import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.neoforged.neoforge.items.IItemHandlerModifiable;
 import net.neoforged.neoforge.items.ItemHandlerHelper;
 import net.neoforged.neoforge.items.ItemStackHandler;
@@ -25,8 +25,19 @@ import net.neoforged.neoforge.items.ItemStackHandler;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+@Mod.EventBusSubscriber(modid = EnderRiftMod.MODID, bus= Mod.EventBusSubscriber.Bus.MOD)
 public class InterfaceBlockEntity extends AggregatorBlockEntity implements IPoweredAutomation
 {
+    @SubscribeEvent
+    private static void registerCapability(RegisterCapabilitiesEvent event)
+    {
+        event.registerBlockEntity(
+                Capabilities.ItemHandler.BLOCK,
+                EnderRiftMod.INTERFACE_BLOCK_ENTITY.get(),
+                (be, context) -> context == be.getFacing() ? be.inventoryOutputs() : null
+        );
+    }
+
     private static final int FilterCount = 9;
 
     private FilterInventory filters = new FilterInventory(FilterCount);
@@ -38,7 +49,6 @@ public class InterfaceBlockEntity extends AggregatorBlockEntity implements IPowe
             setChanged();
         }
     };
-    public LazyOptional<IItemHandler> outputsProvider = LazyOptional.of(() -> outputs);
 
     private Direction facing = null;
 
@@ -69,18 +79,6 @@ public class InterfaceBlockEntity extends AggregatorBlockEntity implements IPowe
     public IItemHandlerModifiable inventoryFilter()
     {
         return filters;
-    }
-
-    @SuppressWarnings("unchecked")
-    @Override
-    public <T> LazyOptional<T> getCapability(Capability<T> capability, @Nullable Direction facing)
-    {
-        if (facing == getFacing())
-        {
-            if (capability == Capabilities.ITEM_HANDLER)
-                return outputsProvider.cast();
-        }
-        return super.getCapability(capability, facing);
     }
 
     @Override

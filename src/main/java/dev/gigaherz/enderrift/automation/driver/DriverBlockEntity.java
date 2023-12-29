@@ -7,35 +7,35 @@ import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.common.capabilities.Capabilities;
-import net.neoforged.neoforge.common.capabilities.Capability;
-import net.neoforged.neoforge.common.util.LazyOptional;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.neoforge.capabilities.Capabilities;
+import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.neoforged.neoforge.energy.EnergyStorage;
 import net.neoforged.neoforge.energy.IEnergyStorage;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.Optional;
 
+@Mod.EventBusSubscriber(modid = EnderRiftMod.MODID, bus= Mod.EventBusSubscriber.Bus.MOD)
 public class DriverBlockEntity extends AggregatorBlockEntity
 {
+    @SubscribeEvent
+    private static void registerCapability(RegisterCapabilitiesEvent event)
+    {
+        event.registerBlockEntity(
+                Capabilities.EnergyStorage.BLOCK,
+                EnderRiftMod.DRIVER_BLOCK_ENTITY.get(),
+                (be, context) -> be.energyBuffer
+        );
+    }
+
     public static final int POWER_LIMIT = 100000;
 
     final EnergyStorage energyBuffer = new EnergyStorage(POWER_LIMIT);
-    final LazyOptional<IEnergyStorage> energyBufferGetter = LazyOptional.of(() -> energyBuffer);
 
     public DriverBlockEntity(BlockPos pos, BlockState state)
     {
         super(EnderRiftMod.DRIVER_BLOCK_ENTITY.get(), pos, state);
-    }
-
-    @Nonnull
-    @Override
-    public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, @Nullable Direction side)
-    {
-        if (cap == Capabilities.ENERGY)
-            return energyBufferGetter.cast();
-        return super.getCapability(cap, side);
     }
 
     @Override

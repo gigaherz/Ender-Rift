@@ -17,19 +17,19 @@ authors="gigaherz"
 
 [[dependencies.enderrift]]
    modId="neoforge"
-   mandatory=true
+   type="required"
    versionRange="[20.2.62-beta,)"
    ordering="NONE"
    side="BOTH"
 [[dependencies.enderrift]]
    modId="minecraft"
-   mandatory=true
+   type="required"
    versionRange="[1.20.2,1.21)"
    ordering="NONE"
    side="BOTH"
 [[dependencies.enderrift]]
    modId="waila"
-   mandatory=false
+   type="optional"
    versionRange="[0,)"
    ordering="AFTER"
    side="BOTH"

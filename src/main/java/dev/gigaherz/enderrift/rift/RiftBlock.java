@@ -1,6 +1,8 @@
 package dev.gigaherz.enderrift.rift;
 
 import com.google.common.collect.Lists;
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import dev.gigaherz.enderrift.EnderRiftMod;
 import dev.gigaherz.enderrift.automation.AutomationHelper;
 import net.minecraft.core.BlockPos;
@@ -21,18 +23,18 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
-import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.neoforged.neoforge.common.capabilities.Capabilities;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
 public class RiftBlock extends BaseEntityBlock
 {
+    public static final MapCodec<RiftBlock> CODEC = RecordCodecBuilder.mapCodec(inst -> inst.group(Properties.CODEC.fieldOf("properties").forGetter(RiftBlock::properties)).apply(inst, RiftBlock::new));
+
     public static final BooleanProperty ASSEMBLED = BooleanProperty.create("assembled");
 
     private static final VoxelShape SHAPE = Block.box(5, 5, 5, 11, 11, 11);
@@ -43,6 +45,12 @@ public class RiftBlock extends BaseEntityBlock
         super(properties);
         registerDefaultState(this.getStateDefinition().any()
                 .setValue(ASSEMBLED, false));
+    }
+
+    @Override
+    protected MapCodec<? extends BaseEntityBlock> codec()
+    {
+        return CODEC;
     }
 
     public RenderShape getRenderShape(BlockState pState)
@@ -147,7 +155,7 @@ public class RiftBlock extends BaseEntityBlock
 
         int count = stack.getCount();
         ItemStack stackToPush = stack.split(count);
-        ItemStack remaining = AutomationHelper.insertItems(rift.getCapability(Capabilities.ITEM_HANDLER, null).orElseThrow(() -> new RuntimeException("WAT")), stackToPush);
+        ItemStack remaining = AutomationHelper.insertItems(rift.getInventory(), stackToPush);
         stack.grow(remaining.getCount());
 
         if (stack.getCount() <= 0)
@@ -189,7 +197,7 @@ public class RiftBlock extends BaseEntityBlock
 
         int numberToExtract = playerIn.isShiftKeyDown() ? 1 : stack.getMaxStackSize();
 
-        ItemStack extracted = AutomationHelper.extractItems(rift.getCapability(Capabilities.ITEM_HANDLER, null).orElseThrow(() -> new RuntimeException("WAT")), stack.copy(), numberToExtract, false);
+        ItemStack extracted = AutomationHelper.extractItems(rift.getInventory(), stack.copy(), numberToExtract, false);
         if (extracted.getCount() > 0)
         {
             popResource(worldIn, pos, extracted);
@@ -215,7 +223,7 @@ public class RiftBlock extends BaseEntityBlock
 
         ItemStack stack = item.getItem().copy();
 
-        ItemStack remaining = AutomationHelper.insertItems(rift.getCapability(Capabilities.ITEM_HANDLER, null).orElseThrow(() -> new RuntimeException("WAT")), stack);
+        ItemStack remaining = AutomationHelper.insertItems(rift.getInventory(), stack);
 
         if (remaining.getCount() <= 0)
         {

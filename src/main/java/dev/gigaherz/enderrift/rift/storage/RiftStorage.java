@@ -4,6 +4,7 @@ import com.mojang.logging.LogUtils;
 import dev.gigaherz.enderrift.EnderRiftMod;
 import dev.gigaherz.enderrift.rift.storage.migration.RiftMigration_17_08_2022;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtAccounter;
 import net.minecraft.nbt.NbtIo;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
@@ -21,6 +22,8 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -105,11 +108,11 @@ public class RiftStorage implements FilenameFilter
     // ReadLock => Access to the rift data
     // WriteLock => Modification of rift data
     private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
-    private final File dataDirectory;
+    private final Path dataDirectory;
 
     private RiftStorage(MinecraftServer server)
     {
-        this.dataDirectory = server.getWorldPath(DATA_DIR).toFile();
+        this.dataDirectory = server.getWorldPath(DATA_DIR);
         Map<Class<? extends RiftMigration>, RiftMigration> migrations = new HashMap<>();
         for (Class<? extends RiftMigration> migration : MIGRATIONS)
         {
@@ -160,7 +163,7 @@ public class RiftStorage implements FilenameFilter
         }
     }
 
-    public File getDataDirectory()
+    public Path getDataDirectory()
     {
         return dataDirectory;
     }
@@ -205,14 +208,12 @@ public class RiftStorage implements FilenameFilter
         lock.writeLock().lock();
         try
         {
-            if (!dataDirectory.exists())
+            if (!Files.exists(dataDirectory))
             {
                 return;
             }
-            File[] files = dataDirectory.listFiles(this);
-            for (File file : files)
-            {
-                String name = file.getName();
+            Files.list(dataDirectory).forEach(file -> {
+                String name = file.getFileName().toString();
                 name = name.substring(0, name.length() - FILE_FORMAT_LENGTH);
                 UUID id;
                 try
@@ -222,10 +223,14 @@ public class RiftStorage implements FilenameFilter
                 catch (IllegalArgumentException iae)
                 {
                     LOGGER.warn("Found invalid rift name {}", name, iae);
-                    continue;
+                    return;
                 }
                 load(id, file);
-            }
+            });
+        }
+        catch (IOException e)
+        {
+            LOGGER.error("Failed to enumerate rifts");
         }
         finally
         {
@@ -235,8 +240,8 @@ public class RiftStorage implements FilenameFilter
 
     public void load(UUID id)
     {
-        File file = new File(dataDirectory, id.toString() + FILE_FORMAT);
-        if (!file.exists())
+        Path file = dataDirectory.resolve(id.toString() + FILE_FORMAT);
+        if (!Files.exists(file))
         {
             return;
         }
@@ -251,14 +256,14 @@ public class RiftStorage implements FilenameFilter
         }
     }
 
-    private void load(UUID id, File file)
+    private void load(UUID id, Path file)
     {
         RiftHolder holder = rifts.computeIfAbsent(id, BUILDER);
         CompoundTag tag;
         LOGGER.info("Loading rift {}...", id);
         try
         {
-            tag = NbtIo.readCompressed(file);
+            tag = NbtIo.readCompressed(file, NbtAccounter.create(0x6400000L));
         }
         catch (IOException e)
         {
@@ -310,18 +315,18 @@ public class RiftStorage implements FilenameFilter
         }
         String id = holder.getId().toString();
         RiftInventory inventory = holder.getInventory();
-        File file = new File(dataDirectory, id + FILE_FORMAT);
+        var file = dataDirectory.resolve(id + FILE_FORMAT);
         LOGGER.info("Saving rift {}...", id);
         try
         {
-            if (!file.exists())
+            if (!Files.exists(file))
             {
-                File folder = file.getParentFile();
-                if (folder != null && !folder.exists())
+                var folder = file.getParent();
+                if (folder != null && !Files.exists(folder))
                 {
-                    folder.mkdirs();
+                    Files.createDirectories(folder);
                 }
-                file.createNewFile();
+                Files.createFile(file);
             }
             NbtIo.writeCompressed(inventory.save(), file);
         }

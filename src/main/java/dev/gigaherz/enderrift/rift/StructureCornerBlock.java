@@ -1,6 +1,9 @@
 package dev.gigaherz.enderrift.rift;
 
 import com.google.common.collect.Lists;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import dev.gigaherz.enderrift.EnderRiftMod;
 import dev.gigaherz.enderrift.automation.AggregatorBlock;
 import net.minecraft.Util;
@@ -10,6 +13,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -32,6 +36,7 @@ import java.util.function.Function;
 
 public class StructureCornerBlock extends AggregatorBlock<StructureCornerBlockEntity>
 {
+    public static final MapCodec<StructureCornerBlock> CODEC = RecordCodecBuilder.mapCodec(inst -> inst.group(Properties.CODEC.fieldOf("properties").forGetter(StructureCornerBlock::properties)).apply(inst, StructureCornerBlock::new));
     public static final EnumProperty<Corner> CORNER = EnumProperty.create("corner", Corner.class);
     public static final BooleanProperty BASE = BooleanProperty.create("base");
 
@@ -60,6 +65,12 @@ public class StructureCornerBlock extends AggregatorBlock<StructureCornerBlockEn
         registerDefaultState(this.getStateDefinition().any()
                 .setValue(CORNER, StructureCornerBlock.Corner.values[0])
                 .setValue(BASE, false));
+    }
+
+    @Override
+    protected MapCodec<? extends BaseEntityBlock> codec()
+    {
+        return CODEC;
     }
 
     @Override
@@ -109,7 +120,7 @@ public class StructureCornerBlock extends AggregatorBlock<StructureCornerBlockEn
     }
 
     @Override
-    public ItemStack getCloneItemStack(BlockState state, HitResult target, BlockGetter world, BlockPos pos, Player player)
+    public ItemStack getCloneItemStack(BlockState state, HitResult target, LevelReader world, BlockPos pos, Player player)
     {
         return new ItemStack(RiftStructure.getOriginalBlock(world, pos));
     }

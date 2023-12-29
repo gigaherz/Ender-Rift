@@ -2,8 +2,8 @@ package dev.gigaherz.enderrift.automation;
 
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.common.capabilities.Capabilities;
-import net.neoforged.neoforge.common.capabilities.ICapabilityProvider;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.items.IItemHandler;
 
 /**
@@ -11,24 +11,14 @@ import net.neoforged.neoforge.items.IItemHandler;
  */
 public abstract class AutomationHelper
 {
-    public static boolean isPowerSource(Object object, Direction facing)
+    public static boolean isPowerSource(BlockEntity object, Direction facing)
     {
-        if (!(object instanceof ICapabilityProvider))
-            return false;
-
-        ICapabilityProvider cap = (ICapabilityProvider) object;
-
-        return cap.getCapability(Capabilities.ENERGY, facing).isPresent();
+        return object.getLevel().getCapability(Capabilities.EnergyStorage.BLOCK, object.getBlockPos(), object.getBlockState(), object, facing) != null;
     }
 
-    public static boolean isAutomatable(Object object, Direction facing)
+    public static boolean isAutomatable(BlockEntity object, Direction facing)
     {
-        if (!(object instanceof ICapabilityProvider))
-            return false;
-
-        ICapabilityProvider cap = (ICapabilityProvider) object;
-
-        return cap.getCapability(Capabilities.ITEM_HANDLER, facing).isPresent();
+        return object.getLevel().getCapability(Capabilities.ItemHandler.BLOCK, object.getBlockPos(), object.getBlockState(), object, facing) != null;
     }
 
     public static ItemStack insertItems(IItemHandler parent, ItemStack stack)

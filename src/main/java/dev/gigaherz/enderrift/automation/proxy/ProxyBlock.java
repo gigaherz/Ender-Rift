@@ -1,6 +1,9 @@
 package dev.gigaherz.enderrift.automation.proxy;
 
 import com.google.common.collect.ImmutableMap;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import dev.gigaherz.enderrift.EnderRiftMod;
 import dev.gigaherz.enderrift.automation.AggregatorBlock;
 import net.minecraft.core.BlockPos;
@@ -14,6 +17,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
@@ -27,6 +31,7 @@ import java.util.Map;
 
 public class ProxyBlock extends AggregatorBlock<ProxyBlockEntity>
 {
+    public static final MapCodec<ProxyBlock> CODEC = RecordCodecBuilder.mapCodec(inst -> inst.group(Properties.CODEC.fieldOf("properties").forGetter(ProxyBlock::properties)).apply(inst, ProxyBlock::new));
     public static final BooleanProperty NORTH = BlockStateProperties.NORTH;
     public static final BooleanProperty SOUTH = BlockStateProperties.SOUTH;
     public static final BooleanProperty WEST = BlockStateProperties.WEST;
@@ -61,6 +66,12 @@ public class ProxyBlock extends AggregatorBlock<ProxyBlockEntity>
                 .setValue(EAST, false)
                 .setValue(UP, false)
                 .setValue(DOWN, false));
+    }
+
+    @Override
+    protected MapCodec<? extends BaseEntityBlock> codec()
+    {
+        return CODEC;
     }
 
     @Override

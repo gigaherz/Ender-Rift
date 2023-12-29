@@ -5,8 +5,6 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.neoforge.network.NetworkEvent;
 
-import java.util.function.Supplier;
-
 public class SetVisibleSlots
 {
     public int windowId;
@@ -39,20 +37,18 @@ public class SetVisibleSlots
         }
     }
 
-    public boolean handle(NetworkEvent.Context context)
+    public void handle(NetworkEvent.Context context)
     {
         final ServerPlayer player = context.getSender();
 
         context.enqueueWork(() ->
         {
-            if (player != null)
+            if (player != null
+                    && player.containerMenu instanceof AbstractBrowserContainer browser
+                    && browser.containerId == this.windowId)
             {
-                if (player.containerMenu instanceof AbstractBrowserContainer && player.containerMenu.containerId == this.windowId)
-                {
-                    ((AbstractBrowserContainer) player.containerMenu).setVisibleSlots(this.visible);
-                }
+                browser.setVisibleSlots(this.visible);
             }
         });
-        return true;
     }
 }

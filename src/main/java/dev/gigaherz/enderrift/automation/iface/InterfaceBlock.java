@@ -1,5 +1,8 @@
 package dev.gigaherz.enderrift.automation.iface;
 
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import dev.gigaherz.enderrift.EnderRiftMod;
 import dev.gigaherz.enderrift.automation.AggregatorBlock;
 import dev.gigaherz.enderrift.automation.browser.BrowserBlock;
@@ -22,6 +25,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
@@ -36,12 +40,19 @@ import javax.annotation.Nullable;
 
 public class InterfaceBlock extends AggregatorBlock<InterfaceBlockEntity>
 {
+    public static final MapCodec<InterfaceBlock> CODEC = RecordCodecBuilder.mapCodec(inst -> inst.group(Properties.CODEC.fieldOf("properties").forGetter(InterfaceBlock::properties)).apply(inst, InterfaceBlock::new));
     public static final DirectionProperty FACING = BlockStateProperties.FACING;
 
     public InterfaceBlock(Properties properties)
     {
         super(properties);
         registerDefaultState(getStateDefinition().any().setValue(FACING, Direction.NORTH));
+    }
+
+    @Override
+    protected MapCodec<? extends BaseEntityBlock> codec()
+    {
+        return null;
     }
 
     @Override

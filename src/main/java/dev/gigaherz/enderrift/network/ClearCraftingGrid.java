@@ -5,8 +5,6 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.neoforge.network.NetworkEvent;
 
-import java.util.function.Supplier;
-
 public class ClearCraftingGrid
 {
     public final int windowId;
@@ -30,18 +28,18 @@ public class ClearCraftingGrid
         buf.writeBoolean(toPlayer);
     }
 
-    public boolean handle(NetworkEvent.Context context)
+    public void handle(NetworkEvent.Context context)
     {
         context.enqueueWork(() ->
         {
             final ServerPlayer player = context.getSender();
 
-            if (player.containerMenu instanceof CraftingBrowserContainer
-                    && player.containerMenu.containerId == this.windowId)
+            if (player != null
+                    && player.containerMenu instanceof CraftingBrowserContainer browser
+                    && browser.containerId == this.windowId)
             {
-                ((CraftingBrowserContainer) player.containerMenu).clearCraftingGrid(player, toPlayer);
+                browser.clearCraftingGrid(player, toPlayer);
             }
         });
-        return true;
     }
 }

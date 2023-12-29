@@ -1,6 +1,9 @@
 package dev.gigaherz.enderrift.automation.browser;
 
 import com.google.common.collect.ImmutableMap;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import dev.gigaherz.enderrift.EnderRiftMod;
 import dev.gigaherz.enderrift.automation.AggregatorBlock;
 import net.minecraft.core.BlockPos;
@@ -18,6 +21,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
@@ -31,6 +35,8 @@ import javax.annotation.Nullable;
 
 public class BrowserBlock extends AggregatorBlock<BrowserBlockEntity>
 {
+    public static final MapCodec<BrowserBlock> CODEC = RecordCodecBuilder.mapCodec(inst -> inst.group(Codec.BOOL.fieldOf("crafting").forGetter(obj -> obj.crafting), Properties.CODEC.fieldOf("properties").forGetter(BrowserBlock::properties)).apply(inst, BrowserBlock::new));
+
     public static final DirectionProperty FACING = BlockStateProperties.FACING;
     public final boolean crafting;
 
@@ -144,5 +150,11 @@ public class BrowserBlock extends AggregatorBlock<BrowserBlockEntity>
         player.openMenu(new SimpleMenuProvider(
                 (id, playerInventory, playerEntity) -> new CraftingBrowserContainer(id, tileEntity, playerInventory),
                 Component.translatable("container.enderrift.crafting_browser")));
+    }
+
+    @Override
+    protected MapCodec<? extends BaseEntityBlock> codec()
+    {
+        return CODEC;
     }
 }

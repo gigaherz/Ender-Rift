@@ -2,6 +2,7 @@ package dev.gigaherz.enderrift.network;
 
 import com.google.common.collect.Lists;
 import dev.gigaherz.enderrift.client.ClientHelper;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.item.Item;
@@ -53,43 +54,36 @@ public class SendSlotChanges
         }
     }
 
-    public boolean handle(NetworkEvent.Context context)
+    public void handle(NetworkEvent.Context context)
     {
         ClientHelper.handleSendSlotChanges(this);
-        return true;
     }
 
-    public static ItemStack readLargeItemStack(FriendlyByteBuf buf)
-    {
-        ItemStack itemstack = ItemStack.EMPTY;
-        int itemId = buf.readVarInt();
-
-        if (itemId >= 0)
-        {
-            int count = buf.readVarInt();
-            itemstack = new ItemStack(Item.byId(itemId), count);
-            itemstack.readShareTag(buf.readNbt());
+    public static ItemStack readLargeItemStack(FriendlyByteBuf buf) {
+        if (!buf.readBoolean()) {
+            return ItemStack.EMPTY;
+        } else {
+            Item item = buf.readById(BuiltInRegistries.ITEM);
+            int i = buf.readVarInt();
+            return net.neoforged.neoforge.attachment.AttachmentInternals.reconstructItemStack(item, i, buf.readNbt());
         }
-
-        return itemstack;
     }
 
-    public static void writeLargeItemStack(FriendlyByteBuf buf, ItemStack stack)
-    {
-        if (stack.getCount() <= 0)
-        {
-            buf.writeVarInt(-1);
-        }
-        else
-        {
-            buf.writeVarInt(Item.getId(stack.getItem()));
+    public static void writeLargeItemStack(FriendlyByteBuf buf, ItemStack stack) {
+        if (stack.isEmpty()) {
+            buf.writeBoolean(false);
+        } else {
+            buf.writeBoolean(true);
+            Item item = stack.getItem();
+            buf.writeId(BuiltInRegistries.ITEM, item);
             buf.writeVarInt(stack.getCount());
-            CompoundTag nbttagcompound = null;
-            if (stack.isDamageableItem() || stack.getItem().shouldOverrideMultiplayerNbt())
-            {
-                nbttagcompound = stack.getShareTag();
+            CompoundTag compoundtag = null;
+            if (item.isDamageable(stack) || item.shouldOverrideMultiplayerNbt()) {
+                compoundtag = stack.getTag();
             }
-            buf.writeNbt(nbttagcompound);
+            compoundtag = net.neoforged.neoforge.attachment.AttachmentInternals.addAttachmentsToTag(compoundtag, stack, false);
+
+            buf.writeNbt(compoundtag);
         }
     }
 }
