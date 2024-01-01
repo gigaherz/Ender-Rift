@@ -17,6 +17,7 @@ import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemHandlerHelper;
+import net.neoforged.neoforge.network.PacketDistributor;
 
 import javax.annotation.Nullable;
 import java.util.Optional;
@@ -222,7 +223,7 @@ public class CraftingBrowserContainer extends AbstractBrowserContainer
 
         if (isRemote)
         {
-            EnderRiftMod.CHANNEL.sendToServer(new ClearCraftingGrid(containerId, toPlayer));
+            PacketDistributor.SERVER.noArg().send(new ClearCraftingGrid(containerId, toPlayer));
         }
 
         this.slotsChanged(craftMatrix);

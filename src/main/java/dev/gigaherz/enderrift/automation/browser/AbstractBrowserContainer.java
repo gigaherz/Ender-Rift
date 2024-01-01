@@ -21,7 +21,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.IItemHandlerModifiable;
-import net.neoforged.neoforge.network.PlayNetworkDirection;
+import net.neoforged.neoforge.network.PacketDistributor;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.annotation.Nonnull;
@@ -243,7 +243,7 @@ public class AbstractBrowserContainer extends AbstractContainerMenu
         {
             if (newLength != oldLength || indicesChanged.size() > 0)
             {
-                EnderRiftMod.CHANNEL.sendTo(new SendSlotChanges(containerId, newLength, indicesChanged, stacksChanged), crafter.connection.connection, PlayNetworkDirection.PLAY_TO_CLIENT);
+                PacketDistributor.PLAYER.with(crafter).send(new SendSlotChanges(containerId, newLength, indicesChanged, stacksChanged));
             }
 
             ItemStack newStack = getCarried();
@@ -308,7 +308,7 @@ public class AbstractBrowserContainer extends AbstractContainerMenu
     {
         if (isClient())
         {
-            EnderRiftMod.CHANNEL.sendToServer(new SetVisibleSlots(containerId, visible));
+            PacketDistributor.SERVER.noArg().send(new SetVisibleSlots(containerId, visible));
         }
         else
         {

@@ -1,19 +1,24 @@
 package dev.gigaherz.enderrift.network;
 
 import com.google.common.collect.Lists;
+import dev.gigaherz.enderrift.EnderRiftMod;
 import dev.gigaherz.enderrift.client.ClientHelper;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.network.NetworkEvent;
+import net.neoforged.neoforge.network.handling.PlayPayloadContext;
 
 import java.util.List;
 import java.util.function.Supplier;
 
-public class SendSlotChanges
+public class SendSlotChanges implements CustomPacketPayload
 {
+    public static final ResourceLocation ID = EnderRiftMod.location("send_slot_changes");
+
     public int windowId;
     public int slotCount;
     public List<Integer> indices;
@@ -42,7 +47,7 @@ public class SendSlotChanges
         }
     }
 
-    public void encode(FriendlyByteBuf buf)
+    public void write(FriendlyByteBuf buf)
     {
         buf.writeInt(windowId);
         buf.writeInt(slotCount);
@@ -54,7 +59,13 @@ public class SendSlotChanges
         }
     }
 
-    public void handle(NetworkEvent.Context context)
+    @Override
+    public ResourceLocation id()
+    {
+        return ID;
+    }
+
+    public void handle(PlayPayloadContext context)
     {
         ClientHelper.handleSendSlotChanges(this);
     }

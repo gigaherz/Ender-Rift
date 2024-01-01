@@ -1,12 +1,17 @@
 package dev.gigaherz.enderrift.network;
 
+import dev.gigaherz.enderrift.EnderRiftMod;
 import dev.gigaherz.enderrift.automation.browser.AbstractBrowserContainer;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.server.level.ServerPlayer;
-import net.neoforged.neoforge.network.NetworkEvent;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.player.Player;
+import net.neoforged.neoforge.network.handling.PlayPayloadContext;
 
-public class SetVisibleSlots
+public class SetVisibleSlots implements CustomPacketPayload
 {
+    public static final ResourceLocation ID = EnderRiftMod.location("set_visible_slots");
+
     public int windowId;
     public int[] visible;
 
@@ -27,7 +32,7 @@ public class SetVisibleSlots
         }
     }
 
-    public void encode(FriendlyByteBuf buf)
+    public void write(FriendlyByteBuf buf)
     {
         buf.writeInt(windowId);
         buf.writeInt(visible.length);
@@ -37,15 +42,19 @@ public class SetVisibleSlots
         }
     }
 
-    public void handle(NetworkEvent.Context context)
+    @Override
+    public ResourceLocation id()
     {
-        final ServerPlayer player = context.getSender();
+        return ID;
+    }
 
-        context.enqueueWork(() ->
+    public void handle(PlayPayloadContext context)
+    {
+        context.workHandler().execute(() ->
         {
-            if (player != null
-                    && player.containerMenu instanceof AbstractBrowserContainer browser
-                    && browser.containerId == this.windowId)
+            final Player player = context.player().orElseThrow();
+
+            if (player.containerMenu instanceof AbstractBrowserContainer browser && browser.containerId == this.windowId)
             {
                 browser.setVisibleSlots(this.visible);
             }

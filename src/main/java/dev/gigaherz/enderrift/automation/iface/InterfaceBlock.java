@@ -25,7 +25,6 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
@@ -34,7 +33,6 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.neoforged.neoforge.items.IItemHandler;
-import net.neoforged.neoforge.network.NetworkHooks;
 
 import javax.annotation.Nullable;
 
@@ -99,7 +97,7 @@ public class InterfaceBlock extends AggregatorBlock<InterfaceBlockEntity>
         if (worldIn.isClientSide)
             return InteractionResult.SUCCESS;
 
-        NetworkHooks.openScreen((ServerPlayer) player, new SimpleMenuProvider(
+        player.openMenu(new SimpleMenuProvider(
                 (id, playerInventory, playerEntity) -> new InterfaceContainer(id, playerInventory, be.inventoryFilter(), be.inventoryOutputs(), ContainerLevelAccess.create(be.getLevel(), be.getBlockPos())),
                 Component.translatable("container.enderrift.interface")), pos);
 
