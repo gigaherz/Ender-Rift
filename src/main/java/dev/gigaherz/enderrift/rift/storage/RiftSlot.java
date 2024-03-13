@@ -12,7 +12,6 @@ public class RiftSlot
     public RiftSlot(ItemStack stack)
     {
         this.sample = stack.copy();
-        sample.setCount(1);
         this.count = stack.getCount();
     }
 
@@ -20,6 +19,7 @@ public class RiftSlot
     {
         this.count = tag.getLong("Count");
         this.sample = ItemStack.of(tag.getCompound("Item"));
+        sample.setCount((int) Math.min(this.count, Integer.MAX_VALUE));
     }
 
     public ItemStack getSample()
@@ -35,15 +35,18 @@ public class RiftSlot
     public void addCount(long count)
     {
         this.count += count;
+        sample.setCount((int) Math.min(this.count, Integer.MAX_VALUE));
     }
 
     public void subtractCount(long count)
     {
         this.count -= count;
+        sample.setCount((int) Math.min(this.count, Integer.MAX_VALUE));
     }
 
     public void setCount(long count)
     {
         this.count = count;
+        sample.setCount((int) Math.min(this.count, Integer.MAX_VALUE));
     }
 }

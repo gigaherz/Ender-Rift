@@ -96,9 +96,7 @@ public class OrbDuplicationRecipe extends CustomRecipe implements IShapedRecipe<
     @Override
     public ItemStack assemble(CraftingContainer crafting, RegistryAccess registryAccess)
     {
-        ItemStack stack = crafting.getItem(4).copy();
-        stack.setCount(2);
-        return stack;
+        return crafting.getItem(4).copyWithCount(2);
     }
 
     @Override

@@ -1,6 +1,7 @@
 package dev.gigaherz.enderrift.rift.storage;
 
 import com.google.common.collect.Lists;
+import dev.gigaherz.enderrift.rift.ILongItemHandler;
 import dev.gigaherz.enderrift.rift.IRiftChangeListener;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -20,7 +21,7 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.function.Consumer;
 
-public class RiftInventory implements IItemHandler
+public class RiftInventory implements ILongItemHandler
 {
 
     final List<Reference<? extends IRiftChangeListener>> listeners = Lists.newArrayList();
@@ -134,9 +135,7 @@ public class RiftInventory implements IItemHandler
             return ItemStack.EMPTY;
         }
         RiftSlot slot = slots.get(index);
-        ItemStack stack = slot.getSample().copy();
-        stack.setCount((int) Math.min(Integer.MAX_VALUE, slot.getCount()));
-        return stack;
+        return slot.getSample();
     }
 
     @Override
@@ -189,32 +188,24 @@ public class RiftInventory implements IItemHandler
             return ItemStack.EMPTY;
         }
         RiftSlot slot = slots.get(index);
+        ItemStack stack = slot.getSample();
         long count = slot.getCount();
         if (simulate)
         {
             int amount = (int) Math.min(wanted, count);
-            ItemStack stack = slot.getSample().copy();
-            stack.setCount(amount);
-            return stack;
+            stack = stack.copyWithCount(amount);
         }
-        try
+        else if (count <= wanted)
         {
-            if (count <= wanted)
-            {
-                ItemStack stack = slot.getSample();
-                stack.setCount((int) count);
-                slots.remove(index);
-                return stack;
-            }
-            ItemStack stack = slot.getSample().copy();
-            stack.setCount(wanted);
+            slots.remove(index);
+        }
+        else
+        {
+            stack = stack.copyWithCount(wanted);
             slot.subtractCount(wanted);
-            return stack;
         }
-        finally
-        {
-            onContentsChanged();
-        }
+        onContentsChanged();
+        return stack;
     }
 
     @Override

@@ -23,6 +23,7 @@ import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.neoforged.neoforge.energy.IEnergyStorage;
 import net.neoforged.neoforge.items.IItemHandler;
+import net.neoforged.neoforge.items.IItemHandlerModifiable;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -318,12 +319,10 @@ public class RiftBlockEntity extends BlockEntity implements IRiftChangeListener
     {
         public long getCount(int slot)
         {
-            RiftInventory inventory = getInventory();
-            if (inventory == null)
-            {
+            ILongItemHandler handler = getInventory();
+            if (handler == null)
                 return 0;
-            }
-            return inventory.getCount(slot);
+            return handler.getCount(slot);
         }
 
         @Override
@@ -332,7 +331,6 @@ public class RiftBlockEntity extends BlockEntity implements IRiftChangeListener
             IItemHandler handler = getInventory();
             if (handler == null)
                 return 0;
-
             return handler.getSlots();
         }
 
@@ -372,13 +370,19 @@ public class RiftBlockEntity extends BlockEntity implements IRiftChangeListener
         @Override
         public int getSlotLimit(int slot)
         {
-            return 64;
+            IItemHandler handler = getInventory();
+            if (handler == null)
+                return 64;
+            return handler.getSlotLimit(slot);
         }
 
         @Override
         public boolean isItemValid(int slot, @Nonnull ItemStack stack)
         {
-            return true;
+            IItemHandler handler = getInventory();
+            if (handler == null)
+                return false;
+            return handler.isItemValid(slot, stack);
         }
     }
 }

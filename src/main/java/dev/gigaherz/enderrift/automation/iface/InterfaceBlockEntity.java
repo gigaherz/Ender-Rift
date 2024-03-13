@@ -271,9 +271,8 @@ public class InterfaceBlockEntity extends AggregatorBlockEntity implements IPowe
 
             if (!simulate)
             {
-                ItemStack cp = stack.copy();
-                cp.setCount(1);
-                filters.set(slot, cp);
+                var sample = stack.copyWithCount(1);
+                filters.set(slot, sample);
             }
 
             return stack;
@@ -300,10 +299,8 @@ public class InterfaceBlockEntity extends AggregatorBlockEntity implements IPowe
         @Override
         public void setStackInSlot(int index, ItemStack stack)
         {
-            stack = stack.copy();
-            stack.setCount(1);
-
-            filters.set(index, stack);
+            var sample = stack.copyWithCount(1);
+            filters.set(index, sample);
 
             setChanged();
         }

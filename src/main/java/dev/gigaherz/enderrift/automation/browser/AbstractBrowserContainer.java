@@ -391,8 +391,7 @@ public class AbstractBrowserContainer extends AbstractContainerMenu
                     {
                         int amount = 1;
 
-                        ItemStack push = dropping.copy();
-                        push.setCount(amount);
+                        ItemStack push = dropping.copyWithCount(amount);
                         ItemStack remaining = insertItemsSided(parent, push);
 
                         dropping.shrink(push.getCount());
@@ -495,9 +494,7 @@ public class AbstractBrowserContainer extends AbstractContainerMenu
     {
         if (isClient() || parent == null)
         {
-            var copy = existing.copy();
-            copy.setCount(Math.min(existingSize, amount));
-            return copy;
+            return existing.copyWithCount(Math.min(existingSize, amount));
         }
         return AutomationHelper.extractItems(parent, existing, amount, simulate);
     }
@@ -514,8 +511,7 @@ public class AbstractBrowserContainer extends AbstractContainerMenu
         int startIndex = SCROLL_SLOTS;
         int endIndex = startIndex + PLAYER_SLOTS;
 
-        ItemStack stackCopy = stack.copy();
-        stackCopy.setCount(amount);
+        ItemStack stackCopy = stack.copyWithCount(amount);
 
         if (!this.simulateInsertStack(stackCopy, startIndex, endIndex))
         {
@@ -869,9 +865,7 @@ public class AbstractBrowserContainer extends AbstractContainerMenu
             if ((slot + scroll) >= indices.length)
                 return ItemStack.EMPTY;
             ItemStack stack = stacks.get(indices[slot + scroll]);
-            stack = stack.copy();
-            stack.setCount(1);
-            return stack;
+            return stack.copyWithCount(1);
         }
 
         @Override

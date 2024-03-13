@@ -85,9 +85,8 @@ public class InterfaceContainer extends AbstractContainerMenu
 
                 if (dropping.getCount() > 0)
                 {
-                    ItemStack copy = dropping.copy();
-                    copy.setCount(1);
-                    slot.set(copy);
+                    var sample = dropping.copyWithCount(1);
+                    slot.set(sample);
                 }
                 else if (slot.getItem().getCount() > 0)
                 {

@@ -3,12 +3,14 @@ plugins {
     id 'eclipse'
     id 'idea'
     id 'maven-publish'
-    id 'net.neoforged.gradle.userdev' version '7.0.76'
+    id 'net.neoforged.gradle.userdev' version '7.0.97'
     id 'com.github.johnrengelman.shadow' version '8.1.1'
 }
 
-version = "2.6.3"
+version = "2.6.4"
 group= "dev.gigaherz.enderrift"
+
+System.out.println(System.getProperty("os.name"))
 
 Provider<String> minecraftVersion(Transformer<String, String> mapper) {
     return project.userDevRuntime.runtimes.map(r -> r.values().first().specification.minecraftVersion).map(mapper)
@@ -95,7 +97,7 @@ configurations {
 }
 
 dependencies {
-    implementation 'net.neoforged:neoforge:20.4.72-beta'
+    implementation 'net.neoforged:neoforge:20.4.198'
 
     compileOnly 'org.jetbrains:annotations:20.1.0'
 

@@ -90,9 +90,7 @@ public class AutomationEnergyWrapper implements IItemHandler
             if (stackSize <= 0)
                 return stack;
 
-            ItemStack temp = stack.copy();
-            temp.setCount(stackSize);
-
+            ItemStack temp = stack.copyWithCount(stackSize);
             ItemStack remaining = inventory.insertItem(slot, temp, simulate);
 
             if (!simulate)
