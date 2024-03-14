@@ -1,6 +1,7 @@
 package dev.gigaherz.enderrift.common;
 
 import dev.gigaherz.enderrift.ConfigValues;
+import dev.gigaherz.enderrift.rift.ILongItemHandler;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.energy.IEnergyStorage;
 import net.neoforged.neoforge.items.IItemHandler;
@@ -8,7 +9,7 @@ import net.neoforged.neoforge.items.IItemHandler;
 import javax.annotation.Nonnull;
 import java.util.Optional;
 
-public class AutomationEnergyWrapper implements IItemHandler
+public class AutomationEnergyWrapper implements ILongItemHandler
 {
     private final IPoweredAutomation owner;
 
@@ -50,15 +51,22 @@ public class AutomationEnergyWrapper implements IItemHandler
     @Override
     public int getSlots()
     {
-        IItemHandler inventory = owner.getInventory();
+        var inventory = owner.getInventory();
         return inventory != null ? inventory.getSlots() : 0;
     }
 
     @Override
     public ItemStack getStackInSlot(int slot)
     {
-        IItemHandler inventory = owner.getInventory();
+        var inventory = owner.getInventory();
         return inventory != null ? inventory.getStackInSlot(slot) : ItemStack.EMPTY;
+    }
+
+    @Override
+    public long getCount(int slot)
+    {
+        var inventory = owner.getInventory();
+        return inventory != null ? inventory.getCount(slot) : 0;
     }
 
     @Override

@@ -9,6 +9,7 @@ import net.minecraft.world.item.ItemStack;
 
 import java.io.File;
 import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.HashMap;
 import java.util.UUID;
 
@@ -26,6 +27,7 @@ public class RiftMigration_17_08_2022 extends RiftMigration
     public void migrate(RiftStorage storage) throws Exception
     {
         var oldStorage = storage.getDataDirectory().resolve("../data/enderRiftStorageManager.dat");
+        var oldStorageBak = storage.getDataDirectory().resolve("../data/enderRiftStorageManager.dat.bak");
         CompoundTag tag = NbtIo.readCompressed(oldStorage, NbtAccounter.create(0x6400000L));
         CompoundTag data = tag.getCompound("data");
         ListTag rifts = data.getList("Rifts", Tag.TAG_COMPOUND);
@@ -47,6 +49,7 @@ public class RiftMigration_17_08_2022 extends RiftMigration
                 inventory.insertItem(i, itemStack, false);
             }
         }
+        Files.move(oldStorage, oldStorageBak, StandardCopyOption.REPLACE_EXISTING);
     }
 
     @Override

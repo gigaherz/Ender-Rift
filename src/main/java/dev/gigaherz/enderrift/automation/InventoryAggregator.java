@@ -1,15 +1,16 @@
 package dev.gigaherz.enderrift.automation;
 
 import com.google.common.collect.Lists;
+import dev.gigaherz.enderrift.rift.ILongItemHandler;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.items.IItemHandler;
 
 import javax.annotation.Nonnull;
 import java.util.List;
 
-public class InventoryAggregator implements IItemHandler
+public class InventoryAggregator implements ILongItemHandler
 {
-    final List<IItemHandler> aggregated = Lists.newArrayList();
+    final List<ILongItemHandler> aggregated = Lists.newArrayList();
 
     public void addAll(Iterable<IItemHandler> inventorySet)
     {
@@ -21,7 +22,7 @@ public class InventoryAggregator implements IItemHandler
 
     public void add(IItemHandler inv)
     {
-        aggregated.add(inv);
+        aggregated.add(ILongItemHandler.wrap(inv));
     }
 
     @Override
@@ -119,5 +120,21 @@ public class InventoryAggregator implements IItemHandler
             index -= size;
         }
         return false;
+    }
+
+    @Override
+    public long getCount(int index)
+    {
+        for (var inv : aggregated)
+        {
+            int size = inv.getSlots();
+            if (index < size)
+            {
+                return inv.getCount(index);
+            }
+
+            index -= size;
+        }
+        return 0;
     }
 }

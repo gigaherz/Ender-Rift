@@ -1,5 +1,6 @@
 package dev.gigaherz.enderrift.common;
 
+import dev.gigaherz.enderrift.rift.ILongItemHandler;
 import net.neoforged.neoforge.energy.IEnergyStorage;
 import net.neoforged.neoforge.items.IItemHandler;
 
@@ -9,7 +10,7 @@ import java.util.Optional;
 public interface IPoweredAutomation
 {
     @Nullable
-    IItemHandler getInventory();
+    ILongItemHandler getInventory();
 
     Optional<IEnergyStorage> getEnergyBuffer();
 

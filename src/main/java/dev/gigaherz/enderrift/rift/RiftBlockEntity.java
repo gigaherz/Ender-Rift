@@ -34,6 +34,8 @@ import java.util.UUID;
 @Mod.EventBusSubscriber(modid = EnderRiftMod.MODID, bus= Mod.EventBusSubscriber.Bus.MOD)
 public class RiftBlockEntity extends BlockEntity implements IRiftChangeListener
 {
+    private boolean changedFlag;
+
     @SubscribeEvent
     private static void registerCapability(RegisterCapabilitiesEvent event)
     {
@@ -132,6 +134,12 @@ public class RiftBlockEntity extends BlockEntity implements IRiftChangeListener
             powered = false;
             BlockState state = level.getBlockState(worldPosition);
             level.sendBlockUpdated(worldPosition, state, state, 3);
+        }
+
+        if (changedFlag)
+        {
+            setChanged();
+            changedFlag = false;
         }
     }
 
@@ -295,7 +303,7 @@ public class RiftBlockEntity extends BlockEntity implements IRiftChangeListener
     @Override
     public void onRiftChanged()
     {
-        setChanged();
+        changedFlag = true;
     }
 
     @Override

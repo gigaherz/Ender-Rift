@@ -212,21 +212,27 @@ public class RiftStorage implements FilenameFilter
             {
                 return;
             }
-            Files.list(dataDirectory).forEach(file -> {
-                String name = file.getFileName().toString();
-                name = name.substring(0, name.length() - FILE_FORMAT_LENGTH);
-                UUID id;
-                try
-                {
-                    id = UUID.fromString(name);
-                }
-                catch (IllegalArgumentException iae)
-                {
-                    LOGGER.warn("Found invalid rift name {}", name, iae);
-                    return;
-                }
-                load(id, file);
-            });
+            try(var fileList = Files.list(dataDirectory))
+            {
+                fileList.forEach(file -> {
+
+                    String name = file.getFileName().toString();
+                    if (!name.endsWith(FILE_FORMAT))
+                        return;
+                    name = name.substring(0, name.length() - FILE_FORMAT_LENGTH);
+                    UUID id;
+                    try
+                    {
+                        id = UUID.fromString(name);
+                    }
+                    catch (IllegalArgumentException iae)
+                    {
+                        LOGGER.warn("Found invalid rift name {}", name, iae);
+                        return;
+                    }
+                    load(id, file);
+                });
+            }
         }
         catch (IOException e)
         {

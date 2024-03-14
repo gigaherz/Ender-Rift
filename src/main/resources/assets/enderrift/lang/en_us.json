@@ -42,6 +42,8 @@
 
     "text.enderrift.network.size": "Network size: %d",
 
+    "text.enderrift.browser.itemcount": "Count: %s",
+
     "option.enderrift.generator": "Generator",
     "option.enderrift.rift": "Rift",
     "option.enderrift.rf": "Show RF"

@@ -2,11 +2,13 @@ package dev.gigaherz.enderrift.automation.browser;
 
 import com.google.common.base.Suppliers;
 import com.google.common.collect.Lists;
-import dev.gigaherz.enderrift.EnderRiftMod;
 import dev.gigaherz.enderrift.automation.AutomationHelper;
 import dev.gigaherz.enderrift.common.slots.SlotFake;
 import dev.gigaherz.enderrift.network.SendSlotChanges;
 import dev.gigaherz.enderrift.network.SetVisibleSlots;
+import dev.gigaherz.enderrift.rift.ILongItemHandler;
+import it.unimi.dsi.fastutil.longs.LongArrayList;
+import it.unimi.dsi.fastutil.longs.LongList;
 import joptsimple.internal.Strings;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -47,6 +49,7 @@ public class AbstractBrowserContainer extends AbstractContainerMenu
     protected final static int PLAYER_SLOTS = PLAYER_ROWS * PLAYER_COLUMNS;
 
     private NonNullList<ItemStack> currentStacks = NonNullList.create();
+    private LongList currentSizes = new LongArrayList();
     private final Player player;
     private int prevChangeCount;
     private ItemStack stackInCursor = ItemStack.EMPTY;
@@ -199,6 +202,7 @@ public class AbstractBrowserContainer extends AbstractContainerMenu
         int newLength;
         List<Integer> indicesChanged = Lists.newArrayList();
         List<ItemStack> stacksChanged = Lists.newArrayList();
+        LongList stackSizesChanged = new LongArrayList();
 
 
         newLength = serverInv.getRealSizeInventory();
@@ -210,15 +214,20 @@ public class AbstractBrowserContainer extends AbstractContainerMenu
         for (int i = 0; i < newLength; ++i)
         {
             ItemStack newStack = serverInv.getStack(i);
-            ItemStack current = currentStacks.get(i);
+            long newCount = serverInv.getStackSizeForSlot(i);
 
-            if (!ItemStack.matches(current, newStack))
+            ItemStack current = currentStacks.get(i);
+            long currentCount = currentSizes.getLong(i);
+
+            if (!ItemStack.isSameItemSameTags(current, newStack) || newCount != currentCount)
             {
                 current = newStack.copy();
                 currentStacks.set(i, current);
+                currentSizes.set(i,newCount);
 
                 indicesChanged.add(i);
                 stacksChanged.add(current);
+                stackSizesChanged.add(newCount);
             }
         }
 
@@ -243,7 +252,7 @@ public class AbstractBrowserContainer extends AbstractContainerMenu
         {
             if (newLength != oldLength || indicesChanged.size() > 0)
             {
-                PacketDistributor.PLAYER.with(crafter).send(new SendSlotChanges(containerId, newLength, indicesChanged, stacksChanged));
+                PacketDistributor.PLAYER.with(crafter).send(new SendSlotChanges(containerId, newLength, indicesChanged, stacksChanged, stackSizesChanged));
             }
 
             ItemStack newStack = getCarried();
@@ -263,10 +272,14 @@ public class AbstractBrowserContainer extends AbstractContainerMenu
     private void changeSize(int oldLength, int newLength)
     {
         NonNullList<ItemStack> oldStacks = currentStacks;
+        LongList oldSizes = currentSizes;
         currentStacks = NonNullList.withSize(newLength, ItemStack.EMPTY);
+        currentSizes = new LongArrayList();
+        currentSizes.addElements(0, new long[newLength]);
         for (int i = 0; i < Math.min(newLength, oldLength); i++)
         {
             currentStacks.set(i, oldStacks.get(i));
+            currentSizes.set(i, oldSizes.getLong(i));
         }
     }
 
@@ -277,7 +290,7 @@ public class AbstractBrowserContainer extends AbstractContainerMenu
         player.connection.send(new ClientboundContainerSetSlotPacket(-1, incrementStateId(), -1, newStack));
     }
 
-    public void slotsChanged(int slotCount, List<Integer> indices, List<ItemStack> stacks)
+    public void slotsChanged(int slotCount, List<Integer> indices, List<ItemStack> stacks, LongList sizes)
     {
         if (slotCount != currentStacks.size())
         {
@@ -288,12 +301,14 @@ public class AbstractBrowserContainer extends AbstractContainerMenu
         {
             int slot = indices.get(i);
             ItemStack stack = stacks.get(i);
+            long size = sizes.getLong(i);
 
             currentStacks.set(slot, stack);
+            currentSizes.set(slot, size);
         }
 
         ClientScrollInventory clientInv = getClient();
-        clientInv.setArray(currentStacks);
+        clientInv.setArray(currentStacks, currentSizes);
 
         setVisibleSlots(clientInv.getIndices());
     }
@@ -329,7 +344,7 @@ public class AbstractBrowserContainer extends AbstractContainerMenu
         this.scroll = 0;
 
         ClientScrollInventory clientInv = getClient();
-        clientInv.setArray(currentStacks);
+        clientInv.setArray(currentStacks, currentSizes);
 
         setVisibleSlots(clientInv.getIndices());
     }
@@ -340,7 +355,7 @@ public class AbstractBrowserContainer extends AbstractContainerMenu
         this.scroll = 0;
 
         ClientScrollInventory clientInv = getClient();
-        clientInv.setArray(currentStacks);
+        clientInv.setArray(currentStacks, currentSizes);
 
         setVisibleSlots(clientInv.getIndices());
     }
@@ -360,7 +375,7 @@ public class AbstractBrowserContainer extends AbstractContainerMenu
 
             Slot slot = this.slots.get(slotId);
             ItemStack existing = slot.getItem();
-            int existingSize = isClient() ? getClient().getStackSizeForSlot(slotId) : existing.getCount();
+            long existingSize = isClient() ? getClient().getStackSizeForSlot(slotId) : existing.getCount();
 
             if (mode == ClickType.PICKUP)
             {
@@ -490,11 +505,11 @@ public class AbstractBrowserContainer extends AbstractContainerMenu
             tile.setChanged();
     }
 
-    private ItemStack extractItemsSided(@Nullable IItemHandler parent, ItemStack existing, int existingSize, int amount, boolean simulate)
+    private ItemStack extractItemsSided(@Nullable IItemHandler parent, ItemStack existing, long existingSize, int amount, boolean simulate)
     {
         if (isClient() || parent == null)
         {
-            return existing.copyWithCount(Math.min(existingSize, amount));
+            return existing.copyWithCount((int)Math.min(existingSize, amount));
         }
         return AutomationHelper.extractItems(parent, existing, amount, simulate);
     }
@@ -658,6 +673,7 @@ public class AbstractBrowserContainer extends AbstractContainerMenu
     {
         final BrowserBlockEntity tile;
         final List<ItemStack> slots = Lists.newArrayList();
+        final LongList slotSizes = new LongArrayList();
         private int[] visible = new int[0];
 
         public ServerScrollInventory(BrowserBlockEntity tile)
@@ -677,11 +693,10 @@ public class AbstractBrowserContainer extends AbstractContainerMenu
 
         public void refresh()
         {
-            IItemHandler inv = tile.getCombinedInventory();
-
-            final List<ItemStack> slotsSeen = Lists.newArrayList();
+            ILongItemHandler inv = tile.getCombinedInventory();
 
             slots.clear();
+            slotSizes.clear();
 
             if (inv == null)
                 return;
@@ -690,28 +705,13 @@ public class AbstractBrowserContainer extends AbstractContainerMenu
             for (int j = 0; j < invSlots; j++)
             {
                 ItemStack invStack = inv.getStackInSlot(j);
+                long invCount = inv.getCount(j);
                 if (invStack.getCount() <= 0)
                     continue;
 
-                boolean found = false;
-
-                for (ItemStack cachedStack : slotsSeen)
-                {
-                    if (ItemStack.isSameItemSameTags(cachedStack, invStack))
-                    {
-                        cachedStack.grow(invStack.getCount());
-                        found = true;
-                        break;
-                    }
-                }
-
-                if (!found)
-                {
-                    ItemStack stack = invStack.copy();
-                    slotsSeen.add(stack);
-
-                    slots.add(stack);
-                }
+                ItemStack stack = invStack.copy();
+                slots.add(stack);
+                slotSizes.add(invCount);
             }
         }
 
@@ -770,20 +770,27 @@ public class AbstractBrowserContainer extends AbstractContainerMenu
         public void setStackInSlot(int slot, ItemStack stack)
         {
         }
+
+        public long getStackSizeForSlot(int slot)
+        {
+            return slotSizes.getLong(slot);
+        }
     }
 
     public class ClientScrollInventory implements IItemHandlerModifiable
     {
         private int[] indices;
         private NonNullList<ItemStack> stacks;
+        private LongList stackSizes;
 
         public ClientScrollInventory()
         {
         }
 
-        public void setArray(final NonNullList<ItemStack> stacks)
+        public void setArray(final NonNullList<ItemStack> stacks, final LongList stackSizes)
         {
             this.stacks = stacks;
+            this.stackSizes = stackSizes;
 
             final List<Integer> indices = Lists.newArrayList();
 
@@ -899,11 +906,11 @@ public class AbstractBrowserContainer extends AbstractContainerMenu
                 stacks.set(indices[slot + scroll], stack);
         }
 
-        public int getStackSizeForSlot(int slot)
+        public long getStackSizeForSlot(int slot)
         {
             if ((slot + scroll) >= indices.length)
                 return 0;
-            return stacks.get(indices[slot + scroll]).getCount();
+            return stackSizes.getLong(indices[slot + scroll]);
         }
 
         public int[] getIndices()

@@ -3,6 +3,8 @@ package dev.gigaherz.enderrift.network;
 import com.google.common.collect.Lists;
 import dev.gigaherz.enderrift.EnderRiftMod;
 import dev.gigaherz.enderrift.client.ClientHelper;
+import it.unimi.dsi.fastutil.longs.LongArrayList;
+import it.unimi.dsi.fastutil.longs.LongList;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
@@ -23,19 +25,22 @@ public class SendSlotChanges implements CustomPacketPayload
     public int slotCount;
     public List<Integer> indices;
     public List<ItemStack> stacks;
+    public LongList stackSizes;
 
-    public SendSlotChanges(int windowId, int slotCount, List<Integer> indices, List<ItemStack> stacks)
+    public SendSlotChanges(int windowId, int slotCount, List<Integer> indices, List<ItemStack> stacks, LongList stackSizes)
     {
         this.windowId = windowId;
         this.slotCount = slotCount;
         this.indices = indices;
         this.stacks = stacks;
+        this.stackSizes = stackSizes;
     }
 
     public SendSlotChanges(FriendlyByteBuf buf)
     {
         indices = Lists.newArrayList();
         stacks = Lists.newArrayList();
+        stackSizes = new LongArrayList();
         windowId = buf.readInt();
         slotCount = buf.readInt();
 
@@ -43,7 +48,8 @@ public class SendSlotChanges implements CustomPacketPayload
         while (count-- > 0)
         {
             indices.add(buf.readInt());
-            stacks.add(readLargeItemStack(buf));
+            stacks.add(buf.readItemWithLargeCount());
+            stackSizes.add(buf.readVarLong());
         }
     }
 
@@ -55,7 +61,8 @@ public class SendSlotChanges implements CustomPacketPayload
         for (int i = 0; i < indices.size(); i++)
         {
             buf.writeInt(indices.get(i));
-            writeLargeItemStack(buf, stacks.get(i));
+            buf.writeItemWithLargeCount(stacks.get(i));
+            buf.writeVarLong(stackSizes.getLong(i));
         }
     }
 
@@ -68,33 +75,5 @@ public class SendSlotChanges implements CustomPacketPayload
     public void handle(PlayPayloadContext context)
     {
         ClientHelper.handleSendSlotChanges(this);
-    }
-
-    public static ItemStack readLargeItemStack(FriendlyByteBuf buf) {
-        if (!buf.readBoolean()) {
-            return ItemStack.EMPTY;
-        } else {
-            Item item = buf.readById(BuiltInRegistries.ITEM);
-            int i = buf.readVarInt();
-            return net.neoforged.neoforge.attachment.AttachmentInternals.reconstructItemStack(item, i, buf.readNbt());
-        }
-    }
-
-    public static void writeLargeItemStack(FriendlyByteBuf buf, ItemStack stack) {
-        if (stack.isEmpty()) {
-            buf.writeBoolean(false);
-        } else {
-            buf.writeBoolean(true);
-            Item item = stack.getItem();
-            buf.writeId(BuiltInRegistries.ITEM, item);
-            buf.writeVarInt(stack.getCount());
-            CompoundTag compoundtag = null;
-            if (item.isDamageable(stack) || item.shouldOverrideMultiplayerNbt()) {
-                compoundtag = stack.getTag();
-            }
-            compoundtag = net.neoforged.neoforge.attachment.AttachmentInternals.addAttachmentsToTag(compoundtag, stack, false);
-
-            buf.writeNbt(compoundtag);
-        }
     }
 }

@@ -3,6 +3,7 @@ package dev.gigaherz.enderrift.automation.browser;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import dev.gigaherz.enderrift.EnderRiftMod;
+import dev.gigaherz.enderrift.common.slots.SlotFake;
 import joptsimple.internal.Strings;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -18,11 +19,15 @@ import net.minecraft.world.item.ItemStack;
 import org.lwjgl.glfw.GLFW;
 
 import javax.annotation.Nonnull;
+import java.text.NumberFormat;
+import java.util.List;
+import java.util.Locale;
 
 public abstract class AbstractBrowserScreen<T extends AbstractBrowserContainer> extends AbstractContainerScreen<T>
 {
     private static final ResourceLocation BACKGROUND_TEXTURE = new ResourceLocation(EnderRiftMod.MODID, "textures/gui/browser.png");
-    private static final ResourceLocation TABS_TEXTURE = new ResourceLocation("minecraft:textures/gui/container/creative_inventory/tabs.png");
+    private static final ResourceLocation SCROLLER_SPRITE = new ResourceLocation("container/creative_inventory/scroller");
+    private static final ResourceLocation SCROLLER_DISABLED_SPRITE = new ResourceLocation("container/creative_inventory/scroller_disabled");
 
     private boolean isDragging;
     private int scrollY;
@@ -37,6 +42,22 @@ public abstract class AbstractBrowserScreen<T extends AbstractBrowserContainer> 
         imageWidth = 194;
         imageHeight = 168;
         this.inventoryLabelY = this.imageHeight - 94;
+    }
+
+    private static final NumberFormat longFormat = NumberFormat.getInstance(Locale.ROOT);
+    static {
+        longFormat.setGroupingUsed(true);
+    }
+
+    @Override
+    protected List<Component> getTooltipFromContainerItem(ItemStack pStack)
+    {
+        var list = super.getTooltipFromContainerItem(pStack);
+        long count = pStack.getCount();
+        if (this.hoveredSlot instanceof SlotFake sf)
+            count = this.menu.getClient().getStackSizeForSlot(sf.getSlotIndex());
+        list.add(Math.min(1,list.size()), Component.translatable("text.enderrift.browser.itemcount", longFormat.format(count)));
+        return list;
     }
 
     @Override
@@ -189,13 +210,11 @@ public abstract class AbstractBrowserScreen<T extends AbstractBrowserContainer> 
         graphics.blit(getBackgroundTexture(), leftPos, topPos, 0, 0, imageWidth, imageHeight);
         graphics.blit(getBackgroundTexture(), leftPos - 27, topPos + 8, 194, 0, 27, 28);
 
-        RenderSystem.setShaderTexture(0, TABS_TEXTURE);
-
         boolean isEnabled = needsScrollBar();
         if (isEnabled)
-            graphics.blit(getBackgroundTexture(), leftPos + 174, topPos + 18 + scrollY, 232, 0, 12, 15);
+            graphics.blitSprite(SCROLLER_SPRITE, leftPos + 174, topPos + 18 + scrollY, 12, 15);
         else
-            graphics.blit(getBackgroundTexture(), leftPos + 174, topPos + 18, 244, 0, 12, 15);
+            graphics.blitSprite(SCROLLER_DISABLED_SPRITE, leftPos + 174, topPos + 18, 12, 15);
 
         searchField.render(graphics, xMouse, yMouse, partialTicks);
     }
@@ -221,7 +240,7 @@ public abstract class AbstractBrowserScreen<T extends AbstractBrowserContainer> 
 
         if (stack.getCount() > 0)
         {
-            int count = getMenu().getClient().getStackSizeForSlot(slotIn.index);
+            long count = getMenu().getClient().getStackSizeForSlot(slotIn.index);
 
             if (count != 1)
             {
@@ -235,23 +254,28 @@ public abstract class AbstractBrowserScreen<T extends AbstractBrowserContainer> 
         }
     }
 
-    private String getSizeString(int count)
+    private static final String[] suffixes = {
+            "", "k", "M", "B", "T", "Qd.", "Qt.", "S" /* A long can't reach this but just in case whatever */
+    };
+    private String getSizeString(long count)
     {
         String s;
-        if (count >= 1000000000)
-            s = (count / 1000000000) + "B";
-        else if (count >= 900000000)
-            s = ".9B";
-        else if (count >= 1000000)
-            s = (count / 1000000) + "M";
-        else if (count >= 900000)
-            s = ".9M";
-        else if (count >= 1000)
-            s = (count / 1000) + "k";
-        else if (count >= 900)
-            s = ".9k";
+
+        int suffix = 0;
+        while(count > 1000)
+        {
+            count /= 1000;
+            suffix++;
+        }
+        if (count >= 900)
+        {
+            suffix++;
+            s = ".9" + suffixes[suffix];
+        }
         else
-            s = String.valueOf(count);
+        {
+            s = count + suffixes[suffix];
+        }
         return s;
     }
 

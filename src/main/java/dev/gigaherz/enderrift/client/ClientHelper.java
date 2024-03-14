@@ -43,7 +43,7 @@ public class ClientHelper
 
             if (entityplayer != null && entityplayer.containerMenu != null && entityplayer.containerMenu.containerId == message.windowId)
             {
-                ((AbstractBrowserContainer) entityplayer.containerMenu).slotsChanged(message.slotCount, message.indices, message.stacks);
+                ((AbstractBrowserContainer) entityplayer.containerMenu).slotsChanged(message.slotCount, message.indices, message.stacks, message.stackSizes);
             }
         });
     }

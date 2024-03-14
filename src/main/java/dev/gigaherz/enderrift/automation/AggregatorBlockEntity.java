@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import dev.gigaherz.enderrift.common.AutomationEnergyWrapper;
 import dev.gigaherz.enderrift.common.IPoweredAutomation;
+import dev.gigaherz.enderrift.rift.ILongItemHandler;
 import dev.gigaherz.graph3.Graph;
 import dev.gigaherz.graph3.GraphObject;
 import dev.gigaherz.graph3.Mergeable;
@@ -138,7 +139,7 @@ public abstract class AggregatorBlockEntity extends BlockEntity
 
     @Nullable
     @Override
-    public IItemHandler getInventory()
+    public ILongItemHandler getInventory()
     {
         return getCombinedInventoryInternal();
     }
@@ -180,7 +181,7 @@ public abstract class AggregatorBlockEntity extends BlockEntity
 
     protected abstract boolean canConnectSide(Direction side);
 
-    public IItemHandler getCombinedInventory()
+    public ILongItemHandler getCombinedInventory()
     {
         return wrapper;
     }
@@ -190,7 +191,7 @@ public abstract class AggregatorBlockEntity extends BlockEntity
         return Optional.empty();
     }
 
-    private IItemHandler getCombinedInventoryInternal()
+    private ILongItemHandler getCombinedInventoryInternal()
     {
         InventoryAggregator aggregator = new InventoryAggregator();
 

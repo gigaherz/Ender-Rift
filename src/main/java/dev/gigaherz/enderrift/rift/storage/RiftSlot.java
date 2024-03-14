@@ -49,4 +49,10 @@ public class RiftSlot
         this.count = count;
         sample.setCount((int) Math.min(this.count, Integer.MAX_VALUE));
     }
+
+    @Override
+    public String toString()
+    {
+        return sample.getItem() + " x " + count;
+    }
 }
