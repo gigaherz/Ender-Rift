@@ -15,6 +15,7 @@ import dev.gigaherz.enderrift.generator.GeneratorBlock;
 import dev.gigaherz.enderrift.generator.GeneratorBlockEntity;
 import dev.gigaherz.enderrift.generator.GeneratorContainer;
 import dev.gigaherz.enderrift.generator.GeneratorScreen;
+import dev.gigaherz.enderrift.integration.Ae2Integration;
 import dev.gigaherz.enderrift.network.ClearCraftingGrid;
 import dev.gigaherz.enderrift.network.SendSlotChanges;
 import dev.gigaherz.enderrift.network.SetVisibleSlots;
@@ -56,6 +57,7 @@ import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 import net.neoforged.bus.api.IEventBus;
+import net.neoforged.fml.ModList;
 import net.neoforged.fml.ModLoadingContext;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
@@ -72,8 +74,6 @@ import net.neoforged.neoforge.registries.DeferredBlock;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import java.util.List;
 import java.util.Map;
@@ -166,6 +166,10 @@ public class EnderRiftMod
         modLoadingContext.registerConfig(ModConfig.Type.SERVER, ConfigValues.SERVER_SPEC);
         //modLoadingContext.registerConfig(ModConfig.Type.CLIENT, ConfigData.CLIENT_SPEC);
 
+        if (ModList.get().isLoaded("ae2"))
+        {
+            Ae2Integration.init(modEventBus);
+        }
     }
 
     private void registerPackets(RegisterPayloadHandlerEvent event)

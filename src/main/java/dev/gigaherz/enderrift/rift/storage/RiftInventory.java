@@ -7,10 +7,12 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.neoforged.neoforge.items.IItemHandler;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.lang.ref.Reference;
 import java.lang.ref.ReferenceQueue;
@@ -226,5 +228,45 @@ public class RiftInventory implements ILongItemHandler
     {
         slots.clear();
         onContentsChanged();
+    }
+
+    @ApiStatus.Internal
+    public int findSlot(Item item, @Nullable CompoundTag tag)
+    {
+        for (int i = 0; i < slots.size(); i++)
+        {
+            RiftSlot slot = slots.get(i);
+            if (slot.getItem() == item && Objects.equals(slot.getTag(), tag))
+            {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    @ApiStatus.Internal
+    public void append(Item item, @Nullable CompoundTag tag, long amount)
+    {
+        var slot = new RiftSlot(item, tag, amount);
+        slots.add(slot);
+    }
+
+    @Nullable
+    @ApiStatus.Internal
+    public RiftSlot getSlot(int index)
+    {
+        if (index >= slots.size())
+        {
+            return null;
+        }
+        return slots.get(index);
+    }
+
+    public void clearSlot(int index)
+    {
+        if (index < slots.size())
+        {
+            slots.remove(index);
+        }
     }
 }

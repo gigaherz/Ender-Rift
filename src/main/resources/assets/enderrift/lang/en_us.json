@@ -30,6 +30,7 @@
     "text.enderrift.rift.energy_usage_insert": "%s RF used by next insertion.",
     "text.enderrift.rift.energy_usage_extract": "%s RF used by next extraction.",
     "text.enderrift.rift.rf": "%s / %s RF.",
+    "text.enderrift.rift.me_name": "Ender-Rift",
 
     "text.enderrift.generator.status.generating.label": "Generating:",
     "text.enderrift.generator.status.generating": "Generating: %d RF/t",
