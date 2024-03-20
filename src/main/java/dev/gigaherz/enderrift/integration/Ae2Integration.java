@@ -21,9 +21,6 @@ import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Iterator;
-import java.util.Map;
-
 public class Ae2Integration
 {
     private static final BlockCapability<MEStorage, @Nullable Direction> ME_STORAGE = BlockCapability
@@ -41,23 +38,42 @@ public class Ae2Integration
                 EnderRiftMod.RIFT_BLOCK_ENTITY.get(),
                 (blockEntity, context) -> {
                     var inv = blockEntity.getInventory();
-                    return inv != null ? new Ae2RiftStorage(inv) : null;
+                    return inv != null ? inv.getOrCreateFeature(Ae2RiftStorage.class, Ae2RiftStorage::new) : null;
                 }
         );
     }
 
-    private static class Ae2RiftStorage implements MEStorage
+    private static class Ae2RiftStorage implements MEStorage, RiftChangeHook
     {
         @NotNull
         private final RiftInventory inv;
-        @NotNull
-        private final Ae2RiftChangeHook hook;
+
+        private final Multimap<AEItemKey, RiftSlot> slotLookup = ArrayListMultimap.create();
 
         public Ae2RiftStorage(RiftInventory inv)
         {
             this.inv = inv;
-            this.hook = new Ae2RiftChangeHook();
-            inv.setHook(hook);
+            inv.addHook(this);
+        }
+
+        @Override
+        public void onClear()
+        {
+            slotLookup.clear();
+        }
+
+        @Override
+        public void onAdd(RiftSlot slot)
+        {
+            var key = AEItemKey.of(slot.getSample());
+            slotLookup.put(key, slot);
+        }
+
+        @Override
+        public void onRemove(RiftSlot slot)
+        {
+            var key = AEItemKey.of(slot.getSample());
+            slotLookup.remove(key, slot);
         }
 
         @Override
@@ -117,7 +133,7 @@ public class Ae2Integration
         @Override
         public void getAvailableStacks(KeyCounter out)
         {
-            for(var keyValue : hook)
+            for(var keyValue : slotLookup.entries())
             {
                 var key = keyValue.getKey();
                 var slot = keyValue.getValue();
@@ -130,47 +146,9 @@ public class Ae2Integration
         }
 
         @Nullable
-        private RiftSlot findSlot(AEItemKey itemKey)
-        {
-            return hook.findSlot(itemKey);
-        }
-    }
-
-    private static class Ae2RiftChangeHook implements RiftChangeHook, Iterable<Map.Entry<AEItemKey, RiftSlot>>
-    {
-
-        private final Multimap<AEItemKey, RiftSlot> slotLookup = ArrayListMultimap.create();
-
-        public Iterator<Map.Entry<AEItemKey, RiftSlot>> iterator()
-        {
-            return slotLookup.entries().iterator();
-        }
-
-        @Nullable
         public RiftSlot findSlot(AEItemKey key)
         {
             return slotLookup.get(key).stream().findFirst().orElse(null);
-        }
-
-
-        @Override
-        public void onClear()
-        {
-            slotLookup.clear();
-        }
-
-        @Override
-        public void onAdd(RiftSlot slot)
-        {
-            var key = AEItemKey.of(slot.getSample());
-            slotLookup.put(key, slot);
-        }
-
-        @Override
-        public void onRemove(RiftSlot slot)
-        {
-            var key = AEItemKey.of(slot.getSample());
-            slotLookup.remove(key, slot);
         }
     }
 }

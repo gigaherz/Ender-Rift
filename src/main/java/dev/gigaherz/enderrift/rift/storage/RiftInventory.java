@@ -8,21 +8,17 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.lang.ref.Reference;
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 public class RiftInventory implements ILongItemHandler
 {
@@ -31,7 +27,7 @@ public class RiftInventory implements ILongItemHandler
     final ReferenceQueue<IRiftChangeListener> pendingRemovals = new ReferenceQueue<>();
     private final List<RiftSlot> slots = Lists.newArrayList();
     private final RiftHolder holder;
-    private RiftChangeHook hook;
+    private final List<RiftChangeHook> hooks = new ArrayList<>();
 
     RiftInventory(final RiftHolder holder)
     {
@@ -105,7 +101,7 @@ public class RiftInventory implements ILongItemHandler
         if (slots.size() > 0)
         {
             slots.clear();
-            if (hook != null) hook.onClear();
+            afterClear();
         }
 
         ListTag list = root.getList("Contents", Tag.TAG_COMPOUND);
@@ -118,9 +114,36 @@ public class RiftInventory implements ILongItemHandler
             ItemStack stack = ItemStack.of(itemCompound);
             RiftSlot slot = new RiftSlot(stack, count);
             slots.add(slot);
-            if (hook != null) hook.onAdd(slot);
+            afterAdd(slot);
         }
         onContentsChanged();
+    }
+
+    private void afterClear()
+    {
+        //noinspection ForLoopReplaceableByForEach
+        for (int i = 0; i < hooks.size(); i++)
+        {
+            hooks.get(i).onClear();
+        }
+    }
+
+    private void afterRemove(RiftSlot slot)
+    {
+        //noinspection ForLoopReplaceableByForEach
+        for (int i = 0; i < hooks.size(); i++)
+        {
+            hooks.get(i).onRemove(slot);
+        }
+    }
+
+    private void afterAdd(RiftSlot slot)
+    {
+        //noinspection ForLoopReplaceableByForEach
+        for (int i = 0; i < hooks.size(); i++)
+        {
+            hooks.get(i).onAdd(slot);
+        }
     }
 
     @Override
@@ -136,8 +159,7 @@ public class RiftInventory implements ILongItemHandler
         {
             return ItemStack.EMPTY;
         }
-        RiftSlot slot = slots.get(index);
-        return slot.getSample();
+        return slots.get(index).getSample();
     }
 
     @Override
@@ -163,7 +185,7 @@ public class RiftInventory implements ILongItemHandler
             }
             var slot = new RiftSlot(stack);
             slots.add(slot);
-            if (hook != null) hook.onAdd(slot);
+            afterAdd(slot);
             return ItemStack.EMPTY;
         }
         finally
@@ -202,7 +224,7 @@ public class RiftInventory implements ILongItemHandler
         else if (count <= wanted)
         {
             slots.remove(index);
-            if (hook != null) hook.onRemove(slot);
+            afterRemove(slot);
         }
         else
         {
@@ -240,7 +262,7 @@ public class RiftInventory implements ILongItemHandler
         if (slots.size() > 0)
         {
             slots.clear();
-            if (hook != null) hook.onClear();
+            afterClear();
             onContentsChanged();
         }
     }
@@ -250,27 +272,31 @@ public class RiftInventory implements ILongItemHandler
     {
         var slot = new RiftSlot(stack, amount);
         slots.add(slot);
-        if (hook != null) hook.onAdd(slot);
+        afterAdd(slot);
     }
 
     public void clearSlot(RiftSlot slot)
     {
         if (slots.remove(slot))
         {
-            if (hook != null) hook.onRemove(slot);
+            afterRemove(slot);
         }
     }
 
     @ApiStatus.Internal
-    public void setHook(RiftChangeHook hook)
+    public void addHook(RiftChangeHook hook)
     {
-        if (this.hook != hook)
+        hooks.add(hook);
+        for (var slot : slots)
         {
-            this.hook = hook;
-            for (var slot : slots)
-            {
-                this.hook.onAdd(slot);
-            }
+            hook.onAdd(slot);
         }
+    }
+
+    private final Map<Class<?>, Object> attachedFeatures = new IdentityHashMap<>();
+    public <T> T getOrCreateFeature(Class<T> featureClass, Function<RiftInventory, T> featureFactory)
+    {
+        //noinspection unchecked
+        return (T)attachedFeatures.computeIfAbsent(featureClass, key -> featureFactory.apply(this));
     }
 }
