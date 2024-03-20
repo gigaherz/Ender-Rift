@@ -3,7 +3,7 @@ plugins {
     id 'eclipse'
     id 'idea'
     id 'maven-publish'
-    id 'net.neoforged.gradle.userdev' version '7.0.97'
+    id 'net.neoforged.gradle.userdev' version '7.0.100'
     id 'com.github.johnrengelman.shadow' version '8.1.1'
 }
 
@@ -71,8 +71,8 @@ repositories {
 
 subsystems {
     parchment {
-        minecraftVersion="1.20.3"
-        mappingsVersion="2023.12.31"
+        minecraftVersion="1.20.4"
+        mappingsVersion="2024.02.25"
     }
 }
 
@@ -105,7 +105,7 @@ configurations {
 }
 
 dependencies {
-    implementation 'net.neoforged:neoforge:20.4.198'
+    implementation 'net.neoforged:neoforge:20.4.210'
 
     compileOnly 'org.jetbrains:annotations:20.1.0'
 

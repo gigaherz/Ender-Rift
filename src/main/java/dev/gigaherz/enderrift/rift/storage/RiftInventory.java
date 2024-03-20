@@ -3,6 +3,7 @@ package dev.gigaherz.enderrift.rift.storage;
 import com.google.common.collect.Lists;
 import dev.gigaherz.enderrift.rift.ILongItemHandler;
 import dev.gigaherz.enderrift.rift.IRiftChangeListener;
+import dev.gigaherz.enderrift.rift.RiftChangeHook;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -30,6 +31,7 @@ public class RiftInventory implements ILongItemHandler
     final ReferenceQueue<IRiftChangeListener> pendingRemovals = new ReferenceQueue<>();
     private final List<RiftSlot> slots = Lists.newArrayList();
     private final RiftHolder holder;
+    private RiftChangeHook hook;
 
     RiftInventory(final RiftHolder holder)
     {
@@ -82,15 +84,6 @@ public class RiftInventory implements ILongItemHandler
         });
     }
 
-    public long getCount(int slot)
-    {
-        if (slot < 0 || slot >= slots.size())
-        {
-            return 0;
-        }
-        return slots.get(slot).getCount();
-    }
-
     CompoundTag save()
     {
         CompoundTag root = new CompoundTag();
@@ -109,7 +102,12 @@ public class RiftInventory implements ILongItemHandler
 
     void load(CompoundTag root)
     {
-        slots.clear();
+        if (slots.size() > 0)
+        {
+            slots.clear();
+            if (hook != null) hook.onClear();
+        }
+
         ListTag list = root.getList("Contents", Tag.TAG_COMPOUND);
         for (Tag rawTag : list)
         {
@@ -118,9 +116,9 @@ public class RiftInventory implements ILongItemHandler
             var itemCompound = tag.getCompound("Item");
             itemCompound.putInt("Count", 1);
             ItemStack stack = ItemStack.of(itemCompound);
-            RiftSlot slot = new RiftSlot(stack);
-            slot.setCount(count);
+            RiftSlot slot = new RiftSlot(stack, count);
             slots.add(slot);
+            if (hook != null) hook.onAdd(slot);
         }
         onContentsChanged();
     }
@@ -163,7 +161,9 @@ public class RiftInventory implements ILongItemHandler
                 }
                 return ItemStack.EMPTY;
             }
-            slots.add(new RiftSlot(stack));
+            var slot = new RiftSlot(stack);
+            slots.add(slot);
+            if (hook != null) hook.onAdd(slot);
             return ItemStack.EMPTY;
         }
         finally
@@ -202,6 +202,7 @@ public class RiftInventory implements ILongItemHandler
         else if (count <= wanted)
         {
             slots.remove(index);
+            if (hook != null) hook.onRemove(slot);
         }
         else
         {
@@ -224,49 +225,52 @@ public class RiftInventory implements ILongItemHandler
         return !ItemStack.isSameItem(ItemStack.EMPTY, stack);
     }
 
+    @Override
+    public long getCount(int index)
+    {
+        if (index < 0 || index >= slots.size())
+        {
+            return 0;
+        }
+        return slots.get(index).getCount();
+    }
+
     public void clear()
     {
-        slots.clear();
-        onContentsChanged();
-    }
-
-    @ApiStatus.Internal
-    public int findSlot(Item item, @Nullable CompoundTag tag)
-    {
-        for (int i = 0; i < slots.size(); i++)
+        if (slots.size() > 0)
         {
-            RiftSlot slot = slots.get(i);
-            if (slot.getItem() == item && Objects.equals(slot.getTag(), tag))
-            {
-                return i;
-            }
+            slots.clear();
+            if (hook != null) hook.onClear();
+            onContentsChanged();
         }
-        return -1;
     }
 
     @ApiStatus.Internal
-    public void append(Item item, @Nullable CompoundTag tag, long amount)
+    public void append(ItemStack stack, long amount)
     {
-        var slot = new RiftSlot(item, tag, amount);
+        var slot = new RiftSlot(stack, amount);
         slots.add(slot);
+        if (hook != null) hook.onAdd(slot);
     }
 
-    @Nullable
-    @ApiStatus.Internal
-    public RiftSlot getSlot(int index)
+    public void clearSlot(RiftSlot slot)
     {
-        if (index >= slots.size())
+        if (slots.remove(slot))
         {
-            return null;
+            if (hook != null) hook.onRemove(slot);
         }
-        return slots.get(index);
     }
 
-    public void clearSlot(int index)
+    @ApiStatus.Internal
+    public void setHook(RiftChangeHook hook)
     {
-        if (index < slots.size())
+        if (this.hook != hook)
         {
-            slots.remove(index);
+            this.hook = hook;
+            for (var slot : slots)
+            {
+                this.hook.onAdd(slot);
+            }
         }
     }
 }

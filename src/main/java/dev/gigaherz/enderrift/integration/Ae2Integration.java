@@ -6,7 +6,10 @@ import appeng.api.stacks.AEItemKey;
 import appeng.api.stacks.AEKey;
 import appeng.api.stacks.KeyCounter;
 import appeng.api.storage.MEStorage;
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimap;
 import dev.gigaherz.enderrift.EnderRiftMod;
+import dev.gigaherz.enderrift.rift.RiftChangeHook;
 import dev.gigaherz.enderrift.rift.storage.RiftInventory;
 import dev.gigaherz.enderrift.rift.storage.RiftSlot;
 import net.minecraft.core.Direction;
@@ -15,9 +18,11 @@ import net.minecraft.resources.ResourceLocation;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.capabilities.BlockCapability;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Objects;
+import java.util.Iterator;
+import java.util.Map;
 
 public class Ae2Integration
 {
@@ -34,102 +39,138 @@ public class Ae2Integration
         event.registerBlockEntity(
                 ME_STORAGE,
                 EnderRiftMod.RIFT_BLOCK_ENTITY.get(),
-                (blockEntity, context) -> new MEStorage()
-                {
-                    private final RiftInventory inv = blockEntity.getInventory();
+                (blockEntity, context) -> {
+                    var inv = blockEntity.getInventory();
+                    return inv != null ? new Ae2RiftStorage(inv) : null;
+                }
+        );
+    }
 
-                    @Override
-                    public Component getDescription()
-                    {
-                        return Component.translatable("text.enderrift.rift.me_name");
-                    }
+    private static class Ae2RiftStorage implements MEStorage
+    {
+        @NotNull
+        private final RiftInventory inv;
+        @NotNull
+        private final Ae2RiftChangeHook hook;
 
-                    @Override
-                    public long insert(AEKey what, long amount, Actionable mode, IActionSource source)
-                    {
-                        if (inv == null)
-                            return 0;
+        public Ae2RiftStorage(RiftInventory inv)
+        {
+            this.inv = inv;
+            this.hook = new Ae2RiftChangeHook();
+            inv.setHook(hook);
+        }
 
-                        if (!(what instanceof AEItemKey itemKey))
-                            return 0;
+        @Override
+        public Component getDescription()
+        {
+            return Component.translatable("text.enderrift.rift.me_name");
+        }
 
-                        if (mode.isSimulate())
-                            return amount;
+        @Override
+        public long insert(AEKey what, long amount, Actionable mode, IActionSource source)
+        {
+            if (!(what instanceof AEItemKey itemKey))
+                return 0;
 
-                        int index = inv.findSlot(itemKey.getItem(), itemKey.getTag());
+            if (mode.isSimulate())
+                return amount;
 
-                        if (index < 0)
-                        {
-                            inv.append(itemKey.getItem(), itemKey.getTag(), amount);
-                        }
-                        else
-                        {
-                            RiftSlot slot = inv.getSlot(index);
-                            Objects.requireNonNull(slot).addCount(amount);
-                        }
+            var slot = findSlot(itemKey);
 
-                        return amount;
-                    }
+            if (slot == null)
+            {
+                inv.append(itemKey.toStack(), amount);
+            }
+            else
+            {
+                slot.addCount(amount);
+            }
 
-                    @Override
-                    public long extract(AEKey what, long amount, Actionable mode, IActionSource source)
-                    {
-                        if (inv == null)
-                            return 0;
+            return amount;
+        }
 
-                        if (!(what instanceof AEItemKey itemKey))
-                            return 0;
+        @Override
+        public long extract(AEKey what, long amount, Actionable mode, IActionSource source)
+        {
+            if (!(what instanceof AEItemKey itemKey))
+                return 0;
 
-                        int index = inv.findSlot(itemKey.getItem(), itemKey.getTag());
+            var slot = findSlot(itemKey);
+            if (slot == null)
+                return 0;
 
-                        if (index < 0)
-                        {
-                            return 0;
-                        }
-                        else
-                        {
-                            RiftSlot slot = Objects.requireNonNull(inv.getSlot(index));
+            var count = slot.getCount();
 
-                            if (mode.isSimulate())
-                                return Math.min(slot.getCount(), amount);
+            if (mode.isSimulate())
+                return Math.min(slot.getCount(), amount);
 
-                            if (slot.getCount() > amount)
-                            {
-                                slot.subtractCount(amount);
-                            }
-                            else
-                            {
-                                inv.clearSlot(index);
-                            }
-                        }
+            if (count <= amount)
+            {
+                inv.clearSlot(slot);
+                return count;
+            }
 
-                        return amount;
-                    }
+            slot.subtractCount(amount);
+            return amount;
+        }
 
-                    @Override
-                    public void getAvailableStacks(KeyCounter out)
-                    {
-                        if (inv == null)
-                            return;
+        @Override
+        public void getAvailableStacks(KeyCounter out)
+        {
+            for(var keyValue : hook)
+            {
+                var key = keyValue.getKey();
+                var slot = keyValue.getValue();
 
-                        for(int i=0;i<inv.getSlots();i++)
-                        {
-                            var slot = inv.getSlot(i);
-                            if (slot == null || slot.getCount() == 0)
-                                continue;
+                if (slot == null || slot.getCount() == 0)
+                    continue;
 
-                            var meKey = (AEItemKey)slot.meKey;
-                            if (meKey == null)
-                            {
-                                slot.meKey = meKey = AEItemKey.of(slot.getSample());
-                            }
+                out.add(key, slot.getCount());
+            }
+        }
 
-                            if (meKey != null)
-                            {
-                                out.add(meKey, slot.getCount());
-                            }
-                        }
-                    }
-                });
+        @Nullable
+        private RiftSlot findSlot(AEItemKey itemKey)
+        {
+            return hook.findSlot(itemKey);
+        }
+    }
+
+    private static class Ae2RiftChangeHook implements RiftChangeHook, Iterable<Map.Entry<AEItemKey, RiftSlot>>
+    {
+
+        private final Multimap<AEItemKey, RiftSlot> slotLookup = ArrayListMultimap.create();
+
+        public Iterator<Map.Entry<AEItemKey, RiftSlot>> iterator()
+        {
+            return slotLookup.entries().iterator();
+        }
+
+        @Nullable
+        public RiftSlot findSlot(AEItemKey key)
+        {
+            return slotLookup.get(key).stream().findFirst().orElse(null);
+        }
+
+
+        @Override
+        public void onClear()
+        {
+            slotLookup.clear();
+        }
+
+        @Override
+        public void onAdd(RiftSlot slot)
+        {
+            var key = AEItemKey.of(slot.getSample());
+            slotLookup.put(key, slot);
+        }
+
+        @Override
+        public void onRemove(RiftSlot slot)
+        {
+            var key = AEItemKey.of(slot.getSample());
+            slotLookup.remove(key, slot);
+        }
     }
 }
