@@ -221,13 +221,13 @@ public class EnderRiftMod
             return 0;
         }
         UUID id = context.getArgument("riftId", UUID.class);
-        RiftHolder holder = RiftStorage.get().getRift(id);
-        if (holder == null || !holder.isValid())
+        var optionalHolder = RiftStorage.get().findRift(id);
+        if (optionalHolder.isEmpty())
         {
             context.getSource().sendFailure(Component.literal(String.format("Couldn't find rift with id '%s'", id)));
             return 0;
         }
-        locateRiftById(context, id, holder.getInventory());
+        locateRiftById(context, id, optionalHolder.orElseThrow().getInventory());
         return 0;
     }
 

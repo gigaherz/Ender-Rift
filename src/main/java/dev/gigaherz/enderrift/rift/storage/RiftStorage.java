@@ -16,6 +16,7 @@ import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.event.level.LevelEvent;
 import net.neoforged.neoforge.event.server.ServerAboutToStartEvent;
 import net.neoforged.neoforge.event.server.ServerStoppingEvent;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 
 import java.io.File;
@@ -24,10 +25,7 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
@@ -185,16 +183,34 @@ public class RiftStorage implements FilenameFilter
         }
     }
 
-    public RiftHolder getRift(UUID id)
+    public RiftHolder getRift(@Nullable UUID id)
     {
         if (id == null)
         {
-            return null;
+            return newRift();
         }
         lock.readLock().lock();
         try
         {
             return rifts.computeIfAbsent(id, BUILDER);
+        }
+        finally
+        {
+            lock.readLock().unlock();
+        }
+    }
+
+    public Optional<RiftHolder> findRift(@Nullable UUID id)
+    {
+        if (id == null)
+        {
+            return Optional.empty();
+        }
+        lock.readLock().lock();
+        try
+        {
+            var rift = rifts.get(id);
+            return Optional.ofNullable(rift);
         }
         finally
         {

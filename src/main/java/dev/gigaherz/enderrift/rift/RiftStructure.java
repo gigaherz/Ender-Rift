@@ -15,6 +15,7 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 
+import java.util.Objects;
 import java.util.UUID;
 
 public class RiftStructure
@@ -177,18 +178,15 @@ public class RiftStructure
 
         world.setBlockAndUpdate(pos, state.setValue(RiftBlock.ASSEMBLED, true));
 
-        RiftBlockEntity rift = (RiftBlockEntity) world.getBlockEntity(pos);
+        RiftBlockEntity rift = Objects.requireNonNull((RiftBlockEntity) world.getBlockEntity(pos));
 
         CompoundTag tagCompound = itemStack.getTag();
 
         if (tagCompound != null && tagCompound.contains("RiftId"))
         {
             UUID id = tagCompound.getUUID("RiftId");
-            if (id != null)
-            {
-                rift.assemble(RiftStorage.get().getRift(id));
-                return;
-            }
+            rift.assemble(RiftStorage.get().getRift(id));
+            return;
         }
         rift.assemble(RiftStorage.get().newRift());
     }
@@ -219,7 +217,7 @@ public class RiftStructure
         {
             world.setBlockAndUpdate(pos, state.setValue(RiftBlock.ASSEMBLED, false));
 
-            RiftBlockEntity rift = (RiftBlockEntity) world.getBlockEntity(pos);
+            RiftBlockEntity rift = Objects.requireNonNull((RiftBlockEntity) world.getBlockEntity(pos));
 
             ItemStack stack = rift.getRiftItem();
             Containers.dropItemStack(world, pos.getX(), pos.getY(), pos.getZ(), stack);

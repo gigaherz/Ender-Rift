@@ -76,7 +76,7 @@ public class RiftInventory implements ILongItemHandler
             {
                 return;
             }
-            listener.getLocation().ifPresent(locationConsumer);
+            locationConsumer.accept(listener.getLocation());
         });
     }
 

@@ -27,6 +27,7 @@ import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import net.neoforged.neoforge.items.ItemHandlerHelper;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -145,23 +146,19 @@ public class RiftBlock extends BaseEntityBlock
             return InteractionResult.FAIL;
 
         BlockEntity te = worldIn.getBlockEntity(pos);
-        if (!(te instanceof RiftBlockEntity))
+        if (!(te instanceof RiftBlockEntity rift) || !rift.isPowered())
             return InteractionResult.FAIL;
 
         if (worldIn.isClientSide)
             return InteractionResult.SUCCESS;
 
-        RiftBlockEntity rift = (RiftBlockEntity) te;
+        var inv = rift.getInventory();
+        if (inv == null)
+            return InteractionResult.FAIL;
 
-        int count = stack.getCount();
-        ItemStack stackToPush = stack.split(count);
-        ItemStack remaining = AutomationHelper.insertItems(rift.getInventory(), stackToPush);
-        stack.grow(remaining.getCount());
+        ItemStack remaining = ItemHandlerHelper.insertItem(inv, stack, false);
 
-        if (stack.getCount() <= 0)
-            stack = ItemStack.EMPTY;
-
-        playerIn.setItemInHand(handIn, stack);
+        playerIn.setItemInHand(handIn, remaining);
 
         return InteractionResult.SUCCESS;
     }
@@ -177,10 +174,8 @@ public class RiftBlock extends BaseEntityBlock
             return;
 
         BlockEntity te = worldIn.getBlockEntity(pos);
-        if (!(te instanceof RiftBlockEntity))
+        if (!(te instanceof RiftBlockEntity rift) || !rift.isPowered())
             return;
-
-        RiftBlockEntity rift = (RiftBlockEntity) te;
 
         ItemStack stack = playerIn.getItemInHand(InteractionHand.MAIN_HAND);
         if (stack.getCount() <= 0)
@@ -195,9 +190,13 @@ public class RiftBlock extends BaseEntityBlock
                 return;
         }
 
+        var inv = rift.getInventory();
+        if (inv == null)
+            return;
+
         int numberToExtract = playerIn.isShiftKeyDown() ? 1 : stack.getMaxStackSize();
 
-        ItemStack extracted = AutomationHelper.extractItems(rift.getInventory(), stack.copy(), numberToExtract, false);
+        ItemStack extracted = AutomationHelper.extractItems(inv, stack, numberToExtract, false);
         if (extracted.getCount() > 0)
         {
             popResource(worldIn, pos, extracted);
@@ -211,19 +210,21 @@ public class RiftBlock extends BaseEntityBlock
         if (worldIn.isClientSide)
             return;
 
-        if (!(entityIn instanceof ItemEntity item))
+        if (!(entityIn instanceof ItemEntity itemEntity))
             return;
 
         if (state.getBlock() != this || !state.getValue(ASSEMBLED))
             return;
 
         BlockEntity te = worldIn.getBlockEntity(pos);
-        if (!(te instanceof RiftBlockEntity rift))
+        if (!(te instanceof RiftBlockEntity rift) || !rift.isPowered())
             return;
 
-        ItemStack stack = item.getItem().copy();
+        var inv = rift.getInventory();
+        if (inv == null)
+            return;
 
-        ItemStack remaining = AutomationHelper.insertItems(rift.getInventory(), stack);
+        ItemStack remaining = ItemHandlerHelper.insertItem(inv, itemEntity.getItem(), false);
 
         if (remaining.getCount() <= 0)
         {
@@ -231,7 +232,7 @@ public class RiftBlock extends BaseEntityBlock
         }
         else
         {
-            item.setItem(remaining);
+            itemEntity.setItem(remaining);
         }
     }
 }

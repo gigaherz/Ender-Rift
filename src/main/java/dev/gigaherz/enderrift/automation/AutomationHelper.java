@@ -45,7 +45,6 @@ public abstract class AutomationHelper
 
         wanted = Math.min(stack.getMaxStackSize(), wanted);
 
-        ItemStack _extracted = stack.copy();
         int extractCount = 0;
 
         for (int i = 0; i < parent.getSlots(); i++)
@@ -71,7 +70,6 @@ public abstract class AutomationHelper
         if (extractCount <= 0)
             return ItemStack.EMPTY;
 
-        _extracted.setCount(extractCount);
-        return _extracted;
+        return stack.copyWithCount(extractCount);
     }
 }

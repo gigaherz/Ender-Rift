@@ -48,7 +48,13 @@ public class GeneratorBlockEntity extends BlockEntity
     public static final int HEAT_INTERVAL = 20;
     public static final int POWER_TRANSFER_MAX = 800;
 
-    private final EnergyBuffer energyBuffer = new EnergyBuffer(POWER_LIMIT);
+    private final EnergyBuffer energyBuffer = new EnergyBuffer(POWER_LIMIT) {
+        @Override
+        public boolean canReceive()
+        {
+            return false;
+        }
+    };
 
     private final ItemStackHandler fuelSlot = new ItemStackHandler(SLOT_COUNT)
     {

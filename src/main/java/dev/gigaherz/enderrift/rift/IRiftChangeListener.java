@@ -13,5 +13,5 @@ public interface IRiftChangeListener
 
     Optional<Level> getRiftLevel();
 
-    Optional<BlockPos> getLocation();
+    BlockPos getLocation();
 }

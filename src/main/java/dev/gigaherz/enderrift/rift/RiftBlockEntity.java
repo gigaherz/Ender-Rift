@@ -7,12 +7,12 @@ import dev.gigaherz.enderrift.rift.storage.RiftInventory;
 import dev.gigaherz.enderrift.rift.storage.RiftStorage;
 import dev.gigaherz.enderrift.rift.storage.migration.RiftMigration_17_08_2022;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.util.Mth;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -23,34 +23,31 @@ import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.neoforged.neoforge.energy.IEnergyStorage;
 import net.neoforged.neoforge.items.IItemHandler;
-import net.neoforged.neoforge.items.IItemHandlerModifiable;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Optional;
-import java.util.Random;
 import java.util.UUID;
 
 @Mod.EventBusSubscriber(modid = EnderRiftMod.MODID, bus= Mod.EventBusSubscriber.Bus.MOD)
 public class RiftBlockEntity extends BlockEntity implements IRiftChangeListener
 {
-    private boolean changedFlag;
-
     @SubscribeEvent
     private static void registerCapability(RegisterCapabilitiesEvent event)
     {
         event.registerBlockEntity(
                 Capabilities.ItemHandler.BLOCK,
                 EnderRiftMod.RIFT_BLOCK_ENTITY.get(),
-                (be, context) -> be.poweredInventory
+                (be, context) -> be.powered ? be.getInventory() : null
         );
     }
 
     private static final int STARTUP_POWER = 10000;
     public static final int BUFFER_POWER = 1000000;
-    private final Random rand = new Random();
+    private final RandomSource rand = RandomSource.create();
 
-    private EnergyBuffer energyBuffer = new EnergyBuffer(BUFFER_POWER);
+    private final EnergyBuffer energyBuffer = new EnergyBuffer(BUFFER_POWER);
+
+    private boolean changedFlag;
 
     private boolean powered;
     private RiftHolder holder;
@@ -61,8 +58,6 @@ public class RiftBlockEntity extends BlockEntity implements IRiftChangeListener
     private float poweringState;
     private boolean poweringStartParticlesSpawned = false;
     // End of Client-side fields
-
-    public PoweredInventory poweredInventory = new PoweredInventory();
 
     public RiftBlockEntity(BlockPos pos, BlockState state)
     {
@@ -165,27 +160,21 @@ public class RiftBlockEntity extends BlockEntity implements IRiftChangeListener
 
         if (!listenerState && level != null && !level.isClientSide)
         {
-            holder.getInventoryOrCreate().addWeakListener(this);
+            RiftInventory inv = holder.getInventoryOrCreate();
+            inv.addWeakListener(this);
             listenerState = true;
+            return inv;
         }
-        return holder.getInventory();
-    }
 
-    public int countInventoryStacks()
-    {
-        IItemHandler handler = getInventory();
-        return handler == null ? 0 : (handler.getSlots() - 1);
+        return holder.getInventory();
     }
 
     public ItemStack getRiftItem()
     {
-        ItemStack stack = new ItemStack(EnderRiftMod.RIFT_ORB.get());
+        var stack = new ItemStack(EnderRiftMod.RIFT_ORB.get());
 
-        CompoundTag tag = new CompoundTag();
-
-        tag.putUUID("RiftId", holder.getId());
-
-        stack.setTag(tag);
+        stack.getOrCreateTag()
+                .putUUID("RiftId", holder.getId());
 
         return stack;
     }
@@ -248,6 +237,9 @@ public class RiftBlockEntity extends BlockEntity implements IRiftChangeListener
 
     public ItemStack chooseRandomStack()
     {
+        if (!powered)
+            return ItemStack.EMPTY;
+
         IItemHandler handler = getInventory();
         if (handler == null)
             return ItemStack.EMPTY;
@@ -259,16 +251,7 @@ public class RiftBlockEntity extends BlockEntity implements IRiftChangeListener
 
         int slot = rand.nextInt(max);
 
-        return poweredInventory.getStackInSlot(slot);
-    }
-
-    public UUID getRiftId()
-    {
-        if (holder == null)
-        {
-            return null;
-        }
-        return holder.getId();
+        return handler.getStackInSlot(slot);
     }
 
     public int getEnergyUsage()
@@ -313,84 +296,13 @@ public class RiftBlockEntity extends BlockEntity implements IRiftChangeListener
     }
 
     @Override
-    public Optional<BlockPos> getLocation()
+    public BlockPos getLocation()
     {
-        return Optional.ofNullable(getBlockPos());
+        return getBlockPos();
     }
 
     public static void tickStatic(Level level, BlockPos blockPos, BlockState blockState, RiftBlockEntity te)
     {
         te.tick();
-    }
-
-    public class PoweredInventory implements IItemHandler
-    {
-        public long getCount(int slot)
-        {
-            ILongItemHandler handler = getInventory();
-            if (handler == null)
-                return 0;
-            return handler.getCount(slot);
-        }
-
-        @Override
-        public int getSlots()
-        {
-            IItemHandler handler = getInventory();
-            if (handler == null)
-                return 0;
-            return handler.getSlots();
-        }
-
-        @Override
-        public ItemStack getStackInSlot(int slot)
-        {
-            if (!powered)
-                return ItemStack.EMPTY;
-            IItemHandler handler = getInventory();
-            if (handler == null)
-                return ItemStack.EMPTY;
-            return handler.getStackInSlot(slot);
-        }
-
-        @Override
-        public ItemStack insertItem(int slot, ItemStack stack, boolean simulate)
-        {
-            if (!powered)
-                return stack;
-            IItemHandler handler = getInventory();
-            if (handler == null)
-                return stack;
-            return handler.insertItem(slot, stack, simulate);
-        }
-
-        @Override
-        public ItemStack extractItem(int slot, int amount, boolean simulate)
-        {
-            if (!powered)
-                return ItemStack.EMPTY;
-            IItemHandler handler = getInventory();
-            if (handler == null)
-                return ItemStack.EMPTY;
-            return handler.extractItem(slot, amount, simulate);
-        }
-
-        @Override
-        public int getSlotLimit(int slot)
-        {
-            IItemHandler handler = getInventory();
-            if (handler == null)
-                return 64;
-            return handler.getSlotLimit(slot);
-        }
-
-        @Override
-        public boolean isItemValid(int slot, @Nonnull ItemStack stack)
-        {
-            IItemHandler handler = getInventory();
-            if (handler == null)
-                return false;
-            return handler.isItemValid(slot, stack);
-        }
     }
 }

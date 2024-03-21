@@ -37,6 +37,8 @@ public class Ae2Integration
                 ME_STORAGE,
                 EnderRiftMod.RIFT_BLOCK_ENTITY.get(),
                 (blockEntity, context) -> {
+                    if (!blockEntity.isPowered())
+                        return null;
                     var inv = blockEntity.getInventory();
                     return inv != null ? inv.getOrCreateFeature(Ae2RiftStorage.class, Ae2RiftStorage::new) : null;
                 }
