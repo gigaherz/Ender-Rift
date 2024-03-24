@@ -165,7 +165,8 @@ public class AbstractBrowserContainer extends AbstractContainerMenu
     {
         /* super stuff */
 
-        for(int i = 0; i < this.slots.size(); ++i) {
+        for (int i = 0; i < this.slots.size(); ++i)
+        {
             var slot = this.slots.get(i);
             if (slot instanceof SlotFake) continue; // exclude fake slots, we sync them below
             ItemStack itemstack = slot.getItem();
@@ -176,10 +177,12 @@ public class AbstractBrowserContainer extends AbstractContainerMenu
 
         this.synchronizeCarriedToRemote();
 
-        for(int j = 0; j < this.dataSlots.size(); ++j) {
+        for (int j = 0; j < this.dataSlots.size(); ++j)
+        {
             DataSlot dataslot = this.dataSlots.get(j);
             int k = dataslot.get();
-            if (dataslot.checkAndClearUpdateFlag()) {
+            if (dataslot.checkAndClearUpdateFlag())
+            {
                 this.updateDataSlotListeners(j, k);
             }
 
@@ -223,7 +226,7 @@ public class AbstractBrowserContainer extends AbstractContainerMenu
             {
                 current = newStack.copy();
                 currentStacks.set(i, current);
-                currentSizes.set(i,newCount);
+                currentSizes.set(i, newCount);
 
                 indicesChanged.add(i);
                 stacksChanged.add(current);
@@ -509,7 +512,7 @@ public class AbstractBrowserContainer extends AbstractContainerMenu
     {
         if (isClient() || parent == null)
         {
-            return existing.copyWithCount((int)Math.min(existingSize, amount));
+            return existing.copyWithCount((int) Math.min(existingSize, amount));
         }
         return AutomationHelper.extractItems(parent, existing, amount, simulate);
     }

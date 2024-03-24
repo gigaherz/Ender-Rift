@@ -16,7 +16,7 @@ import net.neoforged.neoforge.energy.IEnergyStorage;
 
 import java.util.Optional;
 
-@Mod.EventBusSubscriber(modid = EnderRiftMod.MODID, bus= Mod.EventBusSubscriber.Bus.MOD)
+@Mod.EventBusSubscriber(modid = EnderRiftMod.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class DriverBlockEntity extends AggregatorBlockEntity
 {
     @SubscribeEvent

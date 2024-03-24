@@ -1,12 +1,9 @@
 package dev.gigaherz.enderrift.rift;
 
 import dev.gigaherz.enderrift.EnderRiftMod;
-import dev.gigaherz.enderrift.rift.storage.RiftStorage;
-import dev.gigaherz.enderrift.rift.storage.migration.RiftMigration_17_08_2022;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -19,7 +16,6 @@ import net.minecraft.world.level.block.state.BlockState;
 
 import javax.annotation.Nullable;
 import java.util.List;
-import java.util.UUID;
 
 public class RiftItem extends Item
 {
@@ -36,20 +32,6 @@ public class RiftItem extends Item
             return this.getDescriptionId() + ".empty";
         else
             return this.getDescriptionId() + ".bound";
-    }
-
-    @Override
-    public void verifyTagAfterLoad(CompoundTag tag)
-    {
-        if (RiftStorage.isAvailable() && tag.contains("RiftId", Tag.TAG_ANY_NUMERIC))
-        {
-            UUID id = RiftStorage.get().getMigration(RiftMigration_17_08_2022.class).getMigratedId(tag.getInt("RiftId"));
-            tag.remove("RiftId");
-            if (id != null)
-            {
-                tag.putUUID("RiftId", id);
-            }
-        }
     }
 
     @Override

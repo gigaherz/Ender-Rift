@@ -1,5 +1,5 @@
 package dev.gigaherz.enderrift.plugins;
-/*
+
 import dev.gigaherz.enderrift.EnderRiftMod;
 import dev.gigaherz.enderrift.automation.driver.DriverBlockEntity;
 import dev.gigaherz.enderrift.generator.GeneratorBlockEntity;
@@ -159,7 +159,7 @@ public class TheOneProbeProviders implements Function<ITheOneProbe, Void>
             info.text(Component.translatable("text.enderrift.rift.is_formed", true));
             info.text(Component.translatable("text.enderrift.rift.is_powered", rift.isPowered()));
             info.text(Component.translatable("text.enderrift.rift.rift_id", rift.getRiftId()));
-            info.text(Component.translatable("text.enderrift.rift.used_slots", rift.countInventoryStacks()));
+            //info.text(Component.translatable("text.enderrift.rift.used_slots", rift.countInventoryStacks()));
             //info.progress(rift.getEnergyBuffer().map(IEnergyStorage::getEnergyStored).orElse(0), RiftTileEntity.BUFFER_POWER, RF_STYLE);
         }
         else
@@ -168,4 +168,3 @@ public class TheOneProbeProviders implements Function<ITheOneProbe, Void>
         }
     }
 }
-*/

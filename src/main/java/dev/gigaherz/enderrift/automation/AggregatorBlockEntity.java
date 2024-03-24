@@ -172,7 +172,7 @@ public abstract class AggregatorBlockEntity extends BlockEntity
             {
                 var inventory = teOther.getLevel().getCapability(Capabilities.ItemHandler.BLOCK, teOther.getBlockPos(), teOther.getBlockState(), teOther, f.getOpposite());
                 if (inventory != null)
-                        this.connectedInventories.add(inventory);
+                    this.connectedInventories.add(inventory);
             }
         }
 

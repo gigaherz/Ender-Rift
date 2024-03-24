@@ -16,7 +16,6 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.Objects;
-import java.util.UUID;
 
 public class RiftStructure
 {
@@ -184,11 +183,13 @@ public class RiftStructure
 
         if (tagCompound != null && tagCompound.contains("RiftId"))
         {
-            UUID id = tagCompound.getUUID("RiftId");
-            rift.assemble(RiftStorage.get().getRift(id));
             return;
         }
-        rift.assemble(RiftStorage.get().newRift());
+
+        var riftHolder = tagCompound != null && tagCompound.contains("RiftId")
+                ? RiftStorage.getOrCreateRift(tagCompound.getUUID("RiftId"))
+                : RiftStorage.newRift();
+        rift.assemble(riftHolder);
     }
 
     public static void dismantle(Level world, BlockPos pos)

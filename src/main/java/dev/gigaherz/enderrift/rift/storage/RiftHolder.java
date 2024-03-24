@@ -1,5 +1,7 @@
 package dev.gigaherz.enderrift.rift.storage;
 
+import org.jetbrains.annotations.Nullable;
+
 import java.util.UUID;
 
 public class RiftHolder
@@ -18,22 +20,28 @@ public class RiftHolder
         return id;
     }
 
-    public RiftInventory getInventory()
+    public RiftInventory getOrLoad()
     {
+        if (inventory == null)
+        {
+            inventory = RiftStorage.load(this);
+        }
         return inventory;
     }
 
-    public RiftInventory getInventoryOrCreate()
+    public boolean isDirty()
     {
-        if (inventory != null)
-        {
-            return inventory;
-        }
-        return inventory = new RiftInventory(this);
+        return inventory.isDirty();
     }
 
-    public boolean isValid()
+    public void clearDirty()
     {
-        return inventory != null;
+        inventory.clearDirty();
+    }
+
+    @Nullable
+    public RiftInventory getIfLoaded()
+    {
+        return inventory;
     }
 }

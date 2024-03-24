@@ -8,7 +8,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
@@ -16,7 +15,6 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
-import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
@@ -48,11 +46,11 @@ public class StructureEdgeBlock extends Block
 
     private static final Function<BlockState, VoxelShape> SHAPE_CACHE = Util.memoize((state) -> {
         return switch (state.getValue(AXIS))
-                { // base center
-                    case X -> state.getValue(BASE) ? SHAPE_EWB : SHAPE_EW;
-                    case Y -> SHAPE_UD;
-                    case Z -> state.getValue(BASE) ? SHAPE_NSB : SHAPE_NS;
-                };
+        { // base center
+            case X -> state.getValue(BASE) ? SHAPE_EWB : SHAPE_EW;
+            case Y -> SHAPE_UD;
+            case Z -> state.getValue(BASE) ? SHAPE_NSB : SHAPE_NS;
+        };
     });
 
     public StructureEdgeBlock(Properties properties)

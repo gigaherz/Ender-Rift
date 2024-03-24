@@ -1,5 +1,5 @@
 package dev.gigaherz.enderrift.plugins;
-/*
+
 import dev.gigaherz.enderrift.EnderRiftMod;
 import dev.gigaherz.enderrift.automation.browser.CraftingBrowserContainer;
 import mezz.jei.api.IModPlugin;
@@ -26,4 +26,4 @@ public class JEIPlugin implements IModPlugin
                 CraftingBrowserContainer.CRAFTING_SLOT_START, 9,
                 CraftingBrowserContainer.INVENTORY_SLOT_START, 36);
     }
-}*/
+}

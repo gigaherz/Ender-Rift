@@ -24,7 +24,7 @@ import org.jetbrains.annotations.Nullable;
 public class Ae2Integration
 {
     private static final BlockCapability<MEStorage, @Nullable Direction> ME_STORAGE = BlockCapability
-        .createSided(new ResourceLocation("ae2","me_storage"), MEStorage.class);
+            .createSided(new ResourceLocation("ae2", "me_storage"), MEStorage.class);
 
     public static void init(IEventBus modEventBus)
     {
@@ -135,7 +135,7 @@ public class Ae2Integration
         @Override
         public void getAvailableStacks(KeyCounter out)
         {
-            for(var keyValue : slotLookup.entries())
+            for (var keyValue : slotLookup.entries())
             {
                 var key = keyValue.getKey();
                 var slot = keyValue.getValue();

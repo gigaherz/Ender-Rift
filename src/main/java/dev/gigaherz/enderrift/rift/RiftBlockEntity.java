@@ -5,7 +5,6 @@ import dev.gigaherz.enderrift.common.EnergyBuffer;
 import dev.gigaherz.enderrift.rift.storage.RiftHolder;
 import dev.gigaherz.enderrift.rift.storage.RiftInventory;
 import dev.gigaherz.enderrift.rift.storage.RiftStorage;
-import dev.gigaherz.enderrift.rift.storage.migration.RiftMigration_17_08_2022;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
@@ -28,7 +27,7 @@ import javax.annotation.Nullable;
 import java.util.Optional;
 import java.util.UUID;
 
-@Mod.EventBusSubscriber(modid = EnderRiftMod.MODID, bus= Mod.EventBusSubscriber.Bus.MOD)
+@Mod.EventBusSubscriber(modid = EnderRiftMod.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class RiftBlockEntity extends BlockEntity implements IRiftChangeListener
 {
     @SubscribeEvent
@@ -160,13 +159,13 @@ public class RiftBlockEntity extends BlockEntity implements IRiftChangeListener
 
         if (!listenerState && level != null && !level.isClientSide)
         {
-            RiftInventory inv = holder.getInventoryOrCreate();
+            RiftInventory inv = holder.getOrLoad();
             inv.addWeakListener(this);
             listenerState = true;
             return inv;
         }
 
-        return holder.getInventory();
+        return holder.getOrLoad();
     }
 
     public ItemStack getRiftItem()
@@ -188,9 +187,8 @@ public class RiftBlockEntity extends BlockEntity implements IRiftChangeListener
         powered = compound.getBoolean("Powered");
         if (compound.contains("RiftId"))
         {
-            RiftStorage storage = RiftStorage.get();
-            UUID id = compound.hasUUID("RiftId") ? compound.getUUID("RiftId") : storage.getMigration(RiftMigration_17_08_2022.class).getMigratedId(compound.getInt("RiftId"));
-            holder = storage.getRift(id);
+            UUID id = compound.getUUID("RiftId");
+            holder = RiftStorage.getOrCreateRift(id);
         }
     }
 
@@ -304,5 +302,11 @@ public class RiftBlockEntity extends BlockEntity implements IRiftChangeListener
     public static void tickStatic(Level level, BlockPos blockPos, BlockState blockState, RiftBlockEntity te)
     {
         te.tick();
+    }
+
+    @Nullable
+    public UUID getRiftId()
+    {
+        return this.holder != null ? this.holder.getId() : null;
     }
 }

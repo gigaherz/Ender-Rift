@@ -15,7 +15,7 @@ import net.neoforged.neoforge.energy.IEnergyStorage;
 
 import java.util.Optional;
 
-@Mod.EventBusSubscriber(modid = EnderRiftMod.MODID, bus= Mod.EventBusSubscriber.Bus.MOD)
+@Mod.EventBusSubscriber(modid = EnderRiftMod.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class StructureCornerBlockEntity extends AggregatorBlockEntity
 {
     @SubscribeEvent
@@ -87,19 +87,23 @@ public class StructureCornerBlockEntity extends AggregatorBlockEntity
         int zParent = pos.getZ();
         switch (corner)
         {
-            case NE -> {
+            case NE ->
+            {
                 xParent -= 1;
                 zParent += 1;
             }
-            case NW -> {
+            case NW ->
+            {
                 xParent += 1;
                 zParent += 1;
             }
-            case SE -> {
+            case SE ->
+            {
                 xParent -= 1;
                 zParent -= 1;
             }
-            case SW -> {
+            case SW ->
+            {
                 xParent += 1;
                 zParent -= 1;
             }

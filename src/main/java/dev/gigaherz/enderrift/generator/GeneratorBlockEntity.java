@@ -21,7 +21,7 @@ import net.neoforged.neoforge.energy.IEnergyStorage;
 import net.neoforged.neoforge.items.IItemHandlerModifiable;
 import net.neoforged.neoforge.items.ItemStackHandler;
 
-@Mod.EventBusSubscriber(modid = EnderRiftMod.MODID, bus= Mod.EventBusSubscriber.Bus.MOD)
+@Mod.EventBusSubscriber(modid = EnderRiftMod.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class GeneratorBlockEntity extends BlockEntity
 {
     @SubscribeEvent
@@ -48,7 +48,8 @@ public class GeneratorBlockEntity extends BlockEntity
     public static final int HEAT_INTERVAL = 20;
     public static final int POWER_TRANSFER_MAX = 800;
 
-    private final EnergyBuffer energyBuffer = new EnergyBuffer(POWER_LIMIT) {
+    private final EnergyBuffer energyBuffer = new EnergyBuffer(POWER_LIMIT)
+    {
         @Override
         public boolean canReceive()
         {
@@ -266,14 +267,14 @@ public class GeneratorBlockEntity extends BlockEntity
         public int get(int field)
         {
             return switch (field)
-                    {
-                        case 0 -> burnTimeRemaining;
-                        case 1 -> currentItemBurnTime;
-                        case 2 -> energyBuffer.getEnergyStored() & 0xFFFF;
-                        case 3 -> energyBuffer.getEnergyStored() >> 16;
-                        case 4 -> heatLevel;
-                        default -> 0;
-                    };
+            {
+                case 0 -> burnTimeRemaining;
+                case 1 -> currentItemBurnTime;
+                case 2 -> energyBuffer.getEnergyStored() & 0xFFFF;
+                case 3 -> energyBuffer.getEnergyStored() >> 16;
+                case 4 -> heatLevel;
+                default -> 0;
+            };
         }
 
         @Override

@@ -28,6 +28,7 @@ public class RiftInventory implements ILongItemHandler
     private final List<RiftSlot> slots = Lists.newArrayList();
     private final RiftHolder holder;
     private final List<RiftChangeHook> hooks = new ArrayList<>();
+    private boolean isDirty;
 
     RiftInventory(final RiftHolder holder)
     {
@@ -66,6 +67,7 @@ public class RiftInventory implements ILongItemHandler
 
     protected void onContentsChanged()
     {
+        isDirty = true;
         walkListeners(IRiftChangeListener::onRiftChanged);
     }
 
@@ -294,9 +296,25 @@ public class RiftInventory implements ILongItemHandler
     }
 
     private final Map<Class<?>, Object> attachedFeatures = new IdentityHashMap<>();
+
     public <T> T getOrCreateFeature(Class<T> featureClass, Function<RiftInventory, T> featureFactory)
     {
         //noinspection unchecked
-        return (T)attachedFeatures.computeIfAbsent(featureClass, key -> featureFactory.apply(this));
+        return (T) attachedFeatures.computeIfAbsent(featureClass, key -> featureFactory.apply(this));
+    }
+
+    public boolean isDirty()
+    {
+        return this.isDirty;
+    }
+
+    public void clearDirty()
+    {
+        this.isDirty = false;
+    }
+
+    public void markDirty()
+    {
+        isDirty = true;
     }
 }

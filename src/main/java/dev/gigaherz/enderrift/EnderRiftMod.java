@@ -20,7 +20,6 @@ import dev.gigaherz.enderrift.network.ClearCraftingGrid;
 import dev.gigaherz.enderrift.network.SendSlotChanges;
 import dev.gigaherz.enderrift.network.SetVisibleSlots;
 import dev.gigaherz.enderrift.rift.*;
-import dev.gigaherz.enderrift.rift.storage.RiftHolder;
 import dev.gigaherz.enderrift.rift.storage.RiftInventory;
 import dev.gigaherz.enderrift.rift.storage.RiftStorage;
 import net.minecraft.Util;
@@ -130,20 +129,20 @@ public class EnderRiftMod
 
     public static final DeferredHolder<RecipeSerializer<?>, SimpleCraftingRecipeSerializer<OrbDuplicationRecipe>> ORB_DUPLICATION = RECIPE_SERIALIZERS.register("orb_duplication", () -> new SimpleCraftingRecipeSerializer<>(OrbDuplicationRecipe::new));
 
-    public static DeferredHolder<CreativeModeTab, CreativeModeTab> ENDERRIFT_CREATIVE_TAB = CREATIVE_TABS.register("ender_rift_tab", () -> new CreativeModeTab.Builder(CreativeModeTab.Row.TOP,0)
-                    .icon(() -> new ItemStack(RIFT_ORB.get()))
-                    .title(Component.translatable("itemGroup.tabEnderRift"))
-                    .displayItems((featureFlags, output) -> {
-                        output.accept(RIFT_ITEM.get());
-                        output.accept(RIFT_ORB.get());
-                        output.accept(INTERFACE_ITEM.get());
-                        output.accept(BROWSER_ITEM.get());
-                        output.accept(CRAFTING_BROWSER_ITEM.get());
-                        output.accept(PROXY_ITEM.get());
-                        output.accept(DRIVER_ITEM.get());
-                        output.accept(GENERATOR_ITEM.get());
-                    }).build()
-            );
+    public static DeferredHolder<CreativeModeTab, CreativeModeTab> ENDERRIFT_CREATIVE_TAB = CREATIVE_TABS.register("ender_rift_tab", () -> new CreativeModeTab.Builder(CreativeModeTab.Row.TOP, 0)
+            .icon(() -> new ItemStack(RIFT_ORB.get()))
+            .title(Component.translatable("itemGroup.tabEnderRift"))
+            .displayItems((featureFlags, output) -> {
+                output.accept(RIFT_ITEM.get());
+                output.accept(RIFT_ORB.get());
+                output.accept(INTERFACE_ITEM.get());
+                output.accept(BROWSER_ITEM.get());
+                output.accept(CRAFTING_BROWSER_ITEM.get());
+                output.accept(PROXY_ITEM.get());
+                output.accept(DRIVER_ITEM.get());
+                output.accept(GENERATOR_ITEM.get());
+            }).build()
+    );
 
     public EnderRiftMod(IEventBus modEventBus)
     {
@@ -215,19 +214,16 @@ public class EnderRiftMod
 
     private int locateSpecificRift(CommandContext<CommandSourceStack> context)
     {
-        if (!RiftStorage.isAvailable())
-        {
-            context.getSource().sendFailure(Component.literal("Failed to retrieve RiftStorage"));
-            return 0;
-        }
         UUID id = context.getArgument("riftId", UUID.class);
-        var optionalHolder = RiftStorage.get().findRift(id);
+        var optionalHolder = RiftStorage.findRift(id);
         if (optionalHolder.isEmpty())
         {
             context.getSource().sendFailure(Component.literal(String.format("Couldn't find rift with id '%s'", id)));
             return 0;
         }
-        locateRiftById(context, id, optionalHolder.orElseThrow().getInventory());
+        var inv = optionalHolder.orElseThrow().getIfLoaded();
+        if (inv != null)
+            locateRiftById(context, id, inv);
         return 0;
     }
 
@@ -241,7 +237,7 @@ public class EnderRiftMod
 
     private int locateAllRifts(CommandContext<CommandSourceStack> context)
     {
-        RiftStorage.get().walkRifts((id, rift) -> locateRiftById(context, id, rift));
+        RiftStorage.walkRifts((id, rift) -> locateRiftById(context, id, rift));
         return 0;
     }
 
@@ -330,6 +326,5 @@ public class EnderRiftMod
             }
         }
     }
-
 }
 

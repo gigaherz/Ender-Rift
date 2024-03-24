@@ -1,7 +1,6 @@
 package dev.gigaherz.enderrift.automation.browser;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.PoseStack;
 import dev.gigaherz.enderrift.EnderRiftMod;
 import dev.gigaherz.enderrift.common.slots.SlotFake;
 import joptsimple.internal.Strings;
@@ -10,7 +9,6 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
-import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
@@ -45,7 +43,9 @@ public abstract class AbstractBrowserScreen<T extends AbstractBrowserContainer> 
     }
 
     private static final NumberFormat longFormat = NumberFormat.getInstance(Locale.ROOT);
-    static {
+
+    static
+    {
         longFormat.setGroupingUsed(true);
     }
 
@@ -56,7 +56,7 @@ public abstract class AbstractBrowserScreen<T extends AbstractBrowserContainer> 
         long count = pStack.getCount();
         if (this.hoveredSlot instanceof SlotFake sf)
             count = this.menu.getClient().getStackSizeForSlot(sf.getSlotIndex());
-        list.add(Math.min(1,list.size()), Component.translatable("text.enderrift.browser.itemcount", longFormat.format(count)));
+        list.add(Math.min(1, list.size()), Component.translatable("text.enderrift.browser.itemcount", longFormat.format(count)));
         return list;
     }
 
@@ -257,12 +257,13 @@ public abstract class AbstractBrowserScreen<T extends AbstractBrowserContainer> 
     private static final String[] suffixes = {
             "", "k", "M", "B", "T", "Qd.", "Qt.", "S" /* A long can't reach this but just in case whatever */
     };
+
     private String getSizeString(long count)
     {
         String s;
 
         int suffix = 0;
-        while(count > 1000)
+        while (count > 1000)
         {
             count /= 1000;
             suffix++;

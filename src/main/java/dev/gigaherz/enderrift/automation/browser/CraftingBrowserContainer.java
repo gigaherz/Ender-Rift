@@ -214,7 +214,7 @@ public class CraftingBrowserContainer extends AbstractBrowserContainer
                 }
             }
 
-            if(anyChanged)
+            if (anyChanged)
             {
                 slotsChanged(this.craftMatrix);
                 this.broadcastChanges();

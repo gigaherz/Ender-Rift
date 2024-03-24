@@ -13,14 +13,14 @@ public class ClientFields implements ContainerData
     public int get(int field)
     {
         return switch (field)
-                {
-                    case 0 -> burnTimeRemaining;
-                    case 1 -> currentItemBurnTime;
-                    case 2 -> energy & 0xFFFF;
-                    case 3 -> energy >> 16;
-                    case 4 -> heatLevel;
-                    default -> 0;
-                };
+        {
+            case 0 -> burnTimeRemaining;
+            case 1 -> currentItemBurnTime;
+            case 2 -> energy & 0xFFFF;
+            case 3 -> energy >> 16;
+            case 4 -> heatLevel;
+            default -> 0;
+        };
     }
 
     @Override
