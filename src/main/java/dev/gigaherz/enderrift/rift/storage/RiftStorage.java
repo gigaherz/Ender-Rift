@@ -14,11 +14,11 @@ import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.event.level.LevelEvent;
 import net.neoforged.neoforge.event.server.ServerAboutToStartEvent;
 import net.neoforged.neoforge.event.server.ServerStoppingEvent;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 
 import java.io.IOException;
-import java.nio.file.AtomicMoveNotSupportedException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
@@ -27,7 +27,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.BiConsumer;
 
 @Mod.EventBusSubscriber(modid = EnderRiftMod.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
@@ -41,9 +40,6 @@ public class RiftStorage
     private static final Logger LOGGER = LogUtils.getLogger();
     private static final LevelResource DATA_DIR = new LevelResource("enderrift");
 
-    private static final String EXTENSION = ".dat";
-    private static final String TMP_EXTENSION = ".dat.tmp";
-
     private static final HashMap<UUID, RiftHolder> rifts = new HashMap<>();
 
     private static final ReentrantReadWriteUpdateLock lock = new ReentrantReadWriteUpdateLock();
@@ -52,6 +48,24 @@ public class RiftStorage
     private static final Lock writeLock = lock.writeLock();
 
     private static Path dataDirectory;
+
+    @NotNull
+    private static Path getRiftPath(UUID id)
+    {
+        return dataDirectory.resolve(id + ".dat");
+    }
+
+    @NotNull
+    private static Path getTempPath(UUID id)
+    {
+        return dataDirectory.resolve(id + ".dat.tmp");
+    }
+
+    @NotNull
+    private static Path getBakPath(UUID id)
+    {
+        return dataDirectory.resolve(id + ".dat.bak");
+    }
 
     @SubscribeEvent
     public static void serverStart(ServerAboutToStartEvent event)
@@ -76,7 +90,15 @@ public class RiftStorage
         LevelAccessor levelAccessor = event.getLevel();
         if (levelAccessor instanceof ServerLevel sl && sl.dimension().equals(Level.OVERWORLD))
         {
-            saveDirty();
+            readLock.lock();
+            try
+            {
+                saveDirtyNoLock();
+            }
+            finally
+            {
+                readLock.unlock();
+            }
         }
     }
 
@@ -86,7 +108,7 @@ public class RiftStorage
         writeLock.lock();
         try
         {
-            saveDirty();
+            saveDirtyNoLock();
             rifts.clear();
             dataDirectory = null;
         }
@@ -161,79 +183,108 @@ public class RiftStorage
     {
         var inv = new RiftInventory(holder);
         UUID id = holder.getId();
-        Path file = dataDirectory.resolve(id + EXTENSION);
-        boolean loadedFromTemp = false;
-        if (!Files.exists(file))
-        {
-            file = dataDirectory.resolve(id + TMP_EXTENSION);
-            if (!Files.exists(file))
-                return inv;
-            loadedFromTemp = true;
-        }
 
-        LOGGER.info("Loading rift {}...", id);
-        try
+        var tmpFile = getTempPath(id);
+        var bakFile = getBakPath(id);
+        var file = getRiftPath(id);
+
+        if (Files.exists(file))
         {
-            var tag = NbtIo.readCompressed(file, NbtAccounter.create(0x6400000L));
-            inv.load(tag);
-            if (loadedFromTemp)
-                inv.markDirty();
+            if (Files.exists(tmpFile))
+            {
+                try
+                {
+                    tryMoveAtomic(tmpFile, bakFile);
+                    LOGGER.info("Found both main and temporary storage for rift {}. If the rift is missing contents, they may be in '{}'!", id, bakFile);
+                }
+                catch (IOException e)
+                {
+                    LOGGER.error("Error moving temp file {}, this is bad!", tmpFile, e);
+                }
+            }
+
+            loadRift(inv, id, file);
         }
-        catch (IOException e)
+        else if (Files.exists(tmpFile))
         {
-            LOGGER.error("Could not load rift {}", id, e);
+            LOGGER.info("Found temporary storage for rift {} in {}. Attempting to load...", id, tmpFile);
+            if (loadRift(inv, id, tmpFile))
+            {
+                try
+                {
+                    tryMoveAtomic(tmpFile, file);
+                }
+                catch (IOException e)
+                {
+                    LOGGER.error("Error moving temp file {}, this is bad!", tmpFile, e);
+                }
+                return inv;
+            }
         }
 
         return inv;
     }
 
-    public static void saveDirty()
+    private static boolean loadRift(RiftInventory inv, UUID id, Path file)
     {
-        readLock.lock();
+        LOGGER.info("Loading rift {} from {}...", id, file);
         try
         {
-            for (RiftHolder holder : rifts.values())
-            {
-                if (holder.isDirty())
-                {
-                    save(holder);
-                    holder.clearDirty();
-                }
-            }
+            var tag = NbtIo.readCompressed(file, NbtAccounter.create(0x6400000L));
+            inv.load(tag);
         }
-        finally
+        catch (IOException e)
         {
-            readLock.unlock();
+            LOGGER.error("Could not load rift {} from {}", id, file, e);
+            return false;
+        }
+        return true;
+    }
+
+    private static void saveDirtyNoLock()
+    {
+        for (RiftHolder holder : rifts.values())
+        {
+            if (holder.isDirty())
+            {
+                save(holder);
+                holder.clearDirty();
+            }
         }
     }
 
     private static void save(RiftHolder holder)
     {
-        String id = holder.getId().toString();
+        var id = holder.getId();
         RiftInventory inventory = holder.getOrLoad();
         LOGGER.info("Saving rift {}...", id);
         try
         {
-            var tmpFile = dataDirectory.resolve(id + TMP_EXTENSION);
-            var file = dataDirectory.resolve(id + EXTENSION);
+            var tmpFile = getTempPath(id);
+            var file = getRiftPath(id);
 
             NbtIo.writeCompressed(inventory.save(), tmpFile);
 
-            try
-            {
-                // ATOMIC_MOVE may return an IOException in two cases:
-                // 1. If a file exists and the operating system doesn't support replacing an existing file in the atomic move operation, or
-                // 2. If atomic operations are not supported at all.
-                Files.move(tmpFile, file, StandardCopyOption.ATOMIC_MOVE);
-            }
-            catch (IOException ex)
-            {
-                Files.move(tmpFile, file, StandardCopyOption.REPLACE_EXISTING);
-            }
+            tryMoveAtomic(tmpFile, file);
         }
         catch (IOException ex)
         {
             LOGGER.error("Could not save rift {}", id, ex);
+        }
+    }
+
+    private static void tryMoveAtomic(Path tmpFile, Path file) throws IOException
+    {
+        try
+        {
+            // ATOMIC_MOVE may return an IOException in two cases:
+            // 1. If a file exists and the operating system doesn't support replacing an existing file in the atomic move operation, or
+            // 2. If atomic operations are not supported at all.
+            Files.move(tmpFile, file, StandardCopyOption.ATOMIC_MOVE);
+        }
+        catch (IOException ex)
+        {
+            Files.move(tmpFile, file, StandardCopyOption.REPLACE_EXISTING);
         }
     }
 
