@@ -31,12 +31,13 @@ public class RiftHolder
 
     public boolean isDirty()
     {
-        return inventory.isDirty();
+        return inventory != null && inventory.isDirty();
     }
 
     public void clearDirty()
     {
-        inventory.clearDirty();
+        if (inventory != null)
+            inventory.clearDirty();
     }
 
     @Nullable

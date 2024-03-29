@@ -7,7 +7,7 @@ plugins {
     id 'com.github.johnrengelman.shadow' version '8.1.1'
 }
 
-version = "2.8.0"
+version = "2.8.1"
 group= "dev.gigaherz.enderrift"
 
 Provider<String> minecraftVersion(Transformer<String, String> mapper) {
@@ -135,9 +135,11 @@ dependencies {
 
     // TheOneProbe - 1.20.4_neo-11.0.2
     compileOnly "curse.maven:the-one-probe-245211:5159289"
-    runtimeOnly "curse.maven:the-one-probe-245211:5159289"
+    //runtimeOnly "curse.maven:the-one-probe-245211:5159289"
 
-    //compileOnly fg.deobf("mcp.mobius.waila:Hwyla:1.10.8-B72_1.15.2")
+    // Jade (WAILA) - [NeoForge 1.20.4] 13.3.1
+    compileOnly "curse.maven:jade-324717:5109393"
+    runtimeOnly "curse.maven:jade-324717:5109393"
 
     //compile fileTree(dir: 'libs', include: '*.jar')
 
