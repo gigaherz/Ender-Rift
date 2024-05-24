@@ -1,27 +1,23 @@
 package dev.gigaherz.enderrift.plugins;
 /*
-import EnderRiftMod;
-import AggregatorTileEntity;
-import DriverBlock;
-import DriverTileEntity;
-import GeneratorBlock;
-import GeneratorTileEntity;
-import RiftBlock;
-import RiftTileEntity;
-import StructureBlock;
-import StructureTileEntity;
-import dev.gigaherz.graph3.Graph;
-import dev.gigaherz.graph3.GraphObject;
-import mcp.mobius.waila.api.*;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.World;
-import net.minecraftforge.energy.IEnergyStorage;
+import dev.gigaherz.enderrift.EnderRiftMod;
+import dev.gigaherz.enderrift.automation.AggregatorBlockEntity;
+import dev.gigaherz.enderrift.automation.driver.DriverBlock;
+import dev.gigaherz.enderrift.automation.driver.DriverBlockEntity;
+import dev.gigaherz.enderrift.generator.GeneratorBlock;
+import dev.gigaherz.enderrift.generator.GeneratorBlockEntity;
+import dev.gigaherz.enderrift.rift.RiftBlock;
+import dev.gigaherz.enderrift.rift.RiftBlockEntity;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.block.StructureBlock;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.StructureBlockEntity;
+import org.jetbrains.annotations.Nullable;
+import snownee.jade.api.*;
+import snownee.jade.api.config.IPluginConfig;
+import snownee.jade.api.ui.IElement;
 
 import java.util.List;
 import java.util.Optional;
@@ -36,7 +32,7 @@ public class WailaProviders implements IWailaPlugin
 
 
     @Override
-    public void register(IRegistrar registrar)
+    public void register(IWailaCommonRegistration registrar)
     {
         registrar.addConfig(CONFIG_GENERATOR, true);
         registrar.addConfig(CONFIG_RIFT, true);
@@ -45,69 +41,75 @@ public class WailaProviders implements IWailaPlugin
 
         {
             RiftTooltipProvider instance = new RiftTooltipProvider();
-            registrar.registerStackProvider(instance, StructureTileEntity.class);
-            registrar.registerBlockDataProvider(instance, StructureTileEntity.class);
+            registrar.registerStackProvider(instance, StructureBlockEntity.class);
+            registrar.registerBlockDataProvider(instance, StructureBlockEntity.class);
             registrar.registerComponentProvider(instance, TooltipPosition.BODY, StructureBlock.class);
-            registrar.registerBlockDataProvider(instance, RiftTileEntity.class);
+            registrar.registerBlockDataProvider(instance, RiftBlockEntity.class);
             registrar.registerComponentProvider(instance, TooltipPosition.BODY, RiftBlock.class);
         }
 
         {
             NetworkTooltipProvider instance = new NetworkTooltipProvider();
-            registrar.registerComponentProvider(instance, TooltipPosition.BODY, AggregatorTileEntity.class);
+            registrar.registerComponentProvider(instance, TooltipPosition.BODY, AggregatorBlockEntity.class);
         }
 
         {
             DriverTooltipProvider instance = new DriverTooltipProvider();
-            registrar.registerBlockDataProvider(instance, DriverTileEntity.class);
+            registrar.registerBlockDataProvider(instance, DriverBlockEntity.class);
             registrar.registerComponentProvider(instance, TooltipPosition.BODY, DriverBlock.class);
         }
 
         {
             GeneratorTooltipProvider instance = new GeneratorTooltipProvider();
-            registrar.registerBlockDataProvider(instance, GeneratorTileEntity.class);
+            registrar.registerBlockDataProvider(instance, GeneratorBlockEntity.class);
             registrar.registerComponentProvider(instance, TooltipPosition.BODY, GeneratorBlock.class);
         }
     }
 
-    public static class GeneratorTooltipProvider implements IComponentProvider, IServerDataProvider<TileEntity>
+    public static class GeneratorTooltipProvider implements IBlockComponentProvider, IServerDataProvider<BlockAccessor>
     {
         @Override
-        public void appendBody(List<ITextComponent> tooltip, IDataAccessor accessor, IPluginConfig config)
+        public void appendTooltip(ITooltip tooltip, BlockAccessor accessor, IPluginConfig config)
         {
             if (config.get(CONFIG_GENERATOR))
             {
-                CompoundNBT tag = accessor.getServerData();
+                CompoundTag tag = accessor.getServerData();
 
                 if (tag.getInt("powerGen") > 0)
                 {
-                    tooltip.add(new TranslationTextComponent("text.enderrift.generator.status.generating", tag.getInt("powerGen")));
+                    tooltip.add(Component.translatable("text.enderrift.generator.status.generating", tag.getInt("powerGen")));
                 }
                 else if (tag.getBoolean("isBurning"))
                 {
-                    tooltip.add(new TranslationTextComponent("text.enderrift.generator.status.heating"));
+                    tooltip.add(Component.translatable("text.enderrift.generator.status.heating"));
                 }
                 else
                 {
-                    tooltip.add(new TranslationTextComponent("text.enderrift.generator.status.idle"));
+                    tooltip.add(Component.translatable("text.enderrift.generator.status.idle"));
                 }
 
-                tooltip.add(new TranslationTextComponent("text.enderrift.generator.heat", tag.getInt("heat")));
+                tooltip.add(Component.translatable("text.enderrift.generator.heat", tag.getInt("heat")));
 
                 if (config.get(CONFIG_RF))
-                    tooltip.add(new TranslationTextComponent("text.enderrift.generator.energy", tag.getInt("energy"), GeneratorTileEntity.POWER_LIMIT));
+                    tooltip.add(Component.translatable("text.enderrift.generator.energy", tag.getInt("energy"), GeneratorBlockEntity.POWER_LIMIT));
             }
         }
 
         @Override
-        public void appendServerData(CompoundNBT tag, ServerPlayerEntity serverPlayerEntity, World world, TileEntity tileEntity)
+        public void appendServerData(CompoundTag tag, BlockAccessor accessor)
         {
-            GeneratorTileEntity rift = (GeneratorTileEntity) tileEntity;
+            GeneratorBlockEntity rift = (GeneratorBlockEntity) accessor.getBlockEntity();
 
             tag.putBoolean("isBurning", rift.isBurning());
             tag.putInt("powerGen", rift.getGenerationPower());
             tag.putInt("energy", rift.getContainedEnergy());
             tag.putInt("heat", rift.getHeatValue());
+        }
+
+        @Override
+        public ResourceLocation getUid()
+        {
+            return CONFIG_GENERATOR;
         }
     }
 
@@ -121,7 +123,7 @@ public class WailaProviders implements IWailaPlugin
                 CompoundNBT tag = accessor.getServerData();
 
                 if (config.get(CONFIG_RF))
-                    tooltip.add(new TranslationTextComponent("text.enderrift.generator.energy", tag.getInt("energy"), DriverTileEntity.POWER_LIMIT));
+                    tooltip.add(Component.translatable("text.enderrift.generator.energy", tag.getInt("energy"), DriverTileEntity.POWER_LIMIT));
             }
         }
 
@@ -142,7 +144,7 @@ public class WailaProviders implements IWailaPlugin
             Graph network = ((GraphObject) accessor.getTileEntity()).getGraph();
             if (network != null)
             {
-                tooltip.add(new TranslationTextComponent("text.enderrift.network.size", network.getObjects().size()));
+                tooltip.add(Component.translatable("text.enderrift.network.size", network.getObjects().size()));
             }
         }
     }
@@ -165,19 +167,19 @@ public class WailaProviders implements IWailaPlugin
 
                 if (tag != null && tag.contains("isFormed"))
                 {
-                    tooltip.add(new TranslationTextComponent("text.enderrift.rift.is_formed", tag.getBoolean("isFormed")));
-                    tooltip.add(new TranslationTextComponent("text.enderrift.rift.is_powered", tag.getBoolean("isPowered")));
+                    tooltip.add(Component.translatable("text.enderrift.rift.is_formed", tag.getBoolean("isFormed")));
+                    tooltip.add(Component.translatable("text.enderrift.rift.is_powered", tag.getBoolean("isPowered")));
                     if (tag.getBoolean("isFormed"))
                     {
-                        tooltip.add(new TranslationTextComponent("text.enderrift.rift.rift_id", tag.getInt("riftId")));
+                        tooltip.add(Component.translatable("text.enderrift.rift.rift_id", tag.getInt("riftId")));
                         if (config.get(CONFIG_RF))
-                            tooltip.add(new TranslationTextComponent("text.enderrift.rift.rf", tag.getInt("energy"), RiftTileEntity.BUFFER_POWER));
+                            tooltip.add(Component.translatable("text.enderrift.rift.rf", tag.getInt("energy"), RiftTileEntity.BUFFER_POWER));
                     }
-                    tooltip.add(new TranslationTextComponent("text.enderrift.rift.used_slots", tag.getInt("usedSlots")));
+                    tooltip.add(Component.translatable("text.enderrift.rift.used_slots", tag.getInt("usedSlots")));
                 }
                 else
                 {
-                    tooltip.add(new TranslationTextComponent("text.enderrift.rift.is_formed", false));
+                    tooltip.add(Component.translatable("text.enderrift.rift.is_formed", false));
                 }
             }
         }
