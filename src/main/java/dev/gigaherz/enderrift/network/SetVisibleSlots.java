@@ -2,57 +2,67 @@ package dev.gigaherz.enderrift.network;
 
 import dev.gigaherz.enderrift.EnderRiftMod;
 import dev.gigaherz.enderrift.automation.browser.AbstractBrowserContainer;
-import net.minecraft.network.FriendlyByteBuf;
+import io.netty.buffer.ByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
-import net.neoforged.neoforge.network.handling.PlayPayloadContext;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 
-public class SetVisibleSlots implements CustomPacketPayload
+public record SetVisibleSlots(int windowId, int[] visible) implements CustomPacketPayload
 {
     public static final ResourceLocation ID = EnderRiftMod.location("set_visible_slots");
+    public static final Type<SetVisibleSlots> TYPE = new Type<>(ID);
 
-    public int windowId;
-    public int[] visible;
-
-    public SetVisibleSlots(int windowId, int[] visible)
+    private static <T extends ByteBuf> StreamCodec<T, int[]> intArray()
     {
-        this.windowId = windowId;
-        this.visible = visible;
-    }
-
-    public SetVisibleSlots(FriendlyByteBuf buf)
-    {
-        windowId = buf.readInt();
-        int num = buf.readInt();
-        visible = new int[num];
-        for (int i = 0; i < num; i++)
+        return new StreamCodec<>()
         {
-            visible[i] = buf.readInt();
-        }
+            @Override
+            public int[] decode(T pBuffer)
+            {
+                int count = ByteBufCodecs.VAR_INT.decode(pBuffer);
+                var array = new int[count];
+                for (int i = 0; i < count; i++)
+                {
+                    var element = ByteBufCodecs.VAR_INT.decode(pBuffer);
+                    array[i] = element;
+                }
+                return array;
+            }
+
+            @Override
+            public void encode(T pBuffer, int[] pValue)
+            {
+                int count = pValue.length;
+                ByteBufCodecs.VAR_INT.encode(pBuffer, count);
+                for (int i = 0; i < count; i++)
+                {
+                    var element = pValue[i];
+                    ByteBufCodecs.VAR_INT.encode(pBuffer, element);
+                }
+            }
+        };
     }
 
-    public void write(FriendlyByteBuf buf)
-    {
-        buf.writeInt(windowId);
-        buf.writeInt(visible.length);
-        for (int i = 0; i < visible.length; i++)
-        {
-            buf.writeInt(visible[i]);
-        }
-    }
+    public static final StreamCodec<ByteBuf, SetVisibleSlots> STREAM_CODEC = StreamCodec.composite(
+            ByteBufCodecs.VAR_INT, SetVisibleSlots::windowId,
+            intArray(), SetVisibleSlots::visible,
+            SetVisibleSlots::new
+    );
 
     @Override
-    public ResourceLocation id()
+    public Type<? extends CustomPacketPayload> type()
     {
-        return ID;
+        return TYPE;
     }
 
-    public void handle(PlayPayloadContext context)
+    public void handle(IPayloadContext context)
     {
-        context.workHandler().execute(() ->
+        context.enqueueWork(() ->
         {
-            final Player player = context.player().orElseThrow();
+            final Player player = context.player();
 
             if (player.containerMenu instanceof AbstractBrowserContainer browser && browser.containerId == this.windowId)
             {

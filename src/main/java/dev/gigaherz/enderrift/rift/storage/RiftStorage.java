@@ -3,6 +3,7 @@ package dev.gigaherz.enderrift.rift.storage;
 import com.googlecode.concurentlocks.ReentrantReadWriteUpdateLock;
 import com.mojang.logging.LogUtils;
 import dev.gigaherz.enderrift.EnderRiftMod;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.NbtAccounter;
 import net.minecraft.nbt.NbtIo;
 import net.minecraft.server.level.ServerLevel;
@@ -10,7 +11,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.storage.LevelResource;
 import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.level.LevelEvent;
 import net.neoforged.neoforge.event.server.ServerAboutToStartEvent;
 import net.neoforged.neoforge.event.server.ServerStoppingEvent;
@@ -29,7 +30,7 @@ import java.util.UUID;
 import java.util.concurrent.locks.Lock;
 import java.util.function.BiConsumer;
 
-@Mod.EventBusSubscriber(modid = EnderRiftMod.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
+@EventBusSubscriber(modid = EnderRiftMod.MODID, bus = EventBusSubscriber.Bus.GAME)
 public class RiftStorage
 {
     private RiftStorage()
@@ -93,7 +94,7 @@ public class RiftStorage
             readLock.lock();
             try
             {
-                saveDirtyNoLock();
+                saveDirtyNoLock(event.getLevel().registryAccess());
             }
             finally
             {
@@ -108,7 +109,7 @@ public class RiftStorage
         writeLock.lock();
         try
         {
-            saveDirtyNoLock();
+            saveDirtyNoLock(event.getServer().registryAccess());
             rifts.clear();
             dataDirectory = null;
         }
@@ -179,7 +180,7 @@ public class RiftStorage
         }
     }
 
-    static RiftInventory load(RiftHolder holder)
+    static RiftInventory load(RiftHolder holder, HolderLookup.Provider lookup)
     {
         var inv = new RiftInventory(holder);
         UUID id = holder.getId();
@@ -203,12 +204,12 @@ public class RiftStorage
                 }
             }
 
-            loadRift(inv, id, file);
+            loadRift(lookup, inv, id, file);
         }
         else if (Files.exists(tmpFile))
         {
             LOGGER.info("Found temporary storage for rift {} in {}. Attempting to load...", id, tmpFile);
-            if (loadRift(inv, id, tmpFile))
+            if (loadRift(lookup, inv, id, tmpFile))
             {
                 try
                 {
@@ -225,13 +226,13 @@ public class RiftStorage
         return inv;
     }
 
-    private static boolean loadRift(RiftInventory inv, UUID id, Path file)
+    private static boolean loadRift(HolderLookup.Provider lookup, RiftInventory inv, UUID id, Path file)
     {
         LOGGER.info("Loading rift {} from {}...", id, file);
         try
         {
             var tag = NbtIo.readCompressed(file, NbtAccounter.create(0x6400000L));
-            inv.load(tag);
+            inv.load(tag, lookup);
         }
         catch (IOException e)
         {
@@ -241,29 +242,29 @@ public class RiftStorage
         return true;
     }
 
-    private static void saveDirtyNoLock()
+    private static void saveDirtyNoLock(HolderLookup.Provider lookup)
     {
         for (RiftHolder holder : rifts.values())
         {
             if (holder.isDirty())
             {
-                save(holder);
+                save(holder, lookup);
                 holder.clearDirty();
             }
         }
     }
 
-    private static void save(RiftHolder holder)
+    private static void save(RiftHolder holder, HolderLookup.Provider lookup)
     {
         var id = holder.getId();
-        RiftInventory inventory = holder.getOrLoad();
+        RiftInventory inventory = holder.getOrLoad(lookup);
         LOGGER.info("Saving rift {}...", id);
         try
         {
             var tmpFile = getTempPath(id);
             var file = getRiftPath(id);
 
-            NbtIo.writeCompressed(inventory.save(), tmpFile);
+            NbtIo.writeCompressed(inventory.save(lookup), tmpFile);
 
             tryMoveAtomic(tmpFile, file);
         }
@@ -288,12 +289,12 @@ public class RiftStorage
         }
     }
 
-    public static void walkRifts(BiConsumer<UUID, RiftInventory> riftConsumer)
+    public static void walkRifts(HolderLookup.Provider lookup, BiConsumer<UUID, RiftInventory> riftConsumer)
     {
         readLock.lock();
         try
         {
-            rifts.forEach((id, holder) -> riftConsumer.accept(id, holder.getOrLoad()));
+            rifts.forEach((id, holder) -> riftConsumer.accept(id, holder.getOrLoad(lookup)));
         }
         finally
         {

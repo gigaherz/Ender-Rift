@@ -6,6 +6,8 @@ import dev.gigaherz.enderrift.rift.storage.RiftHolder;
 import dev.gigaherz.enderrift.rift.storage.RiftInventory;
 import dev.gigaherz.enderrift.rift.storage.RiftStorage;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.Connection;
@@ -17,7 +19,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.neoforged.neoforge.energy.IEnergyStorage;
@@ -27,7 +29,7 @@ import javax.annotation.Nullable;
 import java.util.Optional;
 import java.util.UUID;
 
-@Mod.EventBusSubscriber(modid = EnderRiftMod.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
+@EventBusSubscriber(modid = EnderRiftMod.MODID, bus = EventBusSubscriber.Bus.MOD)
 public class RiftBlockEntity extends BlockEntity implements IRiftChangeListener
 {
     @SubscribeEvent
@@ -159,31 +161,42 @@ public class RiftBlockEntity extends BlockEntity implements IRiftChangeListener
 
         if (!listenerState && level != null && !level.isClientSide)
         {
-            RiftInventory inv = holder.getOrLoad();
+            RiftInventory inv = holder.getOrLoad(level.registryAccess());
             inv.addWeakListener(this);
             listenerState = true;
             return inv;
         }
 
-        return holder.getOrLoad();
+        return holder.getOrLoad(level.registryAccess());
     }
 
     public ItemStack getRiftItem()
     {
         var stack = new ItemStack(EnderRiftMod.RIFT_ORB.get());
 
-        stack.getOrCreateTag()
-                .putUUID("RiftId", holder.getId());
+        stack.set(EnderRiftMod.RIFT_ID, holder.getId());
 
         return stack;
     }
 
     @Override
-    public void load(CompoundTag compound)
+    protected void applyImplicitComponents(DataComponentInput pComponentInput)
     {
-        super.load(compound);
+        holder = RiftStorage.getOrCreateRift(pComponentInput.get(EnderRiftMod.RIFT_ID));
+    }
 
-        energyBuffer.deserializeNBT(compound.get("Energy"));
+    @Override
+    protected void collectImplicitComponents(DataComponentMap.Builder pComponents)
+    {
+        pComponents.set(EnderRiftMod.RIFT_ID, holder.getId());
+    }
+
+    @Override
+    public void loadAdditional(CompoundTag compound, HolderLookup.Provider lookup)
+    {
+        super.loadAdditional(compound, lookup);
+
+        energyBuffer.deserializeNBT(lookup, compound.get("Energy"));
         powered = compound.getBoolean("Powered");
         if (compound.contains("RiftId"))
         {
@@ -193,11 +206,11 @@ public class RiftBlockEntity extends BlockEntity implements IRiftChangeListener
     }
 
     @Override
-    protected void saveAdditional(CompoundTag compound)
+    protected void saveAdditional(CompoundTag compound, HolderLookup.Provider lookup)
     {
-        super.saveAdditional(compound);
+        super.saveAdditional(compound, lookup);
 
-        compound.put("Energy", energyBuffer.serializeNBT());
+        compound.put("Energy", energyBuffer.serializeNBT(lookup));
         compound.putBoolean("Powered", powered);
         compound.remove("RiftId");
         if (holder != null)
@@ -207,15 +220,15 @@ public class RiftBlockEntity extends BlockEntity implements IRiftChangeListener
     }
 
     @Override
-    public CompoundTag getUpdateTag()
+    public CompoundTag getUpdateTag(HolderLookup.Provider lookup)
     {
-        CompoundTag tag = super.getUpdateTag();
+        CompoundTag tag = super.getUpdateTag(lookup);
         tag.putBoolean("Powered", powered);
         return tag;
     }
 
     @Override
-    public void handleUpdateTag(CompoundTag tag)
+    public void handleUpdateTag(CompoundTag tag, HolderLookup.Provider lookup)
     {
         powered = tag.getBoolean("Powered");
     }
@@ -228,9 +241,9 @@ public class RiftBlockEntity extends BlockEntity implements IRiftChangeListener
     }
 
     @Override
-    public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket pkt)
+    public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket pkt, HolderLookup.Provider lookup)
     {
-        handleUpdateTag(pkt.getTag());
+        handleUpdateTag(pkt.getTag(), lookup);
     }
 
     public ItemStack chooseRandomStack()

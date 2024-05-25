@@ -7,7 +7,7 @@ import dev.gigaherz.enderrift.EnderRiftMod;
 import dev.gigaherz.enderrift.automation.AutomationHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResult;
+import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
@@ -130,37 +130,35 @@ public class RiftBlock extends BaseEntityBlock
         RiftStructure.dismantle(worldIn, pos);
     }
 
-    @Deprecated
     @Override
-    public InteractionResult use(BlockState state, Level worldIn, BlockPos pos, Player playerIn, InteractionHand handIn, BlockHitResult hit)
+    protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand,
+                                              BlockHitResult pHitResult)
     {
-        if (playerIn.isShiftKeyDown())
-            return InteractionResult.PASS;
-
-        ItemStack stack = playerIn.getItemInHand(handIn);
+        if (player.isShiftKeyDown())
+            return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
 
         if (stack.getItem() == EnderRiftMod.RIFT_ORB.get())
-            return InteractionResult.PASS;
+            return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
 
         if (state.getBlock() != this || !state.getValue(ASSEMBLED))
-            return InteractionResult.FAIL;
+            return ItemInteractionResult.FAIL;
 
-        BlockEntity te = worldIn.getBlockEntity(pos);
+        BlockEntity te = level.getBlockEntity(pos);
         if (!(te instanceof RiftBlockEntity rift) || !rift.isPowered())
-            return InteractionResult.FAIL;
+            return ItemInteractionResult.FAIL;
 
-        if (worldIn.isClientSide)
-            return InteractionResult.SUCCESS;
+        if (level.isClientSide)
+            return ItemInteractionResult.SUCCESS;
 
         var inv = rift.getInventory();
         if (inv == null)
-            return InteractionResult.FAIL;
+            return ItemInteractionResult.FAIL;
 
         ItemStack remaining = ItemHandlerHelper.insertItem(inv, stack, false);
 
-        playerIn.setItemInHand(handIn, remaining);
+        player.setItemInHand(hand, remaining);
 
-        return InteractionResult.SUCCESS;
+        return ItemInteractionResult.SUCCESS;
     }
 
     @Deprecated

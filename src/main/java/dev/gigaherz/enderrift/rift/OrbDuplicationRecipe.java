@@ -1,9 +1,8 @@
 package dev.gigaherz.enderrift.rift;
 
 import dev.gigaherz.enderrift.EnderRiftMod;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
-import net.minecraft.core.RegistryAccess;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -14,6 +13,8 @@ import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.common.crafting.IShapedRecipe;
+
+import java.util.UUID;
 
 public class OrbDuplicationRecipe extends CustomRecipe implements IShapedRecipe<CraftingContainer>
 {
@@ -29,7 +30,7 @@ public class OrbDuplicationRecipe extends CustomRecipe implements IShapedRecipe<
             Ingredient.of(Items.ENDER_PEARL),
             Ingredient.of(Items.MAGMA_CREAM)
     );
-    private ItemStack output = new ItemStack(EnderRiftMod.RIFT_ORB.get(), 2);
+    private final ItemStack output = new ItemStack(EnderRiftMod.RIFT_ORB.get(), 2);
 
     public OrbDuplicationRecipe(CraftingBookCategory category)
     {
@@ -55,8 +56,8 @@ public class OrbDuplicationRecipe extends CustomRecipe implements IShapedRecipe<
         if (stack.getItem() != EnderRiftMod.RIFT_ORB.get())
             return false;
 
-        CompoundTag tag = stack.getTag();
-        if (tag == null || !tag.contains("RiftId"))
+        UUID riftId = stack.get(EnderRiftMod.RIFT_ID);
+        if (riftId == null)
             return false;
 
         if (!slotHasItem(crafting, 0, Items.MAGMA_CREAM))
@@ -93,7 +94,7 @@ public class OrbDuplicationRecipe extends CustomRecipe implements IShapedRecipe<
     }
 
     @Override
-    public ItemStack assemble(CraftingContainer crafting, RegistryAccess registryAccess)
+    public ItemStack assemble(CraftingContainer crafting, HolderLookup.Provider registryAccess)
     {
         return crafting.getItem(4).copyWithCount(2);
     }
@@ -105,7 +106,7 @@ public class OrbDuplicationRecipe extends CustomRecipe implements IShapedRecipe<
     }
 
     @Override
-    public ItemStack getResultItem(RegistryAccess registryAccess)
+    public ItemStack getResultItem(HolderLookup.Provider registryAccess)
     {
         return output;
     }
@@ -123,13 +124,13 @@ public class OrbDuplicationRecipe extends CustomRecipe implements IShapedRecipe<
     }
 
     @Override
-    public int getRecipeWidth()
+    public int getWidth()
     {
         return 3;
     }
 
     @Override
-    public int getRecipeHeight()
+    public int getHeight()
     {
         return 3;
     }

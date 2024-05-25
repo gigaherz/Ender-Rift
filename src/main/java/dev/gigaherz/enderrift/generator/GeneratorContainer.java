@@ -91,7 +91,8 @@ public class GeneratorContainer extends AbstractContainerMenu
         }
         else
         {
-            if (GeneratorBlockEntity.getBurnTime(slot.getItem()) <= 0)
+            ItemStack itemStack = slot.getItem();
+            if (itemStack.getBurnTime(null) <= 0)
                 return ItemStack.EMPTY;
 
             startIndex = 0;

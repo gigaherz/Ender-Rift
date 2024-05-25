@@ -223,7 +223,7 @@ public class CraftingBrowserContainer extends AbstractBrowserContainer
 
         if (isRemote)
         {
-            PacketDistributor.SERVER.noArg().send(new ClearCraftingGrid(containerId, toPlayer));
+            PacketDistributor.sendToServer(new ClearCraftingGrid(containerId, toPlayer));
         }
 
         this.slotsChanged(craftMatrix);

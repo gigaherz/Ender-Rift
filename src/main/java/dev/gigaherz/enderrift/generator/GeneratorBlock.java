@@ -7,7 +7,6 @@ import dev.gigaherz.enderrift.automation.iface.InterfaceBlock;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
-import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.SimpleMenuProvider;
 import net.minecraft.world.entity.player.Player;
@@ -93,20 +92,19 @@ public class GeneratorBlock extends BaseEntityBlock
         builder.add(FACING);
     }
 
-    @Deprecated
     @Override
-    public InteractionResult use(BlockState state, Level worldIn, BlockPos pos, Player player, InteractionHand handIn, BlockHitResult hit)
+    protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult pHitResult)
     {
-        BlockEntity tileEntity = worldIn.getBlockEntity(pos);
+        BlockEntity tileEntity = level.getBlockEntity(pos);
 
         if (!(tileEntity instanceof GeneratorBlockEntity be) || player.isShiftKeyDown())
             return InteractionResult.FAIL;
 
-        if (worldIn.isClientSide)
+        if (level.isClientSide)
             return InteractionResult.SUCCESS;
 
         player.openMenu(new SimpleMenuProvider(
-                (id, playerInventory, playerEntity) -> new GeneratorContainer(id, playerInventory, be.inventory(), be.getFields(), ContainerLevelAccess.create(worldIn, pos)),
+                (id, playerInventory, playerEntity) -> new GeneratorContainer(id, playerInventory, be.inventory(), be.getFields(), ContainerLevelAccess.create(level, pos)),
                 Component.translatable("container.enderrift.generator")
         ));
 

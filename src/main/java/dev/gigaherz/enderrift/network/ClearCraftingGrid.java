@@ -2,48 +2,36 @@ package dev.gigaherz.enderrift.network;
 
 import dev.gigaherz.enderrift.EnderRiftMod;
 import dev.gigaherz.enderrift.automation.browser.CraftingBrowserContainer;
-import net.minecraft.network.FriendlyByteBuf;
+import io.netty.buffer.ByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
-import net.neoforged.neoforge.network.handling.PlayPayloadContext;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 
-public class ClearCraftingGrid implements CustomPacketPayload
+public record ClearCraftingGrid(int windowId, boolean toPlayer) implements CustomPacketPayload
 {
     public static final ResourceLocation ID = EnderRiftMod.location("clear_crafting_grid");
+    public static final Type<ClearCraftingGrid> TYPE = new Type<>(ID);
 
-    public final int windowId;
-    public final boolean toPlayer;
-
-    public ClearCraftingGrid(int windowId, boolean toPlayer)
-    {
-        this.windowId = windowId;
-        this.toPlayer = toPlayer;
-    }
-
-    public ClearCraftingGrid(FriendlyByteBuf buf)
-    {
-        windowId = buf.readInt();
-        toPlayer = buf.readBoolean();
-    }
-
-    public void write(FriendlyByteBuf buf)
-    {
-        buf.writeInt(windowId);
-        buf.writeBoolean(toPlayer);
-    }
+    public static final StreamCodec<ByteBuf, ClearCraftingGrid> STREAM_CODEC = StreamCodec.composite(
+            ByteBufCodecs.VAR_INT, ClearCraftingGrid::windowId,
+            ByteBufCodecs.BOOL, ClearCraftingGrid::toPlayer,
+            ClearCraftingGrid::new
+    );
 
     @Override
-    public ResourceLocation id()
+    public Type<? extends CustomPacketPayload> type()
     {
-        return ID;
+        return TYPE;
     }
 
-    public void handle(PlayPayloadContext context)
+    public void handle(IPayloadContext context)
     {
-        context.workHandler().execute(() ->
+        context.enqueueWork(() ->
         {
-            final Player player = context.player().orElseThrow();
+            final Player player = context.player();
 
             if (player.containerMenu instanceof CraftingBrowserContainer browser && browser.containerId == this.windowId)
             {

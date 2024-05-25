@@ -4,7 +4,6 @@ import dev.gigaherz.enderrift.EnderRiftMod;
 import dev.gigaherz.enderrift.rift.storage.RiftStorage;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.Containers;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -16,6 +15,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.Objects;
+import java.util.UUID;
 
 public class RiftStructure
 {
@@ -179,15 +179,10 @@ public class RiftStructure
 
         RiftBlockEntity rift = Objects.requireNonNull((RiftBlockEntity) world.getBlockEntity(pos));
 
-        CompoundTag tagCompound = itemStack.getTag();
+        UUID riftId = itemStack.get(EnderRiftMod.RIFT_ID);
 
-        if (tagCompound != null && tagCompound.contains("RiftId"))
-        {
-            return;
-        }
-
-        var riftHolder = tagCompound != null && tagCompound.contains("RiftId")
-                ? RiftStorage.getOrCreateRift(tagCompound.getUUID("RiftId"))
+        var riftHolder = riftId != null
+                ? RiftStorage.getOrCreateRift(riftId)
                 : RiftStorage.newRift();
         rift.assemble(riftHolder);
     }

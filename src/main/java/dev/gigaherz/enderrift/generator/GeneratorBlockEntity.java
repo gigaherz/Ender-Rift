@@ -4,6 +4,7 @@ import dev.gigaherz.enderrift.EnderRiftMod;
 import dev.gigaherz.enderrift.common.EnergyBuffer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.ContainerData;
@@ -13,15 +14,14 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
-import net.neoforged.neoforge.common.CommonHooks;
 import net.neoforged.neoforge.energy.IEnergyStorage;
 import net.neoforged.neoforge.items.IItemHandlerModifiable;
 import net.neoforged.neoforge.items.ItemStackHandler;
 
-@Mod.EventBusSubscriber(modid = EnderRiftMod.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
+@EventBusSubscriber(modid = EnderRiftMod.MODID, bus = EventBusSubscriber.Bus.MOD)
 public class GeneratorBlockEntity extends BlockEntity
 {
     @SubscribeEvent
@@ -69,7 +69,7 @@ public class GeneratorBlockEntity extends BlockEntity
         @Override
         public ItemStack insertItem(int slot, ItemStack stack, boolean simulate)
         {
-            if (getBurnTime(stack) <= 0)
+            if (stack.getBurnTime(null) <= 0)
                 return stack;
 
             return super.insertItem(slot, stack, simulate);
@@ -159,7 +159,8 @@ public class GeneratorBlockEntity extends BlockEntity
             ItemStack stack = fuelSlot.getStackInSlot(0);
             if (stack.getCount() > 0)
             {
-                currentItemBurnTime = burnTimeRemaining = getBurnTime(fuelSlot.getStackInSlot(0));
+                ItemStack itemStack = fuelSlot.getStackInSlot(0);
+                currentItemBurnTime = burnTimeRemaining = itemStack.getBurnTime(null);
                 timeInterval = 0;
                 if (stack.getCount() == 1)
                     fuelSlot.setStackInSlot(0, stack.getItem().getCraftingRemainingItem(stack));
@@ -224,35 +225,35 @@ public class GeneratorBlockEntity extends BlockEntity
     }
 
     @Override
-    public void load(CompoundTag compound)
+    public void loadAdditional(CompoundTag compound, HolderLookup.Provider lookup)
     {
-        super.load(compound);
+        super.loadAdditional(compound, lookup);
 
         heatLevel = compound.getInt("heatLevel");
         burnTimeRemaining = compound.getInt("burnTimeRemaining");
         currentItemBurnTime = compound.getInt("currentItemBurnTime");
         timeInterval = compound.getInt("timeInterval");
-        energyBuffer.deserializeNBT(compound.get("storedEnergy"));
-        fuelSlot.deserializeNBT(compound.getCompound("fuelSlot"));
+        energyBuffer.deserializeNBT(lookup, compound.get("storedEnergy"));
+        fuelSlot.deserializeNBT(lookup, compound.getCompound("fuelSlot"));
     }
 
     @Override
-    protected void saveAdditional(CompoundTag compound)
+    protected void saveAdditional(CompoundTag compound, HolderLookup.Provider lookup)
     {
-        super.saveAdditional(compound);
+        super.saveAdditional(compound, lookup);
 
         compound.putInt("heatLevel", heatLevel);
         compound.putInt("burnTimeRemaining", burnTimeRemaining);
         compound.putInt("currentItemBurnTime", currentItemBurnTime);
         compound.putInt("timeInterval", timeInterval);
-        compound.put("storedEnergy", energyBuffer.serializeNBT());
-        compound.put("fuelSlot", fuelSlot.serializeNBT());
+        compound.put("storedEnergy", energyBuffer.serializeNBT(lookup));
+        compound.put("fuelSlot", fuelSlot.serializeNBT(lookup));
     }
 
     @Override
-    public void handleUpdateTag(CompoundTag tag)
+    public void handleUpdateTag(CompoundTag tag, HolderLookup.Provider lookup)
     {
-        super.load(tag);
+        super.loadAdditional(tag, lookup);
     }
 
     public boolean isUseableByPlayer(Player player)
@@ -344,11 +345,6 @@ public class GeneratorBlockEntity extends BlockEntity
     public int getBurnTimeRemaining()
     {
         return burnTimeRemaining;
-    }
-
-    public static int getBurnTime(ItemStack itemStack)
-    {
-        return CommonHooks.getBurnTime(itemStack, null);
     }
 
     public static void tickStatic(Level level, BlockPos blockPos, BlockState blockState, GeneratorBlockEntity te)

@@ -1,74 +1,45 @@
 package dev.gigaherz.enderrift.network;
 
-import com.google.common.collect.Lists;
 import dev.gigaherz.enderrift.EnderRiftMod;
 import dev.gigaherz.enderrift.client.ClientHelper;
-import it.unimi.dsi.fastutil.longs.LongArrayList;
-import it.unimi.dsi.fastutil.longs.LongList;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.network.handling.PlayPayloadContext;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 
+import java.util.ArrayList;
 import java.util.List;
 
-public class SendSlotChanges implements CustomPacketPayload
+public record SendSlotChanges(
+        int windowId,
+        int slotCount,
+        List<Integer> indices,
+        List<ItemStack> stacks,
+        List<Long> stackSizes
+) implements CustomPacketPayload
 {
     public static final ResourceLocation ID = EnderRiftMod.location("send_slot_changes");
+    public static final Type<SendSlotChanges> TYPE = new Type<>(ID);
 
-    public int windowId;
-    public int slotCount;
-    public List<Integer> indices;
-    public List<ItemStack> stacks;
-    public LongList stackSizes;
-
-    public SendSlotChanges(int windowId, int slotCount, List<Integer> indices, List<ItemStack> stacks, LongList stackSizes)
-    {
-        this.windowId = windowId;
-        this.slotCount = slotCount;
-        this.indices = indices;
-        this.stacks = stacks;
-        this.stackSizes = stackSizes;
-    }
-
-    public SendSlotChanges(FriendlyByteBuf buf)
-    {
-        indices = Lists.newArrayList();
-        stacks = Lists.newArrayList();
-        stackSizes = new LongArrayList();
-        windowId = buf.readInt();
-        slotCount = buf.readInt();
-
-        int count = buf.readInt();
-        while (count-- > 0)
-        {
-            indices.add(buf.readInt());
-            stacks.add(buf.readItemWithLargeCount());
-            stackSizes.add(buf.readVarLong());
-        }
-    }
-
-    public void write(FriendlyByteBuf buf)
-    {
-        buf.writeInt(windowId);
-        buf.writeInt(slotCount);
-        buf.writeInt(indices.size());
-        for (int i = 0; i < indices.size(); i++)
-        {
-            buf.writeInt(indices.get(i));
-            buf.writeItemWithLargeCount(stacks.get(i));
-            buf.writeVarLong(stackSizes.getLong(i));
-        }
-    }
+    public static final StreamCodec<RegistryFriendlyByteBuf, SendSlotChanges> STREAM_CODEC = StreamCodec.composite(
+            ByteBufCodecs.VAR_INT, SendSlotChanges::windowId,
+            ByteBufCodecs.VAR_INT, SendSlotChanges::slotCount,
+            ByteBufCodecs.VAR_INT.apply(ByteBufCodecs.collection(ArrayList::new)), SendSlotChanges::indices,
+            ItemStack.STREAM_CODEC.apply(ByteBufCodecs.collection(ArrayList::new)), SendSlotChanges::stacks,
+            ByteBufCodecs.VAR_LONG.apply(ByteBufCodecs.collection(ArrayList::new)), SendSlotChanges::stackSizes,
+            SendSlotChanges::new
+    );
 
     @Override
-    public ResourceLocation id()
+    public Type<? extends CustomPacketPayload> type()
     {
-        return ID;
+        return TYPE;
     }
 
-    public void handle(PlayPayloadContext context)
+    public void handle(IPayloadContext context)
     {
         ClientHelper.handleSendSlotChanges(this);
     }

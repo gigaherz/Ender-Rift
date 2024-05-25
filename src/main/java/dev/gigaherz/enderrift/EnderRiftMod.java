@@ -23,11 +23,12 @@ import dev.gigaherz.enderrift.rift.*;
 import dev.gigaherz.enderrift.rift.storage.RiftInventory;
 import dev.gigaherz.enderrift.rift.storage.RiftStorage;
 import net.minecraft.Util;
-import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.UuidArgument;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.UUIDUtil;
+import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.DataGenerator;
@@ -56,19 +57,19 @@ import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 import net.neoforged.bus.api.IEventBus;
+import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.ModList;
-import net.neoforged.fml.ModLoadingContext;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
-import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.fml.event.lifecycle.InterModEnqueueEvent;
+import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.common.data.ExistingFileHelper;
 import net.neoforged.neoforge.data.event.GatherDataEvent;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
-import net.neoforged.neoforge.network.event.RegisterPayloadHandlerEvent;
-import net.neoforged.neoforge.network.registration.IPayloadRegistrar;
+import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
+import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 import net.neoforged.neoforge.registries.DeferredBlock;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredItem;
@@ -92,6 +93,7 @@ public class EnderRiftMod
     private static final DeferredRegister<RecipeSerializer<?>> RECIPE_SERIALIZERS = DeferredRegister.create(BuiltInRegistries.RECIPE_SERIALIZER, MODID);
     private static final DeferredRegister<MenuType<?>> MENU_TYPES = DeferredRegister.create(BuiltInRegistries.MENU, MODID);
     private static final DeferredRegister<CreativeModeTab> CREATIVE_TABS = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, MODID);
+    private static final DeferredRegister<DataComponentType<?>> DATA_COMPONENT_TYPES = DeferredRegister.create(Registries.DATA_COMPONENT_TYPE, MODID);
 
     public static final DeferredBlock<Block> RIFT = BLOCKS.register("rift", () -> new RiftBlock(BlockBehaviour.Properties.of().mapColor(MapColor.STONE).sound(SoundType.METAL).strength(3.0F, 8.0F).dynamicShape()));
     public static final DeferredBlock<StructureCornerBlock> STRUCTURE_CORNER = BLOCKS.register("structure_corner", () -> new StructureCornerBlock(BlockBehaviour.Properties.of().mapColor(MapColor.STONE).sound(SoundType.METAL).strength(3.0F, 8.0F).noLootTable()));
@@ -129,6 +131,10 @@ public class EnderRiftMod
 
     public static final DeferredHolder<RecipeSerializer<?>, SimpleCraftingRecipeSerializer<OrbDuplicationRecipe>> ORB_DUPLICATION = RECIPE_SERIALIZERS.register("orb_duplication", () -> new SimpleCraftingRecipeSerializer<>(OrbDuplicationRecipe::new));
 
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<UUID>> RIFT_ID = DATA_COMPONENT_TYPES.register("rift_id",
+            () -> DataComponentType.<UUID>builder().persistent(UUIDUtil.CODEC).networkSynchronized(UUIDUtil.STREAM_CODEC).build()
+    );
+
     public static DeferredHolder<CreativeModeTab, CreativeModeTab> ENDERRIFT_CREATIVE_TAB = CREATIVE_TABS.register("ender_rift_tab", () -> new CreativeModeTab.Builder(CreativeModeTab.Row.TOP, 0)
             .icon(() -> new ItemStack(RIFT_ORB.get()))
             .title(Component.translatable("itemGroup.tabEnderRift"))
@@ -144,7 +150,7 @@ public class EnderRiftMod
             }).build()
     );
 
-    public EnderRiftMod(IEventBus modEventBus)
+    public EnderRiftMod(ModContainer container, IEventBus modEventBus)
     {
         ITEMS.register(modEventBus);
         BLOCKS.register(modEventBus);
@@ -161,9 +167,8 @@ public class EnderRiftMod
 
         NeoForge.EVENT_BUS.addListener(this::commandEvent);
 
-        ModLoadingContext modLoadingContext = ModLoadingContext.get();
-        modLoadingContext.registerConfig(ModConfig.Type.SERVER, ConfigValues.SERVER_SPEC);
-        //modLoadingContext.registerConfig(ModConfig.Type.CLIENT, ConfigData.CLIENT_SPEC);
+        container.registerConfig(ModConfig.Type.SERVER, ConfigValues.SERVER_SPEC);
+        //container.registerConfig(ModConfig.Type.CLIENT, ConfigData.CLIENT_SPEC);
 
         if (ModList.get().isLoaded("ae2"))
         {
@@ -171,12 +176,12 @@ public class EnderRiftMod
         }
     }
 
-    private void registerPackets(RegisterPayloadHandlerEvent event)
+    private void registerPackets(RegisterPayloadHandlersEvent event)
     {
-        final IPayloadRegistrar registrar = event.registrar(MODID).versioned("1.1.0");
-        registrar.play(ClearCraftingGrid.ID, ClearCraftingGrid::new, play -> play.server(ClearCraftingGrid::handle));
-        registrar.play(SendSlotChanges.ID, SendSlotChanges::new, play -> play.client(SendSlotChanges::handle));
-        registrar.play(SetVisibleSlots.ID, SetVisibleSlots::new, play -> play.server(SetVisibleSlots::handle));
+        final PayloadRegistrar registrar = event.registrar(MODID).versioned("1.1.0");
+        registrar.playToServer(ClearCraftingGrid.TYPE, ClearCraftingGrid.STREAM_CODEC, ClearCraftingGrid::handle);
+        registrar.playToServer(SetVisibleSlots.TYPE, SetVisibleSlots.STREAM_CODEC, SetVisibleSlots::handle);
+        registrar.playToClient(SendSlotChanges.TYPE, SendSlotChanges.STREAM_CODEC, SendSlotChanges::handle);
     }
 
     private void commonSetup(FMLCommonSetupEvent event)
@@ -184,12 +189,12 @@ public class EnderRiftMod
         RiftStructure.init();
     }
 
-    public void clientSetup(FMLClientSetupEvent event)
+    public void clientSetup(RegisterMenuScreensEvent event)
     {
-        MenuScreens.register(GENERATOR_MENU.get(), GeneratorScreen::new);
-        MenuScreens.register(INTERFACE_MENU.get(), InterfaceScreen::new);
-        MenuScreens.register(BROWSER_MENU.get(), BrowserScreen::new);
-        MenuScreens.register(CRAFTING_BROWSER_MENU.get(), CraftingBrowserScreen::new);
+        event.register(GENERATOR_MENU.get(), GeneratorScreen::new);
+        event.register(INTERFACE_MENU.get(), InterfaceScreen::new);
+        event.register(BROWSER_MENU.get(), BrowserScreen::new);
+        event.register(CRAFTING_BROWSER_MENU.get(), CraftingBrowserScreen::new);
     }
 
     public void interComms(InterModEnqueueEvent event)
@@ -237,7 +242,7 @@ public class EnderRiftMod
 
     private int locateAllRifts(CommandContext<CommandSourceStack> context)
     {
-        RiftStorage.walkRifts((id, rift) -> locateRiftById(context, id, rift));
+        RiftStorage.walkRifts(context.getSource().getServer().registryAccess(), (id, rift) -> locateRiftById(context, id, rift));
         return 0;
     }
 
@@ -257,17 +262,17 @@ public class EnderRiftMod
         {
             DataGenerator gen = event.getGenerator();
 
-            gen.addProvider(event.includeServer(), Loot.create(gen));
+            gen.addProvider(event.includeServer(), Loot.create(gen, event.getLookupProvider()));
             gen.addProvider(event.includeServer(), new BlockTagGens(gen, event.getExistingFileHelper()));
         }
 
         private static class Loot
         {
-            public static LootTableProvider create(DataGenerator gen)
+            public static LootTableProvider create(DataGenerator gen, CompletableFuture<HolderLookup.Provider> lookup)
             {
                 return new LootTableProvider(gen.getPackOutput(), Set.of(), List.of(
                         new LootTableProvider.SubProviderEntry(Loot.BlockTables::new, LootContextParamSets.BLOCK)
-                ));
+                ), lookup);
             }
 
             public static class BlockTables extends BlockLootSubProvider

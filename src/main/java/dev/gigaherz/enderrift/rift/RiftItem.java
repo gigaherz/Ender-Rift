@@ -3,7 +3,6 @@ package dev.gigaherz.enderrift.rift;
 import dev.gigaherz.enderrift.EnderRiftMod;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -14,8 +13,8 @@ import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 
-import javax.annotation.Nullable;
 import java.util.List;
+import java.util.UUID;
 
 public class RiftItem extends Item
 {
@@ -27,20 +26,20 @@ public class RiftItem extends Item
     @Override
     public String getDescriptionId(ItemStack stack)
     {
-        CompoundTag tag = stack.getTag();
-        if (tag == null || !tag.contains("RiftId"))
+        UUID riftId = stack.get(EnderRiftMod.RIFT_ID);
+        if (riftId == null)
             return this.getDescriptionId() + ".empty";
         else
             return this.getDescriptionId() + ".bound";
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, @Nullable Level worldIn, List<Component> tooltip, TooltipFlag flagIn)
+    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag flagIn)
     {
-        CompoundTag tag = stack.getTag();
-        if (tag != null && tag.contains("RiftId"))
+        UUID riftId = stack.get(EnderRiftMod.RIFT_ID);
+        if (riftId != null)
         {
-            tooltip.add(Component.translatable("text.enderrift.tooltip.riftid", tag.getUUID("RiftId")));
+            tooltip.add(Component.translatable("text.enderrift.tooltip.riftid", riftId));
         }
     }
 
@@ -66,8 +65,8 @@ public class RiftItem extends Item
 
         if (state.getValue(RiftBlock.ASSEMBLED))
         {
-            CompoundTag tag = stack.getTag();
-            if (tag == null || !tag.contains("RiftId"))
+            UUID riftId = stack.get(EnderRiftMod.RIFT_ID);
+            if (riftId != null)
             {
                 if (!RiftStructure.duplicateOrb(world, pos, player))
                     return InteractionResult.PASS;

@@ -3,7 +3,7 @@ plugins {
     id 'eclipse'
     id 'idea'
     id 'maven-publish'
-    id 'net.neoforged.gradle.userdev' version '7.0.100'
+    id 'net.neoforged.gradle.userdev' version '7.0.134'
     id 'com.github.johnrengelman.shadow' version '8.1.1'
 }
 
@@ -11,14 +11,15 @@ version = "2.8.1"
 group= "dev.gigaherz.enderrift"
 
 Provider<String> minecraftVersion(Transformer<String, String> mapper) {
-    return project.userDevRuntime.runtimes.map(r -> r.values().first().specification.minecraftVersion).map(mapper)
+    return project.provider((() -> project.userDevRuntime.definitions.values().first().specification.minecraftVersion))
+            .map(mapper)
 }
 
 base {
     archivesName = minecraftVersion { "EnderRift-${it}" }
 }
 
-java.toolchain.languageVersion = JavaLanguageVersion.of(17)
+java.toolchain.languageVersion = JavaLanguageVersion.of(21)
 
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8' // Use the UTF-8 charset for Java compilation
@@ -47,9 +48,6 @@ repositories {
         url "https://dvs1.progwml6.com/files/maven"
     }
     maven {
-        url 'https://maven.mcmoddev.com/'
-    }
-    maven {
         url "https://github.com/TehNut/temporary-maven-thing/tree/master/maven"
     }
     maven { // TOP
@@ -73,8 +71,8 @@ repositories {
 
 subsystems {
     parchment {
-        minecraftVersion="1.20.4"
-        mappingsVersion="2024.02.25"
+        minecraftVersion="1.20.6"
+        mappingsVersion="2024.05.01"
     }
 }
 
@@ -111,7 +109,7 @@ configurations {
 }
 
 dependencies {
-    implementation 'net.neoforged:neoforge:20.4.210'
+    implementation 'net.neoforged:neoforge:20.6.75-beta'
 
     compileOnly 'org.jetbrains:annotations:20.1.0'
 
@@ -122,24 +120,24 @@ dependencies {
         transitive = false
     }
 
-    compileOnly "appeng:appliedenergistics2-neoforge:17.11.0-beta:api"
-    runtimeOnly "appeng:appliedenergistics2-neoforge:17.11.0-beta"
+    compileOnly "appeng:appliedenergistics2-neoforge:18.1.2-alpha:api"
+    runtimeOnly "appeng:appliedenergistics2-neoforge:18.1.2-alpha"
 
     implementation("com.googlecode.concurrent-locks:concurrent-locks:1.0.0")
     shade("com.googlecode.concurrent-locks:concurrent-locks:1.0.0")
 
-    compileOnly "mezz.jei:jei-1.20.4-common-api:17.3.0.49"
-    runtimeOnly "mezz.jei:jei-1.20.4-common:17.3.0.49"
-    compileOnly "mezz.jei:jei-1.20.4-neoforge-api:17.3.0.49"
-    runtimeOnly "mezz.jei:jei-1.20.4-neoforge:17.3.0.49"
+    //compileOnly "mezz.jei:jei-1.20.4-common-api:17.3.0.49"
+    //runtimeOnly "mezz.jei:jei-1.20.4-common:17.3.0.49"
+    //compileOnly "mezz.jei:jei-1.20.4-neoforge-api:17.3.0.49"
+    //runtimeOnly "mezz.jei:jei-1.20.4-neoforge:17.3.0.49"
 
     // TheOneProbe - 1.20.4_neo-11.0.2
-    compileOnly "curse.maven:the-one-probe-245211:5159289"
+    //compileOnly "curse.maven:the-one-probe-245211:5159289"
     //runtimeOnly "curse.maven:the-one-probe-245211:5159289"
 
     // Jade (WAILA) - [NeoForge 1.20.4] 13.3.1
-    compileOnly "curse.maven:jade-324717:5109393"
-    runtimeOnly "curse.maven:jade-324717:5109393"
+    //compileOnly "curse.maven:jade-324717:5109393"
+    //runtimeOnly "curse.maven:jade-324717:5109393"
 
     //compile fileTree(dir: 'libs', include: '*.jar')
 

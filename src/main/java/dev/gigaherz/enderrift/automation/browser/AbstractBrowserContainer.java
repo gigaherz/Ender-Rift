@@ -32,6 +32,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Supplier;
+import java.util.stream.IntStream;
 
 public class AbstractBrowserContainer extends AbstractContainerMenu
 {
@@ -222,7 +223,7 @@ public class AbstractBrowserContainer extends AbstractContainerMenu
             ItemStack current = currentStacks.get(i);
             long currentCount = currentSizes.getLong(i);
 
-            if (!ItemStack.isSameItemSameTags(current, newStack) || newCount != currentCount)
+            if (!ItemStack.isSameItemSameComponents(current, newStack) || newCount != currentCount)
             {
                 current = newStack.copy();
                 currentStacks.set(i, current);
@@ -255,7 +256,7 @@ public class AbstractBrowserContainer extends AbstractContainerMenu
         {
             if (newLength != oldLength || indicesChanged.size() > 0)
             {
-                PacketDistributor.PLAYER.with(crafter).send(new SendSlotChanges(containerId, newLength, indicesChanged, stacksChanged, stackSizesChanged));
+                PacketDistributor.sendToPlayer(crafter, new SendSlotChanges(containerId, newLength, indicesChanged, stacksChanged, stackSizesChanged));
             }
 
             ItemStack newStack = getCarried();
@@ -293,7 +294,7 @@ public class AbstractBrowserContainer extends AbstractContainerMenu
         player.connection.send(new ClientboundContainerSetSlotPacket(-1, incrementStateId(), -1, newStack));
     }
 
-    public void slotsChanged(int slotCount, List<Integer> indices, List<ItemStack> stacks, LongList sizes)
+    public void slotsChanged(int slotCount, List<Integer> indices, List<ItemStack> stacks, List<Long> sizes)
     {
         if (slotCount != currentStacks.size())
         {
@@ -304,7 +305,7 @@ public class AbstractBrowserContainer extends AbstractContainerMenu
         {
             int slot = indices.get(i);
             ItemStack stack = stacks.get(i);
-            long size = sizes.getLong(i);
+            long size = sizes.get(i);
 
             currentStacks.set(slot, stack);
             currentSizes.set(slot, size);
@@ -326,7 +327,7 @@ public class AbstractBrowserContainer extends AbstractContainerMenu
     {
         if (isClient())
         {
-            PacketDistributor.SERVER.noArg().send(new SetVisibleSlots(containerId, visible));
+            PacketDistributor.sendToServer(new SetVisibleSlots(containerId, visible));
         }
         else
         {
@@ -556,7 +557,7 @@ public class AbstractBrowserContainer extends AbstractContainerMenu
                 ItemStack stackInSlot = slot.getItem();
 
                 if (stackInSlot.getCount() < stackInSlot.getMaxStackSize()
-                        && ItemStack.isSameItemSameTags(stackInSlot, stack))
+                        && ItemStack.isSameItemSameComponents(stackInSlot, stack))
                 {
                     int j = stackInSlot.getCount() + stack.getCount();
 
@@ -811,7 +812,7 @@ public class AbstractBrowserContainer extends AbstractContainerMenu
                     Item item = invStack.getItem();
                     itemData.add(stack.getHoverName());
                     itemData.add(Component.literal(BuiltInRegistries.ITEM.getKey(item).toString()));
-                    item.appendHoverText(stack, player.level(), itemData, TooltipFlag.Default.NORMAL);
+                    item.appendHoverText(stack, Item.TooltipContext.of(player.level()), itemData, TooltipFlag.Default.NORMAL);
                     matchesSearch = false;
                     for (Component s : itemData)
                     {

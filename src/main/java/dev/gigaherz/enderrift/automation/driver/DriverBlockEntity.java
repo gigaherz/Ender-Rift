@@ -4,11 +4,12 @@ import dev.gigaherz.enderrift.EnderRiftMod;
 import dev.gigaherz.enderrift.automation.AggregatorBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.neoforged.neoforge.energy.EnergyStorage;
@@ -16,7 +17,7 @@ import net.neoforged.neoforge.energy.IEnergyStorage;
 
 import java.util.Optional;
 
-@Mod.EventBusSubscriber(modid = EnderRiftMod.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
+@EventBusSubscriber(modid = EnderRiftMod.MODID, bus = EventBusSubscriber.Bus.MOD)
 public class DriverBlockEntity extends AggregatorBlockEntity
 {
     @SubscribeEvent
@@ -57,19 +58,19 @@ public class DriverBlockEntity extends AggregatorBlockEntity
     }
 
     @Override
-    public void load(CompoundTag compound)
+    protected void loadAdditional(CompoundTag compound, HolderLookup.Provider lookup)
     {
-        super.load(compound);
+        super.loadAdditional(compound, lookup);
 
-        energyBuffer.deserializeNBT(compound.get("storedEnergy"));
+        energyBuffer.deserializeNBT(lookup, compound.get("storedEnergy"));
     }
 
     @Override
-    protected void saveAdditional(CompoundTag compound)
+    protected void saveAdditional(CompoundTag compound, HolderLookup.Provider lookup)
     {
-        super.saveAdditional(compound);
+        super.saveAdditional(compound, lookup);
 
-        compound.put("storedEnergy", energyBuffer.serializeNBT());
+        compound.put("storedEnergy", energyBuffer.serializeNBT(lookup));
     }
 
     public static void tickStatic(Level level, BlockPos blockPos, BlockState blockState, DriverBlockEntity te)

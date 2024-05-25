@@ -1,5 +1,6 @@
 package dev.gigaherz.enderrift.rift.storage;
 
+import net.minecraft.core.HolderLookup;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
@@ -20,11 +21,11 @@ public class RiftHolder
         return id;
     }
 
-    public RiftInventory getOrLoad()
+    public RiftInventory getOrLoad(HolderLookup.Provider lookup)
     {
         if (inventory == null)
         {
-            inventory = RiftStorage.load(this);
+            inventory = RiftStorage.load(this, lookup);
         }
         return inventory;
     }

@@ -6,6 +6,7 @@ import dev.gigaherz.enderrift.automation.AutomationHelper;
 import dev.gigaherz.enderrift.common.IPoweredAutomation;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -15,17 +16,16 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.neoforged.neoforge.items.IItemHandlerModifiable;
-import net.neoforged.neoforge.items.ItemHandlerHelper;
 import net.neoforged.neoforge.items.ItemStackHandler;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-@Mod.EventBusSubscriber(modid = EnderRiftMod.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
+@EventBusSubscriber(modid = EnderRiftMod.MODID, bus = EventBusSubscriber.Bus.MOD)
 public class InterfaceBlockEntity extends AggregatorBlockEntity implements IPoweredAutomation
 {
     @SubscribeEvent
@@ -121,7 +121,7 @@ public class InterfaceBlockEntity extends AggregatorBlockEntity implements IPowe
                     if (inSlot.getCount() > 0)
                         anyChanged = true;
                 }
-                else if (ItemHandlerHelper.canItemStacksStack(inSlot, inFilter))
+                else if (ItemStack.isSameItemSameComponents(inSlot, inFilter))
                 {
                     int free = inSlot.getMaxStackSize() - inSlot.getCount();
                     if (free > 0)
@@ -164,9 +164,9 @@ public class InterfaceBlockEntity extends AggregatorBlockEntity implements IPowe
     }
 
     @Override
-    public void load(CompoundTag compound)
+    public void loadAdditional(CompoundTag compound, HolderLookup.Provider lookup)
     {
-        super.load(compound);
+        super.loadAdditional(compound, lookup);
 
         ListTag _filters = compound.getList("Filters", Tag.TAG_COMPOUND);
         for (int i = 0; i < _filters.size(); ++i)
@@ -176,7 +176,7 @@ public class InterfaceBlockEntity extends AggregatorBlockEntity implements IPowe
 
             if (j >= 0 && j < filters.getSlots())
             {
-                filters.setStackInSlot(j, ItemStack.of(nbttagcompound));
+                filters.setStackInSlot(j, ItemStack.parseOptional(lookup, nbttagcompound));
             }
         }
 
@@ -188,15 +188,15 @@ public class InterfaceBlockEntity extends AggregatorBlockEntity implements IPowe
 
             if (j >= 0 && j < outputs.getSlots())
             {
-                outputs.setStackInSlot(j, ItemStack.of(slot));
+                outputs.setStackInSlot(j, ItemStack.parseOptional(lookup, slot));
             }
         }
     }
 
     @Override
-    protected void saveAdditional(CompoundTag compound)
+    protected void saveAdditional(CompoundTag compound, HolderLookup.Provider lookup)
     {
-        super.saveAdditional(compound);
+        super.saveAdditional(compound, lookup);
 
         ListTag _filters = new ListTag();
         for (int i = 0; i < filters.getSlots(); ++i)
@@ -206,7 +206,7 @@ public class InterfaceBlockEntity extends AggregatorBlockEntity implements IPowe
             {
                 CompoundTag nbttagcompound = new CompoundTag();
                 nbttagcompound.putByte("Slot", (byte) i);
-                stack.save(nbttagcompound);
+                stack.save(lookup, nbttagcompound);
                 _filters.add(nbttagcompound);
             }
         }
@@ -221,7 +221,7 @@ public class InterfaceBlockEntity extends AggregatorBlockEntity implements IPowe
             {
                 CompoundTag slot = new CompoundTag();
                 slot.putByte("Slot", (byte) i);
-                stack.save(slot);
+                stack.save(lookup, slot);
                 _outputs.add(slot);
             }
         }

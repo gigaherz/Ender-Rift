@@ -18,13 +18,13 @@ authors="gigaherz"
 [[dependencies.enderrift]]
    modId="neoforge"
    type="required"
-   versionRange="[20.4.72-beta,)"
+   versionRange="[20.5.75-beta,)"
    ordering="NONE"
    side="BOTH"
 [[dependencies.enderrift]]
    modId="minecraft"
    type="required"
-   versionRange="[1.20.4,1.21)"
+   versionRange="[1.20.6,1.21)"
    ordering="NONE"
    side="BOTH"
 [[dependencies.enderrift]]

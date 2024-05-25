@@ -5,6 +5,7 @@ import dev.gigaherz.enderrift.rift.ILongItemHandler;
 import dev.gigaherz.enderrift.rift.IRiftChangeListener;
 import dev.gigaherz.enderrift.rift.RiftChangeHook;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
@@ -82,7 +83,7 @@ public class RiftInventory implements ILongItemHandler
         });
     }
 
-    CompoundTag save()
+    CompoundTag save(HolderLookup.Provider lookup)
     {
         CompoundTag root = new CompoundTag();
         ListTag list = new ListTag();
@@ -91,14 +92,14 @@ public class RiftInventory implements ILongItemHandler
         {
             CompoundTag tag = new CompoundTag();
             tag.putLong("Count", slot.getCount());
-            tag.put("Item", slot.getSample().copyWithCount(1).save(new CompoundTag()));
+            tag.put("Item", slot.getSample().copyWithCount(1).save(lookup, new CompoundTag()));
             list.add(tag);
         }
         root.put("Contents", list);
         return root;
     }
 
-    void load(CompoundTag root)
+    void load(CompoundTag root, HolderLookup.Provider lookup)
     {
         if (slots.size() > 0)
         {
@@ -113,7 +114,7 @@ public class RiftInventory implements ILongItemHandler
             long count = tag.getLong("Count");
             var itemCompound = tag.getCompound("Item");
             itemCompound.putInt("Count", 1);
-            ItemStack stack = ItemStack.of(itemCompound);
+            ItemStack stack = ItemStack.parse(lookup, itemCompound).orElse(ItemStack.EMPTY);
             RiftSlot slot = new RiftSlot(stack, count);
             slots.add(slot);
             afterAdd(slot);
@@ -200,7 +201,7 @@ public class RiftInventory implements ILongItemHandler
     {
         RiftSlot slot = slots.get(index);
         ItemStack sample = slot.getSample();
-        if (ItemStack.isSameItemSameTags(sample, stack))
+        if (ItemStack.isSameItemSameComponents(sample, stack))
         {
             slot.addCount(stack.getCount());
             return true;
@@ -311,10 +312,5 @@ public class RiftInventory implements ILongItemHandler
     public void clearDirty()
     {
         this.isDirty = false;
-    }
-
-    public void markDirty()
-    {
-        isDirty = true;
     }
 }

@@ -9,7 +9,6 @@ import dev.gigaherz.enderrift.automation.AggregatorBlock;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
-import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.SimpleMenuProvider;
 import net.minecraft.world.entity.player.Player;
@@ -117,11 +116,10 @@ public class BrowserBlock extends AggregatorBlock<BrowserBlockEntity>
         return defaultBlockState().setValue(BrowserBlock.FACING, context.getClickedFace().getOpposite());
     }
 
-    @Deprecated
     @Override
-    public InteractionResult use(BlockState state, Level worldIn, BlockPos pos, Player player, InteractionHand handIn, BlockHitResult hit)
+    protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult pHitResult)
     {
-        BlockEntity tileEntity = worldIn.getBlockEntity(pos);
+        BlockEntity tileEntity = level.getBlockEntity(pos);
 
         if (!(tileEntity instanceof BrowserBlockEntity) || player.isShiftKeyDown())
             return InteractionResult.FAIL;

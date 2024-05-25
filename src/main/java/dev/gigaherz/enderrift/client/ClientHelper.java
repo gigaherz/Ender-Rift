@@ -9,11 +9,11 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import net.minecraft.world.entity.player.Player;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.neoforge.client.event.ModelEvent;
 
-@Mod.EventBusSubscriber(value = Dist.CLIENT, modid = EnderRiftMod.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
+@EventBusSubscriber(value = Dist.CLIENT, modid = EnderRiftMod.MODID, bus = EventBusSubscriber.Bus.MOD)
 public class ClientHelper
 {
     @SubscribeEvent
@@ -35,9 +35,9 @@ public class ClientHelper
         {
             Player entityplayer = minecraft.player;
 
-            if (entityplayer != null && entityplayer.containerMenu != null && entityplayer.containerMenu.containerId == message.windowId)
+            if (entityplayer != null && entityplayer.containerMenu != null && entityplayer.containerMenu.containerId == message.windowId())
             {
-                ((AbstractBrowserContainer) entityplayer.containerMenu).slotsChanged(message.slotCount, message.indices, message.stacks, message.stackSizes);
+                ((AbstractBrowserContainer) entityplayer.containerMenu).slotsChanged(message.slotCount(), message.indices(), message.stacks(), message.stackSizes());
             }
         });
     }
