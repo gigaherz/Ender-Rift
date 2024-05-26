@@ -11,6 +11,6 @@
     "i": { "item": "minecraft:iron_ingot" }
   },
   "result": {
-    "item": "enderrift:proxy"
+    "id": "enderrift:proxy"
   }
 }

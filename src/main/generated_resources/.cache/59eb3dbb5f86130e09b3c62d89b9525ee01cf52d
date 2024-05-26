@@ -1,0 +1,8 @@
+// 1.20.6	2024-05-25T01:57:46.3504022	Loot Tables
+dd935ddd8491794bd36522b211aaea6e0ab2a3a9 data/enderrift/loot_tables/blocks/browser.json
+5d7efdd7eec39b6be081b96ea531079bd863af5b data/enderrift/loot_tables/blocks/crafting_browser.json
+59cd3f6a0842a6cb004991c126786674a55f9a04 data/enderrift/loot_tables/blocks/driver.json
+39c09d82d44cc30ec2071a13faa492573525828c data/enderrift/loot_tables/blocks/generator.json
+dc75394b9c308899eceee2c3b1a28db48d80a789 data/enderrift/loot_tables/blocks/interface.json
+86cca3e9c3f7a1f4a7213022d9ee685a3fabb038 data/enderrift/loot_tables/blocks/proxy.json
+0e28617db02ba19a5e2fa6e5e4be542780747ab6 data/enderrift/loot_tables/blocks/rift.json

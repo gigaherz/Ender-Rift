@@ -11,6 +11,6 @@
     "c": { "item": "minecraft:ender_eye" }
   },
   "result": {
-    "item": "enderrift:rift_orb"
+    "id": "enderrift:rift_orb"
   }
 }

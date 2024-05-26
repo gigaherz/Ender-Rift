@@ -3,11 +3,11 @@ plugins {
     id 'eclipse'
     id 'idea'
     id 'maven-publish'
-    id 'net.neoforged.gradle.userdev' version '7.0.134'
-    id 'com.github.johnrengelman.shadow' version '8.1.1'
+    id 'net.neoforged.gradle.userdev' version '7.0.135'
+    id 'io.github.goooler.shadow' version '8.1.7'
 }
 
-version = "2.8.1"
+version = "2.9.0"
 group= "dev.gigaherz.enderrift"
 
 Provider<String> minecraftVersion(Transformer<String, String> mapper) {
@@ -109,7 +109,7 @@ configurations {
 }
 
 dependencies {
-    implementation 'net.neoforged:neoforge:20.6.75-beta'
+    implementation 'net.neoforged:neoforge:20.6.78-beta'
 
     compileOnly 'org.jetbrains:annotations:20.1.0'
 
@@ -135,9 +135,9 @@ dependencies {
     //compileOnly "curse.maven:the-one-probe-245211:5159289"
     //runtimeOnly "curse.maven:the-one-probe-245211:5159289"
 
-    // Jade (WAILA) - [NeoForge 1.20.4] 13.3.1
-    //compileOnly "curse.maven:jade-324717:5109393"
-    //runtimeOnly "curse.maven:jade-324717:5109393"
+    // Jade (WAILA) - [NeoForge 1.20.6] 14.2.3
+    compileOnly "curse.maven:jade-324717:5366595"
+    runtimeOnly "curse.maven:jade-324717:5366595"
 
     //compile fileTree(dir: 'libs', include: '*.jar')
 

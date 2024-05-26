@@ -12,6 +12,6 @@
     "c": { "item": "minecraft:ender_chest" }
   },
   "result": {
-    "item": "enderrift:rift"
+    "id": "enderrift:rift"
   }
 }

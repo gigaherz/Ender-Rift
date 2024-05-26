@@ -188,7 +188,8 @@ public class RiftBlockEntity extends BlockEntity implements IRiftChangeListener
     @Override
     protected void collectImplicitComponents(DataComponentMap.Builder pComponents)
     {
-        pComponents.set(EnderRiftMod.RIFT_ID, holder.getId());
+        if (holder != null)
+            pComponents.set(EnderRiftMod.RIFT_ID, holder.getId());
     }
 
     @Override

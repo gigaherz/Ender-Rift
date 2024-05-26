@@ -12,6 +12,6 @@
     "i": { "item": "minecraft:iron_ingot" }
   },
   "result": {
-    "item": "enderrift:generator"
+    "id": "enderrift:generator"
   }
 }

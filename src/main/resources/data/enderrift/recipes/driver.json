@@ -11,6 +11,6 @@
     "i": { "item": "minecraft:iron_ingot" }
   },
   "result": {
-    "item": "enderrift:driver"
+    "id": "enderrift:driver"
   }
 }

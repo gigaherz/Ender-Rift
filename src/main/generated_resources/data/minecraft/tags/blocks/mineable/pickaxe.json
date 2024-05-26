@@ -1,0 +1,13 @@
+{
+  "values": [
+    "enderrift:browser",
+    "enderrift:crafting_browser",
+    "enderrift:interface",
+    "enderrift:proxy",
+    "enderrift:driver",
+    "enderrift:rift",
+    "enderrift:generator",
+    "enderrift:structure_corner",
+    "enderrift:structure_edge"
+  ]
+}

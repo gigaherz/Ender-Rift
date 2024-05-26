@@ -158,6 +158,7 @@ public class EnderRiftMod
         RECIPE_SERIALIZERS.register(modEventBus);
         MENU_TYPES.register(modEventBus);
         CREATIVE_TABS.register(modEventBus);
+        DATA_COMPONENT_TYPES.register(modEventBus);
 
         modEventBus.addListener(this::commonSetup);
         modEventBus.addListener(this::clientSetup);
