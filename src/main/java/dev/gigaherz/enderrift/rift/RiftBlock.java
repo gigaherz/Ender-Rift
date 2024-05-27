@@ -6,12 +6,15 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import dev.gigaherz.enderrift.EnderRiftMod;
 import dev.gigaherz.enderrift.automation.AutomationHelper;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BaseEntityBlock;
@@ -31,6 +34,7 @@ import net.neoforged.neoforge.items.ItemHandlerHelper;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.UUID;
 
 public class RiftBlock extends BaseEntityBlock
 {
@@ -233,4 +237,15 @@ public class RiftBlock extends BaseEntityBlock
             itemEntity.setItem(remaining);
         }
     }
+
+    @Override
+    public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag flag)
+    {
+        UUID riftId = stack.get(EnderRiftMod.RIFT_ID);
+        if (riftId != null)
+        {
+            tooltip.add(Component.translatable("text.enderrift.tooltip.riftid", riftId.toString()));
+        }
+    }
+
 }

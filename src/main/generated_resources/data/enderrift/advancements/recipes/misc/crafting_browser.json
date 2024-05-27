@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_browser": {
+      "conditions": {
+        "items": [
+          {
+            "items": "enderrift:browser"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "enderrift:crafting_browser"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_browser"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "enderrift:crafting_browser"
+    ]
+  }
+}

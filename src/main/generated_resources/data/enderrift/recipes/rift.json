@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "c": {
+      "item": "minecraft:ender_chest"
+    },
+    "h": {
+      "item": "minecraft:hopper"
+    },
+    "o": {
+      "item": "minecraft:obsidian"
+    },
+    "r": {
+      "item": "minecraft:redstone_block"
+    }
+  },
+  "pattern": [
+    "oho",
+    "r r",
+    "oco"
+  ],
+  "result": {
+    "count": 1,
+    "id": "enderrift:rift"
+  }
+}

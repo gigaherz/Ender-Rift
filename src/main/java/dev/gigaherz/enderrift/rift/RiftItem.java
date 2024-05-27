@@ -39,7 +39,7 @@ public class RiftItem extends Item
         UUID riftId = stack.get(EnderRiftMod.RIFT_ID);
         if (riftId != null)
         {
-            tooltip.add(Component.translatable("text.enderrift.tooltip.riftid", riftId));
+            tooltip.add(Component.translatable("text.enderrift.tooltip.riftid", riftId.toString()));
         }
     }
 
@@ -66,7 +66,7 @@ public class RiftItem extends Item
         if (state.getValue(RiftBlock.ASSEMBLED))
         {
             UUID riftId = stack.get(EnderRiftMod.RIFT_ID);
-            if (riftId != null)
+            if (riftId == null)
             {
                 if (!RiftStructure.duplicateOrb(world, pos, player))
                     return InteractionResult.PASS;

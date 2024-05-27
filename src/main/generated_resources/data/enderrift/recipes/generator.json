@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "f": {
+      "item": "minecraft:furnace"
+    },
+    "i": {
+      "item": "minecraft:redstone"
+    },
+    "r": {
+      "item": "minecraft:iron_ingot"
+    },
+    "w": {
+      "item": "minecraft:water_bucket"
+    }
+  },
+  "pattern": [
+    "iri",
+    "rwr",
+    "ifi"
+  ],
+  "result": {
+    "count": 1,
+    "id": "enderrift:generator"
+  }
+}

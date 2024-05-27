@@ -32,8 +32,10 @@ import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.DataGenerator;
+import net.minecraft.data.PackOutput;
 import net.minecraft.data.loot.BlockLootSubProvider;
 import net.minecraft.data.loot.LootTableProvider;
+import net.minecraft.data.recipes.*;
 import net.minecraft.data.registries.VanillaRegistries;
 import net.minecraft.data.tags.IntrinsicHolderTagsProvider;
 import net.minecraft.network.chat.ClickEvent;
@@ -42,15 +44,14 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.BlockTags;
+import net.minecraft.tags.ItemTags;
 import net.minecraft.world.flag.FeatureFlags;
 import net.minecraft.world.inventory.MenuType;
-import net.minecraft.world.item.BlockItem;
-import net.minecraft.world.item.CreativeModeTab;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.*;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.SimpleCraftingRecipeSerializer;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
@@ -65,6 +66,7 @@ import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.fml.event.lifecycle.InterModEnqueueEvent;
 import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
 import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.common.Tags;
 import net.neoforged.neoforge.common.data.ExistingFileHelper;
 import net.neoforged.neoforge.data.event.GatherDataEvent;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
@@ -263,8 +265,106 @@ public class EnderRiftMod
         {
             DataGenerator gen = event.getGenerator();
 
+            gen.addProvider(event.includeServer(), new Recipes(gen.getPackOutput(), event.getLookupProvider()));
             gen.addProvider(event.includeServer(), Loot.create(gen, event.getLookupProvider()));
             gen.addProvider(event.includeServer(), new BlockTagGens(gen, event.getExistingFileHelper()));
+        }
+
+        private static class Recipes extends RecipeProvider
+        {
+            public Recipes(PackOutput output, CompletableFuture<HolderLookup.Provider> lookupProvider)
+            {
+                super(output, lookupProvider);
+            }
+
+            @Override
+            protected void buildRecipes(RecipeOutput consumer)
+            {
+                ShapedRecipeBuilder.shaped(RecipeCategory.MISC, BROWSER)
+                        .pattern("ig ")
+                        .pattern("geg")
+                        .pattern("ig ")
+                        .define('e', PROXY)
+                        .define('g', Items.GLOWSTONE_DUST)
+                        .define('i', Items.IRON_INGOT)
+                        .unlockedBy("has_proxy", has(PROXY.get()))
+                        .save(consumer);
+
+                ShapedRecipeBuilder.shaped(RecipeCategory.MISC, CRAFTING_BROWSER)
+                        .pattern("gdg")
+                        .pattern("dbd")
+                        .pattern("gcg")
+                        .define('b', BROWSER)
+                        .define('c', Items.CRAFTING_TABLE)
+                        .define('d', Items.DIAMOND)
+                        .define('g', Items.GOLD_INGOT)
+                        .unlockedBy("has_browser", has(BROWSER))
+                        .save(consumer);
+
+                ShapedRecipeBuilder.shaped(RecipeCategory.MISC, DRIVER)
+                        .pattern("iri")
+                        .pattern("rhr")
+                        .pattern("iri")
+                        .define('h', Items.HOPPER)
+                        .define('i', Blocks.REDSTONE_BLOCK)
+                        .define('r', Items.IRON_INGOT)
+                        .unlockedBy("has_hopper", has(Items.HOPPER))
+                        .save(consumer);
+
+                ShapedRecipeBuilder.shaped(RecipeCategory.MISC, PROXY)
+                        .pattern("iri")
+                        .pattern("rhr")
+                        .pattern("iri")
+                        .define('h', Items.HOPPER)
+                        .define('i', Items.REDSTONE)
+                        .define('r', Items.IRON_INGOT)
+                        .unlockedBy("has_hopper", has(Items.HOPPER))
+                        .save(consumer);
+
+                ShapedRecipeBuilder.shaped(RecipeCategory.MISC, GENERATOR)
+                        .pattern("iri")
+                        .pattern("rwr")
+                        .pattern("ifi")
+                        .define('f', Items.FURNACE)
+                        .define('i', Items.REDSTONE)
+                        .define('r', Items.IRON_INGOT)
+                        .define('w', Items.WATER_BUCKET)
+                        .unlockedBy("has_hopper", has(Items.HOPPER))
+                        .save(consumer);
+
+                ShapedRecipeBuilder.shaped(RecipeCategory.MISC, INTERFACE)
+                        .pattern("ir ")
+                        .pattern("rer")
+                        .pattern("ir ")
+                        .define('e', PROXY)
+                        .define('i', Items.REDSTONE)
+                        .define('r', Items.IRON_INGOT)
+                        .unlockedBy("has_proxy", has(PROXY))
+                        .save(consumer);
+
+                ShapedRecipeBuilder.shaped(RecipeCategory.MISC, RIFT)
+                        .pattern("oho")
+                        .pattern("r r")
+                        .pattern("oco")
+                        .define('c', Items.ENDER_CHEST)
+                        .define('h', Items.HOPPER)
+                        .define('o', Items.OBSIDIAN)
+                        .define('r', Items.REDSTONE_BLOCK)
+                        .unlockedBy("has_proxy", has(Items.ENDER_CHEST))
+                        .save(consumer);
+
+                ShapedRecipeBuilder.shaped(RecipeCategory.MISC, RIFT_ORB)
+                        .pattern("cpc")
+                        .pattern("pyp")
+                        .pattern("cpc")
+                        .define('c', Items.MAGMA_CREAM)
+                        .define('p', Items.ENDER_PEARL)
+                        .define('y', Items.ENDER_EYE)
+                        .unlockedBy("has_proxy", has(Items.ENDER_CHEST))
+                        .save(consumer);
+
+                SpecialRecipeBuilder.special(OrbDuplicationRecipe::new).save(consumer, "enderrift:orb_duplication");
+            }
         }
 
         private static class Loot

@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_proxy": {
+      "conditions": {
+        "items": [
+          {
+            "items": "enderrift:proxy"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "enderrift:interface"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_proxy"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "enderrift:interface"
+    ]
+  }
+}

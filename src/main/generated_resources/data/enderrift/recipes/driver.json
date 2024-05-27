@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "h": {
+      "item": "minecraft:hopper"
+    },
+    "i": {
+      "item": "minecraft:redstone_block"
+    },
+    "r": {
+      "item": "minecraft:iron_ingot"
+    }
+  },
+  "pattern": [
+    "iri",
+    "rhr",
+    "iri"
+  ],
+  "result": {
+    "count": 1,
+    "id": "enderrift:driver"
+  }
+}
