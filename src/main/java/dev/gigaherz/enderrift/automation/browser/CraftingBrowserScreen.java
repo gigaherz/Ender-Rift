@@ -8,7 +8,7 @@ import net.minecraft.world.entity.player.Inventory;
 
 public class CraftingBrowserScreen extends AbstractBrowserScreen<CraftingBrowserContainer>
 {
-    private static final ResourceLocation BACKGROUND_TEXTURE = new ResourceLocation(EnderRiftMod.MODID, "textures/gui/crafting_browser.png");
+    private static final ResourceLocation BACKGROUND_TEXTURE = EnderRiftMod.location("textures/gui/crafting_browser.png");
     private final Inventory inventory;
 
     public CraftingBrowserScreen(CraftingBrowserContainer container, Inventory playerInventory, Component title)

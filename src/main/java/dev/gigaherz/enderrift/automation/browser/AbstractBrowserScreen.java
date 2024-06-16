@@ -23,9 +23,9 @@ import java.util.Locale;
 
 public abstract class AbstractBrowserScreen<T extends AbstractBrowserContainer> extends AbstractContainerScreen<T>
 {
-    private static final ResourceLocation BACKGROUND_TEXTURE = new ResourceLocation(EnderRiftMod.MODID, "textures/gui/browser.png");
-    private static final ResourceLocation SCROLLER_SPRITE = new ResourceLocation("container/creative_inventory/scroller");
-    private static final ResourceLocation SCROLLER_DISABLED_SPRITE = new ResourceLocation("container/creative_inventory/scroller_disabled");
+    private static final ResourceLocation BACKGROUND_TEXTURE = EnderRiftMod.location("textures/gui/browser.png");
+    private static final ResourceLocation SCROLLER_SPRITE = ResourceLocation.withDefaultNamespace("container/creative_inventory/scroller");
+    private static final ResourceLocation SCROLLER_DISABLED_SPRITE = ResourceLocation.withDefaultNamespace("container/creative_inventory/scroller_disabled");
 
     private boolean isDragging;
     private int scrollY;

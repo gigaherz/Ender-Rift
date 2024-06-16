@@ -1,18 +1,18 @@
-// 1.20.6	2024-05-27T18:31:17.275447	Recipes
-bdb45507ed0ef3db2b68d81efb450e9300c2b206 data/enderrift/advancements/recipes/misc/browser.json
-73d5636ae6cac8d6d2e4c51e5adf85f9938fadc4 data/enderrift/advancements/recipes/misc/crafting_browser.json
-29b1790a8696a785a81bf492d678aa9d680f02b2 data/enderrift/advancements/recipes/misc/driver.json
-afe1a678d55f2d04a3978219f55fa40e552240ba data/enderrift/advancements/recipes/misc/generator.json
-3d67d749182be60d4067df28a64ae656ab44bba5 data/enderrift/advancements/recipes/misc/interface.json
-c7f983a02d60532fc173550cf33e44318732146b data/enderrift/advancements/recipes/misc/proxy.json
-375bc6b2d7caf771960fea2511320a30fee70d47 data/enderrift/advancements/recipes/misc/rift.json
-21623c0dc11a6ab7ef60b3a594ff5aa3924701f4 data/enderrift/advancements/recipes/misc/rift_orb.json
-b4b47f97fae6bdb6fdea956d8609023d76b626e4 data/enderrift/recipes/browser.json
-2670935b375ddf0d386c53ea082614fa8b8651f7 data/enderrift/recipes/crafting_browser.json
-e43c5863ea6ccd091c43d981651b1b86ff5b24ba data/enderrift/recipes/driver.json
-b1d32ebb8b3d236815432bbf543cfab2ca4b1a4b data/enderrift/recipes/generator.json
-8d7df1c6175a485f39f3bcd3ae0d1c767bddb7b7 data/enderrift/recipes/interface.json
-5e9daf29e5f59de8a84e396becce6f54f25bf820 data/enderrift/recipes/orb_duplication.json
-fae62aa3325b895529f62035f182301d63625c2c data/enderrift/recipes/proxy.json
-3325fbd23935fc2a693c88ffc4ae42d1746f008f data/enderrift/recipes/rift.json
-6e5a69f9efa27679b03e7dc451f563850fe96280 data/enderrift/recipes/rift_orb.json
+// 1.21	2024-06-16T17:35:04.6739624	Recipes
+bdb45507ed0ef3db2b68d81efb450e9300c2b206 data/enderrift/advancement/recipes/misc/browser.json
+73d5636ae6cac8d6d2e4c51e5adf85f9938fadc4 data/enderrift/advancement/recipes/misc/crafting_browser.json
+29b1790a8696a785a81bf492d678aa9d680f02b2 data/enderrift/advancement/recipes/misc/driver.json
+afe1a678d55f2d04a3978219f55fa40e552240ba data/enderrift/advancement/recipes/misc/generator.json
+3d67d749182be60d4067df28a64ae656ab44bba5 data/enderrift/advancement/recipes/misc/interface.json
+c7f983a02d60532fc173550cf33e44318732146b data/enderrift/advancement/recipes/misc/proxy.json
+375bc6b2d7caf771960fea2511320a30fee70d47 data/enderrift/advancement/recipes/misc/rift.json
+21623c0dc11a6ab7ef60b3a594ff5aa3924701f4 data/enderrift/advancement/recipes/misc/rift_orb.json
+b4b47f97fae6bdb6fdea956d8609023d76b626e4 data/enderrift/recipe/browser.json
+2670935b375ddf0d386c53ea082614fa8b8651f7 data/enderrift/recipe/crafting_browser.json
+e43c5863ea6ccd091c43d981651b1b86ff5b24ba data/enderrift/recipe/driver.json
+b1d32ebb8b3d236815432bbf543cfab2ca4b1a4b data/enderrift/recipe/generator.json
+8d7df1c6175a485f39f3bcd3ae0d1c767bddb7b7 data/enderrift/recipe/interface.json
+5e9daf29e5f59de8a84e396becce6f54f25bf820 data/enderrift/recipe/orb_duplication.json
+fae62aa3325b895529f62035f182301d63625c2c data/enderrift/recipe/proxy.json
+3325fbd23935fc2a693c88ffc4ae42d1746f008f data/enderrift/recipe/rift.json
+6e5a69f9efa27679b03e7dc451f563850fe96280 data/enderrift/recipe/rift_orb.json

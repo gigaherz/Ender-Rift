@@ -28,8 +28,8 @@ public class GeneratorScreen extends AbstractContainerScreen<GeneratorContainer>
     {
         super(container, playerInventory, title);
         imageHeight = 165;
-        guiTextureLocation = new ResourceLocation(EnderRiftMod.MODID, "textures/gui/generator.png");
-        energyTextureLocation = new ResourceLocation(EnderRiftMod.MODID, "textures/gui/energy.png");
+        guiTextureLocation = EnderRiftMod.location( "textures/gui/generator.png");
+        energyTextureLocation = EnderRiftMod.location( "textures/gui/energy.png");
         this.clientFields = (container.fields instanceof ClientFields cf) ? cf : new ClientFields();
     }
 

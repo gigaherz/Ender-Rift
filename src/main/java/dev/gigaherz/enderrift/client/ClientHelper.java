@@ -6,6 +6,7 @@ import dev.gigaherz.enderrift.network.SendSlotChanges;
 import dev.gigaherz.enderrift.rift.RiftRenderer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
+import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.world.entity.player.Player;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -19,7 +20,7 @@ public class ClientHelper
     @SubscribeEvent
     public static void registerModels(ModelEvent.RegisterAdditional event)
     {
-        event.register(EnderRiftMod.location("block/sphere"));
+        event.register(ModelResourceLocation.standalone(EnderRiftMod.location("block/sphere")));
     }
 
     @SubscribeEvent

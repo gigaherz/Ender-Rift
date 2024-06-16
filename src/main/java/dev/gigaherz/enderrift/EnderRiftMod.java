@@ -44,7 +44,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.BlockTags;
-import net.minecraft.tags.ItemTags;
 import net.minecraft.world.flag.FeatureFlags;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.*;
@@ -66,7 +65,6 @@ import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.fml.event.lifecycle.InterModEnqueueEvent;
 import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
 import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.common.Tags;
 import net.neoforged.neoforge.common.data.ExistingFileHelper;
 import net.neoforged.neoforge.data.event.GatherDataEvent;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
@@ -256,7 +254,7 @@ public class EnderRiftMod
 
     public static ResourceLocation location(String path)
     {
-        return new ResourceLocation(MODID, path);
+        return ResourceLocation.fromNamespaceAndPath(MODID, path);
     }
 
     public static class Data
@@ -372,15 +370,15 @@ public class EnderRiftMod
             public static LootTableProvider create(DataGenerator gen, CompletableFuture<HolderLookup.Provider> lookup)
             {
                 return new LootTableProvider(gen.getPackOutput(), Set.of(), List.of(
-                        new LootTableProvider.SubProviderEntry(Loot.BlockTables::new, LootContextParamSets.BLOCK)
+                        new LootTableProvider.SubProviderEntry(BlockTables::new, LootContextParamSets.BLOCK)
                 ), lookup);
             }
 
             public static class BlockTables extends BlockLootSubProvider
             {
-                protected BlockTables()
+                protected BlockTables(HolderLookup.Provider provider)
                 {
-                    super(Set.of(), FeatureFlags.REGISTRY.allFlags());
+                    super(Set.of(), FeatureFlags.REGISTRY.allFlags(), provider);
                 }
 
                 @Override

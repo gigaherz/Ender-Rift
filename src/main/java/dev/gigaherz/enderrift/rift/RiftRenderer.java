@@ -15,6 +15,7 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.Mth;
@@ -87,7 +88,7 @@ public class RiftRenderer
                 RenderType.translucent();
 
         VertexConsumer buffer = iRenderTypeBuffer.getBuffer(type);
-        BakedModel model = minecraft.getModelManager().getModel(EnderRiftMod.location("block/sphere"));
+        BakedModel model = minecraft.getModelManager().getModel(ModelResourceLocation.standalone(EnderRiftMod.location("block/sphere")));
 
         for (int i = 0; i < steps; i++)
         {

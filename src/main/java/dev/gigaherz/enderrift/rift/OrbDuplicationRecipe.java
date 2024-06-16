@@ -7,16 +7,13 @@ import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.item.crafting.CraftingBookCategory;
-import net.minecraft.world.item.crafting.CustomRecipe;
-import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.common.crafting.IShapedRecipe;
 
 import java.util.UUID;
 
-public class OrbDuplicationRecipe extends CustomRecipe implements IShapedRecipe<CraftingContainer>
+public class OrbDuplicationRecipe extends CustomRecipe implements IShapedRecipe<CraftingInput>
 {
     private NonNullList<Ingredient> ingredients = NonNullList.of(
             Ingredient.EMPTY,
@@ -44,9 +41,9 @@ public class OrbDuplicationRecipe extends CustomRecipe implements IShapedRecipe<
     }
 
     @Override
-    public boolean matches(CraftingContainer crafting, Level worldIn)
+    public boolean matches(CraftingInput crafting, Level worldIn)
     {
-        if (crafting.getContainerSize() < 9)
+        if (crafting.size() < 9)
             return false;
 
         ItemStack stack = crafting.getItem(4);
@@ -87,14 +84,14 @@ public class OrbDuplicationRecipe extends CustomRecipe implements IShapedRecipe<
         return true;
     }
 
-    private boolean slotHasItem(CraftingContainer crafting, int slot, Item item)
+    private boolean slotHasItem(CraftingInput crafting, int slot, Item item)
     {
         ItemStack stack = crafting.getItem(slot);
         return stack.getItem() == item;
     }
 
     @Override
-    public ItemStack assemble(CraftingContainer crafting, HolderLookup.Provider registryAccess)
+    public ItemStack assemble(CraftingInput crafting, HolderLookup.Provider registryAccess)
     {
         return crafting.getItem(4).copyWithCount(2);
     }
@@ -112,9 +109,9 @@ public class OrbDuplicationRecipe extends CustomRecipe implements IShapedRecipe<
     }
 
     @Override
-    public NonNullList<ItemStack> getRemainingItems(CraftingContainer inv)
+    public NonNullList<ItemStack> getRemainingItems(CraftingInput inv)
     {
-        return NonNullList.withSize(inv.getContainerSize(), ItemStack.EMPTY);
+        return NonNullList.withSize(inv.size(), ItemStack.EMPTY);
     }
 
     @Override

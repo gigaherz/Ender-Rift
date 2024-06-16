@@ -11,7 +11,7 @@ import net.minecraft.world.entity.player.Inventory;
 
 public class InterfaceScreen extends AbstractContainerScreen<InterfaceContainer>
 {
-    private static final ResourceLocation guiTextureLocation = new ResourceLocation(EnderRiftMod.MODID, "textures/gui/interface.png");
+    private static final ResourceLocation guiTextureLocation = EnderRiftMod.location("textures/gui/interface.png");
     private static final String textFilters = "text.enderrift.interface.filters";
 
     public InterfaceScreen(InterfaceContainer container, Inventory playerInventory, Component title)

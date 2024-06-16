@@ -3,7 +3,7 @@ plugins {
     id 'eclipse'
     id 'idea'
     id 'maven-publish'
-    id 'net.neoforged.gradle.userdev' version '7.0.135'
+    id 'net.neoforged.gradle.userdev' version '7.0.142'
     id 'io.github.goooler.shadow' version '8.1.7'
 }
 
@@ -72,7 +72,7 @@ repositories {
 subsystems {
     parchment {
         minecraftVersion="1.20.6"
-        mappingsVersion="2024.05.01"
+        mappingsVersion="2024.06.16"
     }
 }
 
@@ -109,7 +109,7 @@ configurations {
 }
 
 dependencies {
-    implementation 'net.neoforged:neoforge:20.6.77-beta'
+    implementation 'net.neoforged:neoforge:21.0.10-beta'
 
     compileOnly 'org.jetbrains:annotations:20.1.0'
 
@@ -120,8 +120,8 @@ dependencies {
         transitive = false
     }
 
-    compileOnly "appeng:appliedenergistics2-neoforge:18.1.2-alpha:api"
-    runtimeOnly "appeng:appliedenergistics2-neoforge:18.1.2-alpha"
+    compileOnly "appeng:appliedenergistics2-neoforge:19.0.0-alpha:api"
+    runtimeOnly "appeng:appliedenergistics2-neoforge:19.0.0-alpha"
 
     implementation("com.googlecode.concurrent-locks:concurrent-locks:1.0.0")
     shade("com.googlecode.concurrent-locks:concurrent-locks:1.0.0")
@@ -135,9 +135,9 @@ dependencies {
     //compileOnly "curse.maven:the-one-probe-245211:5159289"
     //runtimeOnly "curse.maven:the-one-probe-245211:5159289"
 
-    // Jade (WAILA) - [NeoForge 1.20.6] 14.2.3
-    compileOnly "curse.maven:jade-324717:5366595"
-    runtimeOnly "curse.maven:jade-324717:5366595"
+    // Jade (WAILA) - [NeoForge 1.21] 15.0.4
+    compileOnly "curse.maven:jade-324717:5427817"
+    runtimeOnly "curse.maven:jade-324717:5427817"
 
     //compile fileTree(dir: 'libs', include: '*.jar')
 

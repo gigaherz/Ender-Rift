@@ -24,7 +24,7 @@ import org.jetbrains.annotations.Nullable;
 public class Ae2Integration
 {
     private static final BlockCapability<MEStorage, @Nullable Direction> ME_STORAGE = BlockCapability
-            .createSided(new ResourceLocation("ae2", "me_storage"), MEStorage.class);
+            .createSided(ResourceLocation.fromNamespaceAndPath("ae2", "me_storage"), MEStorage.class);
 
     public static void init(IEventBus modEventBus)
     {

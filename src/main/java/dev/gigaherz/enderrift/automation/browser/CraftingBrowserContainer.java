@@ -90,13 +90,13 @@ public class CraftingBrowserContainer extends AbstractBrowserContainer
         if (!world.isClientSide)
         {
             ServerPlayer entityplayermp = (ServerPlayer) player;
-            Optional<RecipeHolder<CraftingRecipe>> irecipe = this.world.getRecipeManager().getRecipeFor(RecipeType.CRAFTING, inventoryCrafting, world);
+            Optional<RecipeHolder<CraftingRecipe>> irecipe = this.world.getRecipeManager().getRecipeFor(RecipeType.CRAFTING, inventoryCrafting.asCraftInput(), world);
 
             Optional<ItemStack> stack = irecipe.map((recipe) -> {
                 if (recipe.value().isSpecial() || !world.getGameRules().getBoolean(GameRules.RULE_LIMITED_CRAFTING) || entityplayermp.getRecipeBook().contains(recipe))
                 {
                     craftingResult.setRecipeUsed(recipe);
-                    return recipe.value().assemble(inventoryCrafting, world.registryAccess());
+                    return recipe.value().assemble(inventoryCrafting.asCraftInput(), world.registryAccess());
                 }
                 return null;
             });
