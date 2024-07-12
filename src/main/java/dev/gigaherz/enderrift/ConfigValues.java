@@ -58,7 +58,18 @@ public class ConfigValues
     public static float PowerPerExtractionCap;
 
     @SubscribeEvent
-    public static void modConfig(ModConfigEvent event)
+    public static void modConfig(ModConfigEvent.Loading event)
+    {
+        reloadConfigs();
+    }
+
+    @SubscribeEvent
+    public static void modConfig(ModConfigEvent.Reloading event)
+    {
+        reloadConfigs();
+    }
+
+    private static void reloadConfigs()
     {
         PowerPerInsertionConstant = (float) (double) SERVER.powerPerInsertionConstant.get();
         PowerPerInsertionLinear = (float) (double) SERVER.powerPerInsertionLinear.get();

@@ -264,7 +264,7 @@ public class EnderRiftMod
             DataGenerator gen = event.getGenerator();
 
             gen.addProvider(event.includeServer(), new Recipes(gen.getPackOutput(), event.getLookupProvider()));
-            gen.addProvider(event.includeServer(), Loot.create(gen, event.getLookupProvider()));
+            gen.addProvider(event.includeServer(), Loot.create(gen.getPackOutput(), event.getLookupProvider()));
             gen.addProvider(event.includeServer(), new BlockTagGens(gen, event.getExistingFileHelper()));
         }
 
@@ -367,9 +367,9 @@ public class EnderRiftMod
 
         private static class Loot
         {
-            public static LootTableProvider create(DataGenerator gen, CompletableFuture<HolderLookup.Provider> lookup)
+            public static LootTableProvider create(PackOutput output, CompletableFuture<HolderLookup.Provider> lookup)
             {
-                return new LootTableProvider(gen.getPackOutput(), Set.of(), List.of(
+                return new LootTableProvider(output, Set.of(), List.of(
                         new LootTableProvider.SubProviderEntry(BlockTables::new, LootContextParamSets.BLOCK)
                 ), lookup);
             }
