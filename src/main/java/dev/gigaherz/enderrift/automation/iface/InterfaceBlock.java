@@ -25,7 +25,7 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
-import net.minecraft.world.level.block.state.properties.DirectionProperty;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
@@ -36,7 +36,7 @@ import javax.annotation.Nullable;
 public class InterfaceBlock extends AggregatorBlock<InterfaceBlockEntity>
 {
     public static final MapCodec<InterfaceBlock> CODEC = RecordCodecBuilder.mapCodec(inst -> inst.group(Properties.CODEC.fieldOf("properties").forGetter(InterfaceBlock::properties)).apply(inst, InterfaceBlock::new));
-    public static final DirectionProperty FACING = BlockStateProperties.FACING;
+    public static final EnumProperty<Direction> FACING = BlockStateProperties.FACING;
 
     public InterfaceBlock(Properties properties)
     {

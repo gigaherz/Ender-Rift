@@ -12,6 +12,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.redstone.Orientation;
 import org.jetbrains.annotations.Nullable;
 
 public abstract class AggregatorBlock<T extends AggregatorBlockEntity> extends BaseEntityBlock
@@ -36,11 +37,11 @@ public abstract class AggregatorBlock<T extends AggregatorBlockEntity> extends B
 
     @Deprecated
     @Override
-    public void neighborChanged(BlockState state, Level world, BlockPos pos, Block otherBlock, BlockPos otherPos, boolean isMoving)
+    protected void neighborChanged(BlockState state, Level level, BlockPos pos, Block otherBlock, @Nullable Orientation orientation, boolean isMoving)
     {
-        super.neighborChanged(state, world, pos, otherBlock, otherPos, isMoving);
+        super.neighborChanged(state, level, pos, otherBlock, orientation, isMoving);
 
-        BlockEntity teSelf = world.getBlockEntity(pos);
+        BlockEntity teSelf = level.getBlockEntity(pos);
         if (!(teSelf instanceof AggregatorBlockEntity))
             return;
         ((AggregatorBlockEntity) teSelf).updateNeighbours();

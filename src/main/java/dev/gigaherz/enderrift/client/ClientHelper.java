@@ -1,7 +1,7 @@
 package dev.gigaherz.enderrift.client;
 
 import dev.gigaherz.enderrift.EnderRiftMod;
-import dev.gigaherz.enderrift.automation.browser.AbstractBrowserContainer;
+import dev.gigaherz.enderrift.automation.browser.AbstractBrowserMenu;
 import dev.gigaherz.enderrift.network.SendSlotChanges;
 import dev.gigaherz.enderrift.rift.RiftRenderer;
 import net.minecraft.client.Minecraft;
@@ -38,7 +38,7 @@ public class ClientHelper
 
             if (entityplayer != null && entityplayer.containerMenu != null && entityplayer.containerMenu.containerId == message.windowId())
             {
-                ((AbstractBrowserContainer) entityplayer.containerMenu).slotsChanged(message.slotCount(), message.indices(), message.stacks(), message.stackSizes());
+                ((AbstractBrowserMenu) entityplayer.containerMenu).slotsChanged(message.slotCount(), message.indices(), message.stacks(), message.stackSizes());
             }
         });
     }

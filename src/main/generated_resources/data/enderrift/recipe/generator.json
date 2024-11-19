@@ -2,18 +2,10 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "key": {
-    "f": {
-      "item": "minecraft:furnace"
-    },
-    "i": {
-      "item": "minecraft:redstone"
-    },
-    "r": {
-      "item": "minecraft:iron_ingot"
-    },
-    "w": {
-      "item": "minecraft:water_bucket"
-    }
+    "f": "minecraft:furnace",
+    "i": "minecraft:redstone",
+    "r": "minecraft:iron_ingot",
+    "w": "minecraft:water_bucket"
   },
   "pattern": [
     "iri",

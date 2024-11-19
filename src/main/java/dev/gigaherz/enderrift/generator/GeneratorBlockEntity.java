@@ -69,7 +69,7 @@ public class GeneratorBlockEntity extends BlockEntity
         @Override
         public ItemStack insertItem(int slot, ItemStack stack, boolean simulate)
         {
-            if (stack.getBurnTime(null) <= 0)
+            if (stack.getBurnTime(null, level.fuelValues()) <= 0)
                 return stack;
 
             return super.insertItem(slot, stack, simulate);
@@ -160,10 +160,10 @@ public class GeneratorBlockEntity extends BlockEntity
             if (stack.getCount() > 0)
             {
                 ItemStack itemStack = fuelSlot.getStackInSlot(0);
-                currentItemBurnTime = burnTimeRemaining = itemStack.getBurnTime(null);
+                currentItemBurnTime = burnTimeRemaining = itemStack.getBurnTime(null, level.fuelValues());
                 timeInterval = 0;
                 if (stack.getCount() == 1)
-                    fuelSlot.setStackInSlot(0, stack.getItem().getCraftingRemainingItem(stack));
+                    fuelSlot.setStackInSlot(0, stack.getItem().getCraftingRemainder(stack));
                 else
                     stack.shrink(1);
                 anyChanged = true;

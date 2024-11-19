@@ -2,15 +2,9 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "key": {
-    "e": {
-      "item": "enderrift:proxy"
-    },
-    "g": {
-      "item": "minecraft:glowstone_dust"
-    },
-    "i": {
-      "item": "minecraft:iron_ingot"
-    }
+    "e": "enderrift:proxy",
+    "g": "minecraft:glowstone_dust",
+    "i": "minecraft:iron_ingot"
   },
   "pattern": [
     "ig ",

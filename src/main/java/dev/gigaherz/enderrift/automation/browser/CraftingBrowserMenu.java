@@ -4,6 +4,7 @@ import dev.gigaherz.enderrift.EnderRiftMod;
 import dev.gigaherz.enderrift.automation.AutomationHelper;
 import dev.gigaherz.enderrift.network.ClearCraftingGrid;
 import net.minecraft.network.protocol.game.ClientboundContainerSetSlotPacket;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Inventory;
@@ -22,7 +23,7 @@ import net.neoforged.neoforge.network.PacketDistributor;
 import javax.annotation.Nullable;
 import java.util.Optional;
 
-public class CraftingBrowserContainer extends AbstractBrowserContainer
+public class CraftingBrowserMenu extends AbstractBrowserMenu
 {
     public static final int INVENTORY_SLOT_START = SCROLL_SLOTS;
     public static final int INVENTORY_SLOT_END = SCROLL_SLOTS + PLAYER_SLOTS;
@@ -40,12 +41,12 @@ public class CraftingBrowserContainer extends AbstractBrowserContainer
 
     Slot slotCraftResult;
 
-    public CraftingBrowserContainer(int id, Inventory playerInventory)
+    public CraftingBrowserMenu(int id, Inventory playerInventory)
     {
         this(id, null, playerInventory);
     }
 
-    public CraftingBrowserContainer(int id, @Nullable BrowserBlockEntity te, Inventory playerInventory)
+    public CraftingBrowserMenu(int id, @Nullable BrowserBlockEntity te, Inventory playerInventory)
     {
         super(EnderRiftMod.CRAFTING_BROWSER_MENU.get(), id, te, playerInventory);
 
@@ -85,20 +86,16 @@ public class CraftingBrowserContainer extends AbstractBrowserContainer
             super.slotsChanged(inventoryIn);
     }
 
-    protected void slotChangedCraftingGrid(Level world, Player player, CraftingContainer inventoryCrafting, ResultContainer craftingResult)
+    protected void slotChangedCraftingGrid(Level level, Player player, CraftingContainer inventoryCrafting, ResultContainer craftingResult)
     {
-        if (!world.isClientSide)
+        if (level instanceof ServerLevel serverLevel)
         {
             ServerPlayer entityplayermp = (ServerPlayer) player;
-            Optional<RecipeHolder<CraftingRecipe>> irecipe = this.world.getRecipeManager().getRecipeFor(RecipeType.CRAFTING, inventoryCrafting.asCraftInput(), world);
+            Optional<RecipeHolder<CraftingRecipe>> irecipe = serverLevel.getServer().getRecipeManager().getRecipeFor(RecipeType.CRAFTING, inventoryCrafting.asCraftInput(), level);
 
             Optional<ItemStack> stack = irecipe.map((recipe) -> {
-                if (recipe.value().isSpecial() || !world.getGameRules().getBoolean(GameRules.RULE_LIMITED_CRAFTING) || entityplayermp.getRecipeBook().contains(recipe))
-                {
-                    craftingResult.setRecipeUsed(recipe);
-                    return recipe.value().assemble(inventoryCrafting.asCraftInput(), world.registryAccess());
-                }
-                return null;
+                craftingResult.setRecipeUsed(recipe);
+                return recipe.value().assemble(inventoryCrafting.asCraftInput(), level.registryAccess());
             });
 
             ItemStack itemstack = stack.orElse(ItemStack.EMPTY);

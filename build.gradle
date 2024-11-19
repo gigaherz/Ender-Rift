@@ -3,27 +3,19 @@ plugins {
     id 'eclipse'
     id 'idea'
     id 'maven-publish'
-    id 'net.neoforged.gradle.userdev' version '7.0.153'
+    id 'net.neoforged.moddev' version '2.0.42-beta'
     id 'io.github.goooler.shadow' version '8.1.7'
 }
 
-version = "2.9.2"
+version = "2.9.2.1"
 group= "dev.gigaherz.enderrift"
 
-Provider<String> minecraftVersion(Transformer<String, String> mapper) {
-    return project.provider((() -> project.userDevRuntime.definitions.values().first().specification.minecraftVersion))
-            .map(mapper)
-}
-
+var minecraftVersionResolver = project.neoForge.version.map { "1." + (it =~ /^(\d+(?:\.[1-9]\d*|))\./)[0][1] }
 base {
-    archivesName = minecraftVersion { "EnderRift-${it}" }
+    archivesName = minecraftVersionResolver.map { "EnderRift-${it}" }
 }
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(21)
-
-tasks.withType(JavaCompile).configureEach {
-    options.encoding = 'UTF-8' // Use the UTF-8 charset for Java compilation
-}
 
 sourceSets {
     main.resources.srcDirs += 'src/main/generated_resources'
@@ -69,38 +61,41 @@ repositories {
     flatDir { dirs 'deps' }
 }
 
-subsystems {
-    parchment {
-        minecraftVersion="1.21"
-        mappingsVersion="2024.07.07"
-    }
-}
+neoForge {
+    version = "21.3.19-beta"
 
-minecraft.accessTransformers.file rootProject.file('src/main/resources/META-INF/accesstransformer.cfg')
+    runs {
+        // applies to all the run configs below
+        configureEach {
+            gameDirectory = project.file('run')
+            logLevel = org.slf4j.event.Level.DEBUG
+            //jvmArgument "-Dmixin.debug.export=true"
+            //jvmArgument "-Dmixin.debug.verbose=true"
+        }
 
-runs {
-    // applies to all the run configs below
-    configureEach {
-        systemProperty 'forge.logging.markers', '' // 'REGISTRIES'
-        systemProperty 'forge.logging.console.level', 'debug'
+        client {
+            client()
+        }
 
-        workingDirectory project.file('run')
+        server {
+            server()
+        }
 
-        modSource project.sourceSets.main
-
-        dependencies {
-            runtime "com.googlecode.concurrent-locks:concurrent-locks:1.0.0"
+        data {
+            data()
+            programArguments.addAll '--mod', 'enderrift', '--all', '--output', file('src/main/generated_resources/').getAbsolutePath(), '--existing', file('src/main/resources/').getAbsolutePath()
         }
     }
 
-    client {
+    mods {
+        thismod {
+            sourceSet(sourceSets.main)
+        }
     }
 
-    server {
-    }
-
-    data {
-        programArguments.addAll '--mod', 'enderrift', '--all', '--output', file('src/main/generated_resources/').getAbsolutePath(), '--existing', file('src/main/resources/').getAbsolutePath()
+    parchment {
+        minecraftVersion = "1.21"
+        mappingsVersion = "2024.11.10"
     }
 }
 
@@ -109,23 +104,25 @@ configurations {
 }
 
 dependencies {
-    implementation 'net.neoforged:neoforge:21.0.86-beta'
-
-
     compileOnly 'org.jetbrains:annotations:20.1.0'
 
     //runtimeOnly fg.deobf("dev.gigaherz.guidebook:Guidebook-1.19.1:3.6.1")
 
-    implementation("dev.gigaherz.graph:GraphLib3:3.0.4")
-    shade("dev.gigaherz.graph:GraphLib3:3.0.4") {
+    implementation"dev.gigaherz.graph:GraphLib3:3.0.4"
+    shade ("dev.gigaherz.graph:GraphLib3:3.0.4") {
         transitive = false
     }
 
-    compileOnly "appeng:appliedenergistics2-neoforge:19.0.0-alpha:api"
-    runtimeOnly "appeng:appliedenergistics2-neoforge:19.0.0-alpha"
+    implementation "com.googlecode.concurrent-locks:concurrent-locks:1.0.0"
+    shade "com.googlecode.concurrent-locks:concurrent-locks:1.0.0"
+    additionalRuntimeClasspath  "com.googlecode.concurrent-locks:concurrent-locks:1.0.0"
 
-    implementation("com.googlecode.concurrent-locks:concurrent-locks:1.0.0")
-    shade("com.googlecode.concurrent-locks:concurrent-locks:1.0.0")
+    // Jade (WAILA) - [NeoForge 1.21] 15.0.4
+    compileOnly "curse.maven:jade-324717:5846076"
+    runtimeOnly "curse.maven:jade-324717:5846076"
+
+    //compileOnly "appeng:appliedenergistics2-neoforge:19.0.0-alpha:api"
+    //runtimeOnly "appeng:appliedenergistics2-neoforge:19.0.0-alpha"
 
     //compileOnly "mezz.jei:jei-1.20.4-common-api:17.3.0.49"
     //runtimeOnly "mezz.jei:jei-1.20.4-common:17.3.0.49"
@@ -135,31 +132,6 @@ dependencies {
     // TheOneProbe - 1.20.4_neo-11.0.2
     //compileOnly "curse.maven:the-one-probe-245211:5159289"
     //runtimeOnly "curse.maven:the-one-probe-245211:5159289"
-
-    // Jade (WAILA) - [NeoForge 1.21] 15.0.4
-    compileOnly "curse.maven:jade-324717:5427817"
-    runtimeOnly "curse.maven:jade-324717:5427817"
-
-    //compile fileTree(dir: 'libs', include: '*.jar')
-
-    //runtimeOnly fg.deobf("flatdir:Industrial-Reborn-1.16.1:0.7.0")
-    //runtimeOnly fg.deobf("flatdir:tesseract:1.0.7-mc1.16")
-
-    // PipeZ - 1.19-1.0.6
-    // compileOnly fg.deobf("curse.maven:pipez-443900:3877192")
-    // runtimeOnly fg.deobf("curse.maven:pipez-443900:3877192")
-    
-    // Spark - 1.19-1.9.25
-    // compileOnly fg.deobf("curse.maven:spark-361579:3875647")
-    // runtimeOnly fg.deobf("curse.maven:spark-361579:3875647")
-    
-    // SolarGeneration - 1.19-5.0.1
-    // compileOnly fg.deobf("curse.maven:solargeneration-336538:3873840")
-    // runtimeOnly fg.deobf("curse.maven:solargeneration-336538:3873840")
-    
-    // EdivadLib - 1.19-1.0.2
-    // compileOnly fg.deobf("curse.maven:edivadlib-638508:3864277")
-    // runtimeOnly fg.deobf("curse.maven:edivadlib-638508:3864277")
 }
 
 jar {
@@ -174,16 +146,14 @@ shadowJar {
 }
 
 jar {
-    from('/') {
-        include 'LICENSE.txt'
-    }
+    from(files('LICENSE.txt'))
 
     manifest {
         attributes([
                 "Specification-Title": "enderrift",
                 "Specification-Vendor": "gigaherz",
                 "Specification-Version": "1", // We are version 1 of ourselves
-                "Implementation-Title": project.name,
+                "Implementation-Title": "enderrift",
                 "Implementation-Version": project.version,
                 "Implementation-Vendor" :"gigaherz",
                 "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
@@ -193,4 +163,16 @@ jar {
 
 artifacts {
     archives shadowJar
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8' // Use the UTF-8 charset for Java compilation
+}
+
+// IDEA no longer automatically downloads sources/javadoc jars for dependencies, so we need to explicitly enable the behavior.
+idea {
+    module {
+        downloadSources = true
+        downloadJavadoc = true
+    }
 }

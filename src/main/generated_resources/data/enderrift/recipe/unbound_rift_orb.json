@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "c": "minecraft:magma_cream",
+    "p": "minecraft:ender_pearl",
+    "y": "minecraft:ender_eye"
+  },
+  "pattern": [
+    "cpc",
+    "pyp",
+    "cpc"
+  ],
+  "result": {
+    "count": 1,
+    "id": "enderrift:unbound_rift_orb"
+  }
+}

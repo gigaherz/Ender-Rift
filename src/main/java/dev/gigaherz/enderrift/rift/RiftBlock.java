@@ -8,7 +8,7 @@ import dev.gigaherz.enderrift.automation.AutomationHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
@@ -80,10 +80,10 @@ public class RiftBlock extends BaseEntityBlock
 
     @Deprecated
     @Override
-    public int getLightBlock(BlockState state, BlockGetter worldIn, BlockPos pos)
+    public int getLightBlock(BlockState state)
     {
         if (state.getBlock() != this)
-            return super.getLightBlock(state, worldIn, pos);
+            return super.getLightBlock(state);
         return state.getValue(ASSEMBLED) ? 1 : 15;
     }
 
@@ -135,34 +135,37 @@ public class RiftBlock extends BaseEntityBlock
     }
 
     @Override
-    protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand,
-                                              BlockHitResult pHitResult)
+    protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand,
+                                          BlockHitResult pHitResult)
     {
         if (player.isShiftKeyDown())
-            return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+            return InteractionResult.PASS;
+
+        if (stack.getItem() == EnderRiftMod.UNBOUND_RIFT_ORB.get())
+            return InteractionResult.PASS;
 
         if (stack.getItem() == EnderRiftMod.RIFT_ORB.get())
-            return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+            return InteractionResult.PASS;
 
         if (state.getBlock() != this || !state.getValue(ASSEMBLED))
-            return ItemInteractionResult.FAIL;
+            return InteractionResult.FAIL;
 
         BlockEntity te = level.getBlockEntity(pos);
         if (!(te instanceof RiftBlockEntity rift) || !rift.isPowered())
-            return ItemInteractionResult.FAIL;
+            return InteractionResult.FAIL;
 
         if (level.isClientSide)
-            return ItemInteractionResult.SUCCESS;
+            return InteractionResult.SUCCESS;
 
         var inv = rift.getInventory();
         if (inv == null)
-            return ItemInteractionResult.FAIL;
+            return InteractionResult.FAIL;
 
         ItemStack remaining = ItemHandlerHelper.insertItem(inv, stack, false);
 
         player.setItemInHand(hand, remaining);
 
-        return ItemInteractionResult.SUCCESS;
+        return InteractionResult.SUCCESS;
     }
 
     @Deprecated
@@ -182,7 +185,7 @@ public class RiftBlock extends BaseEntityBlock
         ItemStack stack = playerIn.getItemInHand(InteractionHand.MAIN_HAND);
         if (stack.getCount() <= 0)
         {
-            if (stack.getItem() == EnderRiftMod.RIFT_ORB.get())
+            if (stack.getItem() == EnderRiftMod.RIFT_ORB.get() || stack.getItem() == EnderRiftMod.UNBOUND_RIFT_ORB.get())
                 return;
         }
         else

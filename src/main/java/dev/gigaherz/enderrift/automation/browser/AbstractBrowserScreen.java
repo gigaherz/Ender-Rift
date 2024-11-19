@@ -9,6 +9,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
@@ -21,7 +22,7 @@ import java.text.NumberFormat;
 import java.util.List;
 import java.util.Locale;
 
-public abstract class AbstractBrowserScreen<T extends AbstractBrowserContainer> extends AbstractContainerScreen<T>
+public abstract class AbstractBrowserScreen<T extends AbstractBrowserMenu> extends AbstractContainerScreen<T>
 {
     private static final ResourceLocation BACKGROUND_TEXTURE = EnderRiftMod.location("textures/gui/browser.png");
     private static final ResourceLocation SCROLLER_SPRITE = ResourceLocation.withDefaultNamespace("container/creative_inventory/scroller");
@@ -207,14 +208,14 @@ public abstract class AbstractBrowserScreen<T extends AbstractBrowserContainer> 
     {
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 
-        graphics.blit(getBackgroundTexture(), leftPos, topPos, 0, 0, imageWidth, imageHeight);
-        graphics.blit(getBackgroundTexture(), leftPos - 27, topPos + 8, 194, 0, 27, 28);
+        graphics.blit(RenderType::guiTextured, getBackgroundTexture(), leftPos, topPos, 0, 0, imageWidth, imageHeight, 256, 256);
+        graphics.blit(RenderType::guiTextured, getBackgroundTexture(), leftPos - 27, topPos + 8, 194, 0, 27, 28, 256, 256);
 
         boolean isEnabled = needsScrollBar();
         if (isEnabled)
-            graphics.blitSprite(SCROLLER_SPRITE, leftPos + 174, topPos + 18 + scrollY, 12, 15);
+            graphics.blitSprite(RenderType::guiTextured, SCROLLER_SPRITE, leftPos + 174, topPos + 18 + scrollY, 12, 15);
         else
-            graphics.blitSprite(SCROLLER_DISABLED_SPRITE, leftPos + 174, topPos + 18, 12, 15);
+            graphics.blitSprite(RenderType::guiTextured, SCROLLER_DISABLED_SPRITE, leftPos + 174, topPos + 18, 12, 15);
 
         searchField.render(graphics, xMouse, yMouse, partialTicks);
     }
@@ -224,7 +225,7 @@ public abstract class AbstractBrowserScreen<T extends AbstractBrowserContainer> 
         var poseStack = graphics.pose();
         poseStack.pushPose();
         poseStack.translate(this.leftPos, this.topPos, 300);
-        for (int i = 0; i < AbstractBrowserContainer.SCROLL_SLOTS; ++i)
+        for (int i = 0; i < AbstractBrowserMenu.SCROLL_SLOTS; ++i)
         {
             Slot slot = getMenu().slots.get(i);
             drawSlotText(graphics, slot);
@@ -284,7 +285,7 @@ public abstract class AbstractBrowserScreen<T extends AbstractBrowserContainer> 
     {
         int actualSlotCount = getMenu().getActualSlotCount();
 
-        return actualSlotCount > AbstractBrowserContainer.SCROLL_SLOTS;
+        return actualSlotCount > AbstractBrowserMenu.SCROLL_SLOTS;
     }
 
     @Override
@@ -300,9 +301,9 @@ public abstract class AbstractBrowserScreen<T extends AbstractBrowserContainer> 
         final int actualSlotCount = getMenu().getActualSlotCount();
         final int rows = (int) Math.ceil(actualSlotCount / 9.0);
 
-        if (rows > AbstractBrowserContainer.SCROLL_ROWS)
+        if (rows > AbstractBrowserMenu.SCROLL_ROWS)
         {
-            int scrollRows = rows - AbstractBrowserContainer.SCROLL_ROWS;
+            int scrollRows = rows - AbstractBrowserMenu.SCROLL_ROWS;
 
             int row = getMenu().scroll / 9;
 
@@ -357,7 +358,7 @@ public abstract class AbstractBrowserScreen<T extends AbstractBrowserContainer> 
         final int bitHeight = 15;
         final int actualSlotCount = getMenu().getActualSlotCount();
         final int rows = (int) Math.ceil(actualSlotCount / 9.0);
-        final int scrollRows = rows - AbstractBrowserContainer.SCROLL_ROWS;
+        final int scrollRows = rows - AbstractBrowserMenu.SCROLL_ROWS;
 
         boolean isEnabled = scrollRows > 0;
         if (isEnabled)
@@ -367,7 +368,7 @@ public abstract class AbstractBrowserScreen<T extends AbstractBrowserContainer> 
 
             scrollY = row * (h - bitHeight) / scrollRows;
 
-            final AbstractBrowserContainer container = getMenu();
+            final AbstractBrowserMenu container = getMenu();
             getMenu().setScrollPos(row * 9);
         }
     }

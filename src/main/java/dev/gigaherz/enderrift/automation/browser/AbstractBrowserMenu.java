@@ -32,9 +32,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Supplier;
-import java.util.stream.IntStream;
 
-public class AbstractBrowserContainer extends AbstractContainerMenu
+public class AbstractBrowserMenu extends AbstractContainerMenu
 {
     protected final static int LEFT = 8;
     protected final static int TOP = 18;
@@ -99,7 +98,7 @@ public class AbstractBrowserContainer extends AbstractContainerMenu
         return (ServerScrollInventory) scrollInventory;
     }
 
-    protected AbstractBrowserContainer(MenuType<? extends AbstractBrowserContainer> type, int id, @Nullable BrowserBlockEntity tileEntity, Inventory playerInventory)
+    protected AbstractBrowserMenu(MenuType<? extends AbstractBrowserMenu> type, int id, @Nullable BrowserBlockEntity tileEntity, Inventory playerInventory)
     {
         super(type, id);
 

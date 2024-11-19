@@ -1,7 +1,7 @@
 package dev.gigaherz.enderrift.network;
 
 import dev.gigaherz.enderrift.EnderRiftMod;
-import dev.gigaherz.enderrift.automation.browser.CraftingBrowserContainer;
+import dev.gigaherz.enderrift.automation.browser.CraftingBrowserMenu;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
@@ -33,7 +33,7 @@ public record ClearCraftingGrid(int windowId, boolean toPlayer) implements Custo
         {
             final Player player = context.player();
 
-            if (player.containerMenu instanceof CraftingBrowserContainer browser && browser.containerId == this.windowId)
+            if (player.containerMenu instanceof CraftingBrowserMenu browser && browser.containerId == this.windowId)
             {
                 browser.clearCraftingGrid(player, toPlayer);
             }

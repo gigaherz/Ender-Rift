@@ -6,12 +6,12 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 
-public class CraftingBrowserScreen extends AbstractBrowserScreen<CraftingBrowserContainer>
+public class CraftingBrowserScreen extends AbstractBrowserScreen<CraftingBrowserMenu>
 {
     private static final ResourceLocation BACKGROUND_TEXTURE = EnderRiftMod.location("textures/gui/crafting_browser.png");
     private final Inventory inventory;
 
-    public CraftingBrowserScreen(CraftingBrowserContainer container, Inventory playerInventory, Component title)
+    public CraftingBrowserScreen(CraftingBrowserMenu container, Inventory playerInventory, Component title)
     {
         super(container, playerInventory, title);
         imageWidth = 194;

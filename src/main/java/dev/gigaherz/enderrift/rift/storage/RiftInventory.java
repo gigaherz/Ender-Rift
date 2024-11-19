@@ -92,7 +92,7 @@ public class RiftInventory implements ILongItemHandler
         {
             CompoundTag tag = new CompoundTag();
             tag.putLong("Count", slot.getCount());
-            tag.put("Item", slot.getSample().copyWithCount(1).save(lookup, new CompoundTag()));
+            tag.put("Item", slot.getSample().copyWithCount(1).saveOptional(lookup));
             list.add(tag);
         }
         root.put("Contents", list);
@@ -114,7 +114,7 @@ public class RiftInventory implements ILongItemHandler
             long count = tag.getLong("Count");
             var itemCompound = tag.getCompound("Item");
             itemCompound.putInt("Count", 1);
-            ItemStack stack = ItemStack.parse(lookup, itemCompound).orElse(ItemStack.EMPTY);
+            ItemStack stack = ItemStack.parseOptional(lookup, itemCompound);
             RiftSlot slot = new RiftSlot(stack, count);
             slots.add(slot);
             afterAdd(slot);

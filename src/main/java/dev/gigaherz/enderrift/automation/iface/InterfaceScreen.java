@@ -4,6 +4,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import dev.gigaherz.enderrift.EnderRiftMod;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -41,6 +42,6 @@ public class InterfaceScreen extends AbstractContainerScreen<InterfaceContainer>
     {
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 
-        graphics.blit(guiTextureLocation, leftPos, topPos, 0, 0, imageWidth, imageHeight);
+        graphics.blit(RenderType::guiTextured, guiTextureLocation, leftPos, topPos, 0, 0, imageWidth, imageHeight, 256, 256);
     }
 }

@@ -2,15 +2,9 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "key": {
-    "e": {
-      "item": "enderrift:proxy"
-    },
-    "i": {
-      "item": "minecraft:redstone"
-    },
-    "r": {
-      "item": "minecraft:iron_ingot"
-    }
+    "e": "enderrift:proxy",
+    "i": "minecraft:redstone",
+    "r": "minecraft:iron_ingot"
   },
   "pattern": [
     "ir ",

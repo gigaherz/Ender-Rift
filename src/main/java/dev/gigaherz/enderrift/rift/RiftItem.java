@@ -24,16 +24,6 @@ public class RiftItem extends Item
     }
 
     @Override
-    public String getDescriptionId(ItemStack stack)
-    {
-        UUID riftId = stack.get(EnderRiftMod.RIFT_ID);
-        if (riftId == null)
-            return this.getDescriptionId() + ".empty";
-        else
-            return this.getDescriptionId() + ".bound";
-    }
-
-    @Override
     public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag flagIn)
     {
         UUID riftId = stack.get(EnderRiftMod.RIFT_ID);

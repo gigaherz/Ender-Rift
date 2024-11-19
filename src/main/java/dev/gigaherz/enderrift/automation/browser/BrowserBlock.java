@@ -23,7 +23,7 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
-import net.minecraft.world.level.block.state.properties.DirectionProperty;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
@@ -35,7 +35,7 @@ public class BrowserBlock extends AggregatorBlock<BrowserBlockEntity>
 {
     public static final MapCodec<BrowserBlock> CODEC = RecordCodecBuilder.mapCodec(inst -> inst.group(Codec.BOOL.fieldOf("crafting").forGetter(obj -> obj.crafting), Properties.CODEC.fieldOf("properties").forGetter(BrowserBlock::properties)).apply(inst, BrowserBlock::new));
 
-    public static final DirectionProperty FACING = BlockStateProperties.FACING;
+    public static final EnumProperty<Direction> FACING = BlockStateProperties.FACING;
     public final boolean crafting;
 
     public static final VoxelShape NORTH_PANEL_PART = Block.box(0, 0, 12, 16, 16, 16);
@@ -138,14 +138,14 @@ public class BrowserBlock extends AggregatorBlock<BrowserBlockEntity>
     private void openBrowser(Player player, BrowserBlockEntity tileEntity)
     {
         player.openMenu(new SimpleMenuProvider(
-                (id, playerInventory, playerEntity) -> new BrowserContainer(id, tileEntity, playerInventory),
+                (id, playerInventory, playerEntity) -> new BrowserMenu(id, tileEntity, playerInventory),
                 Component.translatable("container.enderrift.browser")));
     }
 
     private void openCraftingBrowser(Player player, BrowserBlockEntity tileEntity)
     {
         player.openMenu(new SimpleMenuProvider(
-                (id, playerInventory, playerEntity) -> new CraftingBrowserContainer(id, tileEntity, playerInventory),
+                (id, playerInventory, playerEntity) -> new CraftingBrowserMenu(id, tileEntity, playerInventory),
                 Component.translatable("container.enderrift.crafting_browser")));
     }
 

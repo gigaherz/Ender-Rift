@@ -6,6 +6,7 @@ import dev.gigaherz.enderrift.EnderRiftMod;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -94,16 +95,12 @@ public class GeneratorScreen extends AbstractContainerScreen<GeneratorContainer>
     @Override
     protected void renderBg(GuiGraphics graphics, float partialTicks, int mouseX, int mouseY)
     {
-        RenderSystem.setShader(GameRenderer::getPositionTexShader);
-        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-        RenderSystem.setShaderTexture(0, guiTextureLocation);
-
-        graphics.blit(guiTextureLocation, leftPos, topPos, 0, 0, imageWidth, imageHeight);
+        graphics.blit(RenderType::guiTextured, guiTextureLocation, leftPos, topPos, 0, 0, imageWidth, imageHeight, 256, 256);
 
         if (clientFields.burnTimeRemaining > 0)
         {
             int k = getBurnLeftScaled(13);
-            graphics.blit(guiTextureLocation, leftPos + 80, topPos + 36 + 12 - k, 176, 12 - k, 14, k + 1);
+            graphics.blit(RenderType::guiTextured, guiTextureLocation, leftPos + 80, topPos + 36 + 12 - k, 176, 12 - k, 14, k + 1, 256, 256);
         }
 
         drawEnergyBar(graphics, leftPos + imageWidth - 14 - 8, topPos + 20, clientFields.energy, GeneratorBlockEntity.POWER_LIMIT);
@@ -111,15 +108,11 @@ public class GeneratorScreen extends AbstractContainerScreen<GeneratorContainer>
 
     private void drawEnergyBar(GuiGraphics graphics, int x, int y, int powerLevel, int powerLimit)
     {
-        RenderSystem.setShader(GameRenderer::getPositionTexShader);
-        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-        RenderSystem.setShaderTexture(0, energyTextureLocation);
-
         int bar2height = 1 + powerLevel * (barHeight - 2) / powerLimit;
         int bar1height = barHeight - bar2height;
 
-        graphics.blit(energyTextureLocation, x, y, bar1x, 0, barWidth, bar1height, 32, 64);
-        graphics.blit(energyTextureLocation, x, y + bar1height, bar2x, bar1height, barWidth, bar2height, 32, 64);
+        graphics.blit(RenderType::guiTextured, energyTextureLocation, x, y, bar1x, 0, barWidth, bar1height, 32, 64);
+        graphics.blit(RenderType::guiTextured, energyTextureLocation, x, y + bar1height, bar2x, bar1height, barWidth, bar2height, 32, 64);
     }
 
     private int getHeatColor()

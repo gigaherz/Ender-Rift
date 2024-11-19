@@ -92,7 +92,7 @@ public class GeneratorContainer extends AbstractContainerMenu
         else
         {
             ItemStack itemStack = slot.getItem();
-            if (itemStack.getBurnTime(null) <= 0)
+            if (itemStack.getBurnTime(null, player.level().fuelValues()) <= 0)
                 return ItemStack.EMPTY;
 
             startIndex = 0;

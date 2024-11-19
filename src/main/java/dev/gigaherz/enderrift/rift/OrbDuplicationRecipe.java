@@ -6,8 +6,13 @@ import net.minecraft.core.NonNullList;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.*;
+import net.minecraft.world.item.crafting.display.RecipeDisplay;
+import net.minecraft.world.item.crafting.display.RecipeDisplays;
+import net.minecraft.world.item.crafting.display.ShapedCraftingRecipeDisplay;
+import net.minecraft.world.item.crafting.display.SlotDisplay;
 import net.minecraft.world.level.Level;
 
+import java.util.List;
 import java.util.UUID;
 
 public class OrbDuplicationRecipe extends CustomRecipe
@@ -31,9 +36,21 @@ public class OrbDuplicationRecipe extends CustomRecipe
     }
 
     @Override
-    public NonNullList<Ingredient> getIngredients()
+    public List<RecipeDisplay> display()
     {
-        return ingredients;
+        return List.of(new ShapedCraftingRecipeDisplay(3,3,
+                List.of(new SlotDisplay.ItemSlotDisplay(Items.MAGMA_CREAM),
+                new SlotDisplay.ItemSlotDisplay(Items.ENDER_PEARL),
+                new SlotDisplay.ItemSlotDisplay(Items.MAGMA_CREAM),
+                new SlotDisplay.ItemSlotDisplay(Items.ENDER_PEARL),
+                new SlotDisplay.ItemSlotDisplay(EnderRiftMod.RIFT_ORB.get()),
+                new SlotDisplay.ItemSlotDisplay(Items.ENDER_PEARL),
+                new SlotDisplay.ItemSlotDisplay(Items.MAGMA_CREAM),
+                new SlotDisplay.ItemSlotDisplay(Items.ENDER_PEARL),
+                new SlotDisplay.ItemSlotDisplay(Items.MAGMA_CREAM)),
+                new SlotDisplay.ItemStackSlotDisplay(output),
+                new SlotDisplay.ItemSlotDisplay(Items.CRAFTING_TABLE)
+                ));
     }
 
     @Override
@@ -75,25 +92,13 @@ public class OrbDuplicationRecipe extends CustomRecipe
     }
 
     @Override
-    public boolean canCraftInDimensions(int width, int height)
-    {
-        return (width == 3) && (height == 3);
-    }
-
-    @Override
-    public ItemStack getResultItem(HolderLookup.Provider registryAccess)
-    {
-        return output;
-    }
-
-    @Override
     public NonNullList<ItemStack> getRemainingItems(CraftingInput inv)
     {
         return NonNullList.withSize(inv.size(), ItemStack.EMPTY);
     }
 
     @Override
-    public RecipeSerializer<?> getSerializer()
+    public RecipeSerializer<OrbDuplicationRecipe> getSerializer()
     {
         return EnderRiftMod.ORB_DUPLICATION.get();
     }

@@ -1,7 +1,7 @@
 package dev.gigaherz.enderrift.network;
 
 import dev.gigaherz.enderrift.EnderRiftMod;
-import dev.gigaherz.enderrift.automation.browser.AbstractBrowserContainer;
+import dev.gigaherz.enderrift.automation.browser.AbstractBrowserMenu;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
@@ -64,7 +64,7 @@ public record SetVisibleSlots(int windowId, int[] visible) implements CustomPack
         {
             final Player player = context.player();
 
-            if (player.containerMenu instanceof AbstractBrowserContainer browser && browser.containerId == this.windowId)
+            if (player.containerMenu instanceof AbstractBrowserMenu browser && browser.containerId == this.windowId)
             {
                 browser.setVisibleSlots(this.visible);
             }
