@@ -1,9 +1,5 @@
 {
   "variants": {
-    "facing=up": {
-      "model": "enderrift:block/interface",
-      "x": 90
-    },
     "facing=down": {
       "model": "enderrift:block/interface",
       "x": 270
@@ -12,16 +8,20 @@
       "model": "enderrift:block/interface",
       "y": 270
     },
-    "facing=west": {
-      "model": "enderrift:block/interface",
-      "y": 90
-    },
     "facing=north": {
       "model": "enderrift:block/interface",
       "y": 180
     },
     "facing=south": {
       "model": "enderrift:block/interface"
+    },
+    "facing=up": {
+      "model": "enderrift:block/interface",
+      "x": 90
+    },
+    "facing=west": {
+      "model": "enderrift:block/interface",
+      "y": 90
     }
   }
 }

@@ -1,5 +1,9 @@
 {
   "parent": "block/block",
   "loader": "neoforge:obj",
-  "model": "enderrift:models/block/sphere.obj"
+  "model": "enderrift:models/block/sphere.obj",
+  "textures": {
+    "aura": "enderrift:block/rift_aura",
+    "particle": "#aura"
+  }
 }

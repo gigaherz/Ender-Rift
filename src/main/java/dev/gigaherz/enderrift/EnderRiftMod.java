@@ -22,9 +22,17 @@ import dev.gigaherz.enderrift.rift.*;
 import dev.gigaherz.enderrift.rift.storage.RiftInventory;
 import dev.gigaherz.enderrift.rift.storage.RiftStorage;
 import net.minecraft.Util;
+import net.minecraft.client.color.item.Constant;
+import net.minecraft.client.data.models.BlockModelGenerators;
+import net.minecraft.client.data.models.ItemModelGenerators;
+import net.minecraft.client.data.models.ModelProvider;
+import net.minecraft.client.data.models.blockstates.*;
+import net.minecraft.client.data.models.model.*;
+import net.minecraft.client.renderer.item.ItemModel;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.UuidArgument;
+import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.core.component.DataComponentType;
@@ -53,19 +61,17 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
-import net.neoforged.fml.ModList;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.fml.event.lifecycle.InterModEnqueueEvent;
 import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
 import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.common.data.ExistingFileHelper;
 import net.neoforged.neoforge.data.event.GatherDataEvent;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
@@ -115,23 +121,23 @@ public class EnderRiftMod
             GENERATOR = BLOCKS.registerBlock("generator", props -> new GeneratorBlock(props.mapColor(MapColor.STONE).sound(SoundType.METAL).strength(3.0F, 8.0F)));
 
     public static final DeferredItem<Item>
-            RIFT_ITEM = ITEMS.registerItem("rift", props -> new BlockItem(RIFT.get(), props));
+            RIFT_ITEM = ITEMS.registerItem("rift", props -> new BlockItem(RIFT.get(), props.useBlockDescriptionPrefix()));
     public static final DeferredItem<Item>
-            STRUCTURE_CORNER_ITEM = ITEMS.registerItem("structure_corner", props -> new BlockItem(STRUCTURE_CORNER.get(), props));
+            STRUCTURE_CORNER_ITEM = ITEMS.registerItem("structure_corner", props -> new BlockItem(STRUCTURE_CORNER.get(), props.useBlockDescriptionPrefix()));
     public static final DeferredItem<Item>
-            STRUCTURE_EDGE_ITEM = ITEMS.registerItem("structure_edge", props -> new BlockItem(STRUCTURE_EDGE.get(), props));
+            STRUCTURE_EDGE_ITEM = ITEMS.registerItem("structure_edge", props -> new BlockItem(STRUCTURE_EDGE.get(), props.useBlockDescriptionPrefix()));
     public static final DeferredItem<Item>
-            INTERFACE_ITEM = ITEMS.registerItem("interface", props -> new BlockItem(INTERFACE.get(), props));
+            INTERFACE_ITEM = ITEMS.registerItem("interface", props -> new BlockItem(INTERFACE.get(), props.useBlockDescriptionPrefix()));
     public static final DeferredItem<Item>
-            BROWSER_ITEM = ITEMS.registerItem("browser", props -> new BlockItem(BROWSER.get(), props));
+            BROWSER_ITEM = ITEMS.registerItem("browser", props -> new BlockItem(BROWSER.get(), props.useBlockDescriptionPrefix()));
     public static final DeferredItem<Item>
-            CRAFTING_BROWSER_ITEM = ITEMS.registerItem("crafting_browser", props -> new BlockItem(CRAFTING_BROWSER.get(), props));
+            CRAFTING_BROWSER_ITEM = ITEMS.registerItem("crafting_browser", props -> new BlockItem(CRAFTING_BROWSER.get(), props.useBlockDescriptionPrefix()));
     public static final DeferredItem<Item>
-            PROXY_ITEM = ITEMS.registerItem("proxy", props -> new BlockItem(PROXY.get(), props));
+            PROXY_ITEM = ITEMS.registerItem("proxy", props -> new BlockItem(PROXY.get(), props.useBlockDescriptionPrefix()));
     public static final DeferredItem<Item>
-            DRIVER_ITEM = ITEMS.registerItem("driver", props -> new BlockItem(DRIVER.get(), props));
+            DRIVER_ITEM = ITEMS.registerItem("driver", props -> new BlockItem(DRIVER.get(), props.useBlockDescriptionPrefix()));
     public static final DeferredItem<Item>
-            GENERATOR_ITEM = ITEMS.registerItem("generator", props -> new BlockItem(GENERATOR.get(), props));
+            GENERATOR_ITEM = ITEMS.registerItem("generator", props -> new BlockItem(GENERATOR.get(), props.useBlockDescriptionPrefix()));
     public static final DeferredItem<Item>
             UNBOUND_RIFT_ORB = ITEMS.registerItem("unbound_rift_orb", props -> new RiftItem(props.stacksTo(16)));
     public static final DeferredItem<Item>
@@ -280,7 +286,7 @@ public class EnderRiftMod
         return 0;
     }
 
-    public void gatherData(GatherDataEvent event)
+    public void gatherData(GatherDataEvent.Client event)
     {
         Data.gatherData(event);
     }
@@ -292,13 +298,117 @@ public class EnderRiftMod
 
     public static class Data
     {
-        public static void gatherData(GatherDataEvent event)
+        public static void gatherData(GatherDataEvent.Client event)
         {
             DataGenerator gen = event.getGenerator();
 
-            gen.addProvider(event.includeServer(), new Recipes(gen.getPackOutput(), event.getLookupProvider()));
-            gen.addProvider(event.includeServer(), Loot.create(gen.getPackOutput(), event.getLookupProvider()));
-            gen.addProvider(event.includeServer(), new BlockTagGens(gen, event.getExistingFileHelper()));
+            gen.addProvider(true, new Recipes(gen.getPackOutput(), event.getLookupProvider()));
+            gen.addProvider(true, Loot.create(gen.getPackOutput(), event.getLookupProvider()));
+            gen.addProvider(true, new BlockTagGens(gen, event.getLookupProvider()));
+
+            gen.addProvider(true, new ModelsAndClientItems(gen.getPackOutput()));
+        }
+
+        private static class ModelsAndClientItems extends ModelProvider
+        {
+            public ModelsAndClientItems(PackOutput output)
+            {
+                super(output, MODID);
+            }
+
+            @Override
+            protected void registerModels(BlockModelGenerators blockModels, ItemModelGenerators itemModels)
+            {
+                var structureCorner = MultiPartGenerator.multiPart(STRUCTURE_CORNER.get())
+                                .with(Variant.variant().with(VariantProperties.MODEL, location("block/hedron")))
+                                .with(Condition.condition().term(StructureCornerBlock.BASE, true),
+                                        Variant.variant().with(VariantProperties.MODEL, location("block/base")));
+                blockModels.blockStateOutput.accept(structureCorner);
+
+                var structureEdge = MultiPartGenerator.multiPart(STRUCTURE_EDGE.get())
+                        .with(Condition.condition().term(StructureEdgeBlock.AXIS, Direction.Axis.X),
+                                Variant.variant().with(VariantProperties.MODEL, location("block/straight")).with(VariantProperties.Y_ROT, VariantProperties.Rotation.R90))
+                        .with(Condition.condition().term(StructureEdgeBlock.AXIS, Direction.Axis.Y),
+                                Variant.variant().with(VariantProperties.MODEL, location("block/straight")).with(VariantProperties.X_ROT, VariantProperties.Rotation.R90))
+                        .with(Condition.condition().term(StructureEdgeBlock.AXIS, Direction.Axis.Z),
+                                Variant.variant().with(VariantProperties.MODEL, location("block/straight")))
+                        .with(Condition.condition().term(StructureEdgeBlock.BASE, true),
+                                Variant.variant().with(VariantProperties.MODEL, location("block/base")));
+                blockModels.blockStateOutput.accept(structureEdge);
+
+                blockModels.blockStateOutput.accept(MultiVariantGenerator.multiVariant(RIFT.get()).with(
+                        BlockModelGenerators.createBooleanModelDispatch(
+                                RiftBlock.ASSEMBLED,
+                                location("block/rift"),
+                                location("block/rift_active")
+                        )
+                ));
+                blockModels.blockStateOutput.accept(MultiVariantGenerator.multiVariant(INTERFACE.get(), Variant.variant().with(VariantProperties.MODEL, location("block/interface")))
+                        .with(createFacingDispatchAlt()));
+                blockModels.blockStateOutput.accept(MultiVariantGenerator.multiVariant(BROWSER.get(), Variant.variant().with(VariantProperties.MODEL, location("block/browser")))
+                        .with(createFacingDispatchAlt()));
+                blockModels.blockStateOutput.accept(MultiVariantGenerator.multiVariant(CRAFTING_BROWSER.get(), Variant.variant().with(VariantProperties.MODEL, location("block/crafting_browser")))
+                        .with(createFacingDispatchAlt()));
+
+                var proxy = MultiPartGenerator.multiPart(PROXY.get())
+                        .with(Variant.variant().with(VariantProperties.MODEL, location("block/proxy_main")))
+                        .with(Condition.condition().term(ProxyBlock.UP, true),
+                                Variant.variant().with(VariantProperties.MODEL, location("block/proxy_connection")).with(VariantProperties.X_ROT, VariantProperties.Rotation.R90))
+                        .with(Condition.condition().term(ProxyBlock.DOWN, true),
+                                Variant.variant().with(VariantProperties.MODEL, location("block/proxy_connection")).with(VariantProperties.X_ROT, VariantProperties.Rotation.R270))
+                        .with(Condition.condition().term(ProxyBlock.EAST, true),
+                                Variant.variant().with(VariantProperties.MODEL, location("block/proxy_connection")).with(VariantProperties.Y_ROT, VariantProperties.Rotation.R270))
+                        .with(Condition.condition().term(ProxyBlock.WEST, true),
+                                Variant.variant().with(VariantProperties.MODEL, location("block/proxy_connection")).with(VariantProperties.Y_ROT, VariantProperties.Rotation.R90))
+                        .with(Condition.condition().term(ProxyBlock.NORTH, true),
+                                Variant.variant().with(VariantProperties.MODEL, location("block/proxy_connection")).with(VariantProperties.Y_ROT, VariantProperties.Rotation.R180))
+                        .with(Condition.condition().term(ProxyBlock.SOUTH, true),
+                                Variant.variant().with(VariantProperties.MODEL, location("block/proxy_connection")));
+                blockModels.blockStateOutput.accept(proxy);
+
+                var driver = MultiPartGenerator.multiPart(DRIVER.get())
+                        .with(Variant.variant().with(VariantProperties.MODEL, location("block/driver_main")))
+                        .with(Condition.condition().term(DriverBlock.UP, true),
+                                Variant.variant().with(VariantProperties.MODEL, location("block/proxy_connection")).with(VariantProperties.X_ROT, VariantProperties.Rotation.R90))
+                        .with(Condition.condition().term(DriverBlock.DOWN, true),
+                                Variant.variant().with(VariantProperties.MODEL, location("block/proxy_connection")).with(VariantProperties.X_ROT, VariantProperties.Rotation.R270))
+                        .with(Condition.condition().term(DriverBlock.EAST, true),
+                                Variant.variant().with(VariantProperties.MODEL, location("block/proxy_connection")).with(VariantProperties.Y_ROT, VariantProperties.Rotation.R270))
+                        .with(Condition.condition().term(DriverBlock.WEST, true),
+                                Variant.variant().with(VariantProperties.MODEL, location("block/proxy_connection")).with(VariantProperties.Y_ROT, VariantProperties.Rotation.R90))
+                        .with(Condition.condition().term(DriverBlock.NORTH, true),
+                                Variant.variant().with(VariantProperties.MODEL, location("block/proxy_connection")).with(VariantProperties.Y_ROT, VariantProperties.Rotation.R180))
+                        .with(Condition.condition().term(DriverBlock.SOUTH, true),
+                                Variant.variant().with(VariantProperties.MODEL, location("block/proxy_connection")));
+                blockModels.blockStateOutput.accept(driver);
+
+                blockModels.blockStateOutput.accept(MultiVariantGenerator.multiVariant(GENERATOR.get(), Variant.variant().with(VariantProperties.MODEL, location("block/generator")))
+                        .with(BlockModelGenerators.createHorizontalFacingDispatch()));
+
+                itemModels.itemModelOutput.accept(RIFT_ITEM.get(), ItemModelUtils.plainModel(location("item/rift")));
+                itemModels.itemModelOutput.accept(STRUCTURE_CORNER_ITEM.get(), ItemModelUtils.plainModel(location("item/structure")));
+                itemModels.itemModelOutput.accept(STRUCTURE_EDGE_ITEM.get(), ItemModelUtils.plainModel(location("item/structure")));
+                itemModels.itemModelOutput.accept(INTERFACE_ITEM.get(), ItemModelUtils.plainModel(location("item/interface")));
+                itemModels.itemModelOutput.accept(BROWSER_ITEM.get(), ItemModelUtils.plainModel(location("item/browser")));
+                itemModels.itemModelOutput.accept(CRAFTING_BROWSER_ITEM.get(), ItemModelUtils.plainModel(location("item/crafting_browser")));
+                itemModels.itemModelOutput.accept(PROXY_ITEM.get(), ItemModelUtils.plainModel(location("item/proxy")));
+                itemModels.itemModelOutput.accept(DRIVER_ITEM.get(), ItemModelUtils.plainModel(location("item/driver")));
+                itemModels.itemModelOutput.accept(GENERATOR_ITEM.get(), ItemModelUtils.plainModel(location("item/generator")));
+
+                itemModels.itemModelOutput.accept(UNBOUND_RIFT_ORB.get(), ItemModelUtils.plainModel(location("item/rift_orb")));
+                itemModels.itemModelOutput.accept(RIFT_ORB.get(), ItemModelUtils.plainModel(location("item/rift_orb")));
+
+            }
+        }
+
+        public static PropertyDispatch createFacingDispatchAlt() {
+            return PropertyDispatch.property(BlockStateProperties.FACING)
+                    .select(Direction.UP, Variant.variant().with(VariantProperties.X_ROT, VariantProperties.Rotation.R90))
+                    .select(Direction.DOWN, Variant.variant().with(VariantProperties.X_ROT, VariantProperties.Rotation.R270))
+                    .select(Direction.EAST, Variant.variant().with(VariantProperties.Y_ROT, VariantProperties.Rotation.R270))
+                    .select(Direction.WEST, Variant.variant().with(VariantProperties.Y_ROT, VariantProperties.Rotation.R90))
+                    .select(Direction.NORTH, Variant.variant().with(VariantProperties.Y_ROT, VariantProperties.Rotation.R180))
+                    .select(Direction.SOUTH, Variant.variant());
         }
 
         private static class Recipes extends RecipeProvider.Runner
@@ -453,12 +563,11 @@ public class EnderRiftMod
 
         private static class BlockTagGens extends IntrinsicHolderTagsProvider<Block>
         {
-            public BlockTagGens(DataGenerator gen, ExistingFileHelper existingFileHelper)
+            public BlockTagGens(DataGenerator gen, CompletableFuture<HolderLookup.Provider> lookup)
             {
                 super(gen.getPackOutput(), Registries.BLOCK,
-                        CompletableFuture.supplyAsync(VanillaRegistries::createLookup, Util.backgroundExecutor()),
-                        (p_255627_) -> p_255627_.builtInRegistryHolder().key(),
-                        EnderRiftMod.MODID, existingFileHelper);
+                        lookup, block -> block.builtInRegistryHolder().key(),
+                        EnderRiftMod.MODID);
             }
 
             @Override

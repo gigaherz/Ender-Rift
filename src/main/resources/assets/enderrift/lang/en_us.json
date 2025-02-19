@@ -11,8 +11,8 @@
 
     "itemGroup.tabEnderRift": "Ender-Rift",
 
-    "item.enderrift.rift_orb.empty": "Ender-Rift Orb (Unbound)",
-    "item.enderrift.rift_orb.bound": "Ender-Rift Orb (Bound)",
+    "item.enderrift.unbound_rift_orb": "Unbound Ender-Rift Orb",
+    "item.enderrift.rift_orb": "Bound Ender-Rift Orb",
 
     "container.enderrift.interface": "Automation Interface",
     "container.enderrift.browser": "Automation Browser",

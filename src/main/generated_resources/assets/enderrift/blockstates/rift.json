@@ -1,10 +1,10 @@
 {
   "variants": {
     "assembled=false": {
-      "model": "enderrift:block/rift"
+      "model": "enderrift:block/rift_active"
     },
     "assembled=true": {
-      "model": "enderrift:block/rift_active"
+      "model": "enderrift:block/rift"
     }
   }
 }

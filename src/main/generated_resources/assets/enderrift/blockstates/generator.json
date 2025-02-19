@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=east": {
+      "model": "enderrift:block/generator",
+      "y": 90
+    },
+    "facing=north": {
+      "model": "enderrift:block/generator"
+    },
+    "facing=south": {
+      "model": "enderrift:block/generator",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "enderrift:block/generator",
+      "y": 270
+    }
+  }
+}

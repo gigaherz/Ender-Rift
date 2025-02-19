@@ -11,13 +11,14 @@ import net.minecraft.world.item.crafting.display.RecipeDisplays;
 import net.minecraft.world.item.crafting.display.ShapedCraftingRecipeDisplay;
 import net.minecraft.world.item.crafting.display.SlotDisplay;
 import net.minecraft.world.level.Level;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.UUID;
 
 public class OrbDuplicationRecipe extends CustomRecipe
 {
-    private final NonNullList<Ingredient> ingredients = NonNullList.of(
+    private final List<@NotNull Ingredient> ingredients = List.of(
             Ingredient.of(Items.MAGMA_CREAM),
             Ingredient.of(Items.ENDER_PEARL),
             Ingredient.of(Items.MAGMA_CREAM),
@@ -59,14 +60,14 @@ public class OrbDuplicationRecipe extends CustomRecipe
         if (crafting.width() != 3 || crafting.height() != 3)
             return false;
 
-        ItemStack stack = crafting.getItem(1,1);
-        if (stack.getCount() <= 0)
+        ItemStack middle = crafting.getItem(1,1);
+        if (middle.getCount() <= 0)
             return false;
 
-        if (stack.getItem() != EnderRiftMod.RIFT_ORB.get())
+        if (middle.getItem() != EnderRiftMod.RIFT_ORB.get())
             return false;
 
-        UUID riftId = stack.get(EnderRiftMod.RIFT_ID);
+        UUID riftId = middle.get(EnderRiftMod.RIFT_ID);
         if (riftId == null)
             return false;
 

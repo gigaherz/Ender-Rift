@@ -118,9 +118,9 @@ public class StructureCornerBlock extends AggregatorBlock<StructureCornerBlockEn
     }
 
     @Override
-    public ItemStack getCloneItemStack(BlockState state, HitResult target, LevelReader world, BlockPos pos, Player player)
+    public ItemStack getCloneItemStack(LevelReader level, BlockPos pos, BlockState state, boolean includeData, Player player)
     {
-        return new ItemStack(RiftStructure.getOriginalBlock(world, pos));
+        return new ItemStack(RiftStructure.getOriginalBlock(level, pos));
     }
 
     public BlockState cornerState(Corner corner, boolean base)

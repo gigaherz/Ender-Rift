@@ -1,0 +1,17 @@
+{
+  "multipart": [
+    {
+      "apply": {
+        "model": "enderrift:block/hedron"
+      }
+    },
+    {
+      "apply": {
+        "model": "enderrift:block/base"
+      },
+      "when": {
+        "base": "true"
+      }
+    }
+  ]
+}

@@ -88,7 +88,7 @@ public class RiftRenderer
                 RenderType.translucent();
 
         VertexConsumer buffer = iRenderTypeBuffer.getBuffer(type);
-        BakedModel model = minecraft.getModelManager().getModel(ModelResourceLocation.standalone(EnderRiftMod.location("block/sphere")));
+        BakedModel model = minecraft.getModelManager().getStandaloneModel(EnderRiftMod.location("block/sphere"));
 
         for (int i = 0; i < steps; i++)
         {

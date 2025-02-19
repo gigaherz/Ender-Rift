@@ -1,0 +1,62 @@
+{
+  "multipart": [
+    {
+      "apply": {
+        "model": "enderrift:block/proxy_main"
+      }
+    },
+    {
+      "apply": {
+        "model": "enderrift:block/proxy_connection",
+        "x": 90
+      },
+      "when": {
+        "up": "true"
+      }
+    },
+    {
+      "apply": {
+        "model": "enderrift:block/proxy_connection",
+        "x": 270
+      },
+      "when": {
+        "down": "true"
+      }
+    },
+    {
+      "apply": {
+        "model": "enderrift:block/proxy_connection",
+        "y": 270
+      },
+      "when": {
+        "east": "true"
+      }
+    },
+    {
+      "apply": {
+        "model": "enderrift:block/proxy_connection",
+        "y": 90
+      },
+      "when": {
+        "west": "true"
+      }
+    },
+    {
+      "apply": {
+        "model": "enderrift:block/proxy_connection",
+        "y": 180
+      },
+      "when": {
+        "north": "true"
+      }
+    },
+    {
+      "apply": {
+        "model": "enderrift:block/proxy_connection"
+      },
+      "when": {
+        "south": "true"
+      }
+    }
+  ]
+}

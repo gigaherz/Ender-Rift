@@ -183,7 +183,7 @@ public class RiftBlock extends BaseEntityBlock
             return;
 
         ItemStack stack = playerIn.getItemInHand(InteractionHand.MAIN_HAND);
-        if (stack.getCount() <= 0)
+        if (stack.getCount() > 0)
         {
             if (stack.getItem() == EnderRiftMod.RIFT_ORB.get() || stack.getItem() == EnderRiftMod.UNBOUND_RIFT_ORB.get())
                 return;

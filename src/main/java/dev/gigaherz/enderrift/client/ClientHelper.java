@@ -20,7 +20,7 @@ public class ClientHelper
     @SubscribeEvent
     public static void registerModels(ModelEvent.RegisterAdditional event)
     {
-        event.register(ModelResourceLocation.standalone(EnderRiftMod.location("block/sphere")));
+        event.register(EnderRiftMod.location("block/sphere"));
     }
 
     @SubscribeEvent
