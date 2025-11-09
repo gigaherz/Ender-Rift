@@ -13,11 +13,10 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.block.entity.StructureBlockEntity;
 import org.jetbrains.annotations.Nullable;
 import snownee.jade.api.*;
 import snownee.jade.api.config.IPluginConfig;
-import snownee.jade.api.ui.IElement;
+import snownee.jade.api.ui.Element;
 import snownee.jade.impl.ui.ItemStackElement;
 import net.neoforged.neoforge.energy.IEnergyStorage;
 
@@ -65,11 +64,11 @@ public class WailaProviders implements IWailaPlugin
             {
                 CompoundTag tag = accessor.getServerData();
 
-                if (tag.getInt("powerGen") > 0)
+                if (tag.getIntOr("powerGen",0) > 0)
                 {
                     tooltip.add(Component.translatable("text.enderrift.generator.status.generating", tag.getInt("powerGen")));
                 }
-                else if (tag.getBoolean("isBurning"))
+                else if (tag.getBooleanOr("isBurning", false))
                 {
                     tooltip.add(Component.translatable("text.enderrift.generator.status.heating"));
                 }
@@ -163,7 +162,7 @@ public class WailaProviders implements IWailaPlugin
             implements IComponentProvider<BlockAccessor>, IServerDataProvider<BlockAccessor>
     {
         @Override
-        public @Nullable IElement getIcon(BlockAccessor accessor, IPluginConfig config, IElement currentIcon)
+        public @Nullable Element getIcon(BlockAccessor accessor, IPluginConfig config, Element currentIcon)
         {
             return ItemStackElement.of(new ItemStack(accessor.getBlock()));
         }
@@ -187,7 +186,7 @@ public class WailaProviders implements IWailaPlugin
                 if (inv != null) tag.putInt("usedSlots", inv.getSlots());
                 tag.putBoolean("isFormed", rift.getBlockState().getValue(RiftBlock.ASSEMBLED));
                 tag.putBoolean("isPowered", rift.isPowered());
-                if (rift.getRiftId() != null) tag.putUUID("riftId", rift.getRiftId());
+                if (rift.getRiftId() != null) tag.putString("riftId", rift.getRiftId().toString());
                 tag.putInt("energy", rift.getEnergyBuffer().map(IEnergyStorage::getEnergyStored).orElse(0));
             }
         }
@@ -203,7 +202,7 @@ public class WailaProviders implements IWailaPlugin
                 {
                     tooltip.add(Component.translatable("text.enderrift.rift.is_formed", tag.getBoolean("isFormed")));
                     tooltip.add(Component.translatable("text.enderrift.rift.is_powered", tag.getBoolean("isPowered")));
-                    if (tag.getBoolean("isFormed"))
+                    if (tag.getBooleanOr("isFormed", false))
                     {
                         tooltip.add(Component.translatable("text.enderrift.rift.rift_id", tag.getInt("riftId")));
                         if (config.get(CONFIG_RF))

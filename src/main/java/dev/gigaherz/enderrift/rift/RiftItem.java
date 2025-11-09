@@ -3,18 +3,23 @@ package dev.gigaherz.enderrift.rift;
 import dev.gigaherz.enderrift.EnderRiftMod;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.function.Consumer;
 
 public class RiftItem extends Item
 {
@@ -24,12 +29,12 @@ public class RiftItem extends Item
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag flagIn)
+    public void appendHoverText(ItemStack stack, TooltipContext context, TooltipDisplay tooltipDisplay, Consumer<Component> tooltipAdder, TooltipFlag flag)
     {
         UUID riftId = stack.get(EnderRiftMod.RIFT_ID);
         if (riftId != null)
         {
-            tooltip.add(Component.translatable("text.enderrift.tooltip.riftid", riftId.toString()));
+            tooltipAdder.accept(Component.translatable("text.enderrift.tooltip.riftid", riftId.toString()));
         }
     }
 

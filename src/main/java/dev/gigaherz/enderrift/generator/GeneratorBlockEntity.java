@@ -1,6 +1,8 @@
 package dev.gigaherz.enderrift.generator;
 
 import dev.gigaherz.enderrift.EnderRiftMod;
+import dev.gigaherz.enderrift.automation.iface.InterfaceBlock;
+import dev.gigaherz.enderrift.automation.iface.InterfaceBlockEntity;
 import dev.gigaherz.enderrift.common.EnergyBuffer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -13,6 +15,8 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.capabilities.Capabilities;
@@ -21,7 +25,7 @@ import net.neoforged.neoforge.energy.IEnergyStorage;
 import net.neoforged.neoforge.items.IItemHandlerModifiable;
 import net.neoforged.neoforge.items.ItemStackHandler;
 
-@EventBusSubscriber(modid = EnderRiftMod.MODID, bus = EventBusSubscriber.Bus.MOD)
+@EventBusSubscriber(modid = EnderRiftMod.MODID)
 public class GeneratorBlockEntity extends BlockEntity
 {
     @SubscribeEvent
@@ -225,35 +229,43 @@ public class GeneratorBlockEntity extends BlockEntity
     }
 
     @Override
-    public void loadAdditional(CompoundTag compound, HolderLookup.Provider lookup)
+    public void loadAdditional(ValueInput input)
     {
-        super.loadAdditional(compound, lookup);
+        super.loadAdditional(input);
 
-        heatLevel = compound.getInt("heatLevel");
-        burnTimeRemaining = compound.getInt("burnTimeRemaining");
-        currentItemBurnTime = compound.getInt("currentItemBurnTime");
-        timeInterval = compound.getInt("timeInterval");
-        energyBuffer.deserializeNBT(lookup, compound.get("storedEnergy"));
-        fuelSlot.deserializeNBT(lookup, compound.getCompound("fuelSlot"));
+        heatLevel = input.getIntOr("heatLevel", 0);
+        burnTimeRemaining = input.getIntOr("burnTimeRemaining", 0);
+        currentItemBurnTime = input.getIntOr("currentItemBurnTime", 0);
+        timeInterval = input.getIntOr("timeInterval",0);
+        energyBuffer.deserialize(input.childOrEmpty("storedEnergy"));
+        fuelSlot.deserialize(input.childOrEmpty("fuelSlot"));
     }
 
     @Override
-    protected void saveAdditional(CompoundTag compound, HolderLookup.Provider lookup)
+    protected void saveAdditional(ValueOutput output)
     {
-        super.saveAdditional(compound, lookup);
+        super.saveAdditional(output);
 
-        compound.putInt("heatLevel", heatLevel);
-        compound.putInt("burnTimeRemaining", burnTimeRemaining);
-        compound.putInt("currentItemBurnTime", currentItemBurnTime);
-        compound.putInt("timeInterval", timeInterval);
-        compound.put("storedEnergy", energyBuffer.serializeNBT(lookup));
-        compound.put("fuelSlot", fuelSlot.serializeNBT(lookup));
+        output.putInt("heatLevel", heatLevel);
+        output.putInt("burnTimeRemaining", burnTimeRemaining);
+        output.putInt("currentItemBurnTime", currentItemBurnTime);
+        output.putInt("timeInterval", timeInterval);
+        energyBuffer.serialize(output.child("storedEnergy"));
+        fuelSlot.serialize(output.child("fuelSlot"));
     }
 
     @Override
-    public void handleUpdateTag(CompoundTag tag, HolderLookup.Provider lookup)
+    public void handleUpdateTag(ValueInput input)
     {
-        super.loadAdditional(tag, lookup);
+        super.loadAdditional(input);
+    }
+
+    @Override
+    public void preRemoveSideEffects(BlockPos pos, BlockState state)
+    {
+        super.preRemoveSideEffects(pos, state);
+
+        InterfaceBlockEntity.dropItems(level, pos, this.inventory());
     }
 
     public boolean isUseableByPlayer(Player player)

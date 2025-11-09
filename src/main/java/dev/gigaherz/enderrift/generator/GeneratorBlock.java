@@ -7,6 +7,7 @@ import dev.gigaherz.enderrift.automation.iface.InterfaceBlock;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.SimpleMenuProvider;
 import net.minecraft.world.entity.player.Player;
@@ -118,24 +119,9 @@ public class GeneratorBlock extends BaseEntityBlock
         return defaultBlockState().setValue(FACING, context.getHorizontalDirection().getOpposite());
     }
 
-    @Deprecated
     @Override
-    public void onRemove(BlockState state, Level worldIn, BlockPos pos, BlockState newState, boolean isMoving)
+    protected void affectNeighborsAfterRemoval(BlockState state, ServerLevel level, BlockPos pos, boolean movedByPiston)
     {
-        if (newState.getBlock() == this)
-        {
-            super.onRemove(state, worldIn, pos, newState, isMoving);
-            return;
-        }
-
-        BlockEntity tileentity = worldIn.getBlockEntity(pos);
-
-        if (tileentity instanceof GeneratorBlockEntity)
-        {
-            InterfaceBlock.dropInventoryItems(worldIn, pos, ((GeneratorBlockEntity) tileentity).inventory());
-            worldIn.updateNeighbourForOutputSignal(pos, this);
-        }
-
-        super.onRemove(state, worldIn, pos, newState, isMoving);
+        level.updateNeighbourForOutputSignal(pos, this);
     }
 }

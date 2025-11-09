@@ -8,6 +8,8 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.capabilities.Capabilities;
@@ -17,7 +19,7 @@ import net.neoforged.neoforge.energy.IEnergyStorage;
 
 import java.util.Optional;
 
-@EventBusSubscriber(modid = EnderRiftMod.MODID, bus = EventBusSubscriber.Bus.MOD)
+@EventBusSubscriber(modid = EnderRiftMod.MODID)
 public class DriverBlockEntity extends AggregatorBlockEntity
 {
     @SubscribeEvent
@@ -58,19 +60,19 @@ public class DriverBlockEntity extends AggregatorBlockEntity
     }
 
     @Override
-    protected void loadAdditional(CompoundTag compound, HolderLookup.Provider lookup)
+    protected void loadAdditional(ValueInput input)
     {
-        super.loadAdditional(compound, lookup);
+        super.loadAdditional(input);
 
-        energyBuffer.deserializeNBT(lookup, compound.get("storedEnergy"));
+        energyBuffer.deserialize(input.childOrEmpty("storedEnergy"));
     }
 
     @Override
-    protected void saveAdditional(CompoundTag compound, HolderLookup.Provider lookup)
+    protected void saveAdditional(ValueOutput output)
     {
-        super.saveAdditional(compound, lookup);
+        super.saveAdditional(output);
 
-        compound.put("storedEnergy", energyBuffer.serializeNBT(lookup));
+        energyBuffer.serialize(output.child("storedEnergy"));
     }
 
     public static void tickStatic(Level level, BlockPos blockPos, BlockState blockState, DriverBlockEntity te)

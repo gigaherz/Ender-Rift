@@ -3,17 +3,14 @@ plugins {
     id 'eclipse'
     id 'idea'
     id 'maven-publish'
-    id 'net.neoforged.moddev' version '2.0.63-beta'
+    id 'net.neoforged.moddev' version '2.0.107'
     id 'io.github.goooler.shadow' version '8.1.7'
 }
 
+neoForge.version = "21.8.32"
 version = "2.10.0"
 group= "dev.gigaherz.enderrift"
-
-var minecraftVersionResolver = project.neoForge.version.map { "1." + (it =~ /^(\d+(?:\.[1-9]\d*|))\./)[0][1] }
-base {
-    archivesName = minecraftVersionResolver.map { "EnderRift-${it}" }
-}
+base.archivesName = "EnderRift-${neoForge.minecraftVersion}"
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(21)
 
@@ -62,15 +59,11 @@ repositories {
 }
 
 neoForge {
-    version = "21.4.92-beta"
-
     runs {
         // applies to all the run configs below
         configureEach {
             gameDirectory = project.file('run')
             logLevel = org.slf4j.event.Level.DEBUG
-            //jvmArgument "-Dmixin.debug.export=true"
-            //jvmArgument "-Dmixin.debug.verbose=true"
         }
 
         client {
@@ -94,8 +87,8 @@ neoForge {
     }
 
     parchment {
-        minecraftVersion = "1.21"
-        mappingsVersion = "2024.11.10"
+        minecraftVersion = "1.21.8"
+        mappingsVersion = "BLEEDING-SNAPSHOT"
     }
 }
 
@@ -117,9 +110,9 @@ dependencies {
     shade "com.googlecode.concurrent-locks:concurrent-locks:1.0.0"
     additionalRuntimeClasspath  "com.googlecode.concurrent-locks:concurrent-locks:1.0.0"
 
-    // Jade (WAILA) - [NeoForge 1.21.4(21.4.84+)] 17.3.0
-    compileOnly "curse.maven:jade-324717:6170888"
-    runtimeOnly "curse.maven:jade-324717:6170888"
+    // Jade (WAILA)
+    compileOnly "curse.maven:jade-324717:6838468"
+    //runtimeOnly "curse.maven:jade-324717:6838468"
 
     //compileOnly "appeng:appliedenergistics2-neoforge:19.0.0-alpha:api"
     //runtimeOnly "appeng:appliedenergistics2-neoforge:19.0.0-alpha"

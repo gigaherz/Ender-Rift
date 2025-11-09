@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
@@ -74,18 +75,10 @@ public class StructureEdgeBlock extends Block
         return SHAPE_CACHE.apply(state);
     }
 
-    @Deprecated
     @Override
-    public void onRemove(BlockState state, Level worldIn, BlockPos pos, BlockState newState, boolean isMoving)
+    protected void affectNeighborsAfterRemoval(BlockState state, ServerLevel level, BlockPos pos, boolean movedByPiston)
     {
-        if (newState.getBlock() == this)
-        {
-            super.onRemove(state, worldIn, pos, newState, isMoving);
-            return;
-        }
-
-        super.onRemove(state, worldIn, pos, newState, isMoving);
-        RiftStructure.breakStructure(worldIn, pos);
+        RiftStructure.breakStructure(level, pos);
     }
 
     @Deprecated

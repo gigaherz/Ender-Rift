@@ -26,8 +26,10 @@ import net.minecraft.client.color.item.Constant;
 import net.minecraft.client.data.models.BlockModelGenerators;
 import net.minecraft.client.data.models.ItemModelGenerators;
 import net.minecraft.client.data.models.ModelProvider;
+import net.minecraft.client.data.models.MultiVariant;
 import net.minecraft.client.data.models.blockstates.*;
 import net.minecraft.client.data.models.model.*;
+import net.minecraft.client.renderer.block.model.VariantMutator;
 import net.minecraft.client.renderer.item.ItemModel;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
@@ -55,10 +57,12 @@ import net.minecraft.tags.BlockTags;
 import net.minecraft.world.flag.FeatureFlags;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.*;
+import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.item.crafting.CustomRecipe;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.LightBlock;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
@@ -81,11 +85,9 @@ import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 @Mod(EnderRiftMod.MODID)
@@ -114,14 +116,25 @@ public class EnderRiftMod
     public static final DeferredBlock<Block>
             CRAFTING_BROWSER = BLOCKS.registerBlock("crafting_browser", props -> new BrowserBlock(true, props.mapColor(MapColor.STONE).sound(SoundType.METAL).strength(3.0F, 8.0F)));
     public static final DeferredBlock<Block>
-            PROXY = BLOCKS.registerBlock("proxy", props -> new ProxyBlock(props.mapColor(MapColor.STONE).sound(SoundType.METAL).strength(3.0F, 8.0F)));
+            PROXY = BLOCKS.registerBlock("proxy", props ->
+            new ProxyBlock(props.mapColor(MapColor.STONE).sound(SoundType.METAL).strength(3.0F, 8.0F)));
     public static final DeferredBlock<Block>
             DRIVER = BLOCKS.registerBlock("driver", props -> new DriverBlock(props.mapColor(MapColor.STONE).sound(SoundType.METAL).strength(3.0F, 8.0F)));
     public static final DeferredBlock<Block>
             GENERATOR = BLOCKS.registerBlock("generator", props -> new GeneratorBlock(props.mapColor(MapColor.STONE).sound(SoundType.METAL).strength(3.0F, 8.0F)));
 
     public static final DeferredItem<Item>
-            RIFT_ITEM = ITEMS.registerItem("rift", props -> new BlockItem(RIFT.get(), props.useBlockDescriptionPrefix()));
+            RIFT_ITEM = ITEMS.registerItem("rift", props -> new BlockItem(RIFT.get(), props.useBlockDescriptionPrefix()) {
+        @Override
+        public void appendHoverText(ItemStack stack, TooltipContext context, TooltipDisplay tooltipDisplay, Consumer<Component> tooltipAdder, TooltipFlag flag)
+        {
+            UUID riftId = stack.get(EnderRiftMod.RIFT_ID);
+            if (riftId != null)
+            {
+                tooltipAdder.accept(Component.translatable("text.enderrift.tooltip.riftid", riftId.toString()));
+            }
+        }
+    });
     public static final DeferredItem<Item>
             STRUCTURE_CORNER_ITEM = ITEMS.registerItem("structure_corner", props -> new BlockItem(STRUCTURE_CORNER.get(), props.useBlockDescriptionPrefix()));
     public static final DeferredItem<Item>
@@ -143,19 +156,19 @@ public class EnderRiftMod
     public static final DeferredItem<Item>
             RIFT_ORB = ITEMS.registerItem("rift_orb", props -> new RiftItem(props.stacksTo(16)));
 
-    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<RiftBlockEntity>> 
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<RiftBlockEntity>>
             RIFT_BLOCK_ENTITY = BLOCK_ENTITIES.register("rift", () -> new BlockEntityType<>(RiftBlockEntity::new, RIFT.get()));
-    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<StructureCornerBlockEntity>> 
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<StructureCornerBlockEntity>>
             STRUCTURE_CORNER_BLOCK_ENTITY = BLOCK_ENTITIES.register("structure", () -> new BlockEntityType<>(StructureCornerBlockEntity::new, STRUCTURE_CORNER.get()));
-    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<InterfaceBlockEntity>> 
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<InterfaceBlockEntity>>
             INTERFACE_BLOCK_ENTITY = BLOCK_ENTITIES.register("interface", () -> new BlockEntityType<>(InterfaceBlockEntity::new, INTERFACE.get()));
-    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<BrowserBlockEntity>> 
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<BrowserBlockEntity>>
             BROWSER_BLOCK_ENTITY = BLOCK_ENTITIES.register("browser", () -> new BlockEntityType<>(BrowserBlockEntity::new, BROWSER.get(), CRAFTING_BROWSER.get()));
-    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<ProxyBlockEntity>> 
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<ProxyBlockEntity>>
             PROXY_BLOCK_ENTITY = BLOCK_ENTITIES.register("proxy", () -> new BlockEntityType<>(ProxyBlockEntity::new, PROXY.get()));
-    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<DriverBlockEntity>> 
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<DriverBlockEntity>>
             DRIVER_BLOCK_ENTITY = BLOCK_ENTITIES.register("driver", () -> new BlockEntityType<>(DriverBlockEntity::new, DRIVER.get()));
-    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<GeneratorBlockEntity>> 
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<GeneratorBlockEntity>>
             GENERATOR_BLOCK_ENTITY = BLOCK_ENTITIES.register("generator", () -> new BlockEntityType<>(GeneratorBlockEntity::new, GENERATOR.get()));
 
     public static final DeferredHolder<MenuType<?>, MenuType<BrowserMenu>>
@@ -277,7 +290,7 @@ public class EnderRiftMod
         rift.locateListeners(context.getSource().getLevel(), (pos) ->
                 context.getSource().sendSuccess(
                         () -> Component.literal(String.format("Found rift with id '%s' at %s %s %s", riftId, pos.getX(), pos.getY(), pos.getZ()))
-                                .setStyle(Style.EMPTY.withClickEvent(new ClickEvent(Action.RUN_COMMAND, String.format("/tp %s %s %s", pos.getX(), pos.getY(), pos.getZ())))), true));
+                                .setStyle(Style.EMPTY.withClickEvent(new ClickEvent.RunCommand(String.format("/tp %s %s %s", pos.getX(), pos.getY(), pos.getZ())))), true));
     }
 
     private int locateAllRifts(CommandContext<CommandSourceStack> context)
@@ -320,70 +333,70 @@ public class EnderRiftMod
             protected void registerModels(BlockModelGenerators blockModels, ItemModelGenerators itemModels)
             {
                 var structureCorner = MultiPartGenerator.multiPart(STRUCTURE_CORNER.get())
-                                .with(Variant.variant().with(VariantProperties.MODEL, location("block/hedron")))
-                                .with(Condition.condition().term(StructureCornerBlock.BASE, true),
-                                        Variant.variant().with(VariantProperties.MODEL, location("block/base")));
+                        .with(BlockModelGenerators.plainVariant(location("block/hedron")))
+                        .with(BlockModelGenerators.condition().term(StructureCornerBlock.BASE, true),
+                                BlockModelGenerators.plainVariant(location("block/base")));
                 blockModels.blockStateOutput.accept(structureCorner);
 
                 var structureEdge = MultiPartGenerator.multiPart(STRUCTURE_EDGE.get())
-                        .with(Condition.condition().term(StructureEdgeBlock.AXIS, Direction.Axis.X),
-                                Variant.variant().with(VariantProperties.MODEL, location("block/straight")).with(VariantProperties.Y_ROT, VariantProperties.Rotation.R90))
-                        .with(Condition.condition().term(StructureEdgeBlock.AXIS, Direction.Axis.Y),
-                                Variant.variant().with(VariantProperties.MODEL, location("block/straight")).with(VariantProperties.X_ROT, VariantProperties.Rotation.R90))
-                        .with(Condition.condition().term(StructureEdgeBlock.AXIS, Direction.Axis.Z),
-                                Variant.variant().with(VariantProperties.MODEL, location("block/straight")))
-                        .with(Condition.condition().term(StructureEdgeBlock.BASE, true),
-                                Variant.variant().with(VariantProperties.MODEL, location("block/base")));
+                        .with(BlockModelGenerators.condition().term(StructureEdgeBlock.AXIS, Direction.Axis.X),
+                                BlockModelGenerators.plainVariant(location("block/straight")).with(BlockModelGenerators.Y_ROT_90))
+                        .with(BlockModelGenerators.condition().term(StructureEdgeBlock.AXIS, Direction.Axis.Y),
+                                BlockModelGenerators.plainVariant(location("block/straight")).with(BlockModelGenerators.X_ROT_90))
+                        .with(BlockModelGenerators.condition().term(StructureEdgeBlock.AXIS, Direction.Axis.Z),
+                                BlockModelGenerators.plainVariant(location("block/straight")))
+                        .with(BlockModelGenerators.condition().term(StructureEdgeBlock.BASE, true),
+                                BlockModelGenerators.plainVariant(location("block/base")));
                 blockModels.blockStateOutput.accept(structureEdge);
 
-                blockModels.blockStateOutput.accept(MultiVariantGenerator.multiVariant(RIFT.get()).with(
+                blockModels.blockStateOutput.accept(MultiVariantGenerator.dispatch(RIFT.get()).with(
                         BlockModelGenerators.createBooleanModelDispatch(
                                 RiftBlock.ASSEMBLED,
-                                location("block/rift"),
-                                location("block/rift_active")
+                                BlockModelGenerators.plainVariant(location("block/rift")),
+                                BlockModelGenerators.plainVariant(location("block/rift_active"))
                         )
                 ));
-                blockModels.blockStateOutput.accept(MultiVariantGenerator.multiVariant(INTERFACE.get(), Variant.variant().with(VariantProperties.MODEL, location("block/interface")))
-                        .with(createFacingDispatchAlt()));
-                blockModels.blockStateOutput.accept(MultiVariantGenerator.multiVariant(BROWSER.get(), Variant.variant().with(VariantProperties.MODEL, location("block/browser")))
-                        .with(createFacingDispatchAlt()));
-                blockModels.blockStateOutput.accept(MultiVariantGenerator.multiVariant(CRAFTING_BROWSER.get(), Variant.variant().with(VariantProperties.MODEL, location("block/crafting_browser")))
-                        .with(createFacingDispatchAlt()));
+                blockModels.blockStateOutput.accept(MultiVariantGenerator.dispatch(INTERFACE.get(), BlockModelGenerators.plainVariant(location("block/interface")))
+                        .with(ROTATION_FACING_ALT));
+                blockModels.blockStateOutput.accept(MultiVariantGenerator.dispatch(BROWSER.get(), BlockModelGenerators.plainVariant(location("block/browser")))
+                        .with(ROTATION_FACING_ALT));
+                blockModels.blockStateOutput.accept(MultiVariantGenerator.dispatch(CRAFTING_BROWSER.get(), BlockModelGenerators.plainVariant(location("block/crafting_browser")))
+                        .with(ROTATION_FACING_ALT));
 
                 var proxy = MultiPartGenerator.multiPart(PROXY.get())
-                        .with(Variant.variant().with(VariantProperties.MODEL, location("block/proxy_main")))
-                        .with(Condition.condition().term(ProxyBlock.UP, true),
-                                Variant.variant().with(VariantProperties.MODEL, location("block/proxy_connection")).with(VariantProperties.X_ROT, VariantProperties.Rotation.R90))
-                        .with(Condition.condition().term(ProxyBlock.DOWN, true),
-                                Variant.variant().with(VariantProperties.MODEL, location("block/proxy_connection")).with(VariantProperties.X_ROT, VariantProperties.Rotation.R270))
-                        .with(Condition.condition().term(ProxyBlock.EAST, true),
-                                Variant.variant().with(VariantProperties.MODEL, location("block/proxy_connection")).with(VariantProperties.Y_ROT, VariantProperties.Rotation.R270))
-                        .with(Condition.condition().term(ProxyBlock.WEST, true),
-                                Variant.variant().with(VariantProperties.MODEL, location("block/proxy_connection")).with(VariantProperties.Y_ROT, VariantProperties.Rotation.R90))
-                        .with(Condition.condition().term(ProxyBlock.NORTH, true),
-                                Variant.variant().with(VariantProperties.MODEL, location("block/proxy_connection")).with(VariantProperties.Y_ROT, VariantProperties.Rotation.R180))
-                        .with(Condition.condition().term(ProxyBlock.SOUTH, true),
-                                Variant.variant().with(VariantProperties.MODEL, location("block/proxy_connection")));
+                        .with(BlockModelGenerators.plainVariant(location("block/proxy_main")))
+                        .with(BlockModelGenerators.condition().term(ProxyBlock.UP, true),
+                                BlockModelGenerators.plainVariant(location("block/proxy_connection")).with(BlockModelGenerators.X_ROT_90))
+                        .with(BlockModelGenerators.condition().term(ProxyBlock.DOWN, true),
+                                BlockModelGenerators.plainVariant(location("block/proxy_connection")).with(BlockModelGenerators.X_ROT_270))
+                        .with(BlockModelGenerators.condition().term(ProxyBlock.EAST, true),
+                                BlockModelGenerators.plainVariant(location("block/proxy_connection")).with(BlockModelGenerators.Y_ROT_270))
+                        .with(BlockModelGenerators.condition().term(ProxyBlock.WEST, true),
+                                BlockModelGenerators.plainVariant(location("block/proxy_connection")).with(BlockModelGenerators.Y_ROT_90))
+                        .with(BlockModelGenerators.condition().term(ProxyBlock.NORTH, true),
+                                BlockModelGenerators.plainVariant(location("block/proxy_connection")).with(BlockModelGenerators.Y_ROT_180))
+                        .with(BlockModelGenerators.condition().term(ProxyBlock.SOUTH, true),
+                                BlockModelGenerators.plainVariant(location("block/proxy_connection")));
                 blockModels.blockStateOutput.accept(proxy);
 
                 var driver = MultiPartGenerator.multiPart(DRIVER.get())
-                        .with(Variant.variant().with(VariantProperties.MODEL, location("block/driver_main")))
-                        .with(Condition.condition().term(DriverBlock.UP, true),
-                                Variant.variant().with(VariantProperties.MODEL, location("block/proxy_connection")).with(VariantProperties.X_ROT, VariantProperties.Rotation.R90))
-                        .with(Condition.condition().term(DriverBlock.DOWN, true),
-                                Variant.variant().with(VariantProperties.MODEL, location("block/proxy_connection")).with(VariantProperties.X_ROT, VariantProperties.Rotation.R270))
-                        .with(Condition.condition().term(DriverBlock.EAST, true),
-                                Variant.variant().with(VariantProperties.MODEL, location("block/proxy_connection")).with(VariantProperties.Y_ROT, VariantProperties.Rotation.R270))
-                        .with(Condition.condition().term(DriverBlock.WEST, true),
-                                Variant.variant().with(VariantProperties.MODEL, location("block/proxy_connection")).with(VariantProperties.Y_ROT, VariantProperties.Rotation.R90))
-                        .with(Condition.condition().term(DriverBlock.NORTH, true),
-                                Variant.variant().with(VariantProperties.MODEL, location("block/proxy_connection")).with(VariantProperties.Y_ROT, VariantProperties.Rotation.R180))
-                        .with(Condition.condition().term(DriverBlock.SOUTH, true),
-                                Variant.variant().with(VariantProperties.MODEL, location("block/proxy_connection")));
+                        .with(BlockModelGenerators.plainVariant(location("block/driver_main")))
+                        .with(BlockModelGenerators.condition().term(DriverBlock.UP, true),
+                                BlockModelGenerators.plainVariant(location("block/proxy_connection")).with(BlockModelGenerators.X_ROT_90))
+                        .with(BlockModelGenerators.condition().term(DriverBlock.DOWN, true),
+                                BlockModelGenerators.plainVariant(location("block/proxy_connection")).with(BlockModelGenerators.X_ROT_270))
+                        .with(BlockModelGenerators.condition().term(DriverBlock.EAST, true),
+                                BlockModelGenerators.plainVariant(location("block/proxy_connection")).with(BlockModelGenerators.Y_ROT_270))
+                        .with(BlockModelGenerators.condition().term(DriverBlock.WEST, true),
+                                BlockModelGenerators.plainVariant(location("block/proxy_connection")).with(BlockModelGenerators.Y_ROT_90))
+                        .with(BlockModelGenerators.condition().term(DriverBlock.NORTH, true),
+                                BlockModelGenerators.plainVariant(location("block/proxy_connection")).with(BlockModelGenerators.Y_ROT_180))
+                        .with(BlockModelGenerators.condition().term(DriverBlock.SOUTH, true),
+                                BlockModelGenerators.plainVariant(location("block/proxy_connection")));
                 blockModels.blockStateOutput.accept(driver);
 
-                blockModels.blockStateOutput.accept(MultiVariantGenerator.multiVariant(GENERATOR.get(), Variant.variant().with(VariantProperties.MODEL, location("block/generator")))
-                        .with(BlockModelGenerators.createHorizontalFacingDispatch()));
+                blockModels.blockStateOutput.accept(MultiVariantGenerator.dispatch(GENERATOR.get(), BlockModelGenerators.plainVariant(location("block/generator")))
+                        .with(BlockModelGenerators.ROTATION_HORIZONTAL_FACING));
 
                 itemModels.itemModelOutput.accept(RIFT_ITEM.get(), ItemModelUtils.plainModel(location("item/rift")));
                 itemModels.itemModelOutput.accept(STRUCTURE_CORNER_ITEM.get(), ItemModelUtils.plainModel(location("item/structure")));
@@ -397,19 +410,16 @@ public class EnderRiftMod
 
                 itemModels.itemModelOutput.accept(UNBOUND_RIFT_ORB.get(), ItemModelUtils.plainModel(location("item/rift_orb")));
                 itemModels.itemModelOutput.accept(RIFT_ORB.get(), ItemModelUtils.plainModel(location("item/rift_orb")));
-
             }
         }
 
-        public static PropertyDispatch createFacingDispatchAlt() {
-            return PropertyDispatch.property(BlockStateProperties.FACING)
-                    .select(Direction.UP, Variant.variant().with(VariantProperties.X_ROT, VariantProperties.Rotation.R90))
-                    .select(Direction.DOWN, Variant.variant().with(VariantProperties.X_ROT, VariantProperties.Rotation.R270))
-                    .select(Direction.EAST, Variant.variant().with(VariantProperties.Y_ROT, VariantProperties.Rotation.R270))
-                    .select(Direction.WEST, Variant.variant().with(VariantProperties.Y_ROT, VariantProperties.Rotation.R90))
-                    .select(Direction.NORTH, Variant.variant().with(VariantProperties.Y_ROT, VariantProperties.Rotation.R180))
-                    .select(Direction.SOUTH, Variant.variant());
-        }
+        public static final PropertyDispatch<VariantMutator> ROTATION_FACING_ALT = PropertyDispatch.modify(BlockStateProperties.FACING)
+                .select(Direction.UP, BlockModelGenerators.X_ROT_90)
+                .select(Direction.DOWN, BlockModelGenerators.X_ROT_270)
+                .select(Direction.EAST, BlockModelGenerators.Y_ROT_270)
+                .select(Direction.WEST, BlockModelGenerators.Y_ROT_90)
+                .select(Direction.NORTH, BlockModelGenerators.Y_ROT_180)
+                .select(Direction.SOUTH, BlockModelGenerators.NOP);
 
         private static class Recipes extends RecipeProvider.Runner
         {
@@ -587,4 +597,3 @@ public class EnderRiftMod
         }
     }
 }
-

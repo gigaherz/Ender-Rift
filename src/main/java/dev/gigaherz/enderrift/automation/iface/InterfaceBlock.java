@@ -99,38 +99,4 @@ public class InterfaceBlock extends AggregatorBlock<InterfaceBlockEntity>
 
         return InteractionResult.SUCCESS;
     }
-
-    @Deprecated
-    @Override
-    public void onRemove(BlockState state, Level worldIn, BlockPos pos, BlockState newState, boolean isMoving)
-    {
-        if (newState.getBlock() == this)
-        {
-            super.onRemove(state, worldIn, pos, newState, isMoving);
-            return;
-        }
-
-        BlockEntity tileentity = worldIn.getBlockEntity(pos);
-
-        if (tileentity instanceof InterfaceBlockEntity)
-        {
-            dropInventoryItems(worldIn, pos, ((InterfaceBlockEntity) tileentity).inventoryOutputs());
-            worldIn.updateNeighbourForOutputSignal(pos, this);
-        }
-
-        super.onRemove(state, worldIn, pos, newState, isMoving);
-    }
-
-    public static void dropInventoryItems(Level worldIn, BlockPos pos, IItemHandler inventory)
-    {
-        for (int i = 0; i < inventory.getSlots(); ++i)
-        {
-            ItemStack itemstack = inventory.getStackInSlot(i);
-
-            if (itemstack.getCount() > 0)
-            {
-                Containers.dropItemStack(worldIn, (double) pos.getX(), (double) pos.getY(), (double) pos.getZ(), itemstack);
-            }
-        }
-    }
 }

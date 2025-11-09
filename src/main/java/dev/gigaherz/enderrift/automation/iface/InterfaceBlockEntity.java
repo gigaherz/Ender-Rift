@@ -6,26 +6,26 @@ import dev.gigaherz.enderrift.automation.AutomationHelper;
 import dev.gigaherz.enderrift.common.IPoweredAutomation;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.Tag;
+import net.minecraft.world.Containers;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
+import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.IItemHandlerModifiable;
 import net.neoforged.neoforge.items.ItemStackHandler;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-@EventBusSubscriber(modid = EnderRiftMod.MODID, bus = EventBusSubscriber.Bus.MOD)
+@EventBusSubscriber(modid = EnderRiftMod.MODID)
 public class InterfaceBlockEntity extends AggregatorBlockEntity implements IPoweredAutomation
 {
     @SubscribeEvent
@@ -164,69 +164,65 @@ public class InterfaceBlockEntity extends AggregatorBlockEntity implements IPowe
     }
 
     @Override
-    public void loadAdditional(CompoundTag compound, HolderLookup.Provider lookup)
+    public void loadAdditional(ValueInput input)
     {
-        super.loadAdditional(compound, lookup);
+        super.loadAdditional(input);
 
-        ListTag _filters = compound.getList("Filters", Tag.TAG_COMPOUND);
-        for (int i = 0; i < _filters.size(); ++i)
+        var _filters = input.childrenListOrEmpty("Filters");
+
+        for(var entry : _filters)
         {
-            CompoundTag nbttagcompound = _filters.getCompound(i);
-            int j = nbttagcompound.getByte("Slot") & 255;
-
+            var slot = entry.getInt("Slot");
+            if (slot.isEmpty()) continue;
+            int j = slot.get();
             if (j >= 0 && j < filters.getSlots())
             {
-                filters.setStackInSlot(j, ItemStack.parseOptional(lookup, nbttagcompound));
+                filters.setStackInSlot(j, entry.read(ItemStack.MAP_CODEC).orElseThrow());
             }
         }
 
-        ListTag _outputs = compound.getList("Outputs", Tag.TAG_COMPOUND);
-        for (int i = 0; i < _outputs.size(); ++i)
+        var _outputs = input.childrenListOrEmpty("Outputs");
+        for(var entry : _outputs)
         {
-            CompoundTag slot = _outputs.getCompound(i);
-            int j = slot.getByte("Slot") & 255;
-
+            var slot = entry.getInt("Slot");
+            if (slot.isEmpty()) continue;
+            int j = slot.get();
             if (j >= 0 && j < outputs.getSlots())
             {
-                outputs.setStackInSlot(j, ItemStack.parseOptional(lookup, slot));
+                outputs.setStackInSlot(j, entry.read(ItemStack.MAP_CODEC).orElseThrow());
             }
         }
     }
 
     @Override
-    protected void saveAdditional(CompoundTag compound, HolderLookup.Provider lookup)
+    protected void saveAdditional(ValueOutput output)
     {
-        super.saveAdditional(compound, lookup);
+        super.saveAdditional(output);
 
-        ListTag _filters = new ListTag();
+        var _filters = output.childrenList("Filters");
         for (int i = 0; i < filters.getSlots(); ++i)
         {
+            var entry = _filters.addChild();;
             ItemStack stack = filters.getStackInSlot(i);
             if (stack.getCount() > 0)
             {
-                CompoundTag nbttagcompound = new CompoundTag();
-                nbttagcompound.putByte("Slot", (byte) i);
-                stack.save(lookup, nbttagcompound);
-                _filters.add(nbttagcompound);
+                entry.putInt("Slot", i);
+                entry.store(ItemStack.MAP_CODEC, stack);
             }
         }
 
-        compound.put("Filters", _filters);
 
-        ListTag _outputs = new ListTag();
+        var _outputs = output.childrenList("Outputs");
         for (int i = 0; i < outputs.getSlots(); ++i)
         {
+            var entry = _outputs.addChild();;
             ItemStack stack = outputs.getStackInSlot(i);
             if (stack.getCount() > 0)
             {
-                CompoundTag slot = new CompoundTag();
-                slot.putByte("Slot", (byte) i);
-                stack.save(lookup, slot);
-                _outputs.add(slot);
+                entry.putInt("Slot", i);
+                entry.store(ItemStack.MAP_CODEC, stack);
             }
         }
-
-        compound.put("Outputs", _outputs);
     }
 
     public boolean isUseableByPlayer(Player player)
@@ -238,6 +234,27 @@ public class InterfaceBlockEntity extends AggregatorBlockEntity implements IPowe
     public static void tickStatic(Level level, BlockPos blockPos, BlockState blockState, InterfaceBlockEntity te)
     {
         te.tick();
+    }
+
+    @Override
+    public void preRemoveSideEffects(BlockPos pos, BlockState state)
+    {
+        super.preRemoveSideEffects(pos, state);
+
+        if (level != null)
+        {
+            IItemHandler inventory = this.inventoryOutputs();
+            dropItems(level, pos, inventory);
+        }
+    }
+
+    public static void dropItems(Level level, BlockPos pos, IItemHandler inventory)
+    {
+        for (int i = 0; i < inventory.getSlots(); ++i)
+        {
+            ItemStack itemstack = inventory.getStackInSlot(i);
+            Containers.dropItemStack(level, pos.getX(), pos.getY(), pos.getZ(), itemstack);
+        }
     }
 
     private class FilterInventory implements IItemHandlerModifiable

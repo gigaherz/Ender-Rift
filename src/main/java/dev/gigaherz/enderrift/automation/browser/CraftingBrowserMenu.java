@@ -16,6 +16,7 @@ import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
+import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemHandlerHelper;
 import net.neoforged.neoforge.network.PacketDistributor;
@@ -220,7 +221,7 @@ public class CraftingBrowserMenu extends AbstractBrowserMenu
 
         if (isRemote)
         {
-            PacketDistributor.sendToServer(new ClearCraftingGrid(containerId, toPlayer));
+            ClientPacketDistributor.sendToServer(new ClearCraftingGrid(containerId, toPlayer));
         }
 
         this.slotsChanged(craftMatrix);

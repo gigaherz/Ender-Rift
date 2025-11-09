@@ -12,6 +12,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.items.IItemHandlerModifiable;
 import net.neoforged.neoforge.items.ItemStackHandler;
 import net.neoforged.neoforge.items.SlotItemHandler;
+import org.jetbrains.annotations.NotNull;
 
 public class GeneratorContainer extends AbstractContainerMenu
 {
@@ -81,9 +82,9 @@ public class GeneratorContainer extends AbstractContainerMenu
         ItemStack stack = slot.getItem();
         ItemStack stackCopy = stack.copy();
 
-        int startIndex;
-        int endIndex;
+        int startIndex, endIndex;
 
+        // BEGIN decision logic
         if (slotIndex == 0)
         {
             startIndex = 1;
@@ -98,7 +99,13 @@ public class GeneratorContainer extends AbstractContainerMenu
             startIndex = 0;
             endIndex = 1;
         }
+        // END decision logic
 
+        return finishQuickMoveStack(player, stack, startIndex, endIndex, slot, stackCopy);
+    }
+
+    private @NotNull ItemStack finishQuickMoveStack(Player player, ItemStack stack, int startIndex, int endIndex, Slot slot, ItemStack stackCopy)
+    {
         if (!this.moveItemStackTo(stack, startIndex, endIndex, false))
         {
             return ItemStack.EMPTY;

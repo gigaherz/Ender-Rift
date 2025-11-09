@@ -6,21 +6,26 @@ import dev.gigaherz.enderrift.network.SendSlotChanges;
 import dev.gigaherz.enderrift.rift.RiftRenderer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
-import net.minecraft.client.resources.model.ModelResourceLocation;
+import net.minecraft.client.resources.model.*;
 import net.minecraft.world.entity.player.Player;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.neoforge.client.event.ModelEvent;
+import net.neoforged.neoforge.client.model.standalone.SimpleUnbakedStandaloneModel;
+import net.neoforged.neoforge.client.model.standalone.StandaloneModelKey;
 
-@EventBusSubscriber(value = Dist.CLIENT, modid = EnderRiftMod.MODID, bus = EventBusSubscriber.Bus.MOD)
+
+@EventBusSubscriber(value = Dist.CLIENT, modid = EnderRiftMod.MODID)
 public class ClientHelper
 {
+    public static final StandaloneModelKey<QuadCollection> SPHERE = new StandaloneModelKey<>(() -> "EnderRift Sphere");
+
     @SubscribeEvent
-    public static void registerModels(ModelEvent.RegisterAdditional event)
+    public static void registerModels(ModelEvent.RegisterStandalone event)
     {
-        event.register(EnderRiftMod.location("block/sphere"));
+        event.register(SPHERE, SimpleUnbakedStandaloneModel.quadCollection(EnderRiftMod.location("block/sphere")));
     }
 
     @SubscribeEvent

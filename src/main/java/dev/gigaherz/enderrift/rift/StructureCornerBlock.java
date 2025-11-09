@@ -7,6 +7,7 @@ import dev.gigaherz.enderrift.EnderRiftMod;
 import dev.gigaherz.enderrift.automation.AggregatorBlock;
 import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -96,18 +97,10 @@ public class StructureCornerBlock extends AggregatorBlock<StructureCornerBlockEn
         return SHAPE_CACHE.apply(state);
     }
 
-    @Deprecated
     @Override
-    public void onRemove(BlockState state, Level worldIn, BlockPos pos, BlockState newState, boolean isMoving)
+    protected void affectNeighborsAfterRemoval(BlockState state, ServerLevel level, BlockPos pos, boolean movedByPiston)
     {
-        if (newState.getBlock() == this)
-        {
-            super.onRemove(state, worldIn, pos, newState, isMoving);
-            return;
-        }
-
-        super.onRemove(state, worldIn, pos, newState, isMoving);
-        RiftStructure.breakStructure(worldIn, pos);
+        RiftStructure.breakStructure(level, pos);
     }
 
     @Deprecated

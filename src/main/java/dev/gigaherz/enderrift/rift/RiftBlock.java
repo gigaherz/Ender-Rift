@@ -7,14 +7,17 @@ import dev.gigaherz.enderrift.EnderRiftMod;
 import dev.gigaherz.enderrift.automation.AutomationHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.InsideBlockEffectApplier;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BaseEntityBlock;
@@ -35,6 +38,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.function.Consumer;
 
 public class RiftBlock extends BaseEntityBlock
 {
@@ -115,23 +119,10 @@ public class RiftBlock extends BaseEntityBlock
         return Lists.newArrayList(new ItemStack(this));
     }
 
-    @Deprecated
     @Override
-    public void onRemove(BlockState state, Level worldIn, BlockPos pos, BlockState newState, boolean isMoving)
+    protected void affectNeighborsAfterRemoval(BlockState state, ServerLevel level, BlockPos pos, boolean movedByPiston)
     {
-        if (newState.getBlock() == this || !state.getValue(ASSEMBLED))
-        {
-            super.onRemove(state, worldIn, pos, newState, isMoving);
-            return;
-        }
-
-        if (worldIn.getBlockEntity(pos) instanceof RiftBlockEntity rift)
-        {
-            popResource(worldIn, pos, rift.getRiftItem());
-            rift.setRemoved();
-        }
-
-        RiftStructure.dismantle(worldIn, pos);
+        RiftStructure.dismantle(level, pos);
     }
 
     @Override
@@ -208,20 +199,19 @@ public class RiftBlock extends BaseEntityBlock
         }
     }
 
-    @Deprecated
     @Override
-    public void entityInside(BlockState state, Level worldIn, BlockPos pos, Entity entityIn)
+    protected void entityInside(BlockState state, Level level, BlockPos pos, Entity entity, InsideBlockEffectApplier effectApplier)
     {
-        if (worldIn.isClientSide)
+        if (level.isClientSide)
             return;
 
-        if (!(entityIn instanceof ItemEntity itemEntity))
+        if (!(entity instanceof ItemEntity itemEntity))
             return;
 
         if (state.getBlock() != this || !state.getValue(ASSEMBLED))
             return;
 
-        BlockEntity te = worldIn.getBlockEntity(pos);
+        BlockEntity te = level.getBlockEntity(pos);
         if (!(te instanceof RiftBlockEntity rift) || !rift.isPowered())
             return;
 
@@ -233,22 +223,11 @@ public class RiftBlock extends BaseEntityBlock
 
         if (remaining.getCount() <= 0)
         {
-            entityIn.remove(Entity.RemovalReason.KILLED);
+            entity.remove(Entity.RemovalReason.KILLED);
         }
         else
         {
             itemEntity.setItem(remaining);
         }
     }
-
-    @Override
-    public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag flag)
-    {
-        UUID riftId = stack.get(EnderRiftMod.RIFT_ID);
-        if (riftId != null)
-        {
-            tooltip.add(Component.translatable("text.enderrift.tooltip.riftid", riftId.toString()));
-        }
-    }
-
 }

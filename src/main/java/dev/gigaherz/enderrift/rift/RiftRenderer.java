@@ -5,6 +5,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 import dev.gigaherz.enderrift.EnderRiftMod;
+import dev.gigaherz.enderrift.client.ClientHelper;
 import net.minecraft.client.Camera;
 import net.minecraft.client.GraphicsStatus;
 import net.minecraft.client.Minecraft;
@@ -14,14 +15,13 @@ import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.client.resources.model.BakedModel;
-import net.minecraft.client.resources.model.ModelResourceLocation;
+import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.client.model.data.ModelData;
+import net.neoforged.neoforge.model.data.ModelData;
 
 import java.util.List;
 
@@ -42,20 +42,20 @@ public class RiftRenderer
     }
 
     @Override
-    public void render(RiftBlockEntity te, float partialTicks, PoseStack matrixStack, MultiBufferSource iRenderTypeBuffer, int combinedLightIn, int combinedOverlayIn)
+    public void render(RiftBlockEntity be, float partialTicks, PoseStack poseStack, MultiBufferSource multiBufferSource, int packedLight, int packedOverlay, Vec3 position)
     {
-        if (!te.getBlockState().getValue(RiftBlock.ASSEMBLED))
+        if (!be.getBlockState().getValue(RiftBlock.ASSEMBLED))
             return;
 
-        float lastPoweringState = te.getLastPoweringState();
-        float nextPoweringState = te.getPoweringState();
+        float lastPoweringState = be.getLastPoweringState();
+        float nextPoweringState = be.getPoweringState();
         float poweringState = lerp(lastPoweringState, nextPoweringState, partialTicks);
 
         Minecraft minecraft = Minecraft.getInstance();
 
         Camera renderInfo = minecraft.gameRenderer.getMainCamera();
 
-        BlockPos tePos = te.getBlockPos();
+        BlockPos tePos = be.getBlockPos();
         Vec3 cameraPos = renderInfo.getPosition();
 
         double ty = cameraPos.y() - (tePos.getY() + 0.5);
@@ -65,17 +65,17 @@ public class RiftRenderer
         float xz = (float) Math.sqrt(tx * tx + tz * tz);
         float pitch = (float) Math.atan2(ty, xz);
 
-        matrixStack.pushPose();
-        matrixStack.translate(0.5, 0.5, 0.5);
-        matrixStack.mulPose(Axis.YP.rotation(-yaw));
-        matrixStack.mulPose(Axis.ZP.rotation(pitch));
-        matrixStack.translate(-0.5, -0.5, -0.5);
+        poseStack.pushPose();
+        poseStack.translate(0.5, 0.5, 0.5);
+        poseStack.mulPose(Axis.YP.rotation(-yaw));
+        poseStack.mulPose(Axis.ZP.rotation(pitch));
+        poseStack.translate(-0.5, -0.5, -0.5);
 
         int step_time = 20;
         int steps = 5;
         int time_loop = step_time * steps;
 
-        long time = te.getLevel().getGameTime();
+        long time = be.getLevel().getGameTime();
         int tm = (int) (time % step_time);
 
         float c0 = 1.0f / steps;
@@ -85,10 +85,12 @@ public class RiftRenderer
 
         RenderType type = isFabulous ?
                 RenderType.translucentMovingBlock() :
-                RenderType.translucent();
+                RenderType.entityTranslucent(TextureAtlas.LOCATION_BLOCKS);
 
-        VertexConsumer buffer = iRenderTypeBuffer.getBuffer(type);
-        BakedModel model = minecraft.getModelManager().getStandaloneModel(EnderRiftMod.location("block/sphere"));
+        VertexConsumer buffer = multiBufferSource.getBuffer(type);
+        var model = minecraft.getModelManager().getStandaloneModel(ClientHelper.SPHERE);
+        if (model == null)
+            return;
 
         for (int i = 0; i < steps; i++)
         {
@@ -97,26 +99,26 @@ public class RiftRenderer
 
             float scale = (1.0f + poweringState) + (0.6f + poweringState) * progress0;
 
-            matrixStack.pushPose();
-            matrixStack.translate(0.5, 0.5, 0.5);
-            matrixStack.scale(scale, scale, scale);
-            matrixStack.translate(-0.5, -0.5, -0.5);
+            poseStack.pushPose();
+            poseStack.translate(0.5, 0.5, 0.5);
+            poseStack.scale(scale, scale, scale);
+            poseStack.translate(-0.5, -0.5, -0.5);
 
             float a = Mth.clamp(1 - progress1, 0, 1);
             float rgb = Mth.clamp(progress1, 0, 1);
 
             for (Direction d : DIRECTIONS_AND_NULL)
             {
-                for (BakedQuad quad : model.getQuads(null, d, random, ModelData.EMPTY, null))
+                for (BakedQuad quad : model.getQuads(d))
                 {
-                    buffer.putBulkData(matrixStack.last(), quad, rgb, rgb, rgb, a, 0x00F000F0, OverlayTexture.NO_OVERLAY, true);
+                    buffer.putBulkData(poseStack.last(), quad, rgb, rgb, rgb, a, 0x00F000F0, OverlayTexture.NO_OVERLAY, true);
                 }
             }
 
-            matrixStack.popPose();
+            poseStack.popPose();
         }
 
-        matrixStack.popPose();
+        poseStack.popPose();
     }
 
     private float lerp(float a, float b, float p)

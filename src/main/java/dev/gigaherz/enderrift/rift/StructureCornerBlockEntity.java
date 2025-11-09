@@ -15,7 +15,7 @@ import net.neoforged.neoforge.energy.IEnergyStorage;
 
 import java.util.Optional;
 
-@EventBusSubscriber(modid = EnderRiftMod.MODID, bus = EventBusSubscriber.Bus.MOD)
+@EventBusSubscriber(modid = EnderRiftMod.MODID)
 public class StructureCornerBlockEntity extends AggregatorBlockEntity
 {
     @SubscribeEvent

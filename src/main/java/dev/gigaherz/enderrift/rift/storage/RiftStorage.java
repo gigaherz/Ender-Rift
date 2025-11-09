@@ -30,7 +30,7 @@ import java.util.UUID;
 import java.util.concurrent.locks.Lock;
 import java.util.function.BiConsumer;
 
-@EventBusSubscriber(modid = EnderRiftMod.MODID, bus = EventBusSubscriber.Bus.GAME)
+@EventBusSubscriber(modid = EnderRiftMod.MODID)
 public class RiftStorage
 {
     private RiftStorage()

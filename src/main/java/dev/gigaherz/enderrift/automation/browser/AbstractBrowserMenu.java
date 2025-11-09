@@ -21,10 +21,13 @@ import net.minecraft.world.inventory.*;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.TooltipDisplay;
+import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.IItemHandlerModifiable;
 import net.neoforged.neoforge.network.PacketDistributor;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.mutable.MutableBoolean;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -62,7 +65,7 @@ public class AbstractBrowserMenu extends AbstractContainerMenu
     public SortMode sortMode = SortMode.STACK_SIZE;
     public String filterText = "";
 
-    private DataSlot isLowOnPower = new DataSlot()
+    private final DataSlot isLowOnPower = new DataSlot()
     {
         boolean value = false;
 
@@ -326,7 +329,7 @@ public class AbstractBrowserMenu extends AbstractContainerMenu
     {
         if (isClient())
         {
-            PacketDistributor.sendToServer(new SetVisibleSlots(containerId, visible));
+            ClientPacketDistributor.sendToServer(new SetVisibleSlots(containerId, visible));
         }
         else
         {
@@ -797,30 +800,35 @@ public class AbstractBrowserMenu extends AbstractContainerMenu
 
             final List<Integer> indices = Lists.newArrayList();
 
-            final List<Component> itemData = Lists.newArrayList();
-
             int indexx = 0;
             for (ItemStack invStack : stacks)
             {
                 ItemStack stack = invStack.copy();
 
-                boolean matchesSearch = true;
+                boolean matchesSearch;
                 if (!Strings.isNullOrEmpty(filterText))
                 {
-                    itemData.clear();
                     Item item = invStack.getItem();
-                    itemData.add(stack.getHoverName());
-                    itemData.add(Component.literal(BuiltInRegistries.ITEM.getKey(item).toString()));
-                    item.appendHoverText(stack, Item.TooltipContext.of(player.level()), itemData, TooltipFlag.Default.NORMAL);
-                    matchesSearch = false;
-                    for (Component s : itemData)
+                    if (StringUtils.containsIgnoreCase(stack.getHoverName().getString(), filterText)
+                            || StringUtils.containsIgnoreCase(BuiltInRegistries.ITEM.getKey(item).toString(), filterText))
                     {
-                        if (StringUtils.containsIgnoreCase(s.getString(), filterText))
-                        {
-                            matchesSearch = true;
-                            break;
-                        }
+                        matchesSearch = true;
                     }
+                    else
+                    {
+                        MutableBoolean b = new MutableBoolean();
+                        item.appendHoverText(stack, Item.TooltipContext.of(player.level()), TooltipDisplay.DEFAULT, component -> {
+                            if (!b.booleanValue() && StringUtils.containsIgnoreCase(stack.getHoverName().getString(), filterText))
+                            {
+                                b.setTrue();
+                            }
+                        }, TooltipFlag.Default.NORMAL);
+                        matchesSearch = b.booleanValue();
+                    }
+                }
+                else
+                {
+                    matchesSearch = true;
                 }
 
                 if (matchesSearch)

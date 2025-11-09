@@ -9,9 +9,11 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
@@ -83,15 +85,12 @@ public abstract class AbstractBrowserScreen<T extends AbstractBrowserMenu> exten
             int t = topPos + 17;
             int w = 162;
             int h = 54;
-            RenderSystem.disableDepthTest();
-            RenderSystem.setShaderColor(1, 1, 1, 1);
             graphics.fill(l, t, l + w, t + h, 0x7f000000);
             long tm = Minecraft.getInstance().level.getGameTime() % 30;
             if (tm < 15)
             {
                 graphics.drawCenteredString(font, "NO POWER", l + w / 2, t + h / 2 - font.lineHeight / 2, 0xFFFFFF);
             }
-            RenderSystem.enableDepthTest();
         }
     }
 
@@ -206,16 +205,14 @@ public abstract class AbstractBrowserScreen<T extends AbstractBrowserMenu> exten
     @Override
     protected void renderBg(GuiGraphics graphics, float partialTicks, int xMouse, int yMouse)
     {
-        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-
-        graphics.blit(RenderType::guiTextured, getBackgroundTexture(), leftPos, topPos, 0, 0, imageWidth, imageHeight, 256, 256);
-        graphics.blit(RenderType::guiTextured, getBackgroundTexture(), leftPos - 27, topPos + 8, 194, 0, 27, 28, 256, 256);
+        graphics.blit(RenderPipelines.GUI_TEXTURED, getBackgroundTexture(), leftPos, topPos, 0, 0, imageWidth, imageHeight, 256, 256);
+        graphics.blit(RenderPipelines.GUI_TEXTURED, getBackgroundTexture(), leftPos - 27, topPos + 8, 194, 0, 27, 28, 256, 256);
 
         boolean isEnabled = needsScrollBar();
         if (isEnabled)
-            graphics.blitSprite(RenderType::guiTextured, SCROLLER_SPRITE, leftPos + 174, topPos + 18 + scrollY, 12, 15);
+            graphics.blitSprite(RenderPipelines.GUI_TEXTURED, SCROLLER_SPRITE, leftPos + 174, topPos + 18 + scrollY, 12, 15);
         else
-            graphics.blitSprite(RenderType::guiTextured, SCROLLER_DISABLED_SPRITE, leftPos + 174, topPos + 18, 12, 15);
+            graphics.blitSprite(RenderPipelines.GUI_TEXTURED, SCROLLER_DISABLED_SPRITE, leftPos + 174, topPos + 18, 12, 15);
 
         searchField.render(graphics, xMouse, yMouse, partialTicks);
     }
@@ -223,14 +220,14 @@ public abstract class AbstractBrowserScreen<T extends AbstractBrowserMenu> exten
     private void drawCustomSlotTexts(GuiGraphics graphics)
     {
         var poseStack = graphics.pose();
-        poseStack.pushPose();
-        poseStack.translate(this.leftPos, this.topPos, 300);
+        poseStack.pushMatrix();
+        poseStack.translate(this.leftPos, this.topPos);
         for (int i = 0; i < AbstractBrowserMenu.SCROLL_SLOTS; ++i)
         {
             Slot slot = getMenu().slots.get(i);
             drawSlotText(graphics, slot);
         }
-        poseStack.popPose();
+        poseStack.popMatrix();
     }
 
     private void drawSlotText(GuiGraphics graphics, Slot slotIn)
@@ -247,10 +244,20 @@ public abstract class AbstractBrowserScreen<T extends AbstractBrowserMenu> exten
             {
                 String s = getSizeString(count);
 
-                RenderSystem.enableDepthTest();
-                RenderSystem.disableBlend();
-                graphics.drawString(font, s, (float) (xPosition + 19 - 2 - font.width(s)), (float) (yPosition + 6 + 3), 16777215, true);
-                //RenderSystem.enableDepthTest();
+                var xp = (float) (xPosition + 19 - 2 - font.width(s));
+                var yp = (float) (yPosition + 6 + 3);
+                var xpi = Mth.floor(xp);
+                var ypi = Mth.floor(yp);
+                var xpf = xp-xpi;
+                var ypf = yp-ypi;
+
+                var pose = graphics.pose();
+                pose.pushMatrix();
+                pose.translate(xpf,ypf);
+
+                graphics.drawString(font, s, xpi, ypi, 0xffffffff, true);
+
+                pose.popMatrix();
             }
         }
     }

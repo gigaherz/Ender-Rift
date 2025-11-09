@@ -8,7 +8,9 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.Tag;
+import net.minecraft.resources.RegistryOps;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.ApiStatus;
@@ -92,7 +94,7 @@ public class RiftInventory implements ILongItemHandler
         {
             CompoundTag tag = new CompoundTag();
             tag.putLong("Count", slot.getCount());
-            tag.put("Item", slot.getSample().copyWithCount(1).saveOptional(lookup));
+            tag.put("Item", ItemStack.CODEC.encodeStart(RegistryOps.create(NbtOps.INSTANCE, lookup), slot.getSample().copyWithCount(1)).getOrThrow());
             list.add(tag);
         }
         root.put("Contents", list);
@@ -107,18 +109,23 @@ public class RiftInventory implements ILongItemHandler
             afterClear();
         }
 
-        ListTag list = root.getList("Contents", Tag.TAG_COMPOUND);
-        for (Tag rawTag : list)
-        {
-            CompoundTag tag = (CompoundTag) rawTag;
-            long count = tag.getLong("Count");
-            var itemCompound = tag.getCompound("Item");
-            itemCompound.putInt("Count", 1);
-            ItemStack stack = ItemStack.parseOptional(lookup, itemCompound);
-            RiftSlot slot = new RiftSlot(stack, count);
-            slots.add(slot);
-            afterAdd(slot);
-        }
+        root.getList("Contents").ifPresent(list -> {
+            for (Tag rawTag : list)
+            {
+                CompoundTag tag = (CompoundTag) rawTag;
+                long count = tag.getLongOr("Count", 0);
+                if (count == 0) continue;
+                var itemCompound = tag.getCompound("Item").orElseThrow();
+                if (itemCompound.isEmpty()) continue;
+                itemCompound.putInt("count", 1);
+                ItemStack.OPTIONAL_CODEC.decode(RegistryOps.create(NbtOps.INSTANCE, lookup), itemCompound).ifSuccess(pair -> {
+                    ItemStack stack = pair.getFirst();
+                    RiftSlot slot = new RiftSlot(stack, count);
+                    slots.add(slot);
+                    afterAdd(slot);
+                });
+            }
+        });
         onContentsChanged();
     }
 
