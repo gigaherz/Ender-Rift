@@ -1,13 +1,13 @@
 package dev.gigaherz.enderrift.common.slots;
 
+import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.items.IItemHandler;
-import net.neoforged.neoforge.items.SlotItemHandler;
 
-public class SlotFake extends SlotItemHandler
+public class SlotFake extends Slot
 {
-    public SlotFake(IItemHandler itemHandler, int index, int xPosition, int yPosition)
+    public SlotFake(Container itemHandler, int index, int xPosition, int yPosition)
     {
         super(itemHandler, index, xPosition, yPosition);
     }

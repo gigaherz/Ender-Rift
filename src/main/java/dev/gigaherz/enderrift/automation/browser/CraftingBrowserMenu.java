@@ -14,12 +14,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.CraftingRecipe;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.RecipeType;
-import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.client.network.ClientPacketDistributor;
-import net.neoforged.neoforge.items.IItemHandler;
-import net.neoforged.neoforge.items.ItemHandlerHelper;
-import net.neoforged.neoforge.network.PacketDistributor;
 
 import javax.annotation.Nullable;
 import java.util.Optional;
@@ -96,7 +92,7 @@ public class CraftingBrowserMenu extends AbstractBrowserMenu
 
             Optional<ItemStack> stack = irecipe.map((recipe) -> {
                 craftingResult.setRecipeUsed(recipe);
-                return recipe.value().assemble(inventoryCrafting.asCraftInput(), level.registryAccess());
+                return recipe.value().assemble(inventoryCrafting.asCraftInput());
             });
 
             ItemStack itemstack = stack.orElse(ItemStack.EMPTY);
@@ -106,11 +102,11 @@ public class CraftingBrowserMenu extends AbstractBrowserMenu
     }
 
     @Override
-    public void removed(Player playerIn)
+    public void removed(Player player)
     {
-        super.removed(playerIn);
+        super.removed(player);
 
-        if (!this.world.isClientSide)
+        if (!this.world.isClientSide())
         {
             for (int i = 0; i < 9; ++i)
             {
@@ -118,7 +114,7 @@ public class CraftingBrowserMenu extends AbstractBrowserMenu
 
                 if (itemstack.getCount() > 0)
                 {
-                    ItemHandlerHelper.giveItemToPlayer(playerIn, itemstack);
+                    player.getInventory().add(itemstack);
                 }
             }
         }
@@ -179,12 +175,12 @@ public class CraftingBrowserMenu extends AbstractBrowserMenu
 
     public void clearCraftingGrid(Player playerIn, boolean toPlayer)
     {
-        boolean isRemote = tile == null ? true : tile.getLevel().isClientSide;
+        boolean isRemote = tile == null ? true : tile.getLevel().isClientSide();
 
         if (!isRemote)
         {
             boolean anyChanged = false;
-            IItemHandler parent = tile.getCombinedInventory();
+            var parent = tile.getCombinedInventory();
 
             for (int i = 0; i < 9; ++i)
             {
@@ -200,7 +196,7 @@ public class CraftingBrowserMenu extends AbstractBrowserMenu
 
                     if (remaining.getCount() > 0)
                     {
-                        ItemHandlerHelper.giveItemToPlayer(playerIn, remaining);
+                        playerIn.getInventory().add(remaining);
 
                         if (remaining.getCount() != itemstack.getCount())
                             tile.setChanged();

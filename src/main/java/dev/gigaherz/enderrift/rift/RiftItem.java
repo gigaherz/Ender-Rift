@@ -45,7 +45,7 @@ public class RiftItem extends Item
         ItemStack stack = context.getItemInHand();
         Level world = context.getLevel();
 
-        if (world.isClientSide)
+        if (world.isClientSide())
             return InteractionResult.SUCCESS;
 
         BlockPos pos = context.getClickedPos();

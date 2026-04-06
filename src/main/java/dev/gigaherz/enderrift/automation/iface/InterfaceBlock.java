@@ -90,7 +90,7 @@ public class InterfaceBlock extends AggregatorBlock<InterfaceBlockEntity>
         if (!(tileEntity instanceof InterfaceBlockEntity be) || player.isShiftKeyDown())
             return InteractionResult.FAIL;
 
-        if (level.isClientSide)
+        if (level.isClientSide())
             return InteractionResult.SUCCESS;
 
         player.openMenu(new SimpleMenuProvider(

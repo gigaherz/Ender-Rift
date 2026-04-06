@@ -1,8 +1,8 @@
 package dev.gigaherz.enderrift.common;
 
-import net.neoforged.neoforge.energy.EnergyStorage;
+import net.neoforged.neoforge.transfer.energy.SimpleEnergyHandler;
 
-public class EnergyBuffer extends EnergyStorage
+public class EnergyBuffer extends SimpleEnergyHandler
 {
     public EnergyBuffer(int capacity)
     {

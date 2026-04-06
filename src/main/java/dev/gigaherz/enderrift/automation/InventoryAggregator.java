@@ -1,104 +1,65 @@
 package dev.gigaherz.enderrift.automation;
 
 import com.google.common.collect.Lists;
-import dev.gigaherz.enderrift.rift.ILongItemHandler;
-import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.items.IItemHandler;
+import net.neoforged.neoforge.transfer.ResourceHandler;
+import net.neoforged.neoforge.transfer.item.ItemResource;
+import net.neoforged.neoforge.transfer.transaction.TransactionContext;
 
-import javax.annotation.Nonnull;
 import java.util.List;
 
-public class InventoryAggregator implements ILongItemHandler
+public class InventoryAggregator implements ResourceHandler<ItemResource>
 {
-    final List<ILongItemHandler> aggregated = Lists.newArrayList();
+    final List<ResourceHandler<ItemResource>> aggregated = Lists.newArrayList();
 
-    public void addAll(Iterable<IItemHandler> inventorySet)
+    public void addAll(Iterable<ResourceHandler<ItemResource>> inventorySet)
     {
-        for (IItemHandler value : inventorySet)
+        for (var value : inventorySet)
         {
             add(value);
         }
     }
 
-    public void add(IItemHandler inv)
+    public void add(ResourceHandler<ItemResource> inv)
     {
-        aggregated.add(ILongItemHandler.wrap(inv));
+        aggregated.add(inv);
     }
 
     @Override
-    public int getSlots()
+    public int size()
     {
         int sum = 0;
-        for (IItemHandler inv : aggregated)
+        for (ResourceHandler<ItemResource> inv : aggregated)
         {
-            sum += inv.getSlots();
+            sum += inv.size();
         }
         return sum;
     }
 
     @Override
-    public ItemStack getStackInSlot(int index)
+    public ItemResource getResource(int index)
     {
-        for (IItemHandler inv : aggregated)
+        for (var inv : aggregated)
         {
-            int size = inv.getSlots();
+            int size = inv.size();
             if (index < size)
             {
-                return inv.getStackInSlot(index);
+                return inv.getResource(index);
             }
 
             index -= size;
         }
-        return ItemStack.EMPTY;
+        return ItemResource.EMPTY;
     }
 
     @Override
-    public ItemStack insertItem(int index, ItemStack stack, boolean simulate)
+    public long getAmountAsLong(int index)
     {
-        // KEEP indexed!
-        //noinspection ForLoopReplaceableByForEach
-        for (int i = 0; i < aggregated.size(); i++)
+        for (var inv : aggregated)
         {
-            IItemHandler inv = aggregated.get(i);
-            int size = inv.getSlots();
+            int size = inv.size();
             if (index < size)
             {
-                return inv.insertItem(index, stack, simulate);
-            }
-
-            index -= size;
-        }
-        return ItemStack.EMPTY;
-    }
-
-    @Override
-    public ItemStack extractItem(int index, int amount, boolean simulate)
-    {
-        // KEEP indexed!
-        //noinspection ForLoopReplaceableByForEach
-        for (int i = 0; i < aggregated.size(); i++)
-        {
-            IItemHandler inv = aggregated.get(i);
-            int size = inv.getSlots();
-            if (index < size)
-            {
-                return inv.extractItem(index, amount, simulate);
-            }
-
-            index -= size;
-        }
-        return ItemStack.EMPTY;
-    }
-
-    @Override
-    public int getSlotLimit(int index)
-    {
-        for (IItemHandler inv : aggregated)
-        {
-            int size = inv.getSlots();
-            if (index < size)
-            {
-                return inv.getSlotLimit(index);
+                return inv.getAmountAsLong(index);
             }
 
             index -= size;
@@ -107,34 +68,72 @@ public class InventoryAggregator implements ILongItemHandler
     }
 
     @Override
-    public boolean isItemValid(int index, @Nonnull ItemStack stack)
+    public int insert(int index, ItemResource resource, int amount, TransactionContext transaction)
     {
-        for (IItemHandler inv : aggregated)
+        // KEEP indexed!
+        //noinspection ForLoopReplaceableByForEach
+        for (int i = 0; i < aggregated.size(); i++)
         {
-            int size = inv.getSlots();
+            var inv = aggregated.get(i);
+            int size = inv.size();
             if (index < size)
             {
-                return inv.isItemValid(index, stack);
+                return inv.insert(index, resource, amount, transaction);
+            }
+
+            index -= size;
+        }
+        return 0;
+    }
+
+    @Override
+    public int extract(int index, ItemResource resource, int amount, TransactionContext transaction)
+    {
+        // KEEP indexed!
+        //noinspection ForLoopReplaceableByForEach
+        for (int i = 0; i < aggregated.size(); i++)
+        {
+            var inv = aggregated.get(i);
+            int size = inv.size();
+            if (index < size)
+            {
+                return inv.extract(index, resource, amount, transaction);
+            }
+
+            index -= size;
+        }
+        return 0;
+    }
+
+    @Override
+    public long getCapacityAsLong(int index, ItemResource resource)
+    {
+        for (var inv : aggregated)
+        {
+            int size = inv.size();
+            if (index < size)
+            {
+                return inv.getCapacityAsLong(index, resource);
+            }
+
+            index -= size;
+        }
+        return 0;
+    }
+
+    @Override
+    public boolean isValid(int index, ItemResource stack)
+    {
+        for (var inv : aggregated)
+        {
+            int size = inv.size();
+            if (index < size)
+            {
+                return inv.isValid(index, stack);
             }
 
             index -= size;
         }
         return false;
-    }
-
-    @Override
-    public long getCount(int index)
-    {
-        for (var inv : aggregated)
-        {
-            int size = inv.getSlots();
-            if (index < size)
-            {
-                return inv.getCount(index);
-            }
-
-            index -= size;
-        }
-        return 0;
     }
 }

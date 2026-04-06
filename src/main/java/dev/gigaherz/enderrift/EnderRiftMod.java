@@ -21,16 +21,12 @@ import dev.gigaherz.enderrift.network.SetVisibleSlots;
 import dev.gigaherz.enderrift.rift.*;
 import dev.gigaherz.enderrift.rift.storage.RiftInventory;
 import dev.gigaherz.enderrift.rift.storage.RiftStorage;
-import net.minecraft.Util;
-import net.minecraft.client.color.item.Constant;
 import net.minecraft.client.data.models.BlockModelGenerators;
 import net.minecraft.client.data.models.ItemModelGenerators;
 import net.minecraft.client.data.models.ModelProvider;
-import net.minecraft.client.data.models.MultiVariant;
 import net.minecraft.client.data.models.blockstates.*;
 import net.minecraft.client.data.models.model.*;
-import net.minecraft.client.renderer.block.model.VariantMutator;
-import net.minecraft.client.renderer.item.ItemModel;
+import net.minecraft.client.renderer.block.dispatch.VariantMutator;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.UuidArgument;
@@ -52,7 +48,7 @@ import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.ClickEvent.Action;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.flag.FeatureFlags;
 import net.minecraft.world.inventory.MenuType;
@@ -104,24 +100,32 @@ public class EnderRiftMod
     private static final DeferredRegister<DataComponentType<?>> DATA_COMPONENT_TYPES = DeferredRegister.create(Registries.DATA_COMPONENT_TYPE, MODID);
 
     public static final DeferredBlock<Block>
-            RIFT = BLOCKS.registerBlock("rift", props -> new RiftBlock(props.mapColor(MapColor.STONE).sound(SoundType.METAL).strength(3.0F, 8.0F).dynamicShape()));
+            RIFT = BLOCKS.registerBlock("rift", props -> new RiftBlock(props.mapColor(MapColor.STONE).sound(SoundType.METAL)
+                    .strength(3.0F, 8.0F).dynamicShape()));
     public static final DeferredBlock<StructureCornerBlock>
-            STRUCTURE_CORNER = BLOCKS.registerBlock("structure_corner", props -> new StructureCornerBlock(props.mapColor(MapColor.STONE).sound(SoundType.METAL).strength(3.0F, 8.0F).noLootTable()));
+            STRUCTURE_CORNER = BLOCKS.registerBlock("structure_corner", props -> new StructureCornerBlock(props.mapColor(MapColor.STONE).sound(SoundType.METAL)
+                    .strength(3.0F, 8.0F).noLootTable()));
     public static final DeferredBlock<StructureEdgeBlock>
-            STRUCTURE_EDGE = BLOCKS.registerBlock("structure_edge", props -> new StructureEdgeBlock(props.mapColor(MapColor.STONE).sound(SoundType.METAL).strength(3.0F, 8.0F).noLootTable()));
+            STRUCTURE_EDGE = BLOCKS.registerBlock("structure_edge", props -> new StructureEdgeBlock(props.mapColor(MapColor.STONE).sound(SoundType.METAL)
+                    .strength(3.0F, 8.0F).noLootTable()));
     public static final DeferredBlock<Block>
-            INTERFACE = BLOCKS.registerBlock("interface", props -> new InterfaceBlock(props.mapColor(MapColor.STONE).sound(SoundType.METAL).strength(3.0F, 8.0F)));
+            INTERFACE = BLOCKS.registerBlock("interface", props -> new InterfaceBlock(props.mapColor(MapColor.STONE).sound(SoundType.METAL)
+                    .strength(3.0F, 8.0F)));
     public static final DeferredBlock<Block>
-            BROWSER = BLOCKS.registerBlock("browser", props -> new BrowserBlock(false, props.mapColor(MapColor.STONE).sound(SoundType.METAL).strength(3.0F, 8.0F)));
+            BROWSER = BLOCKS.registerBlock("browser", props -> new BrowserBlock(false, props.mapColor(MapColor.STONE).sound(SoundType.METAL)
+                    .strength(3.0F, 8.0F)));
     public static final DeferredBlock<Block>
-            CRAFTING_BROWSER = BLOCKS.registerBlock("crafting_browser", props -> new BrowserBlock(true, props.mapColor(MapColor.STONE).sound(SoundType.METAL).strength(3.0F, 8.0F)));
+            CRAFTING_BROWSER = BLOCKS.registerBlock("crafting_browser", props -> new BrowserBlock(true, props.mapColor(MapColor.STONE).sound(SoundType.METAL)
+                    .strength(3.0F, 8.0F)));
     public static final DeferredBlock<Block>
             PROXY = BLOCKS.registerBlock("proxy", props ->
             new ProxyBlock(props.mapColor(MapColor.STONE).sound(SoundType.METAL).strength(3.0F, 8.0F)));
     public static final DeferredBlock<Block>
-            DRIVER = BLOCKS.registerBlock("driver", props -> new DriverBlock(props.mapColor(MapColor.STONE).sound(SoundType.METAL).strength(3.0F, 8.0F)));
+            DRIVER = BLOCKS.registerBlock("driver", props -> new DriverBlock(props.mapColor(MapColor.STONE).sound(SoundType.METAL)
+                    .strength(3.0F, 8.0F)));
     public static final DeferredBlock<Block>
-            GENERATOR = BLOCKS.registerBlock("generator", props -> new GeneratorBlock(props.mapColor(MapColor.STONE).sound(SoundType.METAL).strength(3.0F, 8.0F)));
+            GENERATOR = BLOCKS.registerBlock("generator", props -> new GeneratorBlock(props.mapColor(MapColor.STONE).sound(SoundType.METAL)
+                    .strength(3.0F, 8.0F)));
 
     public static final DeferredItem<Item>
             RIFT_ITEM = ITEMS.registerItem("rift", props -> new BlockItem(RIFT.get(), props.useBlockDescriptionPrefix()) {
@@ -180,8 +184,8 @@ public class EnderRiftMod
     public static final DeferredHolder<MenuType<?>, MenuType<GeneratorContainer>>
             GENERATOR_MENU = MENU_TYPES.register("generator", () -> new MenuType<>(GeneratorContainer::new, FeatureFlags.DEFAULT_FLAGS));
 
-    public static final DeferredHolder<RecipeSerializer<?>, CustomRecipe.Serializer<OrbDuplicationRecipe>>
-            ORB_DUPLICATION = RECIPE_SERIALIZERS.register("orb_duplication", () -> new CustomRecipe.Serializer<>(OrbDuplicationRecipe::new));
+    public static final DeferredHolder<RecipeSerializer<?>, RecipeSerializer<OrbDuplicationRecipe>>
+            ORB_DUPLICATION = RECIPE_SERIALIZERS.register("orb_duplication", () -> new RecipeSerializer<>(OrbDuplicationRecipe.CODEC, OrbDuplicationRecipe.STREAM_CODEC));
 
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<UUID>> RIFT_ID = DATA_COMPONENT_TYPES.register("rift_id",
             () -> DataComponentType.<UUID>builder().persistent(UUIDUtil.CODEC).networkSynchronized(UUIDUtil.STREAM_CODEC).build()
@@ -261,10 +265,10 @@ public class EnderRiftMod
                 LiteralArgumentBuilder.<CommandSourceStack>literal("enderrift")
                         .then(Commands.literal("locate")
                                 .then(Commands.argument("riftId", UuidArgument.uuid())
-                                        .requires(cs -> cs.hasPermission(3)) //permission
+                                        .requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS)) //permission
                                         .executes(this::locateSpecificRift)
                                 )
-                                .requires(cs -> cs.hasPermission(3)) //permission
+                                .requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS)) //permission
                                 .executes(this::locateAllRifts)
                         )
         );
@@ -304,9 +308,9 @@ public class EnderRiftMod
         Data.gatherData(event);
     }
 
-    public static ResourceLocation location(String path)
+    public static Identifier location(String path)
     {
-        return ResourceLocation.fromNamespaceAndPath(MODID, path);
+        return Identifier.fromNamespaceAndPath(MODID, path);
     }
 
     public static class Data
@@ -352,8 +356,8 @@ public class EnderRiftMod
                 blockModels.blockStateOutput.accept(MultiVariantGenerator.dispatch(RIFT.get()).with(
                         BlockModelGenerators.createBooleanModelDispatch(
                                 RiftBlock.ASSEMBLED,
-                                BlockModelGenerators.plainVariant(location("block/rift")),
-                                BlockModelGenerators.plainVariant(location("block/rift_active"))
+                                BlockModelGenerators.plainVariant(location("block/rift_active")),
+                                BlockModelGenerators.plainVariant(location("block/rift"))
                         )
                 ));
                 blockModels.blockStateOutput.accept(MultiVariantGenerator.dispatch(INTERFACE.get(), BlockModelGenerators.plainVariant(location("block/interface")))
@@ -564,7 +568,7 @@ public class EnderRiftMod
                 protected Iterable<Block> getKnownBlocks()
                 {
                     return BuiltInRegistries.BLOCK.entrySet().stream()
-                            .filter(e -> e.getKey().location().getNamespace().equals(EnderRiftMod.MODID))
+                            .filter(e -> e.getKey().identifier().getNamespace().equals(EnderRiftMod.MODID))
                             .map(Map.Entry::getValue)
                             .collect(Collectors.toList());
                 }

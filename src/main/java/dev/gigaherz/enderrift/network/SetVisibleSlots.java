@@ -6,13 +6,13 @@ import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Player;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 public record SetVisibleSlots(int windowId, int[] visible) implements CustomPacketPayload
 {
-    public static final ResourceLocation ID = EnderRiftMod.location("set_visible_slots");
+    public static final Identifier ID = EnderRiftMod.location("set_visible_slots");
     public static final Type<SetVisibleSlots> TYPE = new Type<>(ID);
 
     private static <T extends ByteBuf> StreamCodec<T, int[]> intArray()

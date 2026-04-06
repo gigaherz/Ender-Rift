@@ -1,28 +1,17 @@
 package dev.gigaherz.enderrift.rift.storage;
 
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
+import net.neoforged.neoforge.transfer.item.ItemResource;
 
 public class RiftSlot
 {
-    private final ItemStack sample;
+    private final ItemResource sample;
     private long count;
 
-    public RiftSlot(ItemStack stack)
+    public RiftSlot(ItemResource stack, long count)
     {
-        this(stack, stack.getCount());
-    }
-
-    public RiftSlot(ItemStack stack, long count)
-    {
-        this.sample = stack.copy();
+        this.sample = stack;
         this.count = count;
-        updateCount();
-    }
-
-    private void updateCount()
-    {
-        sample.setCount((int) Math.min(this.count, Integer.MAX_VALUE));
     }
 
     public Item getItem()
@@ -30,7 +19,7 @@ public class RiftSlot
         return sample.getItem();
     }
 
-    public ItemStack getSample()
+    public ItemResource getResource()
     {
         return sample;
     }
@@ -43,24 +32,26 @@ public class RiftSlot
     public void addCount(long count)
     {
         this.count += count;
-        updateCount();
     }
 
     public void subtractCount(long count)
     {
         this.count -= count;
-        updateCount();
     }
 
     public void setCount(long count)
     {
         this.count = count;
-        updateCount();
     }
 
     @Override
     public String toString()
     {
         return sample.getItem() + " x " + count;
+    }
+
+    public RiftSlot copy()
+    {
+        return new RiftSlot(sample, count);
     }
 }

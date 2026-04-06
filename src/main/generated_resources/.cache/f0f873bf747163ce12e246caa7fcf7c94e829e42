@@ -1,11 +1,11 @@
-// 1.21.8	2025-08-04T18:01:29.146783	Model Definitions - enderrift
+// 26.1.1	2026-04-06T18:40:38.2875118	Model Definitions - enderrift
 0052264b159ddb81ebb4779028611a9967489402 assets/enderrift/blockstates/browser.json
 a7650a1724ba473b0004046b9f6f3554c8674ba5 assets/enderrift/blockstates/crafting_browser.json
 5ee373b43b6cabd40c40e8a40c6cda65ac8891d4 assets/enderrift/blockstates/driver.json
 91215c3fdfe0c4bca642933fa20b361bd1fb1ed7 assets/enderrift/blockstates/generator.json
 47a04e1ec30042e62b8d93b713934484e06cf044 assets/enderrift/blockstates/interface.json
 bd94068d80938d4ccecad2ec1ee9c9f1ce3d85c0 assets/enderrift/blockstates/proxy.json
-b82c49909999ab5309cb0c42692ce6176c43a53a assets/enderrift/blockstates/rift.json
+3eadbb553ce41ea0bf65b9647e9fdc1d94505273 assets/enderrift/blockstates/rift.json
 390a9e6e2bb5c3b473edb68f0c8fff52f2d42299 assets/enderrift/blockstates/structure_corner.json
 783fef2c9c3bcb825bed3123c2e58e2307a2b9ef assets/enderrift/blockstates/structure_edge.json
 217505b656564bc77014a75e23bab76ff6aaa01a assets/enderrift/items/browser.json

@@ -1,6 +1,8 @@
 package dev.gigaherz.enderrift.generator;
 
 import dev.gigaherz.enderrift.EnderRiftMod;
+import net.minecraft.world.Container;
+import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -23,10 +25,10 @@ public class GeneratorContainer extends AbstractContainerMenu
 
     public GeneratorContainer(int id, Inventory playerInventory)
     {
-        this(id, playerInventory, new ItemStackHandler(1), new ClientFields(), ContainerLevelAccess.NULL);
+        this(id, playerInventory, new SimpleContainer(1), new ClientFields(), ContainerLevelAccess.NULL);
     }
 
-    public GeneratorContainer(int id, Inventory playerInventory, IItemHandlerModifiable inventory, ContainerData data, final ContainerLevelAccess levelAccess)
+    public GeneratorContainer(int id, Inventory playerInventory, Container inventory, ContainerData data, final ContainerLevelAccess levelAccess)
     {
         super(EnderRiftMod.GENERATOR_MENU.get(), id);
 
@@ -34,7 +36,7 @@ public class GeneratorContainer extends AbstractContainerMenu
         this.levelAccess = levelAccess;
         this.fields = data;
 
-        addSlot(new SlotItemHandler(inventory, 0, 80, 53));
+        addSlot(new Slot(inventory, 0, 80, 53));
 
         bindPlayerInventory(playerInventory);
 

@@ -14,7 +14,7 @@ import dev.gigaherz.enderrift.rift.storage.RiftInventory;
 import dev.gigaherz.enderrift.rift.storage.RiftSlot;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.capabilities.BlockCapability;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
@@ -24,7 +24,7 @@ import org.jetbrains.annotations.Nullable;
 public class Ae2Integration
 {
     private static final BlockCapability<MEStorage, @Nullable Direction> ME_STORAGE = BlockCapability
-            .createSided(ResourceLocation.fromNamespaceAndPath("ae2", "me_storage"), MEStorage.class);
+            .createSided(Identifier.fromNamespaceAndPath("ae2", "me_storage"), MEStorage.class);
 
     public static void init(IEventBus modEventBus)
     {

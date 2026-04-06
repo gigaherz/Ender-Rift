@@ -14,7 +14,7 @@ import mcjty.theoneprobe.apiimpl.providers.DefaultProbeInfoProvider;
 import mcjty.theoneprobe.apiimpl.styles.ProgressStyle;
 import mcjty.theoneprobe.config.Config;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -51,7 +51,7 @@ public class TheOneProbeProviders implements Function<ITheOneProbe, Void>
         top.registerProvider(new IProbeInfoProvider()
         {
             @Override
-            public ResourceLocation getID()
+            public Identifier getID()
             {
                 return EnderRiftMod.location("probes");
             }

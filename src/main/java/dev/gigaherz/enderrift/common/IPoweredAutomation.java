@@ -1,7 +1,8 @@
 package dev.gigaherz.enderrift.common;
 
-import dev.gigaherz.enderrift.rift.ILongItemHandler;
-import net.neoforged.neoforge.energy.IEnergyStorage;
+import net.neoforged.neoforge.transfer.ResourceHandler;
+import net.neoforged.neoforge.transfer.energy.EnergyHandler;
+import net.neoforged.neoforge.transfer.item.ItemResource;
 
 import javax.annotation.Nullable;
 import java.util.Optional;
@@ -9,9 +10,9 @@ import java.util.Optional;
 public interface IPoweredAutomation
 {
     @Nullable
-    ILongItemHandler getInventory();
+    ResourceHandler<ItemResource> getInventory();
 
-    Optional<IEnergyStorage> getEnergyBuffer();
+    Optional<EnergyHandler> getEnergyBuffer();
 
     boolean isRemote();
 

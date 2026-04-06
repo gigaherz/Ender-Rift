@@ -1,9 +1,13 @@
 package dev.gigaherz.enderrift.rift;
 
+import com.mojang.serialization.MapCodec;
 import dev.gigaherz.enderrift.EnderRiftMod;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.item.crafting.display.RecipeDisplay;
@@ -18,6 +22,22 @@ import java.util.UUID;
 
 public class OrbDuplicationRecipe extends CustomRecipe
 {
+    public static final MapCodec<OrbDuplicationRecipe> CODEC = MapCodec.unit(OrbDuplicationRecipe::new);
+    public static final StreamCodec<RegistryFriendlyByteBuf, OrbDuplicationRecipe> STREAM_CODEC = new StreamCodec<>()
+    {
+        @Override
+        public OrbDuplicationRecipe decode(RegistryFriendlyByteBuf input)
+        {
+            return new OrbDuplicationRecipe();
+        }
+
+        @Override
+        public void encode(RegistryFriendlyByteBuf output, OrbDuplicationRecipe value)
+        {
+            // Nothing to write
+        }
+    };
+
     private final List<@NotNull Ingredient> ingredients = List.of(
             Ingredient.of(Items.MAGMA_CREAM),
             Ingredient.of(Items.ENDER_PEARL),
@@ -29,12 +49,7 @@ public class OrbDuplicationRecipe extends CustomRecipe
             Ingredient.of(Items.ENDER_PEARL),
             Ingredient.of(Items.MAGMA_CREAM)
     );
-    private final ItemStack output = new ItemStack(EnderRiftMod.RIFT_ORB.get(), 2);
-
-    public OrbDuplicationRecipe(CraftingBookCategory category)
-    {
-        super(category);
-    }
+    private final ItemStackTemplate output = new ItemStackTemplate(EnderRiftMod.RIFT_ORB.get(), 2);
 
     @Override
     public List<RecipeDisplay> display()
@@ -84,7 +99,7 @@ public class OrbDuplicationRecipe extends CustomRecipe
     }
 
     @Override
-    public ItemStack assemble(CraftingInput crafting, HolderLookup.Provider registryAccess)
+    public ItemStack assemble(CraftingInput crafting)
     {
         if (crafting.width() != 3 || crafting.height() != 3)
             return ItemStack.EMPTY;

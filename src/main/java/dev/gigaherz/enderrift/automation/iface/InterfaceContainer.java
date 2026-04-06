@@ -2,17 +2,16 @@ package dev.gigaherz.enderrift.automation.iface;
 
 import dev.gigaherz.enderrift.EnderRiftMod;
 import dev.gigaherz.enderrift.common.slots.SlotFilter;
+import net.minecraft.world.Container;
+import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.inventory.ClickType;
+import net.minecraft.world.inventory.ContainerInput;
 import net.minecraft.world.inventory.ContainerLevelAccess;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.items.IItemHandlerModifiable;
-import net.neoforged.neoforge.items.ItemStackHandler;
-import net.neoforged.neoforge.items.SlotItemHandler;
 
 public class InterfaceContainer extends AbstractContainerMenu
 {
@@ -20,10 +19,10 @@ public class InterfaceContainer extends AbstractContainerMenu
 
     public InterfaceContainer(int id, Inventory playerInventory)
     {
-        this(id, playerInventory, new ItemStackHandler(9), new ItemStackHandler(9), ContainerLevelAccess.NULL);
+        this(id, playerInventory, new SimpleContainer(9), new SimpleContainer(9), ContainerLevelAccess.NULL);
     }
 
-    public InterfaceContainer(int id, Inventory playerInventory, IItemHandlerModifiable filters, IItemHandlerModifiable outputs, final ContainerLevelAccess levelAccess)
+    public InterfaceContainer(int id, Inventory playerInventory, Container filters, Container outputs, final ContainerLevelAccess levelAccess)
     {
         super(EnderRiftMod.INTERFACE_MENU.get(), id);
 
@@ -36,7 +35,7 @@ public class InterfaceContainer extends AbstractContainerMenu
 
         for (int x = 0; x < 9; x++)
         {
-            addSlot(new SlotItemHandler(outputs, x, 8 + x * 18, 62));
+            addSlot(new Slot(outputs, x, 8 + x * 18, 62));
         }
 
         bindPlayerInventory(playerInventory);
@@ -72,14 +71,14 @@ public class InterfaceContainer extends AbstractContainerMenu
     }
 
     @Override
-    public void clicked(int slotId, int clickedButton, ClickType mode, Player playerIn)
+    public void clicked(int slotIndex, int buttonNum, ContainerInput input, Player player)
     {
-        if (slotId >= 0 && slotId < 9)
+        if (slotIndex >= 0 && slotIndex < 9)
         {
-            if (mode == ClickType.PICKUP || mode == ClickType.PICKUP_ALL ||
-                    mode == ClickType.SWAP) // 1 is shift-click
+            if (input == ContainerInput.PICKUP || input == ContainerInput.PICKUP_ALL ||
+                    input == ContainerInput.SWAP)
             {
-                Slot slot = this.slots.get(slotId);
+                Slot slot = this.slots.get(slotIndex);
 
                 ItemStack dropping = getCarried();
 
@@ -99,7 +98,7 @@ public class InterfaceContainer extends AbstractContainerMenu
             return;
         }
 
-        super.clicked(slotId, clickedButton, mode, playerIn);
+        super.clicked(slotIndex, buttonNum, input, player);
     }
 
     @Override

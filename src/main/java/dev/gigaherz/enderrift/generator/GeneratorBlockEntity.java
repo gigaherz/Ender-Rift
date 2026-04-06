@@ -1,13 +1,11 @@
 package dev.gigaherz.enderrift.generator;
 
 import dev.gigaherz.enderrift.EnderRiftMod;
-import dev.gigaherz.enderrift.automation.iface.InterfaceBlock;
 import dev.gigaherz.enderrift.automation.iface.InterfaceBlockEntity;
-import dev.gigaherz.enderrift.common.EnergyBuffer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.HolderLookup;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.Container;
+import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.item.ItemStack;
@@ -21,9 +19,14 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
-import net.neoforged.neoforge.energy.IEnergyStorage;
-import net.neoforged.neoforge.items.IItemHandlerModifiable;
-import net.neoforged.neoforge.items.ItemStackHandler;
+import net.neoforged.neoforge.common.util.ValueIOSerializable;
+import net.neoforged.neoforge.transfer.ResourceHandler;
+import net.neoforged.neoforge.transfer.energy.EnergyHandler;
+import net.neoforged.neoforge.transfer.energy.SimpleEnergyHandler;
+import net.neoforged.neoforge.transfer.item.ItemResource;
+import net.neoforged.neoforge.transfer.item.VanillaContainerWrapper;
+import net.neoforged.neoforge.transfer.transaction.Transaction;
+import net.neoforged.neoforge.transfer.transaction.TransactionContext;
 
 @EventBusSubscriber(modid = EnderRiftMod.MODID)
 public class GeneratorBlockEntity extends BlockEntity
@@ -32,18 +35,17 @@ public class GeneratorBlockEntity extends BlockEntity
     private static void registerCapability(RegisterCapabilitiesEvent event)
     {
         event.registerBlockEntity(
-                Capabilities.EnergyStorage.BLOCK,
+                Capabilities.Energy.BLOCK,
                 EnderRiftMod.GENERATOR_BLOCK_ENTITY.get(),
                 (be, context) -> be.energyBuffer
         );
         event.registerBlockEntity(
-                Capabilities.ItemHandler.BLOCK,
+                Capabilities.Item.BLOCK,
                 EnderRiftMod.GENERATOR_BLOCK_ENTITY.get(),
-                (be, context) -> be.fuelSlot
+                (be, context) -> be.fuelSlotWrapper
         );
     }
 
-    public static final int SLOT_COUNT = 1;
     public static final int POWER_LIMIT = 100000;
     public static final int MIN_HEAT = 100;
     public static final int MAX_HEAT = 1000;
@@ -52,33 +54,25 @@ public class GeneratorBlockEntity extends BlockEntity
     public static final int HEAT_INTERVAL = 20;
     public static final int POWER_TRANSFER_MAX = 800;
 
-    private final EnergyBuffer energyBuffer = new EnergyBuffer(POWER_LIMIT)
+    private final SimpleEnergyHandler energyBuffer = new SimpleEnergyHandler(POWER_LIMIT)
     {
         @Override
-        public boolean canReceive()
+        public int insert(int amount, TransactionContext transaction)
         {
-            return false;
+            return 0;
+        }
+
+        @Override
+        protected void onEnergyChanged(int previousAmount)
+        {
+            GeneratorBlockEntity.this.setChanged();
         }
     };
 
-    private final ItemStackHandler fuelSlot = new ItemStackHandler(SLOT_COUNT)
-    {
-        @Override
-        protected void onContentsChanged(int slot)
-        {
-            super.onContentsChanged(slot);
-            setChanged();
-        }
+    private final FuelSlotContainer fuelSlot = new FuelSlotContainer();
 
-        @Override
-        public ItemStack insertItem(int slot, ItemStack stack, boolean simulate)
-        {
-            if (stack.getBurnTime(null, level.fuelValues()) <= 0)
-                return stack;
+    private final ResourceHandler<ItemResource> fuelSlotWrapper = VanillaContainerWrapper.of(fuelSlot);
 
-            return super.insertItem(slot, stack, simulate);
-        }
-    };
 
     public int heatLevel;
     public int burnTimeRemaining;
@@ -92,7 +86,7 @@ public class GeneratorBlockEntity extends BlockEntity
 
     public void tick()
     {
-        if (level.isClientSide)
+        if (level.isClientSide())
             return;
 
         boolean anyChanged;
@@ -151,23 +145,33 @@ public class GeneratorBlockEntity extends BlockEntity
             }
         }
 
-        if (heatLevel >= MIN_HEAT && energyBuffer.getEnergyStored() < POWER_LIMIT)
+        if (heatLevel >= MIN_HEAT && energyBuffer.getAmountAsInt() < POWER_LIMIT)
         {
             int powerGen = getGenerationPower();
-            energyBuffer.setEnergy(Math.min(energyBuffer.getEnergyStored() + powerGen, POWER_LIMIT));
+            energyBuffer.set(Math.min(energyBuffer.getAmountAsInt() + powerGen, POWER_LIMIT));
             anyChanged = true;
         }
 
-        if (burnTimeRemaining <= 0 && energyBuffer.getEnergyStored() < POWER_LIMIT)
+        if (burnTimeRemaining <= 0 && energyBuffer.getAmountAsInt() < POWER_LIMIT)
         {
-            ItemStack stack = fuelSlot.getStackInSlot(0);
-            if (stack.getCount() > 0)
+            var stack = fuelSlot.getItem(0);
+            var count = stack.getCount();
+            if (count > 0)
             {
-                ItemStack itemStack = fuelSlot.getStackInSlot(0);
-                currentItemBurnTime = burnTimeRemaining = itemStack.getBurnTime(null, level.fuelValues());
+                currentItemBurnTime = burnTimeRemaining = stack.getBurnTime(null, level.fuelValues());
                 timeInterval = 0;
                 if (stack.getCount() == 1)
-                    fuelSlot.setStackInSlot(0, stack.getItem().getCraftingRemainder(stack));
+                {
+                    var r = stack.getItem().getCraftingRemainder(stack);
+                    if (r != null)
+                    {
+                        fuelSlot.setItem(0, r.create());
+                    }
+                    else
+                    {
+                        fuelSlot.setItem(0, ItemStack.EMPTY);
+                    }
+                }
                 else
                     stack.shrink(1);
                 anyChanged = true;
@@ -181,10 +185,10 @@ public class GeneratorBlockEntity extends BlockEntity
     {
         boolean anyChanged = false;
 
-        int sendPower = Math.min(POWER_TRANSFER_MAX, energyBuffer.getEnergyStored());
+        int sendPower = Math.min(POWER_TRANSFER_MAX, energyBuffer.getAmountAsInt());
         if (sendPower > 0)
         {
-            IEnergyStorage[] handlers = new IEnergyStorage[6];
+            EnergyHandler[] handlers = new EnergyHandler[6];
             int[] wantedSide = new int[6];
             int accepted = 0;
 
@@ -196,30 +200,41 @@ public class GeneratorBlockEntity extends BlockEntity
                 if (e == null)
                     continue;
 
-                IEnergyStorage handler = e.getLevel().getCapability(Capabilities.EnergyStorage.BLOCK, e.getBlockPos(), e.getBlockState(), e, from);
-                if (handler != null && handler.canReceive())
+                EnergyHandler handler = e.getLevel().getCapability(Capabilities.Energy.BLOCK, e.getBlockPos(), e.getBlockState(), e, from);
+                if (handler != null)
                 {
                     handlers[from.ordinal()] = handler;
-                    int wanted = handler.receiveEnergy(sendPower, true);
-                    wantedSide[from.ordinal()] = wanted;
-                    accepted += wanted;
+
+                    try (var transaction = Transaction.openRoot())
+                    {
+                        int wanted = handler.insert(sendPower, transaction);
+                        if (wanted > 0)
+                        {
+                            wantedSide[from.ordinal()] = wanted;
+                            accepted += wanted;
+                        }
+                    }
                 }
             }
 
             if (accepted > 0)
             {
-                for (Direction from : Direction.values())
+                try (var transaction = Transaction.openRoot())
                 {
-                    IEnergyStorage handler = handlers[from.ordinal()];
-                    int wanted = wantedSide[from.ordinal()];
-                    if (handler == null || wanted == 0)
-                        continue;
+                    for (Direction from : Direction.values())
+                    {
+                        EnergyHandler handler = handlers[from.ordinal()];
+                        int wanted = wantedSide[from.ordinal()];
+                        if (handler == null || wanted == 0)
+                            continue;
 
-                    int given = Math.min(Math.min(energyBuffer.getEnergyStored(), wanted), wanted * accepted / sendPower);
-                    int received = Math.min(given, handler.receiveEnergy(given, false));
-                    energyBuffer.setEnergy(energyBuffer.getEnergyStored() - received);
-                    if (energyBuffer.getEnergyStored() <= 0)
-                        break;
+                        int given = Math.min(Math.min(energyBuffer.getAmountAsInt(), wanted), wanted * accepted / sendPower);
+                        int received = Math.min(given, handler.insert(given, transaction));
+                        energyBuffer.set(energyBuffer.getAmountAsInt() - received);
+                        if (energyBuffer.getAmountAsInt() <= 0)
+                            break;
+                    }
+                    transaction.commit();
                 }
                 anyChanged = true;
             }
@@ -283,8 +298,8 @@ public class GeneratorBlockEntity extends BlockEntity
             {
                 case 0 -> burnTimeRemaining;
                 case 1 -> currentItemBurnTime;
-                case 2 -> energyBuffer.getEnergyStored() & 0xFFFF;
-                case 3 -> energyBuffer.getEnergyStored() >> 16;
+                case 2 -> energyBuffer.getAmountAsInt() & 0xFFFF;
+                case 3 -> energyBuffer.getAmountAsInt() >> 16;
                 case 4 -> heatLevel;
                 default -> 0;
             };
@@ -297,8 +312,8 @@ public class GeneratorBlockEntity extends BlockEntity
             {
                 case 0 -> burnTimeRemaining = value;
                 case 1 -> currentItemBurnTime = value;
-                case 2 -> energyBuffer.setEnergy((energyBuffer.getEnergyStored() & 0xFFFF0000) | (value & 0xFFFF));
-                case 3 -> energyBuffer.setEnergy((energyBuffer.getEnergyStored() & 0xFFFF) | (value << 16));
+                case 2 -> energyBuffer.set((energyBuffer.getAmountAsInt() & 0xFFFF0000) | (value & 0xFFFF));
+                case 3 -> energyBuffer.set((energyBuffer.getAmountAsInt() & 0xFFFF) | (value << 16));
                 case 4 -> heatLevel = value;
             }
         }
@@ -341,12 +356,17 @@ public class GeneratorBlockEntity extends BlockEntity
 
     public int getContainedEnergy()
     {
-        return energyBuffer.getEnergyStored();
+        return energyBuffer.getAmountAsInt();
     }
 
-    public IItemHandlerModifiable inventory()
+    public Container inventory()
     {
         return fuelSlot;
+    }
+
+    public ResourceHandler<ItemResource> transferInventory()
+    {
+        return fuelSlotWrapper;
     }
 
     public int getCurrentItemBurnTime()
@@ -362,5 +382,50 @@ public class GeneratorBlockEntity extends BlockEntity
     public static void tickStatic(Level level, BlockPos blockPos, BlockState blockState, GeneratorBlockEntity te)
     {
         te.tick();
+    }
+
+    private class FuelSlotContainer extends SimpleContainer implements ValueIOSerializable
+    {
+        public FuelSlotContainer()
+        {
+            super(1);
+        }
+
+        @Override
+        public boolean canPlaceItem(int slot, ItemStack itemStack)
+        {
+            if (itemStack.getBurnTime(null, level.fuelValues()) <= 0)
+                return false;
+
+            return super.canPlaceItem(slot, itemStack);
+        }
+
+        @Override
+        public boolean canAddItem(ItemStack itemStack)
+        {
+            if (itemStack.getBurnTime(null, level.fuelValues()) <= 0)
+                return false;
+
+            return super.canAddItem(itemStack);
+        }
+
+        @Override
+        public void setChanged()
+        {
+            super.setChanged();
+            GeneratorBlockEntity.this.setChanged();
+        }
+
+        @Override
+        public void serialize(ValueOutput output)
+        {
+            output.store("Stack", ItemStack.OPTIONAL_CODEC, getItem(0));
+        }
+
+        @Override
+        public void deserialize(ValueInput input)
+        {
+            setItem(0, input.read("Stack", ItemStack.OPTIONAL_CODEC).orElse(ItemStack.EMPTY));
+        }
     }
 }

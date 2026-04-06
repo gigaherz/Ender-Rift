@@ -6,8 +6,9 @@ import dev.gigaherz.enderrift.automation.AutomationHelper;
 import dev.gigaherz.enderrift.common.IPoweredAutomation;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.NonNullList;
+import net.minecraft.world.Container;
 import net.minecraft.world.Containers;
+import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -18,11 +19,8 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
-import net.neoforged.neoforge.items.IItemHandler;
-import net.neoforged.neoforge.items.IItemHandlerModifiable;
-import net.neoforged.neoforge.items.ItemStackHandler;
+import net.neoforged.neoforge.transfer.item.VanillaContainerWrapper;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 @EventBusSubscriber(modid = EnderRiftMod.MODID)
@@ -32,23 +30,16 @@ public class InterfaceBlockEntity extends AggregatorBlockEntity implements IPowe
     private static void registerCapability(RegisterCapabilitiesEvent event)
     {
         event.registerBlockEntity(
-                Capabilities.ItemHandler.BLOCK,
+                Capabilities.Item.BLOCK,
                 EnderRiftMod.INTERFACE_BLOCK_ENTITY.get(),
-                (be, context) -> context == be.getFacing() ? be.inventoryOutputs() : null
+                (be, context) -> context == be.getFacing() ? VanillaContainerWrapper.of(be.inventoryOutputs()) : null
         );
     }
 
     private static final int FilterCount = 9;
 
-    private FilterInventory filters = new FilterInventory(FilterCount);
-    private ItemStackHandler outputs = new ItemStackHandler(FilterCount)
-    {
-        @Override
-        protected void onContentsChanged(int slot)
-        {
-            setChanged();
-        }
-    };
+    private final Container filters = new FilterInventory();
+    private final Container outputs = new OutputsContainer();
 
     private Direction facing = null;
 
@@ -71,12 +62,12 @@ public class InterfaceBlockEntity extends AggregatorBlockEntity implements IPowe
         return facing;
     }
 
-    public IItemHandlerModifiable inventoryOutputs()
+    public Container inventoryOutputs()
     {
         return outputs;
     }
 
-    public IItemHandlerModifiable inventoryFilter()
+    public Container inventoryFilter()
     {
         return filters;
     }
@@ -99,7 +90,7 @@ public class InterfaceBlockEntity extends AggregatorBlockEntity implements IPowe
     {
         super.tick();
 
-        if (level.isClientSide)
+        if (level.isClientSide())
             return;
 
         if (getCombinedInventory() == null)
@@ -109,15 +100,15 @@ public class InterfaceBlockEntity extends AggregatorBlockEntity implements IPowe
 
         for (int i = 0; i < FilterCount; i++)
         {
-            ItemStack inFilter = filters.getStackInSlot(i);
-            ItemStack inSlot = outputs.getStackInSlot(i);
+            ItemStack inFilter = filters.getItem(i);
+            ItemStack inSlot = outputs.getItem(i);
             if (inFilter.getCount() > 0)
             {
                 if (inSlot.getCount() <= 0)
                 {
                     int free = 64;
                     inSlot = AutomationHelper.extractItems(getCombinedInventory(), inFilter, free, false);
-                    outputs.setStackInSlot(i, inSlot);
+                    outputs.setItem(i, inSlot);
                     if (inSlot.getCount() > 0)
                         anyChanged = true;
                 }
@@ -138,7 +129,7 @@ public class InterfaceBlockEntity extends AggregatorBlockEntity implements IPowe
                 {
                     int stackSize = inSlot.getCount();
                     inSlot = AutomationHelper.insertItems(getCombinedInventory(), inSlot);
-                    outputs.setStackInSlot(i, inSlot);
+                    outputs.setItem(i, inSlot);
                     if (stackSize != inSlot.getCount())
                         anyChanged = true;
                 }
@@ -147,7 +138,7 @@ public class InterfaceBlockEntity extends AggregatorBlockEntity implements IPowe
             {
                 int stackSize = inSlot.getCount();
                 inSlot = AutomationHelper.insertItems(getCombinedInventory(), inSlot);
-                outputs.setStackInSlot(i, inSlot);
+                outputs.setItem(i, inSlot);
                 if (stackSize != inSlot.getCount())
                     anyChanged = true;
             }
@@ -175,9 +166,9 @@ public class InterfaceBlockEntity extends AggregatorBlockEntity implements IPowe
             var slot = entry.getInt("Slot");
             if (slot.isEmpty()) continue;
             int j = slot.get();
-            if (j >= 0 && j < filters.getSlots())
+            if (j >= 0 && j < filters.getContainerSize())
             {
-                filters.setStackInSlot(j, entry.read(ItemStack.MAP_CODEC).orElseThrow());
+                filters.setItem(j, entry.read(ItemStack.MAP_CODEC).orElseThrow());
             }
         }
 
@@ -187,9 +178,9 @@ public class InterfaceBlockEntity extends AggregatorBlockEntity implements IPowe
             var slot = entry.getInt("Slot");
             if (slot.isEmpty()) continue;
             int j = slot.get();
-            if (j >= 0 && j < outputs.getSlots())
+            if (j >= 0 && j < outputs.getContainerSize())
             {
-                outputs.setStackInSlot(j, entry.read(ItemStack.MAP_CODEC).orElseThrow());
+                outputs.setItem(j, entry.read(ItemStack.MAP_CODEC).orElseThrow());
             }
         }
     }
@@ -200,10 +191,10 @@ public class InterfaceBlockEntity extends AggregatorBlockEntity implements IPowe
         super.saveAdditional(output);
 
         var _filters = output.childrenList("Filters");
-        for (int i = 0; i < filters.getSlots(); ++i)
+        for (int i = 0; i < filters.getContainerSize(); ++i)
         {
             var entry = _filters.addChild();;
-            ItemStack stack = filters.getStackInSlot(i);
+            ItemStack stack = filters.getItem(i);
             if (stack.getCount() > 0)
             {
                 entry.putInt("Slot", i);
@@ -213,10 +204,10 @@ public class InterfaceBlockEntity extends AggregatorBlockEntity implements IPowe
 
 
         var _outputs = output.childrenList("Outputs");
-        for (int i = 0; i < outputs.getSlots(); ++i)
+        for (int i = 0; i < outputs.getContainerSize(); ++i)
         {
             var entry = _outputs.addChild();;
-            ItemStack stack = outputs.getStackInSlot(i);
+            ItemStack stack = outputs.getItem(i);
             if (stack.getCount() > 0)
             {
                 entry.putInt("Slot", i);
@@ -243,83 +234,54 @@ public class InterfaceBlockEntity extends AggregatorBlockEntity implements IPowe
 
         if (level != null)
         {
-            IItemHandler inventory = this.inventoryOutputs();
+            var inventory = this.inventoryOutputs();
             dropItems(level, pos, inventory);
         }
     }
 
-    public static void dropItems(Level level, BlockPos pos, IItemHandler inventory)
+    public static void dropItems(Level level, BlockPos pos, Container inventory)
     {
-        for (int i = 0; i < inventory.getSlots(); ++i)
+        for (int i = 0; i < inventory.getContainerSize(); ++i)
         {
-            ItemStack itemstack = inventory.getStackInSlot(i);
+            ItemStack itemstack = inventory.getItem(i);
             Containers.dropItemStack(level, pos.getX(), pos.getY(), pos.getZ(), itemstack);
         }
     }
 
-    private class FilterInventory implements IItemHandlerModifiable
+    private class FilterInventory extends SimpleContainer
     {
-        final NonNullList<ItemStack> filters;
-
-        public FilterInventory(int slotCount)
+        public FilterInventory()
         {
-            filters = NonNullList.withSize(slotCount, ItemStack.EMPTY);
+            super(FilterCount);
         }
 
         @Override
-        public int getSlots()
+        public void setItem(int index, ItemStack stack)
         {
-            return FilterCount;
+            if (stack.getCount() > 1)
+                super.setItem(index, stack.copyWithCount(1));
+            else
+                super.setItem(index, stack);
         }
 
         @Override
-        public ItemStack getStackInSlot(int slot)
+        public void setChanged()
         {
-            if (slot < 0 || slot >= filters.size())
-                return ItemStack.EMPTY;
-            return filters.get(slot);
+            InterfaceBlockEntity.this.setChanged();
+        }
+    }
+
+    private class OutputsContainer extends SimpleContainer
+    {
+        public OutputsContainer()
+        {
+            super(InterfaceBlockEntity.FilterCount);
         }
 
         @Override
-        public ItemStack insertItem(int slot, ItemStack stack, boolean simulate)
+        public void setChanged()
         {
-            if (slot < 0 || slot >= filters.size())
-                return stack;
-
-            if (!simulate)
-            {
-                var sample = stack.copyWithCount(1);
-                filters.set(slot, sample);
-            }
-
-            return stack;
-        }
-
-        @Override
-        public ItemStack extractItem(int slot, int amount, boolean simulate)
-        {
-            return ItemStack.EMPTY;
-        }
-
-        @Override
-        public int getSlotLimit(int slot)
-        {
-            return 1;
-        }
-
-        @Override
-        public boolean isItemValid(int slot, @Nonnull ItemStack stack)
-        {
-            return true;
-        }
-
-        @Override
-        public void setStackInSlot(int index, ItemStack stack)
-        {
-            var sample = stack.copyWithCount(1);
-            filters.set(index, sample);
-
-            setChanged();
+            InterfaceBlockEntity.this.setChanged();
         }
     }
 }

@@ -3,25 +3,23 @@ package dev.gigaherz.enderrift.automation.browser;
 import dev.gigaherz.enderrift.EnderRiftMod;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Inventory;
 
 public class CraftingBrowserScreen extends AbstractBrowserScreen<CraftingBrowserMenu>
 {
-    private static final ResourceLocation BACKGROUND_TEXTURE = EnderRiftMod.location("textures/gui/crafting_browser.png");
+    private static final Identifier BACKGROUND_TEXTURE = EnderRiftMod.location("textures/gui/crafting_browser.png");
     private final Inventory inventory;
 
     public CraftingBrowserScreen(CraftingBrowserMenu container, Inventory playerInventory, Component title)
     {
-        super(container, playerInventory, title);
-        imageWidth = 194;
-        imageHeight = 226;
+        super(container, playerInventory, title, 194, 226);
         this.inventoryLabelY = this.imageHeight - 94;
         this.inventory = playerInventory;
     }
 
     @Override
-    protected ResourceLocation getBackgroundTexture()
+    protected Identifier getBackgroundTexture()
     {
         return BACKGROUND_TEXTURE;
     }

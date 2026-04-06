@@ -1,15 +1,19 @@
 package dev.gigaherz.enderrift.common;
 
 import dev.gigaherz.enderrift.ConfigValues;
-import dev.gigaherz.enderrift.rift.ILongItemHandler;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.energy.IEnergyStorage;
 import net.neoforged.neoforge.items.IItemHandler;
+import net.neoforged.neoforge.transfer.ResourceHandler;
+import net.neoforged.neoforge.transfer.energy.EnergyHandler;
+import net.neoforged.neoforge.transfer.item.ItemResource;
+import net.neoforged.neoforge.transfer.transaction.Transaction;
+import net.neoforged.neoforge.transfer.transaction.TransactionContext;
 
 import javax.annotation.Nonnull;
 import java.util.Optional;
 
-public class AutomationEnergyWrapper implements ILongItemHandler
+public class AutomationEnergyWrapper implements ResourceHandler<ItemResource>
 {
     private final IPoweredAutomation owner;
 
@@ -20,7 +24,7 @@ public class AutomationEnergyWrapper implements ILongItemHandler
 
     private double getEnergyInsert()
     {
-        int sizeInventory = getSlots();
+        int sizeInventory = size();
         int sizeInventory2 = sizeInventory * sizeInventory;
         return Math.min(ConfigValues.PowerPerInsertionCap,
                 ConfigValues.PowerPerInsertionConstant
@@ -30,7 +34,7 @@ public class AutomationEnergyWrapper implements ILongItemHandler
 
     private double getEnergyExtract()
     {
-        int sizeInventory = getSlots();
+        int sizeInventory = size();
         int sizeInventory2 = sizeInventory * sizeInventory;
         return Math.min(ConfigValues.PowerPerExtractionCap,
                 ConfigValues.PowerPerExtractionConstant
@@ -49,142 +53,130 @@ public class AutomationEnergyWrapper implements ILongItemHandler
     }
 
     @Override
-    public int getSlots()
+    public int size()
     {
         var inventory = owner.getInventory();
-        return inventory != null ? inventory.getSlots() : 0;
+        return inventory != null ? inventory.size() : 0;
     }
 
     @Override
-    public ItemStack getStackInSlot(int slot)
+    public ItemResource getResource(int slot)
     {
         var inventory = owner.getInventory();
-        return inventory != null ? inventory.getStackInSlot(slot) : ItemStack.EMPTY;
+        return inventory != null ? inventory.getResource(slot) : ItemResource.EMPTY;
     }
 
     @Override
-    public long getCount(int slot)
+    public long getAmountAsLong(int slot)
     {
         var inventory = owner.getInventory();
-        return inventory != null ? inventory.getCount(slot) : 0;
+        return inventory != null ? inventory.getAmountAsLong(slot) : 0;
     }
 
     @Override
-    public ItemStack insertItem(int slot, ItemStack stack, boolean simulate)
+    public int insert(int index, ItemResource resource, int amount, TransactionContext transaction)
     {
-        int stackSize = stack.getCount();
-        int cost = getEffectivePowerUsageToInsert(stackSize);
+        int cost = getEffectivePowerUsageToInsert(amount);
 
-        Optional<IEnergyStorage> optBuffer = owner.getEnergyBuffer();
+        Optional<EnergyHandler> optBuffer = owner.getEnergyBuffer();
         if (optBuffer.isPresent())
         {
-            IEnergyStorage energyBuffer = optBuffer.get();
-            IItemHandler inventory = owner.getInventory();
+            var energyBuffer = optBuffer.get();
+            var inventory = owner.getInventory();
 
             if (inventory == null)
-                return ItemStack.EMPTY;
+                return 0;
 
             boolean powerFailure = false;
-            while (cost > energyBuffer.getEnergyStored() && stackSize > 0)
+            while (cost > energyBuffer.getAmountAsInt() && amount > 0)
             {
                 powerFailure = true;
 
-                stackSize--;
+                amount--;
             }
 
             if (powerFailure)
                 owner.setLowOnPowerTemporary();
 
-            if (stackSize <= 0)
-                return stack;
+            if (amount <= 0)
+                return amount;
 
-            ItemStack temp = stack.copyWithCount(stackSize);
-            ItemStack remaining = inventory.insertItem(slot, temp, simulate);
+            int inserted = inventory.insert(index, resource, amount, transaction);
 
-            if (!simulate)
+            int actualCost = getEffectivePowerUsageToInsert(inserted);
+            if (actualCost < energyBuffer.getAmountAsInt())
             {
-                stackSize -= remaining.getCount();
-
-                int actualCost = getEffectivePowerUsageToInsert(stackSize);
-                energyBuffer.extractEnergy(actualCost, false);
-
+                energyBuffer.extract(actualCost, transaction);
                 owner.setDirty();
+                return inserted;
             }
+        }
 
-            return remaining;
-        }
-        else
-        {
-            return stack;
-        }
+        return 0;
     }
 
     @Override
-    public ItemStack extractItem(int slot, int wanted, boolean simulate)
+    public int extract(int index, ItemResource resource, int amount, TransactionContext transaction)
     {
-        int cost = getEffectivePowerUsageToExtract(wanted);
+        int cost = getEffectivePowerUsageToExtract(amount);
 
-        Optional<IEnergyStorage> optBuffer = owner.getEnergyBuffer();
+        Optional<EnergyHandler> optBuffer = owner.getEnergyBuffer();
         if (optBuffer.isPresent())
         {
-            IEnergyStorage energyBuffer = optBuffer.get();
-            IItemHandler inventory = owner.getInventory();
+            var energyBuffer = optBuffer.get();
+            var inventory = owner.getInventory();
 
             if (inventory == null)
-                return ItemStack.EMPTY;
+                return 0;
 
-            ItemStack existing = inventory.extractItem(slot, wanted, true);
-            wanted = Math.min(wanted, existing.getCount());
+            int extracted = inventory.extract(index, resource, amount, transaction);
 
             boolean powerFailure = false;
-            while (cost > energyBuffer.getEnergyStored() && wanted > 0)
+            while (cost > energyBuffer.getAmountAsInt() && amount > 0)
             {
                 powerFailure = true;
 
-                wanted--;
-                cost = getEffectivePowerUsageToExtract(wanted);
+                amount--;
+                cost = getEffectivePowerUsageToExtract(amount);
             }
 
             if (powerFailure)
                 owner.setLowOnPowerTemporary();
 
-            if (wanted <= 0)
-                return ItemStack.EMPTY;
+            if (amount <= 0)
+                return 0;
 
-            ItemStack extracted = inventory.extractItem(slot, wanted, simulate);
-            if (extracted.getCount() <= 0)
-                return ItemStack.EMPTY;
+            int extracted1 = inventory.extract(index, resource, amount, transaction);
+            if (extracted1 <= 0)
+                return 0;
 
-            if (!simulate)
-            {
-                int actualCost = getEffectivePowerUsageToExtract(extracted.getCount());
-                energyBuffer.extractEnergy(actualCost, false);
+            int actualCost = getEffectivePowerUsageToExtract(extracted1);
+            energyBuffer.extract(actualCost, transaction);
 
-                owner.setDirty();
-            }
+            owner.setDirty();
 
             return extracted;
         }
         else
         {
-            return ItemStack.EMPTY;
+            return 0;
         }
     }
 
     @Override
-    public int getSlotLimit(int slot)
+    public long getCapacityAsLong(int slot, ItemResource resource)
     {
         return 64;
     }
 
     @Override
-    public boolean isItemValid(int slot, @Nonnull ItemStack stack)
+    public boolean isValid(int slot, ItemResource stack)
     {
         return true;
     }
 
     public boolean isLowOnPower()
     {
-        return owner.getEnergyBuffer().map(buffer -> getEffectivePowerUsageToExtract(1) > buffer.getEnergyStored()).orElse(false);
+        return owner.getEnergyBuffer().map(buffer -> getEffectivePowerUsageToExtract(1) > buffer.getAmountAsInt()).orElse(false);
     }
 }

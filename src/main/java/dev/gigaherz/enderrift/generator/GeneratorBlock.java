@@ -101,7 +101,7 @@ public class GeneratorBlock extends BaseEntityBlock
         if (!(tileEntity instanceof GeneratorBlockEntity be) || player.isShiftKeyDown())
             return InteractionResult.FAIL;
 
-        if (level.isClientSide)
+        if (level.isClientSide())
             return InteractionResult.SUCCESS;
 
         player.openMenu(new SimpleMenuProvider(

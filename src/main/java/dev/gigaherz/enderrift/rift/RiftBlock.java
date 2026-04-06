@@ -6,7 +6,6 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import dev.gigaherz.enderrift.EnderRiftMod;
 import dev.gigaherz.enderrift.automation.AutomationHelper;
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -14,10 +13,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.InsideBlockEffectApplier;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BaseEntityBlock;
@@ -33,12 +29,9 @@ import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.neoforged.neoforge.items.ItemHandlerHelper;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
-import java.util.UUID;
-import java.util.function.Consumer;
 
 public class RiftBlock extends BaseEntityBlock
 {
@@ -84,10 +77,10 @@ public class RiftBlock extends BaseEntityBlock
 
     @Deprecated
     @Override
-    public int getLightBlock(BlockState state)
+    public int getLightDampening(BlockState state)
     {
         if (state.getBlock() != this)
-            return super.getLightBlock(state);
+            return super.getLightDampening(state);
         return state.getValue(ASSEMBLED) ? 1 : 15;
     }
 
@@ -145,14 +138,14 @@ public class RiftBlock extends BaseEntityBlock
         if (!(te instanceof RiftBlockEntity rift) || !rift.isPowered())
             return InteractionResult.FAIL;
 
-        if (level.isClientSide)
+        if (level.isClientSide())
             return InteractionResult.SUCCESS;
 
         var inv = rift.getInventory();
         if (inv == null)
             return InteractionResult.FAIL;
 
-        ItemStack remaining = ItemHandlerHelper.insertItem(inv, stack, false);
+        var remaining = AutomationHelper.insertItems(inv, stack);
 
         player.setItemInHand(hand, remaining);
 
@@ -166,7 +159,7 @@ public class RiftBlock extends BaseEntityBlock
         if (state.getBlock() != this || !state.getValue(ASSEMBLED))
             super.attack(state, worldIn, pos, playerIn);
 
-        if (worldIn.isClientSide)
+        if (worldIn.isClientSide())
             return;
 
         BlockEntity te = worldIn.getBlockEntity(pos);
@@ -200,9 +193,9 @@ public class RiftBlock extends BaseEntityBlock
     }
 
     @Override
-    protected void entityInside(BlockState state, Level level, BlockPos pos, Entity entity, InsideBlockEffectApplier effectApplier)
+    protected void entityInside(BlockState state, Level level, BlockPos pos, Entity entity, InsideBlockEffectApplier effectApplier, boolean p_451772_)
     {
-        if (level.isClientSide)
+        if (level.isClientSide())
             return;
 
         if (!(entity instanceof ItemEntity itemEntity))
@@ -219,7 +212,7 @@ public class RiftBlock extends BaseEntityBlock
         if (inv == null)
             return;
 
-        ItemStack remaining = ItemHandlerHelper.insertItem(inv, itemEntity.getItem(), false);
+        ItemStack remaining = AutomationHelper.insertItems(inv, itemEntity.getItem());
 
         if (remaining.getCount() <= 0)
         {

@@ -11,23 +11,23 @@ import dev.gigaherz.graph3.Graph;
 import dev.gigaherz.graph3.GraphObject;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
+import net.neoforged.neoforge.transfer.energy.EnergyHandler;
 import org.jetbrains.annotations.Nullable;
 import snownee.jade.api.*;
 import snownee.jade.api.config.IPluginConfig;
 import snownee.jade.api.ui.Element;
 import snownee.jade.impl.ui.ItemStackElement;
-import net.neoforged.neoforge.energy.IEnergyStorage;
 
 @WailaPlugin
 public class WailaProviders implements IWailaPlugin
 {
-    private static final ResourceLocation CONFIG_GENERATOR = EnderRiftMod.location("generator");
-    private static final ResourceLocation CONFIG_RIFT = EnderRiftMod.location("rift");
-    private static final ResourceLocation CONFIG_DRIVER = EnderRiftMod.location("driver");
-    private static final ResourceLocation CONFIG_RF = EnderRiftMod.location("rf");
-    private static final ResourceLocation CONFIG_NETWORK = EnderRiftMod.location("network");
+    private static final Identifier CONFIG_GENERATOR = EnderRiftMod.location("generator");
+    private static final Identifier CONFIG_RIFT = EnderRiftMod.location("rift");
+    private static final Identifier CONFIG_DRIVER = EnderRiftMod.location("driver");
+    private static final Identifier CONFIG_RF = EnderRiftMod.location("rf");
+    private static final Identifier CONFIG_NETWORK = EnderRiftMod.location("network");
 
 
     @Override
@@ -96,7 +96,7 @@ public class WailaProviders implements IWailaPlugin
         }
 
         @Override
-        public ResourceLocation getUid()
+        public Identifier getUid()
         {
             return CONFIG_GENERATOR;
         }
@@ -110,7 +110,7 @@ public class WailaProviders implements IWailaPlugin
         {
             if (blockAccessor.getBlockEntity() instanceof DriverBlockEntity rift)
             {
-                tag.putInt("energy", rift.getInternalBuffer().map(IEnergyStorage::getEnergyStored).orElse(0));
+                tag.putInt("energy", rift.getInternalBuffer().map(EnergyHandler::getAmountAsInt).orElse(0));
             }
         }
 
@@ -127,7 +127,7 @@ public class WailaProviders implements IWailaPlugin
         }
 
         @Override
-        public ResourceLocation getUid()
+        public Identifier getUid()
         {
             return CONFIG_DRIVER;
         }
@@ -152,7 +152,7 @@ public class WailaProviders implements IWailaPlugin
         }
 
         @Override
-        public ResourceLocation getUid()
+        public Identifier getUid()
         {
             return CONFIG_NETWORK;
         }
@@ -183,11 +183,11 @@ public class WailaProviders implements IWailaPlugin
             if (rift != null)
             {
                 var inv = rift.getInventory();
-                if (inv != null) tag.putInt("usedSlots", inv.getSlots());
+                if (inv != null) tag.putInt("usedSlots", inv.size());
                 tag.putBoolean("isFormed", rift.getBlockState().getValue(RiftBlock.ASSEMBLED));
                 tag.putBoolean("isPowered", rift.isPowered());
                 if (rift.getRiftId() != null) tag.putString("riftId", rift.getRiftId().toString());
-                tag.putInt("energy", rift.getEnergyBuffer().map(IEnergyStorage::getEnergyStored).orElse(0));
+                tag.putInt("energy", rift.getEnergyBuffer().map(EnergyHandler::getAmountAsInt).orElse(0));
             }
         }
 
@@ -218,7 +218,7 @@ public class WailaProviders implements IWailaPlugin
         }
 
         @Override
-        public ResourceLocation getUid()
+        public Identifier getUid()
         {
             return CONFIG_RIFT;
         }

@@ -6,15 +6,14 @@ import dev.gigaherz.enderrift.automation.AutomationHelper;
 import dev.gigaherz.enderrift.common.slots.SlotFake;
 import dev.gigaherz.enderrift.network.SendSlotChanges;
 import dev.gigaherz.enderrift.network.SetVisibleSlots;
-import dev.gigaherz.enderrift.rift.ILongItemHandler;
 import it.unimi.dsi.fastutil.longs.LongArrayList;
 import it.unimi.dsi.fastutil.longs.LongList;
 import joptsimple.internal.Strings;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundContainerSetSlotPacket;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.*;
@@ -23,13 +22,11 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.component.TooltipDisplay;
 import net.neoforged.neoforge.client.network.ClientPacketDistributor;
-import net.neoforged.neoforge.items.IItemHandler;
-import net.neoforged.neoforge.items.IItemHandlerModifiable;
 import net.neoforged.neoforge.network.PacketDistributor;
-import org.apache.commons.lang3.StringUtils;
+import net.neoforged.neoforge.transfer.ResourceHandler;
+import net.neoforged.neoforge.transfer.item.ItemResource;
 import org.apache.commons.lang3.mutable.MutableBoolean;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Arrays;
 import java.util.List;
@@ -60,7 +57,7 @@ public class AbstractBrowserMenu extends AbstractContainerMenu
     @Nullable
     protected BrowserBlockEntity tile;
 
-    public final IItemHandlerModifiable scrollInventory;
+    public final Container scrollInventory;
     public int scroll;
     public SortMode sortMode = SortMode.STACK_SIZE;
     public String filterText = "";
@@ -106,7 +103,7 @@ public class AbstractBrowserMenu extends AbstractContainerMenu
         super(type, id);
 
         this.player = playerInventory.player;
-        boolean isClient = player.level().isClientSide;
+        boolean isClient = player.level().isClientSide();
 
         if (isClient)
         {
@@ -256,7 +253,7 @@ public class AbstractBrowserMenu extends AbstractContainerMenu
 
         if (player instanceof ServerPlayer crafter)
         {
-            if (newLength != oldLength || indicesChanged.size() > 0)
+            if (newLength != oldLength || !indicesChanged.isEmpty())
             {
                 PacketDistributor.sendToPlayer(crafter, new SendSlotChanges(containerId, newLength, indicesChanged, stacksChanged, stackSizesChanged));
             }
@@ -269,7 +266,7 @@ public class AbstractBrowserMenu extends AbstractContainerMenu
             }
         }
 
-        if (newLength != oldLength || indicesChanged.size() > 0)
+        if (newLength != oldLength || !indicesChanged.isEmpty())
         {
             serverInv.resetVisible();
         }
@@ -373,17 +370,17 @@ public class AbstractBrowserMenu extends AbstractContainerMenu
     }
 
     @Override
-    public void clicked(int slotId, int clickedButton, ClickType mode, Player playerIn)
+    public void clicked(int slotId, int clickedButton, ContainerInput input, Player player)
     {
         if (slotId >= 0 && slotId < SCROLL_SLOTS)
         {
-            IItemHandler parent = getTileInventory();
+            var parent = getTileInventory();
 
             Slot slot = this.slots.get(slotId);
             ItemStack existing = slot.getItem();
             long existingSize = isClient() ? getClient().getStackSizeForSlot(slotId) : existing.getCount();
 
-            if (mode == ClickType.PICKUP)
+            if (input == ContainerInput.PICKUP)
             {
                 ItemStack dropping = getCarried();
 
@@ -445,7 +442,7 @@ public class AbstractBrowserMenu extends AbstractContainerMenu
                             ? existing.getMaxStackSize()
                             : Math.max(1, Math.min(existing.getCount(), existing.getMaxStackSize()) / 2);
 
-                    ItemStack extracted = extractItemsSided(parent, existing, existingSize, amount, false);
+                    ItemStack extracted = extractItemsSided(parent, existing, existingSize, amount);
                     if (extracted.getCount() > 0)
                     {
                         markTileDirty();
@@ -464,7 +461,7 @@ public class AbstractBrowserMenu extends AbstractContainerMenu
                 broadcastChanges();
                 return;
             }
-            else if (mode == ClickType.QUICK_MOVE && existingSize > 0)
+            else if (input == ContainerInput.QUICK_MOVE && existingSize > 0)
             {
                 int amount = clickedButton == 0
                         ? existing.getMaxStackSize()
@@ -480,7 +477,7 @@ public class AbstractBrowserMenu extends AbstractContainerMenu
 
                 if (amount > 0)
                 {
-                    ItemStack finalExtract = extractItemsSided(parent, existing, existingSize, amount, false);
+                    ItemStack finalExtract = extractItemsSided(parent, existing, existingSize, amount);
 
                     if (finalExtract.getCount() > 0)
                     {
@@ -492,15 +489,15 @@ public class AbstractBrowserMenu extends AbstractContainerMenu
                 }
             }
 
-            if (mode != ClickType.CLONE)
+            if (input != ContainerInput.CLONE)
                 return;
         }
 
-        super.clicked(slotId, clickedButton, mode, playerIn);
+        super.clicked(slotId, clickedButton, input, player);
     }
 
     @Nullable
-    private IItemHandler getTileInventory()
+    private ResourceHandler<ItemResource> getTileInventory()
     {
         return isClient() ? null : tile.getCombinedInventory();
     }
@@ -511,16 +508,16 @@ public class AbstractBrowserMenu extends AbstractContainerMenu
             tile.setChanged();
     }
 
-    private ItemStack extractItemsSided(@Nullable IItemHandler parent, ItemStack existing, long existingSize, int amount, boolean simulate)
+    private ItemStack extractItemsSided(@Nullable ResourceHandler<ItemResource> parent, ItemStack existing, long existingSize, int amount)
     {
         if (isClient() || parent == null)
         {
             return existing.copyWithCount((int) Math.min(existingSize, amount));
         }
-        return AutomationHelper.extractItems(parent, existing, amount, simulate);
+        return AutomationHelper.extractItems(parent, existing, amount, false);
     }
 
-    private ItemStack insertItemsSided(@Nullable IItemHandler parent, ItemStack dropping)
+    private ItemStack insertItemsSided(@Nullable ResourceHandler<ItemResource> parent, ItemStack dropping)
     {
         if (isClient() || parent == null)
             return ItemStack.EMPTY;
@@ -667,7 +664,7 @@ public class AbstractBrowserMenu extends AbstractContainerMenu
 
     public int getActualSlotCount()
     {
-        return scrollInventory.getSlots();
+        return scrollInventory.getContainerSize();
     }
 
     public boolean isLowOnPower()
@@ -675,7 +672,7 @@ public class AbstractBrowserMenu extends AbstractContainerMenu
         return isLowOnPower.get() != 0;
     }
 
-    public static class ServerScrollInventory implements IItemHandlerModifiable
+    public static class ServerScrollInventory implements Container
     {
         final BrowserBlockEntity tile;
         final List<ItemStack> slots = Lists.newArrayList();
@@ -699,7 +696,7 @@ public class AbstractBrowserMenu extends AbstractContainerMenu
 
         public void refresh()
         {
-            ILongItemHandler inv = tile.getCombinedInventory();
+            ResourceHandler<ItemResource> inv = tile.getCombinedInventory();
 
             slots.clear();
             slotSizes.clear();
@@ -707,18 +704,28 @@ public class AbstractBrowserMenu extends AbstractContainerMenu
             if (inv == null)
                 return;
 
-            int invSlots = inv.getSlots();
+            int invSlots = inv.size();
             for (int j = 0; j < invSlots; j++)
             {
-                ItemStack invStack = inv.getStackInSlot(j);
-                long invCount = inv.getCount(j);
-                if (invStack.getCount() <= 0)
+                var invStack = inv.getResource(j);
+                long invCount = inv.getAmountAsLong(j);
+                if (invCount <= 0)
                     continue;
 
-                ItemStack stack = invStack.copy();
+                ItemStack stack = invStack.toStack();
                 slots.add(stack);
                 slotSizes.add(invCount);
             }
+        }
+
+        public ItemStack getStack(int index)
+        {
+            return slots.get(index);
+        }
+
+        public long getStackSizeForSlot(int slot)
+        {
+            return slotSizes.getLong(slot);
         }
 
         public int getRealSizeInventory()
@@ -727,13 +734,19 @@ public class AbstractBrowserMenu extends AbstractContainerMenu
         }
 
         @Override
-        public int getSlots()
+        public int getContainerSize()
         {
             return visible.length;
         }
 
         @Override
-        public ItemStack getStackInSlot(int index)
+        public boolean isEmpty()
+        {
+            return slots.stream().allMatch(ItemStack::isEmpty);
+        }
+
+        @Override
+        public ItemStack getItem(int index)
         {
             if (index >= visible.length)
                 return ItemStack.EMPTY;
@@ -743,47 +756,43 @@ public class AbstractBrowserMenu extends AbstractContainerMenu
             return slots.get(visible[index]);
         }
 
-        public ItemStack getStack(int index)
-        {
-            return slots.get(index);
-        }
-
         @Override
-        public ItemStack insertItem(int slot, ItemStack stack, boolean simulate)
+        public ItemStack removeItem(int slot, int count)
         {
             return ItemStack.EMPTY;
         }
 
         @Override
-        public ItemStack extractItem(int slot, int amount, boolean simulate)
+        public ItemStack removeItemNoUpdate(int slot)
         {
             return ItemStack.EMPTY;
         }
 
         @Override
-        public int getSlotLimit(int slot)
+        public void setItem(int slot, ItemStack stack)
         {
-            return 64;
         }
 
         @Override
-        public boolean isItemValid(int slot, @Nonnull ItemStack stack)
+        public void setChanged()
+        {
+
+        }
+
+        @Override
+        public boolean stillValid(Player player)
         {
             return true;
         }
 
         @Override
-        public void setStackInSlot(int slot, ItemStack stack)
+        public void clearContent()
         {
-        }
 
-        public long getStackSizeForSlot(int slot)
-        {
-            return slotSizes.getLong(slot);
         }
     }
 
-    public class ClientScrollInventory implements IItemHandlerModifiable
+    public class ClientScrollInventory implements Container
     {
         private int[] indices;
         private NonNullList<ItemStack> stacks;
@@ -809,8 +818,8 @@ public class AbstractBrowserMenu extends AbstractContainerMenu
                 if (!Strings.isNullOrEmpty(filterText))
                 {
                     Item item = invStack.getItem();
-                    if (StringUtils.containsIgnoreCase(stack.getHoverName().getString(), filterText)
-                            || StringUtils.containsIgnoreCase(BuiltInRegistries.ITEM.getKey(item).toString(), filterText))
+                    if (containsIgnoreCase(stack.getHoverName().getString(), filterText)
+                            || containsIgnoreCase(BuiltInRegistries.ITEM.getKey(item).toString(), filterText))
                     {
                         matchesSearch = true;
                     }
@@ -818,7 +827,7 @@ public class AbstractBrowserMenu extends AbstractContainerMenu
                     {
                         MutableBoolean b = new MutableBoolean();
                         item.appendHoverText(stack, Item.TooltipContext.of(player.level()), TooltipDisplay.DEFAULT, component -> {
-                            if (!b.booleanValue() && StringUtils.containsIgnoreCase(stack.getHoverName().getString(), filterText))
+                            if (!b.booleanValue() && containsIgnoreCase(stack.getHoverName().getString(), filterText))
                             {
                                 b.setTrue();
                             }
@@ -872,13 +881,19 @@ public class AbstractBrowserMenu extends AbstractContainerMenu
         }
 
         @Override
-        public int getSlots()
+        public int getContainerSize()
         {
             return indices.length;
         }
 
         @Override
-        public ItemStack getStackInSlot(int slot)
+        public boolean isEmpty()
+        {
+            return stacks.stream().allMatch(ItemStack::isEmpty);
+        }
+
+        @Override
+        public ItemStack getItem(int slot)
         {
             if ((slot + scroll) >= indices.length)
                 return ItemStack.EMPTY;
@@ -887,34 +902,46 @@ public class AbstractBrowserMenu extends AbstractContainerMenu
         }
 
         @Override
-        public ItemStack insertItem(int slot, ItemStack stack, boolean simulate)
+        public ItemStack removeItem(int slot, int count)
         {
-            return ItemStack.EMPTY;
+            var stack = getItem(slot);
+            count = Math.min(count, stack.getMaxStackSize());
+            var amount = getStackSizeForSlot(slot);
+            if (amount > count)
+            {
+                setStackSizeForSlot(slot, amount - count);
+                return stack.copyWithCount(count);
+            }
+            else
+            {
+                setItem(slot, ItemStack.EMPTY);
+                return stack.copyWithCount((int) amount);
+            }
         }
 
         @Override
-        public ItemStack extractItem(int slot, int amount, boolean simulate)
+        public ItemStack removeItemNoUpdate(int slot)
         {
-            return ItemStack.EMPTY;
+            return removeItem(slot, 99);
         }
 
         @Override
-        public int getSlotLimit(int slot)
-        {
-            return 64;
-        }
-
-        @Override
-        public boolean isItemValid(int slot, @Nonnull ItemStack stack)
-        {
-            return true;
-        }
-
-        @Override
-        public void setStackInSlot(int slot, ItemStack stack)
+        public void setItem(int slot, ItemStack stack)
         {
             if ((slot + scroll) < indices.length)
                 stacks.set(indices[slot + scroll], stack);
+        }
+
+        @Override
+        public void setChanged()
+        {
+
+        }
+
+        @Override
+        public boolean stillValid(Player player)
+        {
+            return false;
         }
 
         public long getStackSizeForSlot(int slot)
@@ -924,11 +951,29 @@ public class AbstractBrowserMenu extends AbstractContainerMenu
             return stackSizes.getLong(indices[slot + scroll]);
         }
 
+        public void setStackSizeForSlot(int slot, long count)
+        {
+            if ((slot + scroll) >= indices.length)
+                return;
+            stackSizes.set(indices[slot + scroll], count);
+        }
+
         public int[] getIndices()
         {
             int from = Math.max(0, Math.min(scroll, indices.length - 1));
             int to = Math.min(from + SCROLL_SLOTS, indices.length);
             return Arrays.copyOfRange(indices, from, to);
         }
+
+        @Override
+        public void clearContent()
+        {
+
+        }
+    }
+
+    private static boolean containsIgnoreCase(String string, String filterText)
+    {
+        return org.apache.commons.lang3.Strings.CI.contains(string, filterText);
     }
 }

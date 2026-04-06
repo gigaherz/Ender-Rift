@@ -6,13 +6,13 @@ import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Player;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 public record ClearCraftingGrid(int containerId, boolean toPlayer) implements CustomPacketPayload
 {
-    public static final ResourceLocation ID = EnderRiftMod.location("clear_crafting_grid");
+    public static final Identifier ID = EnderRiftMod.location("clear_crafting_grid");
     public static final Type<ClearCraftingGrid> TYPE = new Type<>(ID);
 
     public static final StreamCodec<ByteBuf, ClearCraftingGrid> STREAM_CODEC = StreamCodec.composite(

@@ -1,62 +1,104 @@
 package dev.gigaherz.enderrift.rift;
 
-import com.google.common.collect.Lists;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.blaze3d.vertex.QuadInstance;
+import com.mojang.logging.LogUtils;
 import com.mojang.math.Axis;
 import dev.gigaherz.enderrift.EnderRiftMod;
 import dev.gigaherz.enderrift.client.ClientHelper;
 import net.minecraft.client.Camera;
-import net.minecraft.client.GraphicsStatus;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.block.model.BakedQuad;
+import net.minecraft.client.gui.components.debug.DebugScreenDisplayer;
+import net.minecraft.client.gui.components.debug.DebugScreenEntry;
+import net.minecraft.client.gui.components.debug.DebugScreenEntryStatus;
+import net.minecraft.client.gui.components.debug.DebugScreenProfile;
+import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
+import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
+import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
+import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.renderer.texture.TextureAtlas;
+import net.minecraft.client.resources.model.geometry.BakedQuad;
+import net.minecraft.client.resources.model.geometry.QuadCollection;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
-import net.minecraft.util.Mth;
-import net.minecraft.util.RandomSource;
+import net.minecraft.resources.Identifier;
+import net.minecraft.util.*;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.model.data.ModelData;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.client.event.CustomizeGuiOverlayEvent;
+import net.neoforged.neoforge.client.event.RegisterDebugEntriesEvent;
+import org.jetbrains.annotations.Nullable;
+import org.joml.Quaternionf;
+import org.slf4j.Logger;
 
+import java.text.NumberFormat;
+import java.util.ArrayList;
 import java.util.List;
 
+@EventBusSubscriber(value= Dist.CLIENT, modid = EnderRiftMod.MODID)
 public class RiftRenderer
-        implements BlockEntityRenderer<RiftBlockEntity>
+        implements BlockEntityRenderer<RiftBlockEntity, RiftRenderer.RiftRenderState>
 {
-    private final RandomSource random = RandomSource.create();
-
-    private static final List<Direction> DIRECTIONS_AND_NULL = Lists.newArrayList(Direction.values());
-
-    static
-    {
-        DIRECTIONS_AND_NULL.add(null);
-    }
+    private static final Logger LOGGER = LogUtils.getLogger();
+    private static final int STEP_TIME = 20;
+    private static final int STEPS = 5;
+    private static final int TIME_LOOP = STEP_TIME * STEPS;
 
     public RiftRenderer(BlockEntityRendererProvider.Context context)
     {
     }
 
-    @Override
-    public void render(RiftBlockEntity be, float partialTicks, PoseStack poseStack, MultiBufferSource multiBufferSource, int packedLight, int packedOverlay, Vec3 position)
+    public static class RiftRenderState extends BlockEntityRenderState
     {
-        if (!be.getBlockState().getValue(RiftBlock.ASSEMBLED))
-            return;
+        public boolean canRender;
+        public float lastPoweringState;
+        public float nextPoweringState;
+        public float poweringState;
+        public Quaternionf rotation;
+        public RenderType renderType;
+        public long stepTime;
+        public float partialTick;
+        public @Nullable QuadCollection model;
+    }
 
-        float lastPoweringState = be.getLastPoweringState();
-        float nextPoweringState = be.getPoweringState();
-        float poweringState = lerp(lastPoweringState, nextPoweringState, partialTicks);
+    @Override
+    public RiftRenderState createRenderState()
+    {
+        return new RiftRenderState();
+    }
+
+    @Override
+    public void extractRenderState(RiftBlockEntity be, RiftRenderState state, float partialTick, Vec3 pos, @Nullable ModelFeatureRenderer.CrumblingOverlay overlay)
+    {
+        BlockEntityRenderState.extractBase(be, state, overlay);
+
+        state.canRender = true;
+        if (!be.getBlockState().getValue(RiftBlock.ASSEMBLED))
+        {
+            state.canRender = false;
+            return;
+        }
+
+        state.partialTick = partialTick;
+
+        state.lastPoweringState = be.getLastPoweringState();
+        state.nextPoweringState = be.getPoweringState();
+        state.poweringState = lerp(state.lastPoweringState, state.nextPoweringState, partialTick);
 
         Minecraft minecraft = Minecraft.getInstance();
 
         Camera renderInfo = minecraft.gameRenderer.getMainCamera();
 
         BlockPos tePos = be.getBlockPos();
-        Vec3 cameraPos = renderInfo.getPosition();
+        Vec3 cameraPos = renderInfo.position();
 
         double ty = cameraPos.y() - (tePos.getY() + 0.5);
         double tx = cameraPos.x() - (tePos.getX() + 0.5);
@@ -65,55 +107,68 @@ public class RiftRenderer
         float xz = (float) Math.sqrt(tx * tx + tz * tz);
         float pitch = (float) Math.atan2(ty, xz);
 
-        poseStack.pushPose();
-        poseStack.translate(0.5, 0.5, 0.5);
-        poseStack.mulPose(Axis.YP.rotation(-yaw));
-        poseStack.mulPose(Axis.ZP.rotation(pitch));
-        poseStack.translate(-0.5, -0.5, -0.5);
+        state.rotation = Axis.YP.rotation(-yaw).mul(Axis.ZP.rotation(pitch));
 
-        int step_time = 20;
-        int steps = 5;
-        int time_loop = step_time * steps;
+        boolean isFabulous = minecraft.options.improvedTransparency().get();
 
-        long time = be.getLevel().getGameTime();
-        int tm = (int) (time % step_time);
+        state.renderType = isFabulous ?
+                RenderTypes.translucentMovingBlock() :
+                RenderTypes.entityTranslucent(TextureAtlas.LOCATION_BLOCKS);
 
-        float c0 = 1.0f / steps;
-        float c1 = 1.0f / (1 - c0);
+        state.model = minecraft.getModelManager().getStandaloneModel(ClientHelper.SPHERE);
+        if (state.model == null)
+        {
+            state.canRender = false;
+            return;
+        }
 
-        boolean isFabulous = minecraft.options.graphicsMode().get().equals(GraphicsStatus.FABULOUS);
+        var time = be.getLevel().getGameTime();
 
-        RenderType type = isFabulous ?
-                RenderType.translucentMovingBlock() :
-                RenderType.entityTranslucent(TextureAtlas.LOCATION_BLOCKS);
+        state.stepTime = (int) (time % STEP_TIME);
+    }
 
-        VertexConsumer buffer = multiBufferSource.getBuffer(type);
-        var model = minecraft.getModelManager().getStandaloneModel(ClientHelper.SPHERE);
-        if (model == null)
+    @Override
+    public void submit(RiftRenderState state, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, CameraRenderState cameraRenderState)
+    {
+        if (!state.canRender)
             return;
 
-        for (int i = 0; i < steps; i++)
+        poseStack.pushPose();
+        poseStack.translate(0.5, 0.5, 0.5);
+        poseStack.mulPose(state.rotation);
+        poseStack.translate(-0.5, -0.5, -0.5);
+
+        float c0 = 1.0f / STEPS;
+        float c1 = 1.0f / (1 - c0);
+
+        for (int i = 0; i < STEPS; i++)
         {
-            float progress0 = ((tm + i * step_time) % time_loop + partialTicks) / time_loop;
+            float progress0 = ((state.stepTime + i * STEP_TIME) % TIME_LOOP + state.partialTick) / TIME_LOOP;
             float progress1 = (progress0 - c0) * c1;
 
-            float scale = (1.0f + poweringState) + (0.6f + poweringState) * progress0;
+            float scale = (1.0f + state.poweringState) + (0.6f + state.poweringState) * progress0;
 
             poseStack.pushPose();
             poseStack.translate(0.5, 0.5, 0.5);
             poseStack.scale(scale, scale, scale);
             poseStack.translate(-0.5, -0.5, -0.5);
 
-            float a = Mth.clamp(1 - progress1, 0, 1);
-            float rgb = Mth.clamp(progress1, 0, 1);
+            int a = Mth.floor(Mth.clamp(1 - progress1, 0, 1)*255);
+            int rgb = Mth.floor(Mth.clamp(progress1, 0, 255) * 255);
 
-            for (Direction d : DIRECTIONS_AND_NULL)
-            {
-                for (BakedQuad quad : model.getQuads(d))
+            var qi = new QuadInstance();
+            qi.setColor(ARGB.color(a,rgb,rgb,rgb));
+            qi.setLightCoords(LightCoordsUtil.FULL_BRIGHT);
+            qi.setOverlayCoords(OverlayTexture.NO_OVERLAY);
+
+            submitNodeCollector.submitCustomGeometry(poseStack, state.renderType, (pose, buffer) -> {
+                if (state.model == null)
+                    return;
+                for (BakedQuad quad : state.model.getAll())
                 {
-                    buffer.putBulkData(poseStack.last(), quad, rgb, rgb, rgb, a, 0x00F000F0, OverlayTexture.NO_OVERLAY, true);
+                    buffer.putBakedQuad(pose, quad, qi);
                 }
-            }
+            });
 
             poseStack.popPose();
         }

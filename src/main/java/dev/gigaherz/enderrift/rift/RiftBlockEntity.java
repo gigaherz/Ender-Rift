@@ -26,8 +26,8 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
-import net.neoforged.neoforge.energy.IEnergyStorage;
-import net.neoforged.neoforge.items.IItemHandler;
+import net.neoforged.neoforge.transfer.energy.EnergyHandler;
+import net.neoforged.neoforge.transfer.item.ItemUtil;
 
 import javax.annotation.Nullable;
 import java.util.Optional;
@@ -40,7 +40,7 @@ public class RiftBlockEntity extends BlockEntity implements IRiftChangeListener
     private static void registerCapability(RegisterCapabilitiesEvent event)
     {
         event.registerBlockEntity(
-                Capabilities.ItemHandler.BLOCK,
+                Capabilities.Item.BLOCK,
                 EnderRiftMod.RIFT_BLOCK_ENTITY.get(),
                 (be, context) -> be.powered ? be.getInventory() : null
         );
@@ -69,14 +69,14 @@ public class RiftBlockEntity extends BlockEntity implements IRiftChangeListener
         super(EnderRiftMod.RIFT_BLOCK_ENTITY.get(), pos, state);
     }
 
-    public Optional<IEnergyStorage> getEnergyBuffer()
+    public Optional<EnergyHandler> getEnergyBuffer()
     {
         return Optional.of(energyBuffer);
     }
 
     public void tick()
     {
-        if (level.isClientSide)
+        if (level.isClientSide())
         {
             lastPoweringState = poweringState;
             if (powered)
@@ -108,10 +108,10 @@ public class RiftBlockEntity extends BlockEntity implements IRiftChangeListener
         }
 
         int energyUsage = getEnergyUsage();
-        int energyStored = energyBuffer.getEnergyStored();
-        if (energyStored > energyBuffer.getMaxEnergyStored())
+        int energyStored = energyBuffer.getCapacityAsInt();
+        if (energyStored > energyBuffer.getAmountAsInt())
         {
-            energyStored = energyBuffer.getMaxEnergyStored();
+            energyStored = energyBuffer.getAmountAsInt();
             energyBuffer.setEnergy(energyStored);
         }
 
@@ -163,7 +163,7 @@ public class RiftBlockEntity extends BlockEntity implements IRiftChangeListener
         if (holder == null)
             return null;
 
-        if (!listenerState && level != null && !level.isClientSide)
+        if (!listenerState && level != null && !level.isClientSide())
         {
             RiftInventory inv = holder.getOrLoad(level.registryAccess());
             inv.addWeakListener(this);
@@ -267,26 +267,26 @@ public class RiftBlockEntity extends BlockEntity implements IRiftChangeListener
         if (!powered)
             return ItemStack.EMPTY;
 
-        IItemHandler handler = getInventory();
+        var handler = getInventory();
         if (handler == null)
             return ItemStack.EMPTY;
 
-        int max = handler.getSlots();
+        int max = handler.size();
 
         if (max <= 0)
             return ItemStack.EMPTY;
 
         int slot = rand.nextInt(max);
 
-        return handler.getStackInSlot(slot);
+        return ItemUtil.getStack(handler, slot);
     }
 
     public int getEnergyUsage()
     {
-        IItemHandler handler = getInventory();
+        var handler = getInventory();
         if (handler == null)
             return 0;
-        return Mth.ceil(Math.pow(handler.getSlots(), 0.8));
+        return Mth.ceil(Math.pow(handler.size(), 0.8));
     }
 
     public boolean isPowered()

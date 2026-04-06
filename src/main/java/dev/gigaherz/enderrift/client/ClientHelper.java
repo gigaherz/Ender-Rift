@@ -7,11 +7,13 @@ import dev.gigaherz.enderrift.rift.RiftRenderer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import net.minecraft.client.resources.model.*;
+import net.minecraft.client.resources.model.geometry.QuadCollection;
 import net.minecraft.world.entity.player.Player;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
+import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.event.ModelEvent;
 import net.neoforged.neoforge.client.model.standalone.SimpleUnbakedStandaloneModel;
 import net.neoforged.neoforge.client.model.standalone.StandaloneModelKey;
@@ -29,9 +31,9 @@ public class ClientHelper
     }
 
     @SubscribeEvent
-    public static void clientSetup(FMLClientSetupEvent event)
+    public static void clientSetup(EntityRenderersEvent.RegisterRenderers event)
     {
-        BlockEntityRenderers.register(EnderRiftMod.RIFT_BLOCK_ENTITY.get(), RiftRenderer::new);
+        event.registerBlockEntityRenderer(EnderRiftMod.RIFT_BLOCK_ENTITY.get(), RiftRenderer::new);
     }
 
     public static void handleSendSlotChanges(final SendSlotChanges message)

@@ -1,18 +1,19 @@
 package dev.gigaherz.enderrift.automation.browser;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import dev.gigaherz.enderrift.EnderRiftMod;
 import dev.gigaherz.enderrift.common.slots.SlotFake;
 import joptsimple.internal.Strings;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.input.CharacterEvent;
+import net.minecraft.client.input.KeyEvent;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.renderer.RenderPipelines;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.Slot;
@@ -26,9 +27,9 @@ import java.util.Locale;
 
 public abstract class AbstractBrowserScreen<T extends AbstractBrowserMenu> extends AbstractContainerScreen<T>
 {
-    private static final ResourceLocation BACKGROUND_TEXTURE = EnderRiftMod.location("textures/gui/browser.png");
-    private static final ResourceLocation SCROLLER_SPRITE = ResourceLocation.withDefaultNamespace("container/creative_inventory/scroller");
-    private static final ResourceLocation SCROLLER_DISABLED_SPRITE = ResourceLocation.withDefaultNamespace("container/creative_inventory/scroller_disabled");
+    private static final Identifier BACKGROUND_TEXTURE = EnderRiftMod.location("textures/gui/browser.png");
+    private static final Identifier SCROLLER_SPRITE = Identifier.withDefaultNamespace("container/creative_inventory/scroller");
+    private static final Identifier SCROLLER_DISABLED_SPRITE = Identifier.withDefaultNamespace("container/creative_inventory/scroller_disabled");
 
     private boolean isDragging;
     private int scrollY;
@@ -39,9 +40,12 @@ public abstract class AbstractBrowserScreen<T extends AbstractBrowserMenu> exten
 
     protected AbstractBrowserScreen(T container, Inventory playerInventory, Component title)
     {
-        super(container, playerInventory, title);
-        imageWidth = 194;
-        imageHeight = 168;
+        this(container, playerInventory, title, 194, 168);
+    }
+
+    protected AbstractBrowserScreen(T container, Inventory playerInventory, Component title, int width, int height)
+    {
+        super(container, playerInventory, title, width, height);
         this.inventoryLabelY = this.imageHeight - 94;
     }
 
@@ -64,20 +68,20 @@ public abstract class AbstractBrowserScreen<T extends AbstractBrowserMenu> exten
     }
 
     @Override
-    public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks)
+    public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTicks)
     {
-        this.renderBackground(graphics, mouseX, mouseY, partialTicks);
-        super.render(graphics, mouseX, mouseY, partialTicks);
+        this.extractBackground(graphics, mouseX, mouseY, partialTicks);
+        super.extractRenderState(graphics, mouseX, mouseY, partialTicks);
 
         //Lighting.turnBackOn();
         drawCustomSlotTexts(graphics);
         //Lighting.turnOff();
 
-        this.renderLowPowerOverlay(graphics, mouseX, mouseY);
-        this.renderTooltip(graphics, mouseX, mouseY);
+        this.extractLowPowerOverlay(graphics, mouseX, mouseY);
+        this.extractTooltip(graphics, mouseX, mouseY);
     }
 
-    private void renderLowPowerOverlay(GuiGraphics graphics, int mouseX, int mouseY)
+    private void extractLowPowerOverlay(GuiGraphicsExtractor graphics, int mouseX, int mouseY)
     {
         if (getMenu().isLowOnPower())
         {
@@ -89,12 +93,12 @@ public abstract class AbstractBrowserScreen<T extends AbstractBrowserMenu> exten
             long tm = Minecraft.getInstance().level.getGameTime() % 30;
             if (tm < 15)
             {
-                graphics.drawCenteredString(font, "NO POWER", l + w / 2, t + h / 2 - font.lineHeight / 2, 0xFFFFFF);
+                graphics.centeredText(font, "NO POWER", l + w / 2, t + h / 2 - font.lineHeight / 2, 0xFFFFFF);
             }
         }
     }
 
-    protected ResourceLocation getBackgroundTexture()
+    protected Identifier getBackgroundTexture()
     {
         return BACKGROUND_TEXTURE;
     }
@@ -123,19 +127,19 @@ public abstract class AbstractBrowserScreen<T extends AbstractBrowserMenu> exten
         addRenderableWidget(this.searchField = new EditBox(this.font, leftPos + 114, topPos + 6, 71, this.font.lineHeight, Component.literal(""))
         {
             @Override
-            public boolean mouseClicked(double mouseX, double mouseY, int mouseButton)
+            public boolean mouseClicked(MouseButtonEvent event, boolean p_434606_)
             {
-                if (mouseX >= (double) this.getX() && mouseX < (double) (this.getX() + this.width)
-                        && mouseY >= (double) this.getY() && mouseY < (double) (this.getY() + this.height))
+                if (event.x() >= (double) this.getX() && event.x() < (double) (this.getX() + this.width)
+                        && event.y() >= (double) this.getY() && event.y() < (double) (this.getY() + this.height))
                 {
-                    if (mouseButton == 1 && !Strings.isNullOrEmpty(getValue()) && getValue().length() > 0)
+                    if (event.button() == 1 && !Strings.isNullOrEmpty(getValue()) && getValue().length() > 0)
                     {
                         setValue("");
                         return true;
                     }
                 }
 
-                return super.mouseClicked(mouseX, mouseY, mouseButton);
+                return super.mouseClicked(event, p_434606_);
             }
         });
 
@@ -152,33 +156,34 @@ public abstract class AbstractBrowserScreen<T extends AbstractBrowserMenu> exten
     }
 
     @Override
-    public boolean charTyped(char p_charTyped_1_, int p_charTyped_2_)
+    public boolean charTyped(CharacterEvent event)
     {
-        if (searchField.isFocused() && searchField.charTyped(p_charTyped_1_, p_charTyped_2_))
+        if (searchField.isFocused() && searchField.charTyped(event))
             return true;
 
-        return this.getFocused() != null && this.getFocused().charTyped(p_charTyped_1_, p_charTyped_2_);
+        return this.getFocused() != null && this.getFocused().charTyped(event);
     }
 
     @Override
-    public boolean keyPressed(int key, int scanCode, int modifiers)
+    public boolean keyPressed(KeyEvent event)
     {
         if (searchField.isFocused())
         {
-            if (searchField.keyPressed(key, scanCode, modifiers))
+            if (searchField.keyPressed(event))
                 return true;
+            var key = event.key();
             if (key != GLFW.GLFW_KEY_ESCAPE && key != GLFW.GLFW_KEY_TAB && key != GLFW.GLFW_KEY_ENTER)
                 return false;
         }
 
-        return super.keyPressed(key, scanCode, modifiers);
+        return super.keyPressed(event);
     }
 
     @Override
-    public void resize(@Nonnull Minecraft minecraft, int scaledWidth, int scaledHeight)
+    public void resize(int scaledWidth, int scaledHeight)
     {
         String s = searchField.getValue();
-        super.resize(minecraft, scaledWidth, scaledHeight);
+        super.resize(scaledWidth, scaledHeight);
         searchField.setValue(s);
     }
 
@@ -203,7 +208,7 @@ public abstract class AbstractBrowserScreen<T extends AbstractBrowserMenu> exten
     }
 
     @Override
-    protected void renderBg(GuiGraphics graphics, float partialTicks, int xMouse, int yMouse)
+    public void extractBackground(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float a)
     {
         graphics.blit(RenderPipelines.GUI_TEXTURED, getBackgroundTexture(), leftPos, topPos, 0, 0, imageWidth, imageHeight, 256, 256);
         graphics.blit(RenderPipelines.GUI_TEXTURED, getBackgroundTexture(), leftPos - 27, topPos + 8, 194, 0, 27, 28, 256, 256);
@@ -214,10 +219,10 @@ public abstract class AbstractBrowserScreen<T extends AbstractBrowserMenu> exten
         else
             graphics.blitSprite(RenderPipelines.GUI_TEXTURED, SCROLLER_DISABLED_SPRITE, leftPos + 174, topPos + 18, 12, 15);
 
-        searchField.render(graphics, xMouse, yMouse, partialTicks);
+        searchField.extractRenderState(graphics, mouseX, mouseY, a);
     }
 
-    private void drawCustomSlotTexts(GuiGraphics graphics)
+    private void drawCustomSlotTexts(GuiGraphicsExtractor graphics)
     {
         var poseStack = graphics.pose();
         poseStack.pushMatrix();
@@ -230,7 +235,7 @@ public abstract class AbstractBrowserScreen<T extends AbstractBrowserMenu> exten
         poseStack.popMatrix();
     }
 
-    private void drawSlotText(GuiGraphics graphics, Slot slotIn)
+    private void drawSlotText(GuiGraphicsExtractor graphics, Slot slotIn)
     {
         int xPosition = slotIn.x;
         int yPosition = slotIn.y;
@@ -255,7 +260,7 @@ public abstract class AbstractBrowserScreen<T extends AbstractBrowserMenu> exten
                 pose.pushMatrix();
                 pose.translate(xpf,ypf);
 
-                graphics.drawString(font, s, xpi, ypi, 0xffffffff, true);
+                graphics.text(font, s, xpi, ypi, 0xffffffff, true);
 
                 pose.popMatrix();
             }
@@ -340,23 +345,20 @@ public abstract class AbstractBrowserScreen<T extends AbstractBrowserMenu> exten
     }
 
     @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int mouseButton)
+    public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick)
     {
-        // scroll
+        final int w = 12;
+        final int h = 62;
+        double mx = event.x() - 174 - leftPos;
+        double my = event.y() - 18 - topPos;
+        if (mx >= 0 && mx < w && my >= 0 && my < h)
         {
-            final int w = 12;
-            final int h = 62;
-            double mx = mouseX - 174 - leftPos;
-            double my = mouseY - 18 - topPos;
-            if (mx >= 0 && mx < w && my >= 0 && my < h)
-            {
-                updateScrollPos((int) my);
-                isDragging = true;
-                return true;
-            }
+            updateScrollPos((int) my);
+            isDragging = true;
+            return true;
         }
 
-        return super.mouseClicked(mouseX, mouseY, mouseButton);
+        return super.mouseClicked(event, doubleClick);
     }
 
     private void updateScrollPos(int my)
@@ -381,25 +383,25 @@ public abstract class AbstractBrowserScreen<T extends AbstractBrowserMenu> exten
     }
 
     @Override
-    public boolean mouseDragged(double mouseX, double mouseY, int mouseButton, double p_mouseDragged_6_, double p_mouseDragged_8_)
+    public boolean mouseDragged(MouseButtonEvent event, double dx, double dy)
     {
         boolean ret = false;
 
-        double my = mouseY - 18 - topPos;
+        double my = event.y() - 18 - topPos;
         if (isDragging)
         {
             updateScrollPos((int) my);
             ret = true;
         }
-        return super.mouseDragged(mouseX, mouseY, mouseButton, p_mouseDragged_6_, p_mouseDragged_8_) || ret;
+        return super.mouseDragged(event, dx, dy) || ret;
     }
 
     @Override
-    public boolean mouseReleased(double mouseX, double mouseY, int mouseButton)
+    public boolean mouseReleased(MouseButtonEvent event)
     {
         boolean ret = false;
 
-        double my = mouseY - 18 - topPos;
+        double my = event.y() - 18 - topPos;
         if (isDragging)
         {
             updateScrollPos((int) my);
@@ -407,6 +409,6 @@ public abstract class AbstractBrowserScreen<T extends AbstractBrowserMenu> exten
             ret = true;
         }
 
-        return super.mouseReleased(mouseX, mouseY, mouseButton) || ret;
+        return super.mouseReleased(event) || ret;
     }
 }

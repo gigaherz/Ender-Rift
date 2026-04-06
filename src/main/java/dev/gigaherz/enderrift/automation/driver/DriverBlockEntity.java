@@ -14,8 +14,8 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
-import net.neoforged.neoforge.energy.EnergyStorage;
-import net.neoforged.neoforge.energy.IEnergyStorage;
+import net.neoforged.neoforge.transfer.energy.EnergyHandler;
+import net.neoforged.neoforge.transfer.energy.SimpleEnergyHandler;
 
 import java.util.Optional;
 
@@ -26,7 +26,7 @@ public class DriverBlockEntity extends AggregatorBlockEntity
     private static void registerCapability(RegisterCapabilitiesEvent event)
     {
         event.registerBlockEntity(
-                Capabilities.EnergyStorage.BLOCK,
+                Capabilities.Energy.BLOCK,
                 EnderRiftMod.DRIVER_BLOCK_ENTITY.get(),
                 (be, context) -> be.energyBuffer
         );
@@ -34,7 +34,7 @@ public class DriverBlockEntity extends AggregatorBlockEntity
 
     public static final int POWER_LIMIT = 100000;
 
-    final EnergyStorage energyBuffer = new EnergyStorage(POWER_LIMIT);
+    final SimpleEnergyHandler energyBuffer = new SimpleEnergyHandler(POWER_LIMIT);
 
     public DriverBlockEntity(BlockPos pos, BlockState state)
     {
@@ -54,7 +54,7 @@ public class DriverBlockEntity extends AggregatorBlockEntity
     }
 
     @Override
-    public Optional<IEnergyStorage> getInternalBuffer()
+    public Optional<EnergyHandler> getInternalBuffer()
     {
         return Optional.of(energyBuffer);
     }

@@ -11,7 +11,7 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
-import net.neoforged.neoforge.energy.IEnergyStorage;
+import net.neoforged.neoforge.transfer.energy.EnergyHandler;
 
 import java.util.Optional;
 
@@ -22,7 +22,7 @@ public class StructureCornerBlockEntity extends AggregatorBlockEntity
     private static void registerCapability(RegisterCapabilitiesEvent event)
     {
         event.registerBlockEntity(
-                Capabilities.EnergyStorage.BLOCK,
+                Capabilities.Energy.BLOCK,
                 EnderRiftMod.STRUCTURE_CORNER_BLOCK_ENTITY.get(),
                 (be, context) -> be.getEnergyBuffer().orElse(null)
         );
@@ -36,13 +36,13 @@ public class StructureCornerBlockEntity extends AggregatorBlockEntity
     }
 
     @Override
-    public Optional<IEnergyStorage> getEnergyBuffer()
+    public Optional<EnergyHandler> getEnergyBuffer()
     {
         return getInternalBuffer();
     }
 
     @Override
-    public Optional<IEnergyStorage> getInternalBuffer()
+    public Optional<EnergyHandler> getInternalBuffer()
     {
         return getParent().flatMap(RiftBlockEntity::getEnergyBuffer);
     }

@@ -4,21 +4,19 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import dev.gigaherz.enderrift.common.AutomationEnergyWrapper;
 import dev.gigaherz.enderrift.common.IPoweredAutomation;
-import dev.gigaherz.enderrift.rift.ILongItemHandler;
 import dev.gigaherz.graph3.Graph;
 import dev.gigaherz.graph3.GraphObject;
 import dev.gigaherz.graph3.Mergeable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.HolderLookup;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.neoforged.neoforge.capabilities.Capabilities;
-import net.neoforged.neoforge.energy.IEnergyStorage;
-import net.neoforged.neoforge.items.IItemHandler;
+import net.neoforged.neoforge.transfer.ResourceHandler;
+import net.neoforged.neoforge.transfer.energy.EnergyHandler;
+import net.neoforged.neoforge.transfer.item.ItemResource;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -30,7 +28,7 @@ public abstract class AggregatorBlockEntity extends BlockEntity
 {
     private Graph<Mergeable.Dummy> graph;
     private boolean firstUpdate = true;
-    private final List<IItemHandler> connectedInventories = Lists.newArrayList();
+    private final List<ResourceHandler<ItemResource>> connectedInventories = Lists.newArrayList();
 
     private final AutomationEnergyWrapper wrapper = new AutomationEnergyWrapper(this);
 
@@ -141,13 +139,13 @@ public abstract class AggregatorBlockEntity extends BlockEntity
 
     @Nullable
     @Override
-    public ILongItemHandler getInventory()
+    public ResourceHandler<ItemResource> getInventory()
     {
         return getCombinedInventoryInternal();
     }
 
     @Override
-    public Optional<IEnergyStorage> getEnergyBuffer()
+    public Optional<EnergyHandler> getEnergyBuffer()
     {
         return getCombinedPowerBuffer();
     }
@@ -172,7 +170,7 @@ public abstract class AggregatorBlockEntity extends BlockEntity
 
             if (AutomationHelper.isAutomatable(teOther, f.getOpposite()))
             {
-                var inventory = teOther.getLevel().getCapability(Capabilities.ItemHandler.BLOCK, teOther.getBlockPos(), teOther.getBlockState(), teOther, f.getOpposite());
+                var inventory = teOther.getLevel().getCapability(Capabilities.Item.BLOCK, teOther.getBlockPos(), teOther.getBlockState(), teOther, f.getOpposite());
                 if (inventory != null)
                     this.connectedInventories.add(inventory);
             }
@@ -183,24 +181,24 @@ public abstract class AggregatorBlockEntity extends BlockEntity
 
     protected abstract boolean canConnectSide(Direction side);
 
-    public ILongItemHandler getCombinedInventory()
+    public ResourceHandler<ItemResource> getCombinedInventory()
     {
         return wrapper;
     }
 
-    public Optional<IEnergyStorage> getInternalBuffer()
+    public Optional<EnergyHandler> getInternalBuffer()
     {
         return Optional.empty();
     }
 
-    private ILongItemHandler getCombinedInventoryInternal()
+    private ResourceHandler<ItemResource> getCombinedInventoryInternal()
     {
         InventoryAggregator aggregator = new InventoryAggregator();
 
         if (getGraph() == null)
             return aggregator;
 
-        Set<IItemHandler> inventories = Sets.newHashSet();
+        Set<ResourceHandler<ItemResource>> inventories = Sets.newHashSet();
         for (GraphObject<Mergeable.Dummy> object : getGraph().getObjects())
         {
             if (!(object instanceof AggregatorBlockEntity proxy))
@@ -214,7 +212,7 @@ public abstract class AggregatorBlockEntity extends BlockEntity
         return aggregator;
     }
 
-    private Optional<IEnergyStorage> getCombinedPowerBuffer()
+    private Optional<EnergyHandler> getCombinedPowerBuffer()
     {
         EnergyAggregator energy = new EnergyAggregator();
 
@@ -235,7 +233,7 @@ public abstract class AggregatorBlockEntity extends BlockEntity
     @Override
     public boolean isRemote()
     {
-        return getLevel().isClientSide;
+        return getLevel().isClientSide();
     }
 
     @Override

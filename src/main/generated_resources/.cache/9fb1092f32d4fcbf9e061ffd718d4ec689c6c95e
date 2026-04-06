@@ -1,4 +1,4 @@
-// 1.21.8	2025-08-04T18:01:29.1512967	Recipes
+// 26.1.1	2026-04-05T23:45:38.2735735	Recipes
 bdb45507ed0ef3db2b68d81efb450e9300c2b206 data/enderrift/advancement/recipes/misc/browser.json
 73d5636ae6cac8d6d2e4c51e5adf85f9938fadc4 data/enderrift/advancement/recipes/misc/crafting_browser.json
 29b1790a8696a785a81bf492d678aa9d680f02b2 data/enderrift/advancement/recipes/misc/driver.json
@@ -7,12 +7,12 @@ afe1a678d55f2d04a3978219f55fa40e552240ba data/enderrift/advancement/recipes/misc
 c7f983a02d60532fc173550cf33e44318732146b data/enderrift/advancement/recipes/misc/proxy.json
 375bc6b2d7caf771960fea2511320a30fee70d47 data/enderrift/advancement/recipes/misc/rift.json
 82c49141b6f41f3a72ee76be8b8a0c5d49245eb7 data/enderrift/advancement/recipes/misc/unbound_rift_orb.json
-ce477abe0e1c190239dfacfdbb240b82053274a6 data/enderrift/recipe/browser.json
-5d8675bb7a1cd1b5d5ef5dab6f3c63aad21f3a25 data/enderrift/recipe/crafting_browser.json
-67c41f48d20616bf6d95ba7f6ae5eae97d63bb0e data/enderrift/recipe/driver.json
-d88ae34a9f2ef638565b6338adc182529620da99 data/enderrift/recipe/generator.json
-f7031ea473b73d77ff20f5cbabb1655b312526e5 data/enderrift/recipe/interface.json
-5e9daf29e5f59de8a84e396becce6f54f25bf820 data/enderrift/recipe/orb_duplication.json
-910ee99775aa494991786c1b136d935cfeebbe49 data/enderrift/recipe/proxy.json
-5fe6f76b8ffff58df393fa0dec4fab3056bc7f9d data/enderrift/recipe/rift.json
-31c7b53d6e8569d4fc8c43b5690791110e4f3b34 data/enderrift/recipe/unbound_rift_orb.json
+8e538b5102dc2aa8bb99f285a4d4cf9a64d85278 data/enderrift/recipe/browser.json
+b0883403da9cb8e12c1c6f2fbaf4cc355584478d data/enderrift/recipe/crafting_browser.json
+b818116a4aeba731c70f26db7cfd753ab84761d8 data/enderrift/recipe/driver.json
+fd9324b760c0de14953ebd33244357648a8f7abc data/enderrift/recipe/generator.json
+69d506b16fc3f0c1ce1559b0fad7469a02ca36b7 data/enderrift/recipe/interface.json
+303f6f1e20dfa87b3c35f11d18a348db94185024 data/enderrift/recipe/orb_duplication.json
+00d218fd1d6e68bd9b6d93095946ae8a2abe42d5 data/enderrift/recipe/proxy.json
+097d47faca87d4156593b527014721b64dd93d1c data/enderrift/recipe/rift.json
+21bce4aa6b568289abcfe445d46af94f4b457454 data/enderrift/recipe/unbound_rift_orb.json

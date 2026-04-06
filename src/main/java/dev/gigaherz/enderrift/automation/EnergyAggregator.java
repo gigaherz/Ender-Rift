@@ -1,73 +1,72 @@
 package dev.gigaherz.enderrift.automation;
 
 import com.google.common.collect.Lists;
-import net.neoforged.neoforge.energy.IEnergyStorage;
+import net.neoforged.neoforge.transfer.energy.EnergyHandler;
+import net.neoforged.neoforge.transfer.transaction.TransactionContext;
 
 import java.util.List;
 
-public class EnergyAggregator implements IEnergyStorage
+public class EnergyAggregator implements EnergyHandler
 {
-    private final List<IEnergyStorage> buffers = Lists.newArrayList();
+    private final List<EnergyHandler> buffers = Lists.newArrayList();
 
     @Override
-    public int receiveEnergy(int maxReceive, boolean simulate)
+    public int insert(int maxReceive, TransactionContext transaction)
     {
-        int remaining = maxReceive;
-        for (IEnergyStorage st : buffers)
+        int inserted = 0;
+        for (int i = 0; i < buffers.size() && inserted < maxReceive; i++)
         {
-            if (st.canReceive())
-                remaining = st.receiveEnergy(remaining, simulate);
+            var st = buffers.get(i);
+            inserted += st.insert(maxReceive - inserted, transaction);
         }
-        return remaining;
+        return inserted;
     }
 
     @Override
-    public int extractEnergy(int maxExtract, boolean simulate)
+    public int extract(int maxExtract, TransactionContext transaction)
     {
-        int remaining = maxExtract;
-        for (IEnergyStorage st : buffers)
+        int extracted = 0;
+        for (int i = 0; i < buffers.size() && extracted < maxExtract; i++)
         {
-            if (st.canExtract())
-                remaining = st.extractEnergy(remaining, simulate);
+            var st = buffers.get(i);
+            extracted += st.extract(maxExtract - extracted, transaction);
         }
-        return remaining;
+        return extracted;
     }
 
     @Override
-    public int getEnergyStored()
+    public long getAmountAsLong()
     {
-        int total = 0;
-        for (IEnergyStorage st : buffers)
+        long total = 0;
+        for (var st : buffers)
         {
-            total += st.getEnergyStored();
-        }
-        return total;
-    }
-
-    @Override
-    public int getMaxEnergyStored()
-    {
-        int total = 0;
-        for (IEnergyStorage st : buffers)
-        {
-            total += st.getMaxEnergyStored();
+            total = saturateAdd(total, st.getAmountAsLong());
         }
         return total;
     }
 
     @Override
-    public boolean canExtract()
+    public long getCapacityAsLong()
     {
-        return buffers.stream().anyMatch(IEnergyStorage::canExtract);
+        long total = 0;
+        for (var st : buffers)
+        {
+            total = saturateAdd(total, st.getCapacityAsLong());
+        }
+        return total;
     }
 
-    @Override
-    public boolean canReceive()
+    private long saturateAdd(long a, long b)
     {
-        return buffers.stream().anyMatch(IEnergyStorage::canReceive);
+        long c = a+b;
+        if (a > 0 && b > 0 && c < 0)
+            return Long.MAX_VALUE;
+        if (a < 0 && b < 0 && c >= 0)
+            return Long.MIN_VALUE;
+        return c;
     }
 
-    public void add(IEnergyStorage buffer)
+    public void add(EnergyHandler buffer)
     {
         buffers.add(buffer);
     }
